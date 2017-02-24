@@ -23,6 +23,7 @@ of this git repo and enter the following
 
 ```
 DB_HOST=localhost
+DB_PORT=8091
 DB_USER=couchbaseUsername
 DB_PASS=couchbasePassword
 ```
