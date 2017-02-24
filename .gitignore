@@ -41,3 +41,6 @@ jspm_packages
 
 # For javascript linter
 .jshintrc
+
+# Compiled output
+dist/
