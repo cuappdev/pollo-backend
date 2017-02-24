@@ -38,3 +38,6 @@ jspm_packages
 
 # Environment variables for dotenv
 .env
+
+# For javascript linter
+.jshintrc

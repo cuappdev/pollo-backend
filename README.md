@@ -1,10 +1,7 @@
 # clicker-backend
-Backend for the clicker app
-
+Backend for the clicker app. NodeJS + Typescript + Couchbase
 
 ## Local Development
-
-Make sure you have docker, node >= 4.8.0, and npm installed locally.
 
 ### Setting up Couchbase
 
@@ -35,9 +32,36 @@ and password respectively.
 
 ### Starting Clicker backend
 
-Make sure the Couchbase server is running and the .env file is setup properly,
-then run the command
+To install all project dependencies, run
+```
+npm install
+```
+You will have to run this everytime dependencies are added to the packages.json
+file.
 
-`npm start`
+We use gulp to persistently compile Typescript files. Install gulp globally on
+your computer.
+```
+npm install -g gulp
+```
+To compile this project, run
+```
+gulp scripts
+```
+This will compile all `*.ts` scripts in the `src/` directory and output them
+to `dist/`. Alternatively, you can set gulp to auto-compile every time you make
+a change to the project by running.
+```
+gulp
+```
 
-This will run the application locally on port 8080.
+To start clicker-backend locally, run
+```
+npm start
+```
+which will run the application locally on port 8080.
+
+To run the tests under `test/`, do
+```
+npm test
+```
