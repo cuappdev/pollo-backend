@@ -30,6 +30,5 @@ export class IndexRouter {
 
 // Create the IndexRouter, and export its configured Express.Router
 const indexRouter = new IndexRouter();
-indexRouter.init();
 
 export default indexRouter.router;
