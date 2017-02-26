@@ -16,20 +16,15 @@ through the setup, Couchbase will be running locally.
 
 ### Connecting NodeJS to Couchbase
 
-During the setup phase, you should have set a username & password for your
-local Couchbase server. We will now add these to a local environment file so
-that Node can find your database. Create a file called `.env` under the root
-of this git repo and enter the following
+We will now add these to a local environment file so that Node can find your
+database. Create a file called `.env` under the root of this git repo and enter
+the following:
 
 ```
 DB_HOST=localhost
 DB_PORT=8091
-DB_USER=couchbaseUsername
-DB_PASS=couchbasePassword
+DB_BUCKET=default
 ```
-
-Replacing `couchbaseUsername` and `couchbasePassword` with your username
-and password respectively.
 
 ### Starting Clicker backend
 
