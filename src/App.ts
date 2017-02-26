@@ -1,5 +1,6 @@
 import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
+import * as dotenv from 'dotenv';
 import * as express from 'express';
 import * as path from 'path';
 import * as logger from 'morgan';
@@ -18,6 +19,7 @@ class App {
     this.express = express();
     this.middleware();
     this.routes();
+    dotenv.config();
   }
 
   // Configure Express middleware.
