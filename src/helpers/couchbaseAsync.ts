@@ -9,7 +9,8 @@ class CouchbaseAsync {
   constructor() {
     var db_host: string = process.env['DB_HOST'];
     var db_port: number = process.env['DB_PORT'];
-    this.cluster = new couchbase.Cluster('couchbase://' + db_host + ':' + db_port);
+    this.cluster = new couchbase.Cluster(
+      'couchbase://' + db_host + ':' + db_port);
   }
 
   /* Opens a disposable bucket to couchbase as a Promise */
@@ -17,16 +18,17 @@ class CouchbaseAsync {
     return new Promise((fulfill, reject) => {
       // Open the couchbase bucket. If the bucket has a password then use
       // the password.
-      if ('DB_BUCKET_PASSWORD' in process.env)
-        return fulfill(this.cluster.openBucket(process.env['DB_BUCKET'],
-          process.env['DB_BUCKET_PASSWORD']));
-      else
-        return fulfill(this.cluster.openBucket(process.env['DB_BUCKET']));
-    }).disposer(
-      (bucket: couchbase.Bucket, promise: Promise<couchbase.Bucket>) => {
-        bucket.disconnect();
+      var db_bucket: string = process.env['DB_BUCKET'];
+      var db_password: string = 'DB_BUCKET_PASSWORD' in process.env
+        ? process.env['DB_BUCKET_PASSWORD'] : '';
+      return fulfill(
+        Promise.promisifyAll(this.cluster.openBucket(db_bucket, db_password)));
+    }).disposer((bucket: any, promise: Promise<any>) => {
+      // Ensures that we disconnect from couchbase no matter what happens.
+      bucket.disconnect();
     });
   }
+
 }
 
 const couchbaseAsync: CouchbaseAsync = new CouchbaseAsync();
