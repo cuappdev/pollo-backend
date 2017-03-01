@@ -1,7 +1,7 @@
 import * as couchbase from 'couchbase';
 import * as Promise from 'bluebird';
 
-class CouchbaseAsync {
+class CouchbaseClient {
 
   // Points to the couchbase cluster
   private cluster: couchbase.Cluster;
@@ -21,9 +21,10 @@ class CouchbaseAsync {
       var db_bucket: string = process.env['DB_BUCKET'];
       var db_password: string = 'DB_BUCKET_PASSWORD' in process.env
         ? process.env['DB_BUCKET_PASSWORD'] : '';
-      return fulfill(
-        Promise.promisifyAll(this.cluster.openBucket(db_bucket, db_password)));
-    }).disposer((bucket: any, promise: Promise<any>) => {
+      return fulfill(Promise.promisifyAll(
+        this.cluster.openBucket(db_bucket, db_password)
+      ) as couchbase.BucketAsync); // Force BucketAsync type
+    }).disposer((bucket: couchbase.BucketAsync, promise: Promise<any>) => {
       // Ensures that we disconnect from couchbase no matter what happens.
       bucket.disconnect();
     });
@@ -31,5 +32,5 @@ class CouchbaseAsync {
 
 }
 
-const couchbaseAsync: CouchbaseAsync = new CouchbaseAsync();
-export default couchbaseAsync;
+const couchbaseClient: CouchbaseClient = new CouchbaseClient();
+export default couchbaseClient;
