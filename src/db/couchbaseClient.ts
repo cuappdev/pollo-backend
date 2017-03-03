@@ -42,4 +42,4 @@ class CouchbaseClient {
 
 }
 
-export const couchbaseClient: CouchbaseClient = new CouchbaseClient();
+export const couchbaseClient = new CouchbaseClient();

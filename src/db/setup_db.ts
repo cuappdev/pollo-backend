@@ -9,7 +9,7 @@ import {couchbaseClient} from './couchbaseClient';
 import * as Promise from 'bluebird';
 
 // The couchbase buckets that we're setting up.
-let bucket_names: string[] = ['users', 'classes'];
+let bucket_names = ['users', 'classes'];
 let bucket_options = {
   bucketType: 'couchbase',
   ramQuotaMB: 100,
@@ -17,8 +17,8 @@ let bucket_options = {
   saslPassword: 'BUCKET_PASSWORD' in process.env ? process.env['BUCKET_PASSWORD'] : '',
 };
 
-let clusterManager: AsyncClusterManager = couchbaseClient.openAsyncClusterManager()
-clusterManager.listBucketsAsync().then((rows: any[]) => {
+let clusterManager = couchbaseClient.openAsyncClusterManager()
+clusterManager.listBucketsAsync().then((rows) => {
   // Delete existing buckets.
   console.log('Deleting existing buckets...');
   return Promise.each(rows, (row) => {
