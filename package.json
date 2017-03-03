@@ -51,6 +51,6 @@
     "express": "^4.14.1",
     "morgan": "^1.8.1",
     "passport": "^0.3.2",
-    "passport-google-oauth2": "^0.1.6"
+    "passport-google-token": "^0.1.2"
   }
 }
