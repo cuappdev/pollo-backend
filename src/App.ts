@@ -7,7 +7,7 @@ import * as logger from 'morgan';
 
 // Our routes files
 import IndexRouter from './routes/index';
-import UserRouter from './routes/users';
+import AuthRouter from './routes/auth';
 
 // Creates and configures an ExpressJS web server.
 class App {
@@ -34,7 +34,7 @@ class App {
   // Configure API endpoints.
   private routes(): void {
     this.express.use('/', IndexRouter);
-    this.express.use('/users/', UserRouter);
+    this.express.use('/users/', AuthRouter);
   }
 
 }
