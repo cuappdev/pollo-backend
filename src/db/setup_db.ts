@@ -11,7 +11,7 @@ import {couchbaseClient} from './couchbaseClient';
 import * as Promise from 'bluebird';
 
 // The couchbase buckets that we're setting up.
-let bucket_names = ['users', 'classes'];
+let bucket_names = ['users', 'classes', 'questions'];
 // How we want to setup these buckets.
 let bucket_options = {
   bucketType: 'couchbase',
