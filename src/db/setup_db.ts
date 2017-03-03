@@ -6,7 +6,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-import {AsyncClusterManager} from 'couchbase'
+import {CreateBucketOptions, AsyncClusterManager} from 'couchbase';
 import {couchbaseClient} from './couchbaseClient';
 import * as Promise from 'bluebird';
 
@@ -18,7 +18,7 @@ let bucket_options = {
   ramQuotaMB: 100,
   replicaNumber: 1,
   saslPassword: 'BUCKET_PASSWORD' in process.env ? process.env['BUCKET_PASSWORD'] : '',
-};
+} as CreateBucketOptions;
 
 let main = (): void => {
   let clusterManager = couchbaseClient.openAsyncClusterManager()
