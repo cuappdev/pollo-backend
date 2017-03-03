@@ -1,4 +1,5 @@
 import {Router, Request, Response, NextFunction} from 'express';
+import * as util from 'util';
 
 export class IndexRouter {
   router: Router
@@ -18,12 +19,17 @@ export class IndexRouter {
     res.json({message:'Hello World!'});
   }
 
+  public test2(req: Request, res: Response, next: NextFunction) {
+    res.json({message: util.format('Hello, %s!', req.params.name)})
+  }
+
   /**
    * Take each handler, and attach to one of the Express.Router's
    * endpoints.
    */
   init() {
     this.router.get('/', this.test);
+    this.router.get('/test/:name', this.test2);
   }
 
 }
