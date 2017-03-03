@@ -14,7 +14,7 @@ declare module 'couchbase' {
      * @param key The target document key.
      * @param fragment The document's contents to append.
      */
-    appendAsync(key: any | Buffer, fragment: any): Promise<Bucket.OpCallback>;
+    appendAsync(key: any | Buffer, fragment: any): Promise<any>;
 
     /**
      *
@@ -22,7 +22,7 @@ declare module 'couchbase' {
      * @param fragment The document's contents to append.
      * @param options The options object.
      */
-    appendAsync(key: any | Buffer, fragment: any, options: AppendOptions): Promise<Bucket.OpCallback>;
+    appendAsync(key: any | Buffer, fragment: any, options: AppendOptions): Promise<any>;
 
     /**
      * Increments or decrements a key's numeric value.
@@ -30,7 +30,7 @@ declare module 'couchbase' {
      * @param key The target document key.
      * @param delta The amount to add or subtract from the counter value. This value may be any non-zero integer.
      */
-    counterAsync(key: any | Buffer, delta: number): Promise<Bucket.OpCallback>;
+    counterAsync(key: any | Buffer, delta: number): Promise<any>;
 
     /**
      *
@@ -38,19 +38,19 @@ declare module 'couchbase' {
      * @param delta The amount to add or subtract from the counter value. This value may be any non-zero integer.
      * @param options The options object.
      */
-    counterAsync(key: any | Buffer, delta: number, options: CounterOptions): Promise<Bucket.OpCallback>;
+    counterAsync(key: any | Buffer, delta: number, options: CounterOptions): Promise<any>;
 
     /**
      * Retrieves a document.
      * @param key The target document key.
      */
-    getAsync(key: any | Buffer): Promise<Bucket.OpCallback>;
+    getAsync(key: any | Buffer): Promise<any>;
 
     /**
      * @param key The target document key.
      * @param options The options object.
      */
-    getAsync(key: any | Buffer, options: any): Promise<Bucket.OpCallback>;
+    getAsync(key: any | Buffer, options: any): Promise<any>;
 
     /**
      * Lock the document on the server and retrieve it. When an document is locked, its CAS changes and subsequent operations on the document (without providing the current CAS) will fail until the lock is no longer held.
@@ -58,7 +58,7 @@ declare module 'couchbase' {
      * Once locked, a document can be unlocked either by explicitly calling Bucket#unlock or by performing a storage operation (e.g. Bucket#upsert, Bucket#replace, Bucket::append) with the current CAS value. Note that any other lock operations on this key will fail while a document is locked.
      * @param key The target document key.
      */
-    getAndLockAsync(key: any): Promise<Bucket.OpCallback>;
+    getAndLockAsync(key: any): Promise<any>;
 
     /**
      * Lock the document on the server and retrieve it. When an document is locked, its CAS changes and subsequent operations on the document (without providing the current CAS) will fail until the lock is no longer held.
@@ -67,7 +67,7 @@ declare module 'couchbase' {
      * @param key The target document key.
      * @param options The options object.
      */
-    getAndLockAsync(key: any, options: GetAndLockOptions): Promise<Bucket.OpCallback>;
+    getAndLockAsync(key: any, options: GetAndLockOptions): Promise<any>;
 
     /**
      * Retrieves a document and updates the expiry of the item at the same time.
@@ -75,40 +75,40 @@ declare module 'couchbase' {
      * @param expiry The expiration time to use. If a value of 0 is provided, then the current expiration time is cleared and the key is set to never expire. Otherwise, the key is updated to expire in the time provided (in seconds).
      * @param options The options object.
      */
-    getAndTouchAsync(key: any | Buffer, expiry: number, options: any): Promise<Bucket.OpCallback>;
+    getAndTouchAsync(key: any | Buffer, expiry: number, options: any): Promise<any>;
 
     /**
      * Retrieves a document and updates the expiry of the item at the same time.
      * @param key The target document key.
      * @param expiry The expiration time to use. If a value of 0 is provided, then the current expiration time is cleared and the key is set to never expire. Otherwise, the key is updated to expire in the time provided (in seconds).
      */
-    getAndTouchAsync(key: any | Buffer, expiry: number): Promise<Bucket.OpCallback>;
+    getAndTouchAsync(key: any | Buffer, expiry: number): Promise<any>;
 
     /**
      * Retrieves a list of keys
      * @param keys The target document keys.
      */
-    getMultiAsync(key: any[] | Buffer[]): Promise<Bucket.MultiGetCallback>;
+    getMultiAsync(key: any[] | Buffer[]): Promise<any[]>;
 
     /**
      * Get a document from a replica server in your cluster.
      * @param key The target document key.
      */
-    getReplicaAsync(key: any | Buffer): Promise<Bucket.OpCallback>;
+    getReplicaAsync(key: any | Buffer): Promise<any>;
 
     /**
     * Get a document from a replica server in your cluster.
     * @param key The target document key.
     * @param options The options object.
     */
-    getReplicaAsync(key: any | Buffer, options: GetReplicaOptions): Promise<Bucket.OpCallback>;
+    getReplicaAsync(key: any | Buffer, options: GetReplicaOptions): Promise<any>;
 
     /**
      * Identical to Bucket#upsert but will fail if the document already exists.
      * @param key The target document key.
      * @param value The document's contents.
      */
-    insertAsync(key: any | Buffer, value: any): Promise<Bucket.OpCallback>;
+    insertAsync(key: any | Buffer, value: any): Promise<any>;
 
     /**
      * Identical to Bucket#upsert but will fail if the document already exists.
@@ -116,14 +116,14 @@ declare module 'couchbase' {
      * @param value The document's contents.
      * @param options The options object.
      */
-    insertAsync(key: any | Buffer, value: any, options: InsertOptions): Promise<Bucket.OpCallback>;
+    insertAsync(key: any | Buffer, value: any, options: InsertOptions): Promise<any>;
 
     /**
      * Like Bucket#append, but prepends data to the existing value.
      * @param key The target document key.
      * @param fragment The document's contents to prepend.
      */
-    prependAsync(key: any, fragment: any): Promise<Bucket.OpCallback>;
+    prependAsync(key: any, fragment: any): Promise<any>;
 
     /**
      * Like Bucket#append, but prepends data to the existing value.
@@ -131,14 +131,14 @@ declare module 'couchbase' {
      * @param fragment The document's contents to prepend.
      * @param options The options object.
      */
-    prependAsync(key: any, fragment: any, options: PrependOptions): Promise<Bucket.OpCallback>;
+    prependAsync(key: any, fragment: any, options: PrependOptions): Promise<any>;
 
     /**
      * Executes a previously prepared query object. This could be a ViewQuery or a N1qlQuery.
      * Note: N1qlQuery queries are currently an uncommitted interface and may be subject to change in 2.0.0's final release.
      * @param query The query to execute.
      */
-    queryAsync(query: ViewQuery | N1qlQuery): Promise<Bucket.QueryCallback>;
+    queryAsync(query: ViewQuery | N1qlQuery): Promise<any[]>;
 
     /**
      * Executes a previously prepared query object. This could be a ViewQuery or a N1qlQuery.
@@ -146,27 +146,27 @@ declare module 'couchbase' {
      * @param query The query to execute.
      * @param params A list or map to do replacements on a N1QL query.
      */
-    queryAsync(query: ViewQuery | N1qlQuery, params: Object | Array<any>): Promise<Bucket.QueryCallback>;
+    queryAsync(query: ViewQuery | N1qlQuery, params: Object | Array<any>): Promise<any[]>;
 
     /**
      * Deletes a document on the server.
      * @param key The target document key.
      */
-    removeAsync(key: any | Buffer): Promise<Bucket.OpCallback>;
+    removeAsync(key: any | Buffer): Promise<any>;
 
     /**
      * Deletes a document on the server.
      * @param key The target document key.
      * @param options The options object.
      */
-    removeAsync(key: any | Buffer, options: RemoveOptions): Promise<Bucket.OpCallback>;
+    removeAsync(key: any | Buffer, options: RemoveOptions): Promise<any>;
 
     /**
      * Identical to Bucket#upsert, but will only succeed if the document exists already (i.e. the inverse of Bucket#insert).
      * @param key The target document key.
      * @param value The document's contents.
      */
-    replaceAsync(key: any | Buffer, value: any): Promise<Bucket.OpCallback>;
+    replaceAsync(key: any | Buffer, value: any): Promise<any>;
 
     /**
      * Identical to Bucket#upsert, but will only succeed if the document exists already (i.e. the inverse of Bucket#insert).
@@ -174,7 +174,7 @@ declare module 'couchbase' {
      * @param value The document's contents.
      * @param options The options object.
      */
-    replaceAsync(key: any | Buffer, value: any, options: ReplaceOptions): Promise<Bucket.OpCallback>;
+    replaceAsync(key: any | Buffer, value: any, options: ReplaceOptions): Promise<any>;
 
     /**
      * Update the document expiration time.
@@ -182,14 +182,14 @@ declare module 'couchbase' {
      * @param expiry The expiration time to use. If a value of 0 is provided, then the current expiration time is cleared and the key is set to never expire. Otherwise, the key is updated to expire in the time provided (in seconds). Values larger than 302460*60 seconds (30 days) are interpreted as absolute times (from the epoch).
      * @param options The options object.
      */
-    touchAsync(key: any | Buffer, expiry: number, options: TouchOptions): Promise<Bucket.OpCallback>;
+    touchAsync(key: any | Buffer, expiry: number, options: TouchOptions): Promise<any>;
 
     /**
      * Unlock a previously locked document on the server. See the Bucket#lock method for more details on locking.
      * @param key The target document key.
      * @param cas The CAS value returned when the key was locked. This operation will fail if the CAS value provided does not match that which was the result of the original lock operation.
      */
-    unlockAsync(key: any | Buffer, cas: Bucket.CAS): Promise<Bucket.OpCallback>;
+    unlockAsync(key: any | Buffer, cas: Bucket.CAS): Promise<any>;
 
     /**
      * Unlock a previously locked document on the server. See the Bucket#lock method for more details on locking.
@@ -197,14 +197,14 @@ declare module 'couchbase' {
      * @param cas The CAS value returned when the key was locked. This operation will fail if the CAS value provided does not match that which was the result of the original lock operation.
      * @param options The options object.
      */
-    unlockAsync(key: any | Buffer, cas: Bucket.CAS, options: any): Promise<Bucket.OpCallback>;
+    unlockAsync(key: any | Buffer, cas: Bucket.CAS, options: any): Promise<any>;
 
     /**
      * Stores a document to the bucket.
      * @param key The target document key.
      * @param value The document's contents.
      */
-    upsertAsync(key: any | Buffer, value: any): Promise<Bucket.OpCallback>;
+    upsertAsync(key: any | Buffer, value: any): Promise<any>;
 
     /**
      * Stores a document to the bucket.
@@ -212,7 +212,7 @@ declare module 'couchbase' {
      * @param value The document's contents.
      * @param options The options object.
      */
-    upsertAsync(key: any | Buffer, value: any, options: UpsertOptions): Promise<Bucket.OpCallback>;
+    upsertAsync(key: any | Buffer, value: any, options: UpsertOptions): Promise<any>;
 
   }
 
@@ -221,20 +221,20 @@ declare module 'couchbase' {
     /**
      * @param name
      */
-    createBucketAsync(name: string): Promise<Function>;
+    createBucketAsync(name: string): Promise<any>;
 
     /**
      * @param name
      * @param opts
      */
-    createBucketAsync(name: string, opts: any): Promise<Function>;
+    createBucketAsync(name: string, opts: any): Promise<any>;
 
-    listBucketsAsync(): Promise<Function>;
+    listBucketsAsync(): Promise<any[]>;
 
     /**
      * @param name
      */
-    removeBucketAsync(name: string): Promise<Function>;
+    removeBucketAsync(name: string): Promise<any>;
 
   }
 

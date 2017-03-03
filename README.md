@@ -61,7 +61,7 @@ gulp
 If this is your first time running the app locally, you'll need to setup the db
 before you can run the app. After compiling, run
 ```
-npm setup_db
+node ./dist/db/setup_db.js
 ```
 
 To start clicker-backend locally, run
