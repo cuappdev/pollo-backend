@@ -8,7 +8,7 @@ declare module 'couchbase' {
    * Declares all **Async methods that result from invoking PromisifyAll on a
    * couchbase.Bucket object.
    */
-  export interface BucketAsync extends Bucket {
+  export interface AsyncBucket extends Bucket {
     /**
      * Similar to Bucket#upsert, but instead of setting a new key, it appends data to the existing key. Note that this function only makes sense when the stored data is a string; 'appending' to a JSON document may result in parse errors when the document is later retrieved.
      * @param key The target document key.
@@ -213,6 +213,28 @@ declare module 'couchbase' {
      * @param options The options object.
      */
     upsertAsync(key: any | Buffer, value: any, options: UpsertOptions): Promise<Bucket.OpCallback>;
+
+  }
+
+  export interface AsyncClusterManager extends ClusterManager {
+
+    /**
+     * @param name
+     */
+    createBucketAsync(name: string): Promise<Function>;
+
+    /**
+     * @param name
+     * @param opts
+     */
+    createBucketAsync(name: string, opts: any): Promise<Function>;
+
+    listBucketsAsync(): Promise<Function>;
+
+    /**
+     * @param name
+     */
+    removeBucketAsync(name: string): Promise<Function>;
 
   }
 

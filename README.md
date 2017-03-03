@@ -19,12 +19,19 @@ through the setup, Couchbase will be running locally.
 We will now add these to a local environment file so that Node can find your
 database. Create a file called `.env` under the root of this git repo and enter
 the following:
-
 ```
 DB_HOST=localhost
 DB_PORT=8091
-DB_BUCKET=default
+DB_USERNAME=cluster_username
+DB_PASSWORD=cluster_password
+GOOGLE_CLIENT_ID=google_client_id
+GOOGLE_CLIENT_SECRET=google_client_secret
 ```
+Replacing `cluster\_username` and `cluster\_password` with the admin username
+and password for your local couchbase db which you setup earlier.
+
+`GOOGLE\_CLIENT\_ID` and `GOOGLE\_CLIENT\_SECRET` are the id and secret used
+to authenticate sign ins. You can obtain these on the [Google API Console](https://console.developers.google.com/project/_/apiui/apis/library)
 
 ### Starting Clicker backend
 
@@ -44,11 +51,17 @@ To compile this project, run
 ```
 gulp scripts
 ```
-This will compile all `*.ts` scripts in the `src/` directory and output them
+This will compile all `\*.ts` scripts in the `src/` directory and output them
 to `dist/`. Alternatively, you can set gulp to auto-compile every time you make
 a change to the project by running.
 ```
 gulp
+```
+
+If this is your first time running the app locally, you'll need to setup the db
+before you can run the app. After compiling, run
+```
+npm setup_db
 ```
 
 To start clicker-backend locally, run
