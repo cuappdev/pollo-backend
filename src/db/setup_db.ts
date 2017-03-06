@@ -8,6 +8,7 @@ dotenv.config();
 
 import {CreateBucketOptions, AsyncClusterManager} from 'couchbase';
 import * as Promise from 'bluebird';
+import * as util from 'util';
 
 import {couchbaseClient} from './couchbaseClient';
 import * as constants from '../helpers/constants';
@@ -31,11 +32,27 @@ let main = (): void => {
     });
   }).then(() => {
     console.log('Adding clicker buckets...');
-    Promise.each(constants.BUCKETS, (name) => {
+    return Promise.each(constants.BUCKETS, (name) => {
+      console.log(util.format("  Adding bucket %s", name))
       return clusterManager.createBucketAsync(name, bucket_options);
     });
   }).then(() => {
-    console.log('Setup completed, buckets successfully created');
+    console.log('Adding primary key index to each bucket');
+    return Promise.each(constants.BUCKETS, (name) => {
+      console.log(util.format("  Adding primary key to bucket %s", name))
+      return Promise.using(couchbaseClient.openAsyncBucket(name), (bucket) => {
+        // Coerce manager to be `any` because the typescript definition
+        // for BucketManager is missing createPrimaryKeyIndex()
+        let manager: any = bucket.manager();
+        return new Promise((fulfill, reject) => {
+          return manager.createPrimaryIndex(() => {
+            return fulfill({});
+          });
+        });
+      });
+    });
+  }).then(() => {
+    return console.log('Setup completed, buckets successfully created');
   }).done();
 }
 
