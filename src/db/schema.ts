@@ -3,11 +3,9 @@
  */
 export interface User {
   netid: string;
-  name: string;
+  name: { given_name: string, family_name: string };
   displayName: string;
-  email?: string;
-  language: string;
-  picture: ByteString;
+  email: string;
 };
 
 /**

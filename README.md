@@ -25,13 +25,12 @@ DB_PORT=8091
 DB_USERNAME=cluster_username
 DB_PASSWORD=cluster_password
 GOOGLE_CLIENT_ID=google_client_id
-GOOGLE_CLIENT_SECRET=google_client_secret
 ```
 Replacing `cluster\_username` and `cluster\_password` with the admin username
 and password for your local couchbase db which you setup earlier.
 
-`GOOGLE\_CLIENT\_ID` and `GOOGLE\_CLIENT\_SECRET` are the id and secret used
-to authenticate sign ins. You can obtain these on the [Google API Console](https://console.developers.google.com/project/_/apiui/apis/library)
+`GOOGLE\_CLIENT\_ID` is the id used to authenticate sign ins. You can obtain 
+these on the [Google API Console](https://console.developers.google.com/project/_/apiui/apis/library)
 
 ### Starting Clicker backend
 

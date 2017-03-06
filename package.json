@@ -49,8 +49,9 @@
     "debug": "^2.6.1",
     "dotenv": "^4.0.0",
     "express": "^4.14.1",
+    "google-auth-library": "^0.10.0",
     "morgan": "^1.8.1",
     "passport": "^0.3.2",
-    "passport-google-token": "^0.1.2"
+    "passport-custom": "^1.0.5"
   }
 }

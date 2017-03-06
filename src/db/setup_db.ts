@@ -7,17 +7,18 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import {CreateBucketOptions, AsyncClusterManager} from 'couchbase';
-import {couchbaseClient} from './couchbaseClient';
 import * as Promise from 'bluebird';
 
-// The couchbase buckets that we're setting up.
-let bucket_names = ['users', 'classes', 'questions'];
+import {couchbaseClient} from './couchbaseClient';
+import * as constants from '../helpers/constants';
+
 // How we want to setup these buckets.
 let bucket_options = {
   bucketType: 'couchbase',
   ramQuotaMB: 100,
   replicaNumber: 1,
-  saslPassword: 'BUCKET_PASSWORD' in process.env ? process.env['BUCKET_PASSWORD'] : '',
+  saslPassword: constants.BUCKET_PASSWORD in process.env
+    ? process.env[constants.BUCKET_PASSWORD] : '',
 } as CreateBucketOptions;
 
 let main = (): void => {
@@ -30,7 +31,7 @@ let main = (): void => {
     });
   }).then(() => {
     console.log('Adding clicker buckets...');
-    Promise.each(bucket_names, (name) => {
+    Promise.each(constants.BUCKETS, (name) => {
       return clusterManager.createBucketAsync(name, bucket_options);
     });
   }).then(() => {
@@ -40,5 +41,5 @@ let main = (): void => {
 
 // Runs the main function only on invocation, not import.
 if (require.main === module) {
-    main();
+  main();
 }
