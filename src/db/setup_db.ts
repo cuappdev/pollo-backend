@@ -17,41 +17,65 @@ import * as constants from '../helpers/constants';
 let bucket_options = {
   bucketType: 'couchbase',
   ramQuotaMB: 100,
-  replicaNumber: 1,
+  replicaNumber: 0,
   saslPassword: constants.BUCKET_PASSWORD in process.env
     ? process.env[constants.BUCKET_PASSWORD] : '',
 } as CreateBucketOptions;
 
-let main = (): void => {
-  let clusterManager = couchbaseClient.openAsyncClusterManager()
-  clusterManager.listBucketsAsync().then((rows) => {
+/**
+ * Deletes buckets that already exist in the cluster.
+ * @param clusterManager
+ * @return AsyncClusterManager
+ */
+let deleteExistingBuckets = (
+  clusterManager: AsyncClusterManager): Promise<any> => {
+  return clusterManager.listBucketsAsync().then((rows) => {
     // Delete existing buckets.
     console.log('Deleting existing buckets...');
     return Promise.each(rows, (row) => {
       return clusterManager.removeBucketAsync(row.name);
     });
-  }).then(() => {
-    console.log('Adding clicker buckets...');
-    return Promise.each(constants.BUCKETS, (name) => {
-      console.log(util.format("  Adding bucket %s", name))
-      return clusterManager.createBucketAsync(name, bucket_options);
-    });
-  }).then(() => {
-    console.log('Adding primary key index to each bucket');
-    return Promise.each(constants.BUCKETS, (name) => {
-      console.log(util.format("  Adding primary key to bucket %s", name))
-      return Promise.using(couchbaseClient.openAsyncBucket(name), (bucket) => {
-        // Coerce manager to be `any` because the typescript definition
-        // for BucketManager is missing createPrimaryKeyIndex()
-        let manager: any = bucket.manager();
-        return new Promise((fulfill, reject) => {
-          return manager.createPrimaryIndex(() => {
-            return fulfill({});
-          });
+  });
+}
+
+/**
+ * Create clicker buckets.
+ * @param clusterManager
+ * @return AsyncClusterManager
+ */
+let createClickerBuckets = (
+  clusterManager: AsyncClusterManager): Promise<any> => {
+  console.log('Adding clicker buckets...');
+  return Promise.each(constants.BUCKETS, (name) => {
+    console.log(util.format("  Adding bucket %s", name))
+    return clusterManager.createBucketAsync(name, bucket_options);
+  });
+}
+
+let createIndexes = (): Promise<any> => {
+  console.log('Adding primary key index to each bucket');
+  return Promise.each(constants.BUCKETS, (name) => {
+    console.log(util.format("  Adding primary key to bucket %s", name))
+    let creationDelay = 1000;
+    let loopCreateIndex = () => {
+      // Keep attempting to create an index w/ an exponential delay.
+      return Promise.delay(creationDelay *= 2).then(() => {
+        return Promise.using(couchbaseClient.openAsyncBucketManager(name), (manager) => {
+          return manager.createPrimaryIndexAsync()
+          // Repeat index creation recursively if we get an error.
+          .error(loopCreateIndex);
         });
       });
-    });
-  }).then(() => {
+    };
+    return loopCreateIndex();
+  });
+}
+
+let main = (): void => {
+  Promise.using(couchbaseClient.openAsyncClusterManager(), (clusterManager) => {
+    return deleteExistingBuckets(clusterManager)
+      .then(() => createClickerBuckets(clusterManager));
+  }).then(createIndexes).then(() => {
     return console.log('Setup completed, buckets successfully created');
   }).done();
 }

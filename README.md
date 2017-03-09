@@ -8,7 +8,7 @@ Backend for the clicker app. NodeJS + Typescript + Couchbase
 This is a one time setup. run the following command to start a community edition
 Couchbase server in docker.
 
-`docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-4.0.0`
+`docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-4.5.0`
 
 Next, point your browser to `localhost:8091`. You should see a page to setup
 Couchbase. You can go ahead and stick with the default settings. After going
@@ -21,7 +21,6 @@ database. Create a file called `.env` under the root of this git repo and enter
 the following:
 ```
 DB_HOST=localhost
-DB_PORT=8091
 DB_USERNAME=cluster_username
 DB_PASSWORD=cluster_password
 GOOGLE_CLIENT_ID=google_client_id
@@ -29,7 +28,7 @@ GOOGLE_CLIENT_ID=google_client_id
 Replacing `cluster\_username` and `cluster\_password` with the admin username
 and password for your local couchbase db which you setup earlier.
 
-`GOOGLE\_CLIENT\_ID` is the id used to authenticate sign ins. You can obtain 
+`GOOGLE\_CLIENT\_ID` is the id used to authenticate sign ins. You can obtain
 these on the [Google API Console](https://console.developers.google.com/project/_/apiui/apis/library)
 
 ### Starting Clicker backend

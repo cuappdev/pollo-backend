@@ -238,4 +238,98 @@ declare module 'couchbase' {
 
   }
 
+  export interface AsyncBucketManager extends BucketManager {
+
+    /**
+     * Builds any indexes that were previously created with the deferred attribute.
+     */
+     buildDeferredIndexesAsync(): Promise<any>;
+
+     /**
+      * Creates a non-primary GSI index from a name and list of fields.
+      * @param indexName
+      * @param fields
+      */
+     createIndexAsync(indexName: string, fields: string): Promise<any>;
+
+     /**
+      * Creates a non-primary GSI index from a name and list of fields.
+      * @param indexName
+      * @param fields
+      * @param options
+      */
+     createIndexAsync(indexName: string, fields: string, options: any): Promise<any>;
+
+    /**
+     * Creates a primary GSI index with an optional name.
+     */
+     createPrimaryIndexAsync(): Promise<any>;
+
+    /**
+     * Creates a primary GSI index with an optional name.
+     * @param options
+     */
+     createPrimaryIndexAsync(options: any): Promise<any>;
+
+     /**
+      * Drops a specific GSI index by name.
+      * @param indexName
+      */
+     dropIndexAsync(indexName): Promise<any>;
+
+     /**
+      * Drops a specific GSI index by name.
+      * @param indexName
+      * @param options
+      */
+     dropIndexAsync(indexName, options): Promise<any>;
+
+     /**
+      * Drops a primary GSI index.
+      */
+     dropPrimaryIndex(): Promise<any>;
+
+     /**
+      * Drops a primary GSI index.
+      * @param options
+      */
+     dropPrimaryIndexAsync(options): Promise<any>;
+
+    /**
+     * Flushes the cluster, deleting all data stored within this bucket. Note that this method requires the Flush permission to be enabled on the bucket from the management console before it will work.
+     */
+    flushAsync(): Promise<any>;
+
+    /**
+     * Retrieves a specific design document from this bucket.
+     * @param name
+     */
+    getDesignDocumentAsync(name: string): Promise<any>;
+
+    /**
+     * Retrieves a list of all design documents registered to a bucket.
+     */
+    getDesignDocumentsAsync(): Promise<any>;
+
+    /**
+     * Registers a design document to this bucket, failing if it already exists.
+     * @param name
+     * @param data
+     */
+    insertDesignDocumentAsync(name: string, data: any): Promise<any>;
+
+    /**
+     * Unregisters a design document from this bucket.
+     * @param name
+     */
+    removeDesignDocumentAsync(name: string): Promise<any>;
+
+    /**
+     * Registers a design document to this bucket, overwriting any existing design document that was previously registered.
+     * @param name
+     * @param data
+     */
+    upsertDesignDocumentAsync(name: string, data: any): Promise<any>;
+  }
+
 }
