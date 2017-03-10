@@ -39,7 +39,7 @@ class CouchbaseClient {
     let db_username: string = process.env[constants.DB_USERNAME];
     let db_password: string = process.env[constants.DB_PASSWORD];
     return Promise.resolve(
-      Promise.promisifyAll(this.cluster.manager(
+      Promise.promisifyAll(this.managementCluster.manager(
         db_username, db_password)) as couchbase.AsyncClusterManager
     ).disposer((manager, promise) => { /* No disposing needed for Cluster Manager */ });
   }
