@@ -1,0 +1,10 @@
+# Files to ignore when deploying clicker-backend to elasticbeanstalk
+.gitignore
+deploy.sh
+README.md
+gulpfile.js
+tsconfig.json
+node_modules/
+.git/
+test/
+src/
