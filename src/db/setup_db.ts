@@ -62,8 +62,14 @@ let createIndexes = (): Promise<any> => {
       return Promise.delay(creationDelay *= 2).then(() => {
         return Promise.using(couchbaseClient.openAsyncBucketManager(name), (manager) => {
           return manager.createPrimaryIndexAsync()
-          // Repeat index creation recursively if we get an error.
-          .error(loopCreateIndex);
+            // Repeat index creation recursively if we get an error.
+            .error((err) => {
+              if (err.code === 22)
+                // The 22 code is due do the table creation being still underway.
+                return loopCreateIndex();
+              else
+                throw err;
+            });
         });
       });
     };
