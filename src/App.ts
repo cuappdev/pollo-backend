@@ -2,6 +2,8 @@ import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
 import * as express from 'express';
+import * as session from 'express-session';
+import * as passport from 'passport';
 import * as path from 'path';
 import * as logger from 'morgan';
 
@@ -17,10 +19,10 @@ class App {
 
   //Run configuration methods on the Express instance.
   constructor() {
+    dotenv.config();
     this.express = express();
     this.middleware();
     this.routes();
-    dotenv.config();
   }
 
   // Configure Express middleware.
@@ -29,6 +31,13 @@ class App {
     this.express.use(bodyParser.json());
     this.express.use(bodyParser.urlencoded({ extended: false }));
     this.express.use(cookieParser());
+    this.express.use(session({
+      secret: '~~clicker secret~~',
+      resave: true,
+      saveUninitialized: true
+    }));
+    this.express.use(passport.initialize());
+    this.express.use(passport.session());
   }
 
   // Configure API endpoints.

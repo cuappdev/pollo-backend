@@ -6,15 +6,24 @@ import * as constants from '../helpers/constants';
 
 class CouchbaseClient {
 
-  // Points to the couchbase cluster.
-  private cluster: couchbase.Cluster;
-  // For cluster management.
-  private managementCluster: couchbase.Cluster;
+  // For singleton pattern
+  private static _instance: CouchbaseClient;
 
-  constructor() {
+  public static get getInstance() {
+    return this._instance || (this._instance = new this());
+  }
+
+  private constructor() {
+  }
+
+  private getCluster(): couchbase.Cluster {
     let db_host: string = process.env[constants.DB_HOST];
-    this.cluster = new couchbase.Cluster(util.format('memcached://%s/', db_host));
-    this.managementCluster = new couchbase.Cluster(util.format('couchbase://%s/', db_host));
+    return new couchbase.Cluster(util.format('couchbase://%s/', db_host));
+  }
+
+  private getManagementCluster() {
+    let db_host: string = process.env[constants.DB_HOST];
+    return new couchbase.Cluster(util.format('couchbase://%s/', db_host));
   }
 
   /** Opens a disposable AsyncBucket, on the provided bucketName */
@@ -23,7 +32,7 @@ class CouchbaseClient {
     let bucket_password: string = constants.BUCKET_PASSWORD in process.env
       ? process.env[constants.BUCKET_PASSWORD] : '';
     return Promise.resolve(
-      Promise.promisifyAll(this.cluster.openBucket(
+      Promise.promisifyAll(this.getCluster().openBucket(
         bucketName, bucket_password)) as couchbase.AsyncBucket
     ).disposer((bucket, promise) => {
       // Ensures that we disconnect from couchbase no matter what happens.
@@ -39,7 +48,7 @@ class CouchbaseClient {
     let db_username: string = process.env[constants.DB_USERNAME];
     let db_password: string = process.env[constants.DB_PASSWORD];
     return Promise.resolve(
-      Promise.promisifyAll(this.managementCluster.manager(
+      Promise.promisifyAll(this.getManagementCluster().manager(
         db_username, db_password)) as couchbase.AsyncClusterManager
     ).disposer((manager, promise) => { /* No disposing needed for Cluster Manager */ });
   }
@@ -52,7 +61,7 @@ class CouchbaseClient {
     let bucketPassword: string = constants.BUCKET_PASSWORD in process.env
       ? process.env[constants.BUCKET_PASSWORD] : '';
     return Promise.resolve(
-      Promise.promisifyAll(this.managementCluster.openBucket(
+      Promise.promisifyAll(this.getManagementCluster().openBucket(
         bucketName, bucketPassword).manager()) as couchbase.AsyncBucketManager
     ).disposer((manager, promise) => {
       // To access private variables
@@ -62,4 +71,4 @@ class CouchbaseClient {
 
 }
 
-export const couchbaseClient = new CouchbaseClient();
+export const couchbaseClient = CouchbaseClient.getInstance;
