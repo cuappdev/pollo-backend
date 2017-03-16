@@ -17,3 +17,16 @@ export const BUCKETS = [USERS_BUCKET, CLASSES_BUCKET, QUESTIONS_BUCKETS];
 
 // For google auth.
 export const GOOGLE_CLIENT_ID = 'GOOGLE_CLIENT_ID';
+
+
+// Common error messages
+export const MALFORMED_MESSAGE = "Malformed message received";
+export const UNAUTHORIZED_MESSAGE = "Unauthorized request received";
+
+// Keys for tables
+export const USERS_BUCKET_KEY = 'netid:%s';
+export const CLASSES_BUCKET_KEY = 'courseId:%s';
+
+// Keys for counters
+export const COURSE_ID_COUNTER = "courseIdCounter"
+export const LECTURE_ID_COUNTER = "courseId%s:lectureIdCounter"

@@ -11,6 +11,7 @@ var GoogleAuth = require('google-auth-library');
 import {couchbaseClient} from '../db/couchbaseClient';
 import * as constants from '../helpers/constants';
 import {User, UserSchema} from '../db/schema';
+import {UserHelper} from '../helpers/userHelper';
 
 export class AuthRouter {
   router: Router;
@@ -26,30 +27,6 @@ export class AuthRouter {
     this.addSerializeUser();
     this.addDeserializeUser();
     this.addAuthStrategy();
-  }
-
-  /**
-   * Specifies how to translate a cache'd User session object into the full object.
-   */
-  private deserializeUser(user: User): Promise<UserSchema> {
-    return Promise.using(couchbaseClient.openAsyncBucket(constants.USERS_BUCKET), (bucket) => {
-      return bucket.getAsync(util.format('netid:%s', user.netid))
-        .then((deserializedUser: UserSchema) => {
-          return deserializedUser;
-        });
-    });
-  }
-
-  /**
-   * Translates a UserSchema into a User object that can be stored in the session.
-   */
-  private serializeUser(user: UserSchema): Promise<User> {
-      return Promise.resolve({
-        netid: user.netid,
-        email: user.email,
-        displayName: user.displayName,
-        name: user.name
-    });
   }
 
   /**
@@ -84,12 +61,12 @@ export class AuthRouter {
    */
   private findOrCreateUser(user: UserSchema): Promise<UserSchema> {
     return Promise.using(couchbaseClient.openAsyncBucket(constants.USERS_BUCKET), (bucket) => {
-      return bucket.getAsync(util.format('netid:%s', user.netid)).then((result: UserSchema) => {
+      return bucket.getAsync(util.format(constants.USERS_BUCKET_KEY, user.netid)).then((result: UserSchema) => {
         // User already exists in our system. Use that user.
         return result;
       }, (err) => {
         // User doesn't exist yet, insert them.
-        return bucket.upsertAsync(util.format('netid:%s', user.netid), user).then(() => {
+        return bucket.upsertAsync(util.format(constants.USERS_BUCKET_KEY, user.netid), user).then(() => {
           return user;
         })
       });
@@ -114,20 +91,24 @@ export class AuthRouter {
 
   public addSerializeUser(): void {
     passport.serializeUser((user: UserSchema, done) => {
-      this.serializeUser(user).then((serializedUser) => {
-        return done(null, serializedUser);
-      }, (err) => {
-        return done(err);
-      });
+      Promise.using(couchbaseClient.openAsyncBucket(constants.USERS_BUCKET), (bucket) => {
+        return UserHelper.serializeUser(bucket, user).then((serializedUser) => {
+          return done(null, serializedUser);
+        }, (err) => {
+          return done(err);
+        });
+      })
     });
   }
 
   public addDeserializeUser(): void {
     passport.deserializeUser((user: User, done) => {
-      this.deserializeUser(user).then((user) => {
-        return done(null, user);
-      }, (err) => {
-        return done(err);
+      Promise.using(couchbaseClient.openAsyncBucket(constants.USERS_BUCKET), (bucket) => {
+        return UserHelper.deserializeUser(bucket, user).then((user) => {
+          return done(null, user);
+        }, (err) => {
+          return done(err);
+        });
       });
     });
   }

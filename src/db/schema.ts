@@ -24,6 +24,7 @@ export interface Class {
   courseName: string;
   course: string;
   semester: string;
+  professors: User[];
 };
 
 /**
@@ -32,8 +33,8 @@ export interface Class {
 export interface ClassSchema extends Class {
   time?: Date;
   place?: string;
-  professors: User[];
   lectures: Lecture[];
+  students: User[];
 };
 
 /**
