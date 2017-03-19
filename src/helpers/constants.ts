@@ -16,7 +16,7 @@ export const QUESTIONS_BUCKETS = 'questions';
 export const BUCKETS = [USERS_BUCKET, CLASSES_BUCKET, QUESTIONS_BUCKETS];
 
 // For google auth.
-export const GOOGLE_CLIENT_ID = 'GOOGLE_CLIENT_ID';
+export const GOOGLE_CLIENT_IDS = 'GOOGLE_CLIENT_IDS';
 
 
 // Common error messages

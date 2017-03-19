@@ -16,7 +16,8 @@ export class ClassHelper {
    * @return Promise<number> the number of the next courseId.
    */
   public static incrementCourseIdCounter(bucket: AsyncBucket): Promise<number> {
-    return bucket.counterAsync(constants.COURSE_ID_COUNTER, 1, { initial: 1 });
+    return bucket.counterAsync(constants.COURSE_ID_COUNTER, 1, { initial: 1 })
+      .then((result) => result.value);
   }
 
   /**
@@ -25,8 +26,7 @@ export class ClassHelper {
    * @param classSchema: ClassSchema the class to convert.
    * @return Promise<Class> the serialized class, as a promise
    */
-  public static serializeClass(
-    bucket: AsyncBucket, classSchema: ClassSchema): Promise<Class> {
+  public static serializeClass(classSchema: ClassSchema): Promise<Class> {
     return Promise.resolve({
       courseId: classSchema.courseId,
       courseNumber: classSchema.courseNumber,
@@ -45,7 +45,10 @@ export class ClassHelper {
    */
   public static deserializeClass(
     bucket: AsyncBucket, c: Class): Promise<ClassSchema> {
-      return bucket.getAsync(util.format(constants.CLASSES_BUCKET_KEY, c.courseId))
+    return bucket.getAsync(util.format(constants.CLASSES_BUCKET_KEY, c.courseId))
+      .then((result) => {
+        return result.value;
+      })
   }
 
 }

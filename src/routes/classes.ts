@@ -22,28 +22,35 @@ export class ClassesRouter {
   }
 
   public createClass(req: Request, res: Response, next: NextFunction) {
+    console.log('Creating a new class');
     if (!req.isAuthenticated()) {
-      return res.status(401).send(constants.UNAUTHORIZED_MESSAGE);
+      return res.status(401).json({ message: constants.UNAUTHORIZED_MESSAGE });
     }
     let allFields = true;
+    console.log(req.body);
     ["courseNumber", "semester", "course", "courseName", "professorNetids"].forEach((field) => {
       if (!(field in req.body)) allFields = false;
     });
     if (!allFields) {
-      return res.status(400).send(constants.MALFORMED_MESSAGE);
+      return res.status(400).json({ message: constants.MALFORMED_MESSAGE });
     }
     // All fields have been provided, and user is authenticated. Proceed to create class
     Promise.using(couchbaseClient.openAsyncBucket(constants.USERS_BUCKET),
       couchbaseClient.openAsyncBucket(constants.CLASSES_BUCKET),
       (usersBucket, classesBucket) => {
         // Grab all involved professor user objects involved.
-        let professorsAsync = Promise.map(req.body.professorNetids, (netid: string) => {
+        console.log('Validating all professors');
+        let professorsAsync;
+        if (!Array.isArray(req.body.professorNetids)) {
+          req.body.professorNetids = [req.body.professorNetids];
+        }
+        professorsAsync = Promise.map(req.body.professorNetids, (netid: string) => {
           return UserHelper.getUser(usersBucket, netid)
         }).map((professor: schema.UserSchema) => {
-          return UserHelper.serializeUser(usersBucket, professor);
+          return UserHelper.serializeUser(professor);
         });
         professorsAsync.error((err) => {
-          res.status(400).send('One or more provided netids don\'t have accounts');
+          res.status(404).json({ message: 'One or more provided netids don\'t have accounts' });
           throw err;
         });
 
@@ -64,31 +71,34 @@ export class ClassesRouter {
             }
             // Upsert the class to Couchbase.
             return classesBucket.upsertAsync(util.format(constants.CLASSES_BUCKET_KEY, courseId), newClass)
-              .then(() => { return newClass });
+              .then(() => {
+                return ClassHelper.serializeClass(newClass);
+              });
           }).then((newClass) => {
             // Add the new class to each professor's list of classes.
             return Promise.each(req.body.professorNetids, (netid: string) => {
-              return UserHelper.joinClass(usersBucket, netid, newClass.courseId)
+              return UserHelper.joinClass(usersBucket, netid, newClass)
             }).then(() => { return newClass })
           });
       }).then((newClass) => {
         return res.json({
           courseId: newClass.courseId
         });
-      }).error((err) => res.status(500).send(err))
+      }).error((err) => res.status(500).json({ message: 'Encountered an internal server error' }));
   }
 
   public getAllClasses(req: Request, res: Response, next: NextFunction) {
     let query = N1qlQuery.fromString(
       ' SELECT courseId, courseNumber, courseName, course, semester, professors' +
-      ' FROM classes'
+      ' FROM classes' +
+      ' WHERE courseId IS NOT MISSING'
     );
     Promise.using(couchbaseClient.openAsyncBucket(constants.CLASSES_BUCKET),
-    (classesBucket): Promise<schema.Class[]> => {
-      return classesBucket.queryAsync(query);
-    }).then((classes) => {
-      return res.json(classes);
-    });
+      (classesBucket): Promise<schema.Class[]> => {
+        return classesBucket.queryAsync(query);
+      }).then((classes) => {
+        return res.json(classes);
+      });
   }
 
   /**
