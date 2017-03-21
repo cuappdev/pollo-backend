@@ -99,7 +99,7 @@ export class ClassesRouter {
   }
 
   public getMyClasses(req: Request, res: Response, next: NextFunction) {
-    if (!req.isAuthenticated) {
+    if (!req.isAuthenticated()) {
       return res.status(401).json({ message: constants.UNAUTHORIZED_MESSAGE });
     }
     // List of classes is stored in the deserialized user object, so we don't
