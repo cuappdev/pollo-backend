@@ -12,7 +12,8 @@ export interface User {
  * Defines the schema for the users document in Couchbase.
  */
 export interface UserSchema extends User {
-  classes: Class[];
+  studentClasses: Class[];
+  professorClasses: Class[];
 };
 
 /**
@@ -25,14 +26,22 @@ export interface Class {
   course: string;
   semester: string;
   professors: User[];
+  time?: Date;
+  place?: string;
 };
+
+/**
+ * Type of class returned when user requests his own classes.
+ */
+export interface UserClass extends Class {
+  isProf: boolean;
+  students?: User[];
+}
 
 /**
  * Defines the schema for the documents in the classes bucket in Couchbase.
  */
 export interface ClassSchema extends Class {
-  time?: Date;
-  place?: string;
   lectures: Lecture[];
   students: User[];
 };

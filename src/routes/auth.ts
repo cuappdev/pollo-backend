@@ -38,7 +38,7 @@ export class AuthRouter {
         process.env[constants.GOOGLE_CLIENT_IDS].split(',')[0], '', ''));
     let verifyPromise = client.verifyIdTokenAsync(
       idToken, process.env[constants.GOOGLE_CLIENT_IDS].split(','))
-    return verifyPromise.then((login) => {
+    return verifyPromise.then((login): UserSchema => {
       var payload = login.getPayload();
       let email_extension_index = payload['email'].indexOf('@cornell.edu');
       if (email_extension_index <= -1)
@@ -49,7 +49,8 @@ export class AuthRouter {
         displayName: payload['name'],
         name: { given_name: payload['given_name'], family_name: payload['family_name'] },
         netid: payload['email'].substring(0, email_extension_index),
-        classes: []
+        studentClasses: [],
+        professorClasses: []
       };
     });
   }

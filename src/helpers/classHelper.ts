@@ -2,8 +2,9 @@ import {AsyncBucket} from 'couchbase';
 import * as Promise from 'bluebird';
 import * as util from 'util';
 
+import {couchbaseClient} from '../db/couchbaseClient'
+import {UserSchema, User, UserClass, Class, ClassSchema} from '../db/schema';
 import * as constants from '../helpers/constants';
-import {UserSchema, User, Class, ClassSchema} from '../db/schema';
 
 /**
  * Utility class for use static functions related to querying and updating classes.
@@ -40,7 +41,7 @@ export class ClassHelper {
   /**
    * Converts a ClassSchema to a Class.
    * @param classesBucket: AsyncBucket the bucket for classes.
-   * @param c: serialized class who's full information we're fetching.
+   * @param c: Class serialized class who's full information we're fetching.
    * @return Promise<ClassSchema> the deserialized class, as a promise
    */
   public static deserializeClass(
@@ -49,6 +50,32 @@ export class ClassHelper {
       .then((result) => {
         return result.value;
       })
+  }
+
+  /**
+   * Converts a Class object to a UserClass object.
+   * @param c: Class the class we are converting.
+   * @param isProf: Whether the user is a professor of this class.
+   * @return Promise<UserClass> the UserClass as a Promise.
+   */
+  public static getUserClass(c: Class, isProf: boolean): Promise<UserClass> {
+    let userClass: UserClass = {
+      courseId: c.courseId,
+      courseNumber: c.courseNumber,
+      courseName: c.courseName,
+      course: c.course,
+      semester: c.semester,
+      professors: c.professors,
+      isProf: isProf,
+    }
+    // Determine whether or not to add students to the object.
+    if (!isProf) return Promise.resolve(userClass);
+    return Promise.using(couchbaseClient.openAsyncBucket(constants.CLASSES_BUCKET), (bucket) => {
+      return ClassHelper.deserializeClass(bucket, c).then((classSchema) => {
+        userClass.students = classSchema.students;
+        return userClass;
+      });
+    })
   }
 
 }

@@ -39,11 +39,12 @@ export class UserHelper {
       });
   }
 
-  public static joinClass(bucket: AsyncBucket, netid: string, c: Class): Promise<any> {
+  public static joinClass(bucket: AsyncBucket, netid: string, c: Class, isProf: boolean): Promise<any> {
     // Get the user with the given netid.
     console.log(util.format('User %s joining class %s', netid, c));
     return UserHelper.getUser(bucket, netid).then((user: UserSchema) => {
-      user.classes.push(c);
+      if (isProf) user.professorClasses.push(c);
+      else user.studentClasses.push(c);
       // Add the new class and re-upsert him.
       return bucket.upsertAsync(util.format(constants.USERS_BUCKET_KEY, netid), user);
     })

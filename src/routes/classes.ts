@@ -77,7 +77,7 @@ export class ClassesRouter {
           }).then((newClass) => {
             // Add the new class to each professor's list of classes.
             return Promise.each(req.body.professorNetids, (netid: string) => {
-              return UserHelper.joinClass(usersBucket, netid, newClass)
+              return UserHelper.joinClass(usersBucket, netid, newClass, true)
             }).then(() => { return newClass })
           });
       }).then((newClass) => {
@@ -101,6 +101,27 @@ export class ClassesRouter {
       });
   }
 
+  public getMyClasses(req: Request, res: Response, next: NextFunction) {
+    if (!req.isAuthenticated) {
+      return res.status(401).json({ message: constants.UNAUTHORIZED_MESSAGE });
+    }
+    // List of classes is stored in the deserialized user object, so we don't
+    // need to make a query.
+    let user: schema.UserSchema = req.user;
+    // Map each class in studentClasses to a UserClass object.
+    let studentClassesAsync = Promise.map(user.studentClasses, (c) => {
+      return ClassHelper.getUserClass(c, false);
+    });
+    let professorClassesAsync = Promise.map(user.professorClasses, (c) => {
+      return ClassHelper.getUserClass(c, true);
+    });
+    return Promise.join(studentClassesAsync, professorClassesAsync,
+      (studentClasses, professorClasses) => {
+        let allClasses = studentClasses.concat(professorClasses);
+        return res.json(allClasses);
+      });
+  }
+
   /**
    * Take each handler, and attach to one of the Express.Router's
    * endpoints.
@@ -108,6 +129,7 @@ export class ClassesRouter {
   init() {
     this.router.post('/', this.createClass);
     this.router.get('/', this.getAllClasses);
+    this.router.get('/enrolled', this.getMyClasses);
   }
 
 }
