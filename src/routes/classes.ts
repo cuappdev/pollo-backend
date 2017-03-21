@@ -22,12 +22,10 @@ export class ClassesRouter {
   }
 
   public createClass(req: Request, res: Response, next: NextFunction) {
-    console.log('Creating a new class');
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: constants.UNAUTHORIZED_MESSAGE });
     }
     let allFields = true;
-    console.log(req.body);
     ["courseNumber", "semester", "course", "courseName", "professorNetids"].forEach((field) => {
       if (!(field in req.body)) allFields = false;
     });
@@ -39,7 +37,6 @@ export class ClassesRouter {
       couchbaseClient.openAsyncBucket(constants.CLASSES_BUCKET),
       (usersBucket, classesBucket) => {
         // Grab all involved professor user objects involved.
-        console.log('Validating all professors');
         let professorsAsync;
         if (!Array.isArray(req.body.professorNetids)) {
           req.body.professorNetids = [req.body.professorNetids];
