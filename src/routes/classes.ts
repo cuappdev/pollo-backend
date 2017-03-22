@@ -13,9 +13,6 @@ import {ClassHelper} from '../helpers/classHelper';
 export class ClassesRouter {
   router: Router
 
-  /**
-   * Initialize the IndexRouter
-   */
   constructor() {
     this.router = Router();
     this.init();
@@ -74,7 +71,7 @@ export class ClassesRouter {
           }).then((newClass) => {
             // Add the new class to each professor's list of classes.
             return Promise.each(req.body.professorNetids, (netid: string) => {
-              return UserHelper.joinClass(usersBucket, netid, newClass, true)
+              return UserHelper.addClass(usersBucket, netid, newClass, true)
             }).then(() => { return newClass })
           });
       }).then((newClass) => {
@@ -119,14 +116,39 @@ export class ClassesRouter {
       });
   }
 
-  /**
-   * Take each handler, and attach to one of the Express.Router's
-   * endpoints.
-   */
+  /** Endpoint for a student to join a class */
+  public joinClass(req: Request, res: Response, next: NextFunction) {
+    Promise.using(couchbaseClient.openAsyncBucket(constants.USERS_BUCKET),
+      couchbaseClient.openAsyncBucket(constants.CLASSES_BUCKET),
+      (usersBucket, classesBucket) => {
+        // Get the class that we're adding.
+        let classSchemaAsync = ClassHelper.getClass(classesBucket, req.params.courseId);
+        // Add user to class roster.
+        let addToClassAsync = Promise.join(classSchemaAsync, UserHelper.serializeUser(req.user), (c, user) => {
+          c.students.push(user);
+          return classesBucket.upsertAsync(
+            util.format(constants.CLASSES_BUCKET_KEY, c.courseId), c);
+        });
+        // Add class to student's class list.
+        let addClassAsync = classSchemaAsync.then(ClassHelper.serializeClass).then((c) => {
+          let user: schema.UserSchema = req.user;
+          user.studentClasses.push(c)
+          return classesBucket.upsertAsync(
+            util.format(constants.USERS_BUCKET_KEY, user.netid), user);
+        });
+        return Promise.join(addToClassAsync, addClassAsync, () => { });
+      }).then(() => {
+        res.json({ message: "success" });
+      }, () => {
+        res.status(404).json({ message: "failure" });
+      });
+  }
+
   init() {
     this.router.post('/', this.createClass);
     this.router.get('/', this.getAllClasses);
     this.router.get('/enrolled', this.getMyClasses);
+    this.router.put('/join/:courseId', this.joinClass);
   }
 
 }

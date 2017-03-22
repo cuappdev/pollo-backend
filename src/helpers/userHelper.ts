@@ -39,7 +39,16 @@ export class UserHelper {
       });
   }
 
-  public static joinClass(bucket: AsyncBucket, netid: string, c: Class, isProf: boolean): Promise<any> {
+  /**
+   * Adds a class to a student's class list. If isProf, adds him/her as a professor.
+   * This only adds a class to a user's class roster, it does not add him/her
+   * to the class. See ClassHelper for that.
+   * @param bucket: AsyncBucket The user's bucket.
+   * @param netid: string The user to add to the class.
+   * @param c: Class the class to add.
+   * @param isProf: boolean whether the user is to be added as a professor.
+   */
+  public static addClass(bucket: AsyncBucket, netid: string, c: Class, isProf: boolean): Promise<any> {
     // Get the user with the given netid.
     console.log(util.format('User %s joining class %s', netid, c));
     return UserHelper.getUser(bucket, netid).then((user: UserSchema) => {
