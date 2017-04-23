@@ -36,14 +36,18 @@
     "@types/node": "^7.0.5",
     "@types/passport": "^0.3.3",
     "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-preset-env": "^1.4.0",
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
+    "extract-text-webpack-plugin": "^2.1.0",
     "gulp": "^3.9.1",
     "gulp-typescript": "^3.1.5",
     "mocha": "^3.2.0",
     "react-google-login": "^2.8.5",
     "ts-node": "^2.1.0",
-    "typescript": "^2.2.1"
+    "typescript": "^2.2.1",
+    "webpack": "^2.4.1"
   },
   "dependencies": {
     "babel-cli": "^6.24.1",
