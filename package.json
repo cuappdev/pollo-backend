@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node dist/start.js",
-    "test": "mocha --reporter spec --compilers ts:ts-node/register test/**/*.test.ts"
+    "test": "mocha --reporter spec --compilers ts:ts-node/register test/**/*.test.ts",
+    "dev": "node_modules/.bin/webpack-dev-server"
   },
   "repository": {
     "type": "git",
@@ -34,15 +35,18 @@
     "@types/morgan": "^1.7.32",
     "@types/node": "^7.0.5",
     "@types/passport": "^0.3.3",
+    "babel-core": "^6.24.1",
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
     "gulp": "^3.9.1",
     "gulp-typescript": "^3.1.5",
     "mocha": "^3.2.0",
+    "react-google-login": "^2.8.5",
     "ts-node": "^2.1.0",
     "typescript": "^2.2.1"
   },
   "dependencies": {
+    "babel-cli": "^6.24.1",
     "bluebird": "^3.4.7",
     "body-parser": "^1.16.1",
     "cookie-parser": "^1.4.3",
@@ -52,8 +56,15 @@
     "express": "^4.14.1",
     "express-session": "^1.15.1",
     "google-auth-library": "^0.10.0",
+    "isomorphic-fetch": "^2.2.1",
     "morgan": "^1.8.1",
     "passport": "^0.3.2",
-    "passport-custom": "^1.0.5"
+    "passport-custom": "^1.0.5",
+    "react": "^15.5.4",
+    "react-bootstrap": "^0.30.8",
+    "react-dom": "^15.5.4",
+    "react-router": "^4.1.1",
+    "socket.io": "^1.7.3",
+    "socket.io-client": "^1.7.3"
   }
 }
