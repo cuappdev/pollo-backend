@@ -49,3 +49,6 @@ dist/
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+# Babel cache
+babel_cache/
