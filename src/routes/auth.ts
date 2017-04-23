@@ -62,7 +62,7 @@ export class AuthRouter {
    * @return Promise<UserSchema>
    */
   private findOrCreateUser(user: UserSchema): Promise<UserSchema> {
-    return Promise.using(couchbaseClient.openAsyncBucket(constants.USERS_BUCKET), (bucket) => {
+    return Promise.using(couchbaseClient.openAsyncBucket(constants.CLICKER_BUCKET), (bucket) => {
       return bucket.getAsync(util.format(constants.USERS_BUCKET_KEY, user.netid)).then((result) => {
         // User already exists in our system. Use that user.
         return result.value;
@@ -101,7 +101,7 @@ export class AuthRouter {
 
   public addDeserializeUser(): void {
     passport.deserializeUser((user: User, done) => {
-      return Promise.using(couchbaseClient.openAsyncBucket(constants.USERS_BUCKET), (bucket) => {
+      return Promise.using(couchbaseClient.openAsyncBucket(constants.CLICKER_BUCKET), (bucket) => {
         return UserHelper.deserializeUser(bucket, user);
       }).then((user) => {
         return done(null, user);

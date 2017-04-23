@@ -80,7 +80,7 @@ export class ClassHelper {
     }
     // Determine whether or not to add students to the object.
     if (!isProf) return Promise.resolve(userClass);
-    return Promise.using(couchbaseClient.openAsyncBucket(constants.CLASSES_BUCKET), (bucket) => {
+    return Promise.using(couchbaseClient.openAsyncBucket(constants.CLICKER_BUCKET), (bucket) => {
       return ClassHelper.deserializeClass(bucket, c).then((classSchema) => {
         userClass.students = classSchema.students;
         return userClass;
