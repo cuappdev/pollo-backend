@@ -24,6 +24,7 @@ class App {
     this.express = express();
     this.middleware();
     this.routes();
+    this.views();
   }
 
   // Configure Express middleware.
@@ -39,15 +40,23 @@ class App {
     }));
     this.express.use(passport.initialize());
     this.express.use(passport.session());
+    // Setting path for frontend files.
+    this.express.use(express.static(path.join(__dirname, '/../public')));
   }
 
   // Configure API endpoints.
   private routes(): void {
-    this.express.use('/', IndexRouter);
-    this.express.use('/auth/', AuthRouter);
-    this.express.use('/classes/', ClassesRouter);
+    this.express.use('api/v1/', IndexRouter);
+    this.express.use('api/v1/auth/', AuthRouter);
+    this.express.use('api/v1/classes/', ClassesRouter);
   }
 
+  private views(): void {
+    // Set all views
+    this.express.get('*', (req, res) => {
+      res.sendFile(path.join(__dirname, '/../public/index.html'));
+    });
+  }
 }
 
 export default new App().express;
