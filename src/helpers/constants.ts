@@ -10,10 +10,8 @@ export const DB_PASSWORD = 'DB_PASSWORD';
 export const BUCKET_PASSWORD = 'BUCKET_PASSWORD';
 
 // Relevant buckets.
-export const USERS_BUCKET = 'users';
-export const CLASSES_BUCKET = 'classes';
-export const QUESTIONS_BUCKETS = 'questions';
-export const BUCKETS = [USERS_BUCKET, CLASSES_BUCKET, QUESTIONS_BUCKETS];
+export const CLICKER_BUCKET = 'clicker';
+export const BUCKETS = [CLICKER_BUCKET];
 
 // For google auth.
 export const GOOGLE_CLIENT_IDS = 'GOOGLE_CLIENT_IDS';
@@ -24,9 +22,9 @@ export const MALFORMED_MESSAGE = "Malformed message received";
 export const UNAUTHORIZED_MESSAGE = "Unauthorized request received";
 
 // Keys for tables
-export const USERS_BUCKET_KEY = 'netid:%s';
-export const CLASSES_BUCKET_KEY = 'courseId:%s';
+export const USERS_BUCKET_KEY = '%s:netid';
+export const CLASSES_BUCKET_KEY = '%s:courseId';
 
 // Keys for counters
 export const COURSE_ID_COUNTER = "courseIdCounter"
-export const LECTURE_ID_COUNTER = "courseId%s:lectureIdCounter"
+export const LECTURE_ID_COUNTER = "course:%s:lectureIdCounter"
