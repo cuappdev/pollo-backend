@@ -42,8 +42,11 @@ jspm_packages
 # For javascript linter
 .jshintrc
 
-# Compiled output
+# Compiled output backend
 dist/
+
+# Compiled output frontend
+public/js/*
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
