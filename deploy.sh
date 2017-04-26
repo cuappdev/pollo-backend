@@ -1,6 +1,6 @@
 #!/bin/bash
 # Deploy clicker-backend app on AWS Elasticbeanstalk.
 
-gulp scripts;
+./run.sh
 eb labs cleanup-versions;
 eb deploy;
