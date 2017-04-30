@@ -1,18 +1,34 @@
-import * as http from 'http';
 import socket from 'socket.io';
 
-export default (server, port) => {
-  const io = socket(server);
+/*
+ * The Socket class manages socket.io server
+ */
+class Socket {
 
-  io.on('connection', onConnect);
-};
+  // Socket
+  public io: socket;
 
-var onConnect = (client) => {
-  console.log('Client connected to socket');
+  /*
+   * Initialize the IndexRouter
+   */
+  constructor(server, port) {
+    this.io = socket(server);
+    this.io.on('connection', this.onConnect);
+  }
 
-  client.on('disconnect', onDisconnect);
-};
+  /*
+   * On connect
+   */
+  onConnect (client): void {
+    console.log('Client connected to socket');
 
-var onDisconnect = () => {
-  console.log('Client disconnected');
-};
+    client.on('disconnect', this.onDisconnect);
+  };
+
+  /*
+   * On disconnect
+   */
+  onDisconnect (): void {
+    console.log('Client disconnected');
+  };
+}
