@@ -24,7 +24,6 @@ class App {
     this.express = express();
     this.middleware();
     this.routes();
-    this.views();
   }
 
   // Configure Express middleware.
@@ -46,17 +45,11 @@ class App {
 
   // Configure API endpoints.
   private routes(): void {
-    this.express.use('api/v1/', IndexRouter);
-    this.express.use('api/v1/auth/', AuthRouter);
-    this.express.use('api/v1/classes/', ClassesRouter);
+    this.express.use('/api/v1/', IndexRouter);
+    this.express.use('/api/v1/auth/', AuthRouter);
+    this.express.use('/api/v1/classes/', ClassesRouter);
   }
 
-  private views(): void {
-    // Set all views
-    this.express.get('*', (req, res) => {
-      res.sendFile(path.join(__dirname, '/../public/index.html'));
-    });
-  }
 }
 
 export default new App().express;
