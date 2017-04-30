@@ -2,6 +2,7 @@ import * as http from 'http';
 import * as debug from 'debug';
 
 import App from './App';
+import Socket from './Socket';
 
 debug('clicker-backend:server');
 
@@ -12,6 +13,7 @@ const server = http.createServer(App);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+Socket(server, port);
 
 function normalizePort(val: number|string): number|string|boolean {
   let port: number = (typeof val === 'string') ? parseInt(val, 10) : val;
