@@ -1,6 +1,6 @@
 #!/bin/bash
-# To build, do `./run.sh`.
-# To build and watch, run `./run.sh watch`
+# To build, do `./build.sh`.
+# To build and watch, run `./build.sh watch`
 
 child_processes=();
 
@@ -14,16 +14,18 @@ control_c() {
 trap control_c SIGINT
 
 build() {
-  webpack;
-  gulp scripts;
+  webpack &
+  child_processes+=($!);
+  gulp scripts &
+  child_processes+=($!);
 }
 
 watch() {
   # Build once first, and then watch afterwards.:
-  gulp scripts;
   gulp &
   child_processes+=($!);
-  npm run dev;
+  webpack --watch &
+  child_processes+=($!);  
 }
 
 if [ "$1" == "watch" ]; then
@@ -31,3 +33,7 @@ if [ "$1" == "watch" ]; then
 else
   build;
 fi
+
+for pid in "${child_processes[@]}"; do
+  wait $pid;
+done
