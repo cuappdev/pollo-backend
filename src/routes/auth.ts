@@ -157,7 +157,7 @@ export class AuthRouter {
 
   init() {
     this.router.post('/signin', passport.authenticate(constants.GOOGLE_STRATEGY), this.googleAuth);
-    this.router.post('/signin/simple', passport.authenticate(constants.SIMPLE_AUTHS), this.simpleAuth);
+    this.router.post('/signin/simple', passport.authenticate(constants.SIMPLE_STRATEGY), this.simpleAuth);
   }
 }
 
