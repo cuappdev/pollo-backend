@@ -1,4 +1,6 @@
 # Files to ignore when deploying clicker-backend to elasticbeanstalk
+# File types to ignore
+*.swp
 # Git files
 .gitignore
 .git/
@@ -19,4 +21,5 @@ test/
 src/
 app/
 babel_cache/
-
+# Environment files
+.env
