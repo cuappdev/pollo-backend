@@ -3,7 +3,7 @@ import socket from 'socket.io';
 /*
  * The Socket class manages socket.io server
  */
-class Socket {
+export class Socket {
 
   // Socket
   public io: socket;
