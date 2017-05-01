@@ -4,7 +4,7 @@
 .git/
 # bash files
 deploy.sh
-run.sh
+build.sh
 # README
 README.md
 # Node modules
@@ -13,6 +13,7 @@ node_modules/
 gulpfile.js
 tsconfig.json
 webpack.config.js
+.babelrc
 # Source that is compiled out.
 test/
 src/
