@@ -32,13 +32,13 @@ export class AuthRouter {
    * @param idToken: string
    * @return Promise<UserSchema>
    */
-  private validateAndGetUser(idToken: string): Promise<UserSchema> {
+  private googleValidation(idToken: string): Promise<UserSchema> {
     let client: any = Promise.promisifyAll(
       new this.auth.OAuth2(
         process.env[constants.GOOGLE_CLIENT_IDS].split(',')[0], '', ''));
-    let verifyPromise = client.verifyIdTokenAsync(
-      idToken, process.env[constants.GOOGLE_CLIENT_IDS].split(','))
-    return verifyPromise.then((login): UserSchema => {
+    return client.verifyIdTokenAsync(
+      idToken, process.env[constants.GOOGLE_CLIENT_IDS].split(',')
+    ).then((login): UserSchema => {
       var payload = login.getPayload();
       let email_extension_index = payload['email'].indexOf('@cornell.edu');
       if (email_extension_index <= -1)
@@ -53,6 +53,24 @@ export class AuthRouter {
         professorClasses: []
       };
     });
+  }
+
+  /**
+   * @param username: string
+   * @param password: string
+   * @return Promise<UserSchema>: the user after authentication, or an error.
+   */
+  private simpleValidation(username: string, password: string): Promise<UserSchema> {
+    let simple_auths = JSON.parse(process.env[constants.SIMPLE_AUTHS]);
+    return (username in simple_auths && simple_auths[username] === password) ?
+      Promise.resolve({
+        email: username + "@cornell.edu",
+        displayName: "simpleAuth",
+        name: null,
+        netid: username,
+        studentClasses: [],
+        professorClasses: []
+      }) : Promise.reject("Failed to authenticate user");
   }
 
   /**
@@ -79,8 +97,20 @@ export class AuthRouter {
    * Creates a custom passport strategy for login.
    */
   public addAuthStrategy(): void {
-    passport.use('custom-strategy', new CustomStrategy((req, done) => {
-      this.validateAndGetUser(req.body.idToken)
+    // Google Auth strategy.
+    passport.use(constants.GOOGLE_STRATEGY, new CustomStrategy((req, done) => {
+      this.googleValidation(req.body.idToken)
+        .then(this.findOrCreateUser)
+        .then((user) => {
+          return done(null, user);
+        }, (err) => {
+          // validation failed.
+          return done(err);
+        });
+    }));
+    // Simple backdoor auth strategy.
+    passport.use(constants.SIMPLE_STRATEGY, new CustomStrategy((req, done) => {
+      this.simpleValidation(req.body.username, req.body.password)
         .then(this.findOrCreateUser)
         .then((user) => {
           return done(null, user);
@@ -112,14 +142,22 @@ export class AuthRouter {
   }
 
   /**
-   * Handles authentication & user registration.
+   * Handles authentication & user registration for google auth.
    */
   public googleAuth(req: Request, res: Response, next: NextFunction) {
     res.json(req.user);
   }
 
+  /**
+   * Handles authentication & user registration for simple auth.
+   */
+  public simpleAuth(req: Request, res: Response, next: NextFunction) {
+    res.json(req.user);
+  }
+
   init() {
-    this.router.post('/signin', passport.authenticate('custom-strategy'), this.googleAuth);
+    this.router.post('/signin', passport.authenticate(constants.GOOGLE_STRATEGY), this.googleAuth);
+    this.router.post('/signin/simple', passport.authenticate(constants.SIMPLE_AUTHS), this.simpleAuth);
   }
 }
 
