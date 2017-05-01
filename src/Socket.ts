@@ -1,4 +1,4 @@
-import socket from 'socket.io';
+import * as socket from 'socket.io';
 
 /*
  * The Socket class manages socket.io server
@@ -6,7 +6,7 @@ import socket from 'socket.io';
 export class Socket {
 
   // Socket
-  public io: socket;
+  private io: SocketIO.Server;
 
   /*
    * Initialize the IndexRouter
