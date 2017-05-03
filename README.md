@@ -40,20 +40,21 @@ npm install
 You will have to run this everytime dependencies are added to the packages.json
 file.
 
-We use gulp to persistently compile Typescript files. Install gulp globally on
-your computer.
+We use gulp to persistently compile backend Typescript files, and webpack to
+compile frontend react es6 files. Install gulp and webpack globally on your
+computer.
 ```
 npm install -g gulp
+npm install -g webpack
 ```
 To compile this project, run
 ```
-gulp scripts
+./build.sh
 ```
-This will compile all `\*.ts` scripts in the `src/` directory and output them
-to `dist/`. Alternatively, you can set gulp to auto-compile every time you make
-a change to the project by running.
+Alternatively, you can persistently watch and compile the project whenever
+any files are changed by running the following
 ```
-gulp
+./build.sh --watch
 ```
 
 If this is your first time running the app locally, you'll need to setup the db
