@@ -28,7 +28,7 @@ watch() {
   child_processes+=($!);  
 }
 
-if [ "$1" == "watch" ]; then
+if [ "$1" == "--watch" ]; then
   watch;
 else
   build;
