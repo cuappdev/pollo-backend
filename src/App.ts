@@ -41,6 +41,7 @@ class App {
     this.express.use(passport.session());
     // Setting path for frontend files.
     this.express.use(express.static(path.join(__dirname, '/../public')));
+    this.express.get('*', (req, res) => res.sendFile(path.join(__dirname, '/../public/index.html')));
   }
 
   // Configure API endpoints.
