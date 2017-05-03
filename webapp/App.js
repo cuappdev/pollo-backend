@@ -1,7 +1,19 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { Router, browserHistory } from 'react-router';
+import { render } from 'react-dom';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 
-import routes from './routes';
+import Layout from './components/Layout';
+import Landing from './components/landing/Landing';
+import Home from './components/home/Home';
+import Login from './components/login/Login';
 
-ReactDOM.render(<Router history={browserHistory} routes={routes} />, document.getElementById('root'));
+render(
+  <Router>
+    <Layout>
+      <Route exact path='/' component={Landing} />
+      <Route exact path='/app' component={Home} />
+      <Route path='/login' component={Login} />
+    </Layout>
+  </Router>
+  , document.getElementById('root')
+);
