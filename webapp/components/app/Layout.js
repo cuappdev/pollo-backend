@@ -1,12 +1,11 @@
 import React from 'react';
 
-require('../stylesheets/all.scss');
+require('../../stylesheets/app/app.scss');
 
 class Layout extends React.Component {
   render () {
     return (
-      <div>
-        Layout
+      <div className='app-container'>
         {this.props.children}
       </div>
     );

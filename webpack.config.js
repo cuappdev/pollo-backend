@@ -2,17 +2,13 @@ const webpack = require('webpack');
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-const extractSass = new ExtractTextPlugin({
-  filename: '[name].[contenthash].css',
-  disable: process.env.NODE_ENV === 'development'
-});
+const extractSass = new ExtractTextPlugin('css/style.css');
 
 module.exports = {
   entry: path.join(__dirname, 'webapp', 'App.js'),
   output: {
-    path: path.join(__dirname, 'public', 'js'),
-    publicPath: '/js',
-    filename: 'bundle.js'
+    path: path.join(__dirname, '/public'),
+    filename: 'js/bundle.js'
   },
   devServer: {
     port: 5000,
@@ -48,7 +44,7 @@ module.exports = {
     extractSass,
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
-    }),
+    })
     // new webpack.optimize.UglifyJsPlugin({
     //   compress: { warnings: false },
     //   mangle: true,
