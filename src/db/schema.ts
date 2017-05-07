@@ -54,7 +54,7 @@ export interface Lecture {
   date: Date;
   name: string;
   class: Class;
-  question: Question;
+  questionIds: number[];
 };
 
 type Question = MultipleChoiceQuestion | ShortAnswerQuestion;

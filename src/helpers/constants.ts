@@ -24,13 +24,15 @@ export const GOOGLE_CLIENT_IDS = 'GOOGLE_CLIENT_IDS';
 export const MALFORMED_MESSAGE = "Malformed message received";
 export const UNAUTHORIZED_MESSAGE = "Unauthorized request received";
 
-// Keys for tables
+// Keys for different schema objects
 export const USERS_BUCKET_KEY = '%s:netid';
 export const CLASSES_BUCKET_KEY = '%s:courseId';
+export const QUESTION_BUCKET_KEY = '%s:questionId';
 
 // Keys for counters
 export const COURSE_ID_COUNTER = "courseIdCounter";
-export const LECTURE_ID_COUNTER = "course:%s:lectureIdCounter";
+export const LECTURE_ID_COUNTER = "%s:course:lectureIdCounter";
+export const QUESTION_ID_COUNTER = "questionIdCounter"
 
 // Passport strategies
 export const GOOGLE_STRATEGY = "google-strategy";
