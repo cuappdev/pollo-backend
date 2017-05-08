@@ -11,8 +11,9 @@ export class Socket {
   /*
    * Initialize the IndexRouter
    */
-  constructor(server, port) {
+  constructor (server, port) {
     this.io = socket(server);
+    console.log('Socket.io listening on port', port)
     this.io.on('connection', this.onConnect);
   }
 
