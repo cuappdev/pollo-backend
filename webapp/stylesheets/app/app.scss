@@ -1,1 +1,52 @@
+// Site-wide styling
 @import 'reset';
+
+/* Variables */
+
+/* Colors */
+
+$border-color: #D8D8D8;
+
+/* App-wide styles */
+
+html, body, .root {
+  height: 100%;
+}
+
+button {
+  border: none;
+  background-color: transparent;
+}
+
+/* Mixins */
+
+@mixin respond($class) {
+  @if $class == xs {
+    @media (max-width: 767px) { @content; }
+  }
+
+  @else if $class == sm {
+    @media (min-width: 768px) { @content; }
+  }
+
+  @else if $class == md {
+    @media (min-width: 992px) { @content; }
+  }
+
+  @else if $class == lg {
+    @media (min-width: 1200px) { @content; }
+  }
+
+  @else {
+    @warn "Respond mixin usage: xs | sm | md | lg";
+  }
+}
+
+/* @include transition(all,2s,ease-out); */
+@mixin transition($what: all, $time: 0.2s, $how: ease-in-out) {
+    -webkit-transition: $what $time $how;
+    -moz-transition:    $what $time $how;
+    -ms-transition:     $what $time $how;
+    -o-transition:      $what $time $how;
+    transition:         $what $time $how;
+}

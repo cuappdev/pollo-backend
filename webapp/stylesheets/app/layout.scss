@@ -1,0 +1,41 @@
+// Main app styling
+@import 'app';
+
+/* Variables */
+
+$header-height: 100px;
+$gutter: 10vw;
+$content-padding: $header-height / 2;
+
+/* Styles */
+
+.main {
+  min-height: 100vh;
+  max-width: 100vw;
+}
+
+.main-header {
+  height: $header-height;
+  padding: 0px $gutter;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid $border-color;
+}
+
+#main-nav-back {
+  position: absolute;
+  left: $gutter / 2;
+}
+
+.main-nav ul {
+  display: flex;
+
+  li {
+    padding: 8px;
+  }
+}
+
+.main-content {
+  padding: $content-padding $gutter;
+}
