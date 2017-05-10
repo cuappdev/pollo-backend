@@ -1,15 +1,15 @@
 import React from 'react';
 
+require('../../stylesheets/classes/ClassesList.scss');
+
 class ClassesList extends React.Component {
   render () {
     return (
-      <div>
-        <ul>
-          <li>ASTRO 1101: Introduction To Astronomy</li>
-          <li>INFO 1200: Information Ethics, Law, and Policy</li>
-          <li>INFO 2950: Introduction to Data Science</li>
-        </ul>
-      </div>
+      <ul className='classes-list'>
+        <li className='class-item'>ASTRO 1101: Introduction To Astronomy</li>
+        <li className='class-item'>INFO 1200: Information Ethics, Law, and Policy</li>
+        <li className='class-item'>INFO 2950: Introduction to Data Science</li>
+      </ul>
     );
   }
 }

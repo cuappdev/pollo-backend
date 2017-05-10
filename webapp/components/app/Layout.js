@@ -7,12 +7,14 @@ class Layout extends React.Component {
     return (
       <div className='main'>
         <header className='main-header'>
-          <button id='main-nav-back'>Back</button>
+          <button id='main-nav-back'>
+            <i className='fa fa-angle-left fa-2x' aria-hidden='true' />
+          </button>
           <h1>CliquePod</h1>
           <nav className='main-nav'>
             <ul>
               <li>
-                Frank Reshman
+                <p>Frank Reshman</p>
               </li>
               <li>
                 <button>signout</button>

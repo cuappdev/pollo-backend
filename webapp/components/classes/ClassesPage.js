@@ -2,14 +2,16 @@ import React from 'react';
 
 import ClassesList from './ClassesList';
 
+require('../../stylesheets/classes/ClassesPage.scss');
+
 class ClassesPage extends React.Component {
   render () {
     return (
-      <div>
+      <div className='classes-page'>
         <h1>Your class list</h1>
         <p>Choose a class to view past polls</p>
         <ClassesList />
-        <button>+ Add class</button>
+        <button id='add-class-button'>+ Add class</button>
       </div>
     );
   }

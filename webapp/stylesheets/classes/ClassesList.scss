@@ -1,0 +1,14 @@
+@import '../app/app';
+
+.classes-list {
+  margin: 8px 0px;
+}
+
+.class-item {
+  font-weight: 600;
+  padding: 16px;
+  margin-bottom: 16px;
+  background-color: $light-background-color;
+
+  @include interaction(white, $dark-background-color, white, $dark-background-color);
+}
