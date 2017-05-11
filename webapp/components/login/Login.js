@@ -6,7 +6,9 @@ import { signIn } from '../../utils/requests';
 class Login extends React.Component {
   handleSuccess (r) {
     const idToken = r.tokenId;
-    signIn(idToken);
+    signIn(idToken, (response) => {
+      console.log(response);
+    });
   }
 
   handleFailure (r) {

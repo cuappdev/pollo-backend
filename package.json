@@ -51,7 +51,7 @@
     "mocha": "^3.2.0",
     "node-sass": "^4.5.2",
     "react-google-login": "^2.8.5",
-    "react-router-dom": "^4.1.1",
+    "react-router": "^3.0.5",
     "sass-loader": "^6.0.3",
     "style-loader": "^0.17.0",
     "ts-node": "^2.1.0",
@@ -77,7 +77,6 @@
     "passport-custom": "^1.0.5",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
-    "react-router": "^4.1.1",
     "socket.io": "^1.7.3",
     "socket.io-client": "^1.7.3"
   }

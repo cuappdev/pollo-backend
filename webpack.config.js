@@ -12,6 +12,7 @@ module.exports = {
   },
   devServer: {
     port: 5000,
+    contentBase: '/public',
     proxy: {
       '*': 'http://localhost:8080'
     },
