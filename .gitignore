@@ -47,6 +47,7 @@ dist/
 
 # Compiled output frontend
 public/js/*
+public/css/*
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
