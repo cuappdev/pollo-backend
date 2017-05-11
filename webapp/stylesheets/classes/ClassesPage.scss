@@ -9,7 +9,7 @@
 #add-class-button {
   font-weight: 600;
   padding: 8px;
-  color: $dark-background-color;
+  color: $dark-gray;
 
   @include interaction(black, white, black, white);
 }

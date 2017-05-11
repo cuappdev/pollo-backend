@@ -3,7 +3,7 @@ import React from 'react';
 class ClassPage extends React.Component {
   render () {
     return (
-      <h1>Class page</h1>
+      <h1>Class page for {this.props.params.id}</h1>
     );
   }
 }

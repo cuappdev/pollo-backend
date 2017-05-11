@@ -39,9 +39,6 @@ class App {
     }));
     this.express.use(passport.initialize());
     this.express.use(passport.session());
-    // Setting path for frontend files.
-    this.express.use(express.static(path.join(__dirname, '/../public')));
-    this.express.get('*', (req, res) => res.sendFile(path.join(__dirname, '/../public/index.html')));
   }
 
   // Configure API endpoints.
@@ -49,6 +46,10 @@ class App {
     this.express.use('/api/v1/', IndexRouter);
     this.express.use('/api/v1/auth/', AuthRouter);
     this.express.use('/api/v1/classes/', ClassesRouter);
+
+    // Setting path for frontend files.
+    this.express.use(express.static(path.join(__dirname, '/../public')));
+    this.express.get('*', (req, res) => res.sendFile(path.join(__dirname, '/../public/index.html')));
   }
 
 }

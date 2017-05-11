@@ -3,6 +3,10 @@ import React from 'react';
 require('../../stylesheets/app/layout.scss');
 
 class Layout extends React.Component {
+  handleSignOut () {
+    
+  }
+
   render () {
     return (
       <div className='main'>
@@ -14,10 +18,10 @@ class Layout extends React.Component {
           <nav className='main-nav'>
             <ul>
               <li>
-                <p>Frank Reshman</p>
+                <p>{localStorage.getItem('name')}</p>
               </li>
               <li>
-                <button>signout</button>
+                <button onClick={() => this.handleSignOut()}>signout</button>
               </li>
             </ul>
           </nav>

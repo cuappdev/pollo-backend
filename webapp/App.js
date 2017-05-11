@@ -17,7 +17,7 @@ render(
       <Route path='app' component={Layout}>
         <IndexRedirect to='classes' />
         <Route path='classes' component={ClassesPage} />
-        <Route path='class/:classid' component={ClassPage} />
+        <Route path='class/:id' component={ClassPage} />
         <Redirect from='*' to='classes' />
       </Route>
       <Route path='*' component={NotFound} />
