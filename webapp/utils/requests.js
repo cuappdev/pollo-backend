@@ -8,7 +8,7 @@ const signIn = (idToken, onSuccess, onFailure) => {
     localStorage.setItem('name', data.displayName);
     localStorage.setItem('email', data.email);
     localStorage.setItem('netid', data.netid);
-    browserHistory.push('/app');
+    window.location = '/app';
     onSuccess(data);
   }, onFailure);
 };
