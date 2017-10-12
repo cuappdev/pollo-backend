@@ -1,0 +1,10 @@
+[ignore]
+./node_modules/*
+
+[include]
+
+[libs]
+
+[options]
+esproposal.decorators=ignore
+module.ignore_non_literal_requires=true

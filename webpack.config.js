@@ -1,57 +1,40 @@
-const webpack = require('webpack');
+const fs = require('fs');
 const path = require('path');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const webpack = require('webpack');
 
-const extractSass = new ExtractTextPlugin('css/style.css');
+const nodeModules = {};
+fs.readdirSync('node_modules')
+  .filter(function (x) {
+    return ['.bin'].indexOf(x) === -1;
+  })
+  .forEach(function (mod) {
+    nodeModules[mod] = 'commonjs ' + mod;
+  });
 
 module.exports = {
-  entry: path.join(__dirname, 'webapp', 'App.js'),
+  devtool: 'eval',
+  entry: ['babel-polyfill', path.join(__dirname, 'src/server.js')],
+  context: __dirname,
+  node: {
+    __filename: true,
+    __dirname: true
+  },
+  target: 'node',
   output: {
-    path: path.join(__dirname, '/public'),
-    filename: 'js/bundle.js'
+    path: path.join(__dirname, './build/'),
+    filename: 'bundle.js'
   },
-  devServer: {
-    port: 5000,
-    contentBase: '/public',
-    proxy: {
-      '*': 'http://localhost:8080'
-    },
-    historyApiFallback: true
-  },
+  externals: nodeModules,
   module: {
     rules: [
       {
         test: /\.jsx?$/,
         loader: 'babel-loader',
-        query: {
-          cacheDirectory: 'babel_cache',
-          presets: ['react', 'es2015']
-        }
-      },
-      {
-        test: /\.scss$/,
-        use: extractSass.extract({
-          use: [{
-            loader: 'css-loader'
-          }, {
-            loader: 'sass-loader'
-          }],
-          fallback: 'style-loader'
-        })
+        exclude: /(node_modules)/
       }
     ]
   },
   plugins: [
-    extractSass,
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
-    })
-    // new webpack.optimize.UglifyJsPlugin({
-    //   compress: { warnings: false },
-    //   mangle: true,
-    //   sourcemap: false,
-    //   beautify: false,
-    //   dead_code: true
-    // })
+    new webpack.IgnorePlugin(/\.(css|less)$/)
   ]
 };

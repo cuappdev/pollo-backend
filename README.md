@@ -1,75 +1,14 @@
-# clicker-backend
-Backend for the clicker app. NodeJS + Typescript + Couchbase
+# Clicker Backend
 
-## Local Development
-
-### Setting up Couchbase
-
-This is a one time setup. run the following command to start a community edition
-Couchbase server in docker.
-
-`docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-4.5.0`
-
-Next, point your browser to `localhost:8091`. You should see a page to setup
-Couchbase. You can go ahead and stick with the default settings. After going
-through the setup, Couchbase will be running locally.
-
-### Connecting NodeJS to Couchbase
-
-We will now add these to a local environment file so that Node can find your
-database. Create a file called `.env` under the root of this git repo and enter
-the following:
-```
-DB_HOST=localhost
-DB_USERNAME=cluster_username
-DB_PASSWORD=cluster_password
-GOOGLE_CLIENT_IDS=id1,id2
-```
-Replacing `cluster\_username` and `cluster\_password` with the admin username
-and password for your local couchbase db which you setup earlier.
-
-`GOOGLE\_CLIENT\_IDS` is the id(s) used to authenticate sign ins. You can obtain
-these on the [Google API Console](https://console.developers.google.com/project/_/apiui/apis/library)
-
-### Starting Clicker backend
-
-To install all project dependencies, run
-```
-npm install
-```
-You will have to run this everytime dependencies are added to the packages.json
-file.
-
-We use gulp to persistently compile backend Typescript files, and webpack to
-compile frontend react es6 files. Install gulp and webpack globally on your
-computer.
-```
-npm install -g gulp
-npm install -g webpack
-```
-To compile this project, run
-```
-./build.sh
-```
-Alternatively, you can persistently watch and compile the project whenever
-any files are changed by running the following
-```
-./build.sh --watch
-```
-
-If this is your first time running the app locally, you'll need to setup the db
-before you can run the app. After compiling, run
-```
-node ./dist/db/setup_db.js
-```
-
-To start clicker-backend locally, run
-```
+To run:
+````bash
 npm start
-```
-which will run the application locally on port 8080.
+````
 
-To run the tests under `test/`, do
-```
-npm test
-```
+Required variables:
+````bash
+MYSQL_HOST
+MYSQL_USER
+MYSQL_PASSWORD
+MYSQL_DB
+````
