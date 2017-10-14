@@ -173,9 +173,8 @@ const getStudents = async (id: number): Promise<Array<?User>> => {
       .where('courses.id=:courseId')
       .setParameters({ courseId: id })
       .getOne();
-    return course.students;
+    return (course) ? course.students : [];
   } catch (e) {
-    console.log(e);
     throw new Error('Problem getting students from course!');
   }
 };
@@ -188,7 +187,7 @@ const getAdmins = async (id: number): Promise<Array<?User>> => {
       .where('courses.id=:courseId')
       .setParameters({ courseId: id })
       .getOne();
-    return course.admins;
+    return (course) ? course.admins : [];
   } catch (e) {
     console.log(e);
     throw new Error('Problem getting admins from course!');

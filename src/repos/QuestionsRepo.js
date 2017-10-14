@@ -43,17 +43,19 @@ const getQuestionById = async (id: number): Promise<?Question> => {
 const updateQuestionById = async (id: number, text: string, data: json):
 Promise<?Question> => {
   try {
-    await db().createQueryBuilder('questions')
-      .where('questions.id = :id')
+    const question = await db().createQueryBuilder('question')
+      .leftJoinAndSelect('question.lecture', 'lecture')
+      .leftJoinAndSelect('question.responses', 'responses')
+      .where('question.id = :id')
       .setParameters({ id: id })
-      .update({
-        text: text,
-        data: data
-      })
-      .execute();
-    return await db().findOneById(id);
+      .getOne();
+    question.text = text;
+    question.data = data;
+    await db().persist(question);
+    return question;
   } catch (e) {
-    throw new Error('Error updating response');
+    // throw new Error('Error updating response');
+    throw new Error(e);
   }
 };
 

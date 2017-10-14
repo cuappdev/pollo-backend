@@ -5,7 +5,6 @@ import {
   json
 } from 'typeorm';
 import {Response} from '../models/Response';
-import {QUESTION_TYPE} from '../utils/constants';
 import QuestionsRepo from './QuestionsRepo';
 import UsersRepo from './UsersRepo';
 
@@ -14,13 +13,16 @@ const db = (): Repository<Response> => {
 };
 
 // Create a response
-const createResponse = async (type: QUESTION_TYPE, data: json,
+const createResponse = async (data: json,
   questionId: number, userId: number): Promise<Response> => {
   try {
     const response = new Response();
-    response.type = type;
     response.response = data;
-    response.question = await QuestionsRepo.getQuestionById(questionId);
+    var question = await QuestionsRepo.getQuestionById(questionId);
+    if (question) {
+      response.question = question;
+      response.type = question.type;
+    }
     response.user = await UsersRepo.getUserById(userId);
     await db().persist(response);
     return response;
@@ -55,19 +57,30 @@ Promise<Array<?Response>> => {
 };
 
 // Update a response
-const updateResponse = async (id: number, newReponse: json):
+const updateResponse = async (id: number, newResponse: json):
 Promise<?Response> => {
   try {
-    await db().createQueryBuilder('responses')
-      .where('responses.id = :id')
+    const response = await db().createQueryBuilder('response')
+      .leftJoinAndSelect('response.question', 'question')
+      .leftJoinAndSelect('response.user', 'user')
+      .where('response.id = :id')
       .setParameters({ id: id })
-      .update({
-        response: newReponse
-      })
-      .execute();
-    return await db().findOneById(id);
+      .getOne();
+    response.response = newResponse;
+    await db().persist(response);
+    return response;
   } catch (e) {
     throw new Error('Error updating response');
+  }
+};
+
+// Delete a response by Id
+const deleteResponseById = async (id: number) => {
+  try {
+    const r = await db().findOneById(id);
+    await db().remove(r);
+  } catch (e) {
+    throw new Error(`Problem deleting response by id: ${id}!`);
   }
 };
 
@@ -93,5 +106,6 @@ export default {
   getResponseById,
   getResponsesByQuestionId,
   updateResponse,
+  deleteResponseById,
   paginateResponseByQuestionId
 };

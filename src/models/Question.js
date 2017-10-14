@@ -24,7 +24,8 @@ export class Question extends Base {
   type: QUESTION_TYPE = '';
 
   // contains choices, correct answer, etc.
-  // ex. For a checkbox question {"choices": ["A","B","C","D"], "answer": ["A", "D"]}
+  // ex. For a checkbox question:
+  // {'choices': ['A','B','C','D'], 'answer': ['A', 'D']}
   @Column('json', { nullable: true }) // null if question is open ended
   data: json = {};
 
