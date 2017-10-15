@@ -4,10 +4,7 @@ import AppDevEdgeRouter from '../utils/AppDevEdgeRouter';
 import constants from '../utils/constants';
 import OrganizationsRepo from '../repos/OrganizationsRepo'
 
-type APIOrganization = {
-  id: string,
-  name: string,
-}
+import type { APIOrganization } from './APITypes'
 
 class GetOrganizations extends AppDevEdgeRouter<APIOrganization> {
 
