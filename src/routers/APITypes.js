@@ -15,7 +15,7 @@ export type APICourse = {|
 
 export type APILecture = {|
   id: id,
-  dateTime: string,
+  dateTime: number,
 |}
 
 export type APIQuestion = {|

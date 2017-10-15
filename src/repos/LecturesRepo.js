@@ -74,8 +74,13 @@ Promise<Array<?Lecture>> => {
 };
 
 // Returns lectures in reverse chronological order starting at the cursor
-const paginateLectureByCourseId = async (courseId: number, cursor: number,
+const paginateLectureByCourseId = async (courseId: number, cursor?: number,
   items: number): Promise<Array<?Lecture>> => {
+
+  if (!cursor) {
+    cursor = (new Date()).getTime();
+  }
+
   try {
     const lectures = await db().createQueryBuilder('lectures')
       .innerJoin('lectures.course', 'course', 'course.id = :courseId')
