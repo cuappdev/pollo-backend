@@ -70,6 +70,7 @@ const deleteOrgById = async (id: number) => {
 // Returns organizations in reverse chronological order starting at the cursor
 const paginateOrganization = async (cursor: number, items: number):
 Promise<Array<?Organization>> => {
+  cursor = cursor || (new Date()).getTime();
   try {
     const organizations = await db().createQueryBuilder('organizations')
       .where('organizations.createdAt <= :c')
