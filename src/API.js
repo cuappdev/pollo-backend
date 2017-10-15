@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import path from 'path';
 import fs from 'fs';
 import serveFavicon from 'serve-favicon';
+import globby from 'globby'
 
 class API {
   express: Object;
@@ -30,10 +31,12 @@ class API {
     this.express.use('/api/v1', Router);
   }
 
-  routes (): void {
-    // Connect all routers
-    fs.readdirSync(path.join(__dirname, "routers")).forEach(file => {
-      if (file.indexOf('Router.js') === -1) return;
+  routes(): void {
+
+    const opts = { cwd: path.join(__dirname, "routers") }
+
+    // Connect all routerss
+    globby.sync(['**/*Router.js'], opts).forEach(file => {
       const router = require("./routers/" + file);
       this._use(router.default);
     });

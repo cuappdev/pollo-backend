@@ -1,7 +1,7 @@
 // @flow
 import { Request } from 'express';
-import AppDevRouter from '../utils/AppDevRouter';
-import OrganizationsRepo from '../repos/OrganizationsRepo';
+import AppDevRouter from '../../utils/AppDevRouter';
+import OrganizationsRepo from '../../repos/OrganizationsRepo';
 
 class GetUsersRouter extends AppDevRouter {
   constructor() {

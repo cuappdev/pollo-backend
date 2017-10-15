@@ -1,10 +1,10 @@
 // @flow
 import { Request } from 'express';
-import AppDevEdgeRouter from '../utils/AppDevEdgeRouter';
-import constants from '../utils/constants';
-import OrganizationsRepo from '../repos/OrganizationsRepo'
+import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
+import constants from '../../utils/constants';
+import OrganizationsRepo from '../../repos/OrganizationsRepo'
 
-import type { APIOrganization } from './APITypes'
+import type { APIOrganization } from '../APITypes'
 
 class GetOrganizations extends AppDevEdgeRouter<APIOrganization> {
 
