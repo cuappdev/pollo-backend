@@ -196,8 +196,13 @@ const getAdmins = async (id: number): Promise<Array<?User>> => {
 };
 
 // Returns courses in reverse chronological order starting at the cursor
-const paginateCourseByOrgId = async (orgId: number, cursor: number,
-  items: number): Promise<Array<?Course>> => {
+const paginateCourseByOrgId = async (orgId: number, cursor?: number,
+  items?: number): Promise<Array<?Course>> => {
+
+  if (cursor === undefined) {
+    cursor = (new Date()).getTime();
+  }
+
   try {
     const courses = await db().createQueryBuilder('courses')
       .innerJoin('courses.organization', 'organization',
