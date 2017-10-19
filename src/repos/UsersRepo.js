@@ -74,10 +74,21 @@ Promise<Array<?Course>> => {
   }
 };
 
+// Delete a user by Id
+const deleteUserById = async (id: number) => {
+  try {
+    const user = await db().findOneById(id);
+    await db().remove(user);
+  } catch (e) {
+    throw new Error(`Problem deleting user by id: ${id}!`);
+  }
+};
+
 export default {
   getUsers,
   createUser,
   getUserById,
   getUserByGoogleId,
-  getAssocCoursesByUserId
+  getAssocCoursesByUserId,
+  deleteUserById
 };
