@@ -25,10 +25,8 @@ beforeAll(async () => {
 });
 
 test('Create Course', async () => {
-  const course = await CoursesRepo.createCourse('CS', 3110,
+  const course = await CoursesRepo.createCourse(
     'Functional Programming and Data Structures', 'FA \'17', orgId, adminId);
-  expect(course.subject).toBe('CS');
-  expect(course.catalogNum).toBe(3110);
   expect(course.name).toBe('Functional Programming and Data Structures');
   expect(course.term).toBe('FA \'17');
   id = course.id;
@@ -36,8 +34,6 @@ test('Create Course', async () => {
 
 test('Get Course', async () => {
   const course = await CoursesRepo.getCourseById(id);
-  expect(course.subject).toBe('CS');
-  expect(course.catalogNum).toBe(3110);
   expect(course.name).toBe('Functional Programming and Data Structures');
   expect(course.term).toBe('FA \'17');
 });
@@ -50,9 +46,7 @@ test('Get Courses', async () => {
 
 test('Update Course', async () => {
   const course = await CoursesRepo.updateCourseById(id, 'Networks',
-    'SP \'18', 'CS', 2850);
-  expect(course.subject).toBe('CS');
-  expect(course.catalogNum).toBe(2850);
+    'SP \'18');
   expect(course.name).toBe('Networks');
   expect(course.term).toBe('SP \'18');
 });

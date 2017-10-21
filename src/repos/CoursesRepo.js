@@ -10,12 +10,10 @@ const db = (): Repository<Course> => {
 };
 
 // Create a course
-const createCourse = async (subject: string, catalogNum: number, name: string,
+const createCourse = async (name: string,
   term: string, organizationId: number, adminId: number): Promise<Course> => {
   try {
     const course = new Course();
-    course.subject = subject;
-    course.catalogNum = catalogNum;
     course.name = name;
     course.term = term;
     course.organization = await OrganizationsRepo.getOrgById(organizationId);
@@ -53,14 +51,12 @@ const deleteCourseById = async (id: number) => {
 };
 
 // Update a course by Id
-const updateCourseById = async (id: number, name: ?string, term: ?string,
-  subject: ?string, catalogNum: ?number): Promise<?Course> => {
+const updateCourseById = async (id: number, name: ?string, term: ?string):
+  Promise<?Course> => {
   try {
     var field = {};
     if (name) field.name = name;
     if (term) field.term = term;
-    if (subject) field.subject = subject;
-    if (catalogNum) field.catalogNum = catalogNum;
     await db().createQueryBuilder('courses')
       .where('courses.id = :courseId')
       .setParameters({ courseId: id })

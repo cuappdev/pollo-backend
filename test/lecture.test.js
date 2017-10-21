@@ -25,7 +25,7 @@ beforeAll(async () => {
   const admin = await UsersRepo.createUser(fields);
   adminId = admin.id;
 
-  const course = await CoursesRepo.createCourse('CS', 3110,
+  const course = await CoursesRepo.createCourse(
     'Functional Programming and Data Structures', 'FA \'17', orgId, adminId);
   courseId = course.id;
 });
