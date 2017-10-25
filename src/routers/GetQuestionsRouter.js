@@ -1,10 +1,10 @@
 // @flow
-import { Request } from 'express';
+import type { APIQuestion } from './APITypes'
+
 import AppDevEdgeRouter from '../utils/AppDevEdgeRouter';
 import constants from '../utils/constants';
 import QuestionsRepo from '../repos/QuestionsRepo'
-
-import type { APIQuestion } from './APITypes'
+import { Request } from 'express';
 
 class GetQuestionsRouter extends AppDevEdgeRouter<APIQuestion> {
 
@@ -19,10 +19,10 @@ class GetQuestionsRouter extends AppDevEdgeRouter<APIQuestion> {
   async contentArray(req, pageInfo, error) {
 
     const id = req.params.id
-    const quesitons = await QuestionsRepo
+    const questions = await QuestionsRepo
       .paginateQuestionByLectureId(id, pageInfo.cursor, pageInfo.count)
 
-    return quesitons
+    return questions
       .filter(Boolean)
       .map(question => ({
         node: {
