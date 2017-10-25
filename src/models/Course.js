@@ -18,12 +18,6 @@ export class Course extends Base {
   id: any = null;
 
   @Column('string')
-  subject: string = '';
-
-  @Column('number')
-  catalogNum: number = 0;
-
-  @Column('string')
   name: string = '';
 
   @Column('string')
