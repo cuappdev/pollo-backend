@@ -6,7 +6,7 @@ import CoursesRepo from '../repos/CoursesRepo'
 
 import type { APICourse } from './APITypes'
 
-class GetOrganizations extends AppDevEdgeRouter<APICourse> {
+class GetCourses extends AppDevEdgeRouter<APICourse> {
 
   constructor() {
     super(constants.REQUEST_TYPES.GET);
@@ -35,4 +35,4 @@ class GetOrganizations extends AppDevEdgeRouter<APICourse> {
   }
 }
 
-export default new GetOrganizations().router;
+export default new GetCourses().router;
