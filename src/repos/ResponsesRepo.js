@@ -85,10 +85,15 @@ const deleteResponseById = async (id: number) => {
 };
 
 // Returns responses in reverse chronological order starting at the cursor
-const paginateResponseByQuestionId = async (questionId: number, cursor: number,
+const paginateResponseByQuestionId = async (questionId: number, cursor?: number,
   items: number): Promise<Array<?Response>> => {
+  if (cursor === undefined) {
+    cursor = (new Date()).getTime();
+  }
+
   try {
     const responses = await db().createQueryBuilder('responses')
+      .leftJoinAndSelect('responses.user', 'user')
       .innerJoin('responses.question', 'question', 'question.id=:questionId')
       .where('responses.createdAt <= :c')
       .setParameters({questionId: questionId, c: cursor})

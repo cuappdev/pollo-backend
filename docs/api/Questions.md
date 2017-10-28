@@ -7,13 +7,23 @@
       data: string
     }
 
-    type Answer {
+    type SingleResponse {
       id: id
       question: id
       answerer: id,
       type: string,
-      data: string,
+      response: string,
     }
+
+    type MultipleResponse {
+      id: id
+      question: id
+      answerer: id,
+      type: string,
+      response: string[],
+    }
+
+    type Answer = SingleResponse | MultipleResponse
 
 ## Questions
 

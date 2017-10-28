@@ -40,17 +40,29 @@ beforeAll(async () => {
 
 test('Create Question', async () => {
   const question = await QuestionsRepo.createQuestion('What is 1 + 1?',
-    constants.QUESTION_TYPES.MULTIPLE_CHOICE, {'choices': ['0', '1', '2', '3'],
-      'answer': ['0']}, lectureId);
-  expect(question.data.choices).toEqual(['0', '1', '2', '3']);
-  expect(question.data.answer).toEqual(['0']);
+    constants.QUESTION_TYPES.MULTIPLE_CHOICE, {'options': {
+      'A': '1',
+      'B': '2',
+      'C': '3',
+      'D': '4'},
+    'answer': 'B'}, lectureId);
+  expect(question.data.options).toEqual({
+    'A': '1',
+    'B': '2',
+    'C': '3',
+    'D': '4'});
+  expect(question.data.answer).toEqual('B');
   questionId = question.id;
 });
 
 test('Get Question', async () => {
   const question = await QuestionsRepo.getQuestionById(questionId);
-  expect(question.data.choices).toEqual(['0', '1', '2', '3']);
-  expect(question.data.answer).toEqual(['0']);
+  expect(question.data.options).toEqual({
+    'A': '1',
+    'B': '2',
+    'C': '3',
+    'D': '4'});
+  expect(question.data.answer).toEqual('B');
 });
 
 test('Get Questions', async () => {
@@ -61,22 +73,26 @@ test('Get Questions', async () => {
 
 test('Update Question', async () => {
   const question = await QuestionsRepo.updateQuestionById(questionId,
-    'updated question', {'choices': ['new choice', 'a', 'b'], 'answer': ['a']});
+    'updated question', {'options': {'A': 'new choice', 'B': 'b', 'C': 'c'},
+      'answer': 'A'});
   expect(question.text).toBe('updated question');
-  expect(question.data.choices).toEqual(['new choice', 'a', 'b']);
-  expect(question.data.answer).toEqual(['a']);
+  expect(question.data.options).toEqual({
+    'A': 'new choice',
+    'B': 'b',
+    'C': 'c'});
+  expect(question.data.answer).toEqual('A');
 });
 
 test('Create Response', async () => {
-  const response = await ResponsesRepo.createResponse({'answer': ['a']},
+  const response = await ResponsesRepo.createResponse({'answer': 'A'},
     questionId, adminId);
-  expect(response.response.answer).toEqual(['a']);
+  expect(response.response.answer).toEqual('A');
   responseId = response.id;
 });
 
 test('Get Response', async () => {
   const response = await ResponsesRepo.getResponseById(responseId);
-  expect(response.response.answer).toEqual(['a']);
+  expect(response.response.answer).toEqual('A');
 });
 
 test('Get Responses', async () => {
@@ -87,8 +103,8 @@ test('Get Responses', async () => {
 
 test('Update Response', async () => {
   const response = await ResponsesRepo.updateResponse(responseId,
-    {'answer': ['b']});
-  expect(response.response.answer).toEqual(['b']);
+    {'answer': 'B'});
+  expect(response.response.answer).toEqual('B');
 });
 
 test('Delete Response', async () => {

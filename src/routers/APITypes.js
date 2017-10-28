@@ -25,13 +25,25 @@ export type APIQuestion = {|
   data: string
 |}
 
-export type APIAnswer = {|
+// for free response or multiple choice questions
+export type SingleResponse = {|
   id: id,
   question: id,
   answerer: id,
   type: string,
-  data: string,
+  response: string
 |}
+
+// for multiple answer or ranking questions
+export type MultipleResponse = {|
+  id: id,
+  question: id,
+  answerer: id,
+  type: string,
+  response: string[]
+|}
+
+export type APIAnswer = SingleResponse | MultipleResponse
 
 export type APIUser = {|
   id: id,
