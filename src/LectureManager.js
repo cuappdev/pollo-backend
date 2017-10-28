@@ -24,12 +24,11 @@ class LectureManager {
     return id;
   }
 
-
-  async startNewLecture(lecture: Lecture) {
+  async startNewLecture(lecture: Lecture): {port: number} {
     const id = this._getSocketID();
-    const port = id + 2000;
+    const port = id + 4000;
 
-    this.lectureSockets[id] = new LectureSocket({port})
+    this.lectureSockets[id] = new LectureSocket({port, lecture})
     const err = await this.lectureSockets[id].start()
 
     if (err) {
@@ -41,6 +40,15 @@ class LectureManager {
     }
   }
 
+  endLecture(lecture: Lecture): void {
+    const index = this.lectureSockets.findIndex(x => {
+      if (typeof x !== 'number') return false;
+      return (x.lecture.id == lecture.id)
+    })
+    this.lectureSockets[index].close();
+    this.lectureSockets[index] = index;
+    console.log(this.lectureSockets)
+  }
 }
 
 export default new LectureManager()

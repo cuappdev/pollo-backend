@@ -2,7 +2,7 @@
 import AppDevRouter from '../utils/AppDevRouter';
 import constants from '../utils/constants';
 import LectureManager from '../LectureManager';
-import LecturesRepo from '../repos/LecturesRepo'
+import LecturesRepo from '../repos/LecturesRepo';
 import {Request} from 'express';
 import socket from 'socket.io';
 
@@ -20,9 +20,9 @@ class StartLectureRouter extends AppDevRouter {
     const id = req.params.id
     const lecture = await LecturesRepo.getLectureById(id)
 
-    // if (!lecture) {
-    //   throw new Error(`No lecture with id ${id} found.`)
-    // }
+    if (!lecture) {
+      throw new Error(`No lecture with id ${id} found.`)
+    }
 
     const { port } = await LectureManager.startNewLecture(lecture)
 

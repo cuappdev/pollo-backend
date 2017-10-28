@@ -2,11 +2,13 @@
 import type { SocketIO } from 'socket.io'
 
 import http from 'http';
+import { Lecture } from './models/Lecture';
 import { remove } from './utils/lib'
 import socket from 'socket.io';
 
 export type LectureSocketConfig = {
-  port: number
+  port: number,
+  lecture: Lecture,
 }
 
 type id = number;
@@ -42,6 +44,8 @@ export default class LectureSocket {
   io: SocketIO.Server;
   port: number;
 
+  lecture: Lecture
+
   admins: Array<{ socket: IOSocket }>
   students: Array<{ socket: IOSocket }>
 
@@ -59,27 +63,28 @@ export default class LectureSocket {
     question: -1
   }
 
-  constructor({port}: LectureSocketConfig) {
+  constructor({port, lecture}: LectureSocketConfig) {
     this.port = port;
+    this.lecture = lecture;
   }
 
   start(): Promise<?Error> {
     return new Promise((res, rej) => {
       this.io = socket.listen(this.port)
-      this.io.on('connect', this._onConnect);
+      this.io.on('connect', this._onConnect.bind(this));
       this.io.httpServer.on('listening', res);
       this.io.httpServer.on('error', rej);
     });
   }
 
-  // close() {
-  //   this.io.server.close()
-  //   this.io.httpServer.close()
-  // }
+  close() {
+    this.io.server.close()
+    this.io.httpServer.close()
+  }
 
   _clientError(client: IOSocket, msg: string): void {
     console.log(msg);
-    client.close()
+    // client.close()
     return;
   }
 
