@@ -1,9 +1,7 @@
 // @flow
 import API from './API';
-
 import dbConnection from './db/DbConnection';
 import http from 'http';
-import SocketServer from './SocketServer';
 
 type Error = {
   errno?: number;
@@ -35,18 +33,11 @@ const onListening = (): void => {
   console.log(`Listening on ${addr.port}`);
 };
 
-const mountApp = (): void => {
-  SocketServer.server = server;
-  SocketServer.port = port;
-  SocketServer.runServer();
-  SocketServer.on('error', onError);
-  SocketServer.on('listening', onListening);
-  SocketServer.setupSocket();
-};
-
 // Bootstrap everything
 dbConnection().then(_ => {
-  mountApp();
+  server.on('error', onError);
+  server.on('listening', onListening);
+  server.listen(port);
 }).catch(err => {
   console.log(err);
 });

@@ -1,35 +1,33 @@
 // @flow
-import {Request} from 'express';
 import AppDevRouter from '../utils/AppDevRouter';
-import socket from 'socket.io';
-import SocketServer from '../SocketServer';
 import constants from '../utils/constants';
+import LectureManager from '../LectureManager';
+import LecturesRepo from '../repos/LecturesRepo'
+import {Request} from 'express';
+import socket from 'socket.io';
 
 class StartLectureRouter extends AppDevRouter {
-  constructor () {
+
+  constructor() {
     super(constants.REQUEST_TYPES.POST);
   }
 
-  getPath (): string {
-    return '/start-lecture/';
+  getPath(): string {
+    return '/lectures/:id/start/';
   }
 
-  _generateLectureId (courseId: string, date: string): string {
-    // TODO - Generate unique lecture ID given the course ID and the date
-    // Date format is as follows: "Fri Sep 15 2017"
-    return courseId.replace(/\s/g, '') + date.replace(/\s/g, '');
-  }
+  async content(req: Request) {
+    const id = req.params.id
+    const lecture = await LecturesRepo.getLectureById(id)
 
-  async content (req: Request) {
-    // Start socket with namespace of lecture id
-    const profId = req.body.socketId;
-    const courseId = req.body.courseId;
-    const date = req.body.date;
-    const lectureId = this._generateLectureId(courseId, date);
-    const success = SocketServer.startLecture(profId, lectureId);
+    // if (!lecture) {
+    //   throw new Error(`No lecture with id ${id} found.`)
+    // }
+
+    const { port } = await LectureManager.startNewLecture(lecture)
+
     return {
-      success: success,
-      lectureId: lectureId
+      port
     };
   }
 }
