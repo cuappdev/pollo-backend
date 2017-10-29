@@ -8,19 +8,19 @@
     }
 
     type SingleResponse {
-      id: id
-      question: id
-      answerer: id,
+      id: string,
+      question: string,
+      answerer: string,
       type: string,
-      response: string,
+      response: string
     }
 
     type MultipleResponse {
-      id: id
-      question: id
-      answerer: id,
+      id: string,
+      question: string,
+      answerer: string,
       type: string,
-      response: string[],
+      response: string[]
     }
 
     type Answer = SingleResponse | MultipleResponse
