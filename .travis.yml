@@ -6,7 +6,4 @@ services:
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS clicker;'
 env:
-  - MYSQL_HOST='127.0.0.1'
-  - MYSQL_USER='root'
-  - MYSQL_PASSWORD=''
-  - MYSQL_DB='clicker'
+  - MYSQL_HOST='127.0.0.1' MYSQL_USER='root' MYSQL_PASSWORD='' MYSQL_DB='clicker'
