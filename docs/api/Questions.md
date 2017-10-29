@@ -24,13 +24,23 @@
     type Question = FreeResponseQuestion | MultipleChoiceQuestion
       | MultipleAnswerQuestion
 
-    type Answer {
-      id: id
-      question: id
-      answerer: id,
+    type SingleResponse {
+      id: string,
+      question: string,
+      answerer: string,
       type: string,
-      data: string,
+      response: string
     }
+
+    type MultipleResponse {
+      id: string,
+      question: string,
+      answerer: string,
+      type: string,
+      response: string[]
+    }
+
+    type Answer = SingleResponse | MultipleResponse
 
 ## Questions
 
