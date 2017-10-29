@@ -31,14 +31,14 @@ class GetQuestionsRouter extends AppDevEdgeRouter<APIQuestion> {
         var node;
         if (question.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
           var f: FreeResponseQuestion = {
-            id: question.id,
+            id: String(question.id),
             text: question.text,
             type: question.type
           };
           node = f;
         } else if (question.type === constants.QUESTION_TYPES.MULTIPLE_CHOICE) {
           var m: MultipleChoiceQuestion = {
-            id: question.id,
+            id: String(question.id),
             text: question.text,
             type: question.type,
             options: question.data.options,
@@ -47,7 +47,7 @@ class GetQuestionsRouter extends AppDevEdgeRouter<APIQuestion> {
           node = m;
         } else {
           var q: MultipleAnswerQuestion = {
-            id: question.id,
+            id: String(question.id),
             text: question.text,
             type: question.type,
             options: question.data.options,
