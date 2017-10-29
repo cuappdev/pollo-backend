@@ -32,7 +32,7 @@ class GetResponsesRouter extends AppDevEdgeRouter<APIAnswer> {
         if (response.type === constants.QUESTION_TYPES.FREE_RESPONSE ||
           response.type === constants.QUESTION_TYPES.MULTIPLE_CHOICE) {
           var r: SingleResponse = {
-            id: response.id,
+            id: String(response.id),
             question: id,
             answerer: String(userId),
             type: response.type,
@@ -41,7 +41,7 @@ class GetResponsesRouter extends AppDevEdgeRouter<APIAnswer> {
           node = r;
         } else {
           var m: MultipleResponse = {
-            id: response.id,
+            id: String(response.id),
             question: id,
             answerer: String(userId),
             type: response.type,
