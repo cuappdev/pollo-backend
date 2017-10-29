@@ -8,6 +8,7 @@ var id;
 beforeAll(async () => {
   await dbConnection().catch(function (e) {
     console.log('Error connecting to database');
+    process.exit();
   });
 });
 
