@@ -5,6 +5,7 @@ import dbConnection from '../src/db/DbConnection';
 beforeAll(() => {
   dbConnection().catch(function (e) {
     console.log('Error connecting to database');
+    process.exit();
   });
 });
 

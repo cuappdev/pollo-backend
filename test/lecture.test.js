@@ -13,6 +13,7 @@ var adminId;
 beforeAll(async () => {
   await dbConnection().catch(function (e) {
     console.log('Error connecting to database');
+    process.exit();
   });
   const org = await OrganizationRepo.createOrganization('Temp Organization');
   orgId = org.id;
