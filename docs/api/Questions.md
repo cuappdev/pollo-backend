@@ -1,11 +1,28 @@
 # Questions
+    type FreeResponseQuestion {
+      id: string,
+      text: string,
+      type: string
+    }
 
-    type Question {
+    type MultipleChoiceQuestion {
       id: string,
       text: string,
       type: string,
-      data: string
+      options: string,
+      answer: string
     }
+
+    type MultipleAnswerQuestion {
+      id: string,
+      text: string,
+      type: string,
+      options: string,
+      answer: string[]
+    }
+
+    type Question = FreeResponseQuestion | MultipleChoiceQuestion
+      | MultipleAnswerQuestion
 
     type SingleResponse {
       id: string,

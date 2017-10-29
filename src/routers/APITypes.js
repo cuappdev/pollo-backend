@@ -18,12 +18,31 @@ export type APILecture = {|
   dateTime: number,
 |}
 
-export type APIQuestion = {|
+export type FreeResponseQuestion = {|
+  id: id,
+  text: string,
+  type: string
+|}
+
+export type MultipleChoiceQuestion = {|
   id: id,
   text: string,
   type: string,
-  data: string
+  options: string,
+  answer: string
 |}
+
+// For multiple answer and ranking questions
+export type MultipleAnswerQuestion = {|
+  id: id,
+  text: string,
+  type: string,
+  options: string,
+  answer: string[]
+|}
+
+export type APIQuestion = FreeResponseQuestion | MultipleChoiceQuestion
+  | MultipleAnswerQuestion
 
 // for free response or multiple choice questions
 export type SingleResponse = {|
