@@ -2,24 +2,22 @@
 import { Request } from 'express';
 import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
 import constants from '../../utils/constants';
-import OrganizationsRepo from '../../repos/OrganizationsRepo'
+import OrganizationsRepo from '../../repos/OrganizationsRepo';
 
-import type { APIOrganization } from '../APITypes'
+import type { APIOrganization } from '../APITypes';
 
 class GetOrganizations extends AppDevEdgeRouter<APIOrganization> {
-
-  constructor() {
+  constructor () {
     super(constants.REQUEST_TYPES.GET);
   }
 
-  getPath(): string {
+  getPath (): string {
     return '/organizations/';
   }
 
-  async contentArray(req, pageInfo, error) {
-
+  async contentArray (req, pageInfo, error) {
     const orgs = await OrganizationsRepo
-      .paginateOrganization(pageInfo.cursor || 0, pageInfo.count)
+      .paginateOrganization(pageInfo.cursor || 0, pageInfo.count);
 
     return orgs
       // filters falsy entries out
@@ -27,9 +25,9 @@ class GetOrganizations extends AppDevEdgeRouter<APIOrganization> {
       .map(org => ({
         node: {
           id: org.id,
-          name: org.name,
+          name: org.name
         },
-        cursor: org.createdAt.valueOf(),
+        cursor: org.createdAt.valueOf()
       }));
   }
 }
