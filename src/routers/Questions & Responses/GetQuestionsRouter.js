@@ -17,7 +17,7 @@ class GetQuestionsRouter extends AppDevEdgeRouter<APIQuestion> {
   }
 
   getPath (): string {
-    return '/lecture/:id/questions/';
+    return '/lectures/:id/questions/';
   }
 
   async contentArray (req, pageInfo, error) {
