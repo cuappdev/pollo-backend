@@ -96,7 +96,7 @@ export default class LectureSocket {
       return;
     }
 
-    if (userType === 'professor') {
+    if (userType === 'admin') {
       console.log(`Admin with id ${client.id} connected to socket`);
       this._setupProfessorEvents(client)
       this.admins[client.id] = {
@@ -141,7 +141,7 @@ export default class LectureSocket {
       return;
     }
 
-    client.on('server/question/response', (answer: Answer) => {
+    client.on('server/question/respond', (answer: Answer) => {
       // todo: prevent spoofing
       const question = this._currentQuestion();
       if (question === null) {
