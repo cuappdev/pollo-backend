@@ -2,8 +2,8 @@ import OrganizationRepo from '../src/repos/OrganizationsRepo';
 import dbConnection from '../src/db/DbConnection';
 
 // Connects to db before running tests
-beforeAll(() => {
-  dbConnection().catch(function (e) {
+beforeAll(async () => {
+  await dbConnection().catch(function (e) {
     console.log('Error connecting to database');
     process.exit();
   });
@@ -40,5 +40,5 @@ test('Delete Organization', async () => {
 });
 
 afterAll(async () => {
-  // await OrganizationRepo.deleteOrgById(id);
+  await OrganizationRepo.deleteOrgById(id);
 });
