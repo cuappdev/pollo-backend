@@ -1,7 +1,7 @@
 // @flow
 import { Request } from 'express';
-import AppDevRouter from '../utils/AppDevRouter';
-import ResponsesRepo from '../repos/ResponsesRepo';
+import AppDevRouter from '../../utils/AppDevRouter';
+import ResponsesRepo from '../../repos/ResponsesRepo';
 
 class PostResponseRouter extends AppDevRouter {
   constructor () {
