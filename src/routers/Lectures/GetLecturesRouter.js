@@ -25,9 +25,9 @@ class GetLecturesRouter extends AppDevEdgeRouter<APILecture> {
       .map(lecture => ({
         node: {
           id: lecture.id,
-          dateTime: lecture.dateTime
+          dateTime: lecture.dateTime,
         },
-        cursor: lecture.createdAt.valueOf()
+        cursor: lecture.createdAt.valueOf(),
       }));
   }
 }

@@ -26,9 +26,9 @@ class GetCourses extends AppDevEdgeRouter<APICourse> {
         node: {
           id: course.id,
           name: course.name,
-          term: course.term
+          term: course.term,
         },
-        cursor: course.createdAt.valueOf()
+        cursor: course.createdAt.valueOf(),
       }));
   }
 }
