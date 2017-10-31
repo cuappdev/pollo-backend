@@ -1,26 +1,24 @@
 // @flow
 import { Request } from 'express';
-import AppDevEdgeRouter from '../utils/AppDevEdgeRouter';
-import constants from '../utils/constants';
-import CoursesRepo from '../repos/CoursesRepo'
+import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
+import constants from '../../utils/constants';
+import CoursesRepo from '../../repos/CoursesRepo';
 
-import type { APICourse } from './APITypes'
+import type { APICourse } from '../APITypes';
 
 class GetCourses extends AppDevEdgeRouter<APICourse> {
-
-  constructor() {
+  constructor () {
     super(constants.REQUEST_TYPES.GET);
   }
 
-  getPath(): string {
+  getPath (): string {
     return '/organizations/:id/courses/';
   }
 
-  async contentArray(req, pageInfo, error) {
-
-    const id = req.params.id
+  async contentArray (req, pageInfo, error) {
+    const id = req.params.id;
     const courses = await CoursesRepo
-      .paginateCourseByOrgId(id, pageInfo.cursor, pageInfo.count)
+      .paginateCourseByOrgId(id, pageInfo.cursor, pageInfo.count);
 
     return courses
       .filter(Boolean)
