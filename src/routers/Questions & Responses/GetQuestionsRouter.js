@@ -4,11 +4,11 @@ import type {
   MultipleChoiceQuestion,
   MultipleAnswerQuestion,
   APIQuestion
-} from './APITypes';
+} from '../APITypes';
 
-import AppDevEdgeRouter from '../utils/AppDevEdgeRouter';
-import constants from '../utils/constants';
-import QuestionsRepo from '../repos/QuestionsRepo';
+import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
+import constants from '../../utils/constants';
+import QuestionsRepo from '../../repos/QuestionsRepo';
 import { Request } from 'express';
 
 class GetQuestionsRouter extends AppDevEdgeRouter<APIQuestion> {
