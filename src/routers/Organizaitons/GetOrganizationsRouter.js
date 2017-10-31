@@ -25,9 +25,9 @@ class GetOrganizations extends AppDevEdgeRouter<APIOrganization> {
       .map(org => ({
         node: {
           id: org.id,
-          name: org.name
+          name: org.name,
         },
-        cursor: org.createdAt.valueOf()
+        cursor: org.createdAt.valueOf(),
       }));
   }
 }

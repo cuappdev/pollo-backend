@@ -74,6 +74,21 @@ Promise<?Response> => {
   }
 };
 
+// Get response if user already answered question
+const existingResponse = async (userId: number, questionId: number):
+Promise<?Response> => {
+  try {
+    const response = await db().createQueryBuilder('response')
+      .innerJoin('response.question', 'question', 'question.id=:questionId')
+      .innerJoin('response.user', 'user', 'user.id=:userId')
+      .setParameters({ questionId: questionId, userId: userId })
+      .getOne();
+    return response;
+  } catch (e) {
+    return null;
+  }
+};
+
 // Delete a response by Id
 const deleteResponseById = async (id: number) => {
   try {
@@ -111,6 +126,7 @@ export default {
   getResponseById,
   getResponsesByQuestionId,
   updateResponse,
+  existingResponse,
   deleteResponseById,
   paginateResponseByQuestionId
 };
