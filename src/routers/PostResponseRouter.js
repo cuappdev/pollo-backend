@@ -40,7 +40,7 @@ class PostResponseRouter extends AppDevRouter {
         question: questionId,
         answerer: user,
         type: r.type,
-        response: answer
+        response: answer,
       }
     };
   }
