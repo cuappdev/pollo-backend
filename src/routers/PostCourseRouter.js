@@ -19,14 +19,12 @@ class GetUsersRouter extends AppDevRouter {
     const term = req.body.term
     const orgId = req.params.id
     const adminId = /** TODO: GET THIS FROM SENT CREDENTIALS */ 0;
-    const subject = /** TODO: Do courses really need a subject field? Discuss. */ '';
-    const catalogNumber = /** TODO: Do courses need a catalog number? Discuss. */ 0;
 
     if (!name) throw new Error('Name missing')
     if (!term) throw new Error('Term missing')
 
     const course = await CoursesRepo
-      .createCourse(subject, catalogNumber, name, term, orgId, adminId)
+      .createCourse(name, term, orgId, adminId)
 
     return {
       node: {
