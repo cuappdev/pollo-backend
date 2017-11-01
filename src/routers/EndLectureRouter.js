@@ -1,9 +1,10 @@
 // @flow
-import {Request} from 'express';
 import AppDevRouter from '../utils/AppDevRouter';
-import socket from 'socket.io';
-import SocketServer from '../SocketServer';
 import constants from '../utils/constants';
+import LectureManager from '../LectureManager';
+import LecturesRepo from '../repos/LecturesRepo';
+import { Request } from 'express';
+import socket from 'socket.io';
 
 class EndLectureRouter extends AppDevRouter {
   constructor () {
@@ -11,15 +12,19 @@ class EndLectureRouter extends AppDevRouter {
   }
 
   getPath (): string {
-    return '/end-lecture/';
+    return '/lectures/:id/end/';
   }
 
-  async content (req: Request) {
-    // Close socket with namespace of lectureId
-    const profId = req.body.profId;
-    const lectureId = req.body.lectureId;
-    const success = SocketServer.endLecture(profId, lectureId);
-    return success;
+  async content(req: Request) {
+    const id = req.params.id
+    const lecture = await LecturesRepo.getLectureById(id)
+
+    if (!lecture) {
+      throw new Error(`No lecture with id ${id} found.`)
+    }
+
+    LectureManager.endLecture(lecture);
+    return {};
   }
 }
 
