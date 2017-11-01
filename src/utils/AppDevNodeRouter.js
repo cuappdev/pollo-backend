@@ -11,7 +11,7 @@ type id = number
 class AppDevNodeRouter<T> extends AppDevRouter {
 
   constructor() {
-    super("GET");
+    super('GET');
   }
 
   async fetchWithId(id: id): Promise<?T> {
