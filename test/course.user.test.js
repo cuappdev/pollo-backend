@@ -66,13 +66,14 @@ test('Add and Get Admins', async () => {
 });
 
 test('Remove Students', async () => {
-  await CoursesRepo.removeStudents(courseId);
+  await CoursesRepo.removeStudents(courseId, studentIds);
   const students = await CoursesRepo.getStudents(courseId);
   expect(students).toHaveLength(0);
 });
 
 test('Remove Admins', async () => {
-  await CoursesRepo.removeAdmins(courseId);
+  await CoursesRepo.removeAdmins(courseId, adminIds);
+  await CoursesRepo.removeAdmins(courseId, [adminId]);
   const admins = await CoursesRepo.getAdmins(courseId);
   expect(admins).toHaveLength(0);
 });

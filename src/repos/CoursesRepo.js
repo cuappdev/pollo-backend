@@ -97,26 +97,29 @@ const addStudents = async (id: number, studentIds: number[]) => {
     for (var i = 0; i < studentIds.length; i++) {
       students.push(await UsersRepo.getUserById(studentIds[i]));
     }
+    course.students = students;
     await db().persist(course);
   } catch (e) {
-    console.log(e);
     throw new Error('Problem adding students to course!');
   }
 };
 
 // remove students from course
-const removeStudents = async (id: number) => {
+const removeStudents = async (id: number, studentIds: number[]) => {
   try {
     const course = await db().createQueryBuilder('courses')
       .leftJoinAndSelect('courses.organization', 'organization')
       .leftJoinAndSelect('courses.admins', 'admins')
       .leftJoinAndSelect('courses.lectures', 'lectures')
+      .leftJoinAndSelect('courses.students', 'students')
       .where('courses.id = :courseId')
       .setParameters({ courseId: id })
       .getOne();
+    course.students = course.students.filter(function (student) {
+      return !studentIds.includes(student.id);
+    });
     await db().persist(course);
   } catch (e) {
-    console.log(e);
     throw new Error('Problem removing students from course!');
   }
 };
@@ -145,19 +148,24 @@ const addAdmins = async (id: number, adminIds: number[]) => {
 };
 
 // remove admins from course
-const removeAdmins = async (id: number) => {
+const removeAdmins = async (id: number, adminIds: number[]) => {
   try {
     const course = await db().createQueryBuilder('courses')
       .leftJoinAndSelect('courses.organization', 'organization')
       .leftJoinAndSelect('courses.students', 'students')
       .leftJoinAndSelect('courses.lectures', 'lectures')
+      .leftJoinAndSelect('courses.admins', 'admins')
       .where('courses.id = :courseId')
       .setParameters({ courseId: id })
       .getOne();
+
+    course.admins = course.admins.filter(function (admin) {
+      return !adminIds.includes(admin.id);
+    });
     await db().persist(course);
   } catch (e) {
     console.log(e);
-    throw new Error('Problem removing students from course!');
+    throw new Error('Problem removing admins from course!');
   }
 };
 
@@ -193,7 +201,6 @@ const getAdmins = async (id: number): Promise<Array<?User>> => {
 // Returns courses in reverse chronological order starting at the cursor
 const paginateCourseByOrgId = async (orgId: number, cursor?: number,
   items?: number): Promise<Array<?Course>> => {
-
   if (cursor === undefined) {
     cursor = (new Date()).getTime();
   }
