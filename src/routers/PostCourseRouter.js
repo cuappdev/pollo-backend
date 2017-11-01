@@ -5,7 +5,7 @@ import CoursesRepo from '../repos/CoursesRepo';
 
 import type { APICourse } from './APITypes'
 
-class GetUsersRouter extends AppDevRouter {
+class PostCourseRouter extends AppDevRouter {
   constructor() {
     super('POST');
   }
@@ -36,4 +36,4 @@ class GetUsersRouter extends AppDevRouter {
   }
 }
 
-export default new GetUsersRouter().router;
+export default new PostCourseRouter().router;
