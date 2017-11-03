@@ -1,5 +1,4 @@
 // @flow
-import { Request } from 'express';
 import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
 import constants from '../../utils/constants';
 import LecturesRepo from '../../repos/LecturesRepo';

@@ -1,11 +1,8 @@
 // @flow
-
 import type { Express } from 'express';
-
 import bodyParser from 'body-parser';
-import express, { Router } from 'express';
-import fs from 'fs';
-import globby from 'globby'
+import express from 'express';
+import globby from 'globby';
 import path from 'path';
 
 class API {
@@ -22,20 +19,19 @@ class API {
     this.express.use(bodyParser.urlencoded({ extended: false }));
   }
 
-  routes(): void {
-    const registered = []
+  routes (): void {
+    const registered = [];
 
     // Connect all routers in ./routers
-    const opts = { cwd: path.join(__dirname, "routers") }
+    const opts = { cwd: path.join(__dirname, 'routers') };
     globby.sync(['**/*Router.js'], opts).forEach(file => {
-      const router = require("./routers/" + file).default;
+      const router = require('./routers/' + file).default;
 
       registered.push(...router.stack
         .filter(r => r.route)
-        .map(r => `/api/v1${r.route.path}`))
+        .map(r => `/api/v1${r.route.path}`));
 
       this.express.use('/api/v1', router);
-
     });
 
     // Fallback prints all registered routes

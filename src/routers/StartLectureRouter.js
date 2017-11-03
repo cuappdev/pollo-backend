@@ -7,28 +7,24 @@ import {Request} from 'express';
 import socket from 'socket.io';
 
 class StartLectureRouter extends AppDevRouter {
-
-  constructor() {
+  constructor () {
     super(constants.REQUEST_TYPES.POST);
   }
 
-  getPath(): string {
+  getPath (): string {
     return '/lectures/:id/start/';
   }
 
-  async content(req: Request) {
-    const id = req.params.id
-    const lecture = await LecturesRepo.getLectureById(id)
+  async content (req: Request) {
+    const id = req.params.id;
+    const lecture = await LecturesRepo.getLectureById(id);
 
     if (!lecture) {
-      throw new Error(`No lecture with id ${id} found.`)
+      throw new Error(`No lecture with id ${id} found.`);
     }
 
-    const { port } = await LectureManager.startNewLecture(lecture)
-
-    return {
-      port
-    };
+    const { port } = await LectureManager.startNewLecture(lecture);
+    return {port};
   }
 }
 

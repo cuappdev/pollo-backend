@@ -9,7 +9,6 @@ import type {
 import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
 import constants from '../../utils/constants';
 import QuestionsRepo from '../../repos/QuestionsRepo';
-import { Request } from 'express';
 
 class GetQuestionsRouter extends AppDevEdgeRouter<APIQuestion> {
   constructor () {
