@@ -2,10 +2,11 @@
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import LecturesRepo from '../../repos/LecturesRepo';
+import constants from '../../utils/constants';
 
 class DeleteLectureRouter extends AppDevRouter {
   constructor () {
-    super('DELETE');
+    super(constants.REQUEST_TYPES.DELETE);
   }
 
   getPath (): string {
