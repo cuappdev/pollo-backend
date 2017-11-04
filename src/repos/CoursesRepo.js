@@ -9,6 +9,19 @@ const db = (): Repository<Course> => {
   return getConnectionManager().get().getRepository(Course);
 };
 
+// Contains all course codes used mapped to course id
+var courseCodes = {};
+
+// Generates random alphanumeric string
+function randomCode (length) {
+  var code = Math.round((Math.pow(36, length + 1) - Math.random() *
+    Math.pow(36, length))).toString(36).slice(1).toUpperCase();
+  if (courseCodes[code]) {
+    code = randomCode(length);
+  }
+  return code;
+}
+
 // Create a course
 const createCourse = async (name: string,
   term: string, organizationId: number, adminId: number): Promise<Course> => {
@@ -17,6 +30,8 @@ const createCourse = async (name: string,
     course.name = name;
     course.term = term;
     course.organization = await OrganizationsRepo.getOrgById(organizationId);
+    course.code = randomCode(6);
+    courseCodes[course.code] = course.id;
 
     const admin = await UsersRepo.getUserById(adminId);
     if (!admin) throw new Error('Problem getting admin from id!');
@@ -38,6 +53,13 @@ const getCourseById = async (id: number): Promise<?Course> => {
   } catch (e) {
     throw new Error(`Problem getting course by id: ${id}!`);
   }
+};
+
+// Get a course id from course code
+const getCourseId = (code: string) => {
+  var id = courseCodes[code];
+  if (!id) throw new Error('Could not find course associated with given code.');
+  return id;
 };
 
 // Delete a course by Id
@@ -193,7 +215,6 @@ const getAdmins = async (id: number): Promise<Array<?User>> => {
 // Returns courses in reverse chronological order starting at the cursor
 const paginateCourseByOrgId = async (orgId: number, cursor?: number,
   items?: number): Promise<Array<?Course>> => {
-
   if (cursor === undefined) {
     cursor = (new Date()).getTime();
   }
