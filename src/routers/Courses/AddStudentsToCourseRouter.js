@@ -2,10 +2,11 @@
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import CoursesRepo from '../../repos/CoursesRepo';
+import constants from '../../utils/constants';
 
 class AddStudentsToCourseRouter extends AppDevRouter {
   constructor () {
-    super('POST');
+    super(constants.REQUEST_TYPES.POST);
   }
 
   getPath (): string {
