@@ -3,7 +3,8 @@ import type { SocketIO } from 'socket.io';
 
 import http from 'http';
 import { Lecture } from './models/Lecture';
-import { remove } from './utils/lib';
+import * as rr from './repos/ResponsesRepo';
+import { remove } from './utils/lib'
 import socket from 'socket.io';
 
 export type LectureSocketConfig = {
@@ -32,9 +33,6 @@ type CurrentState = {
   question: number,
 }
 
-type AnswerMap = {
-  [number]: Answer
-}
 
 /**
  * Represents a single running lecture
@@ -55,7 +53,9 @@ export default class LectureSocket {
   questions: {
     [number]: {
       question: Question,
-      answers: AnswerMap,
+      answers: {
+        [number]: Answer
+      },
     }
   }
 
@@ -177,12 +177,25 @@ export default class LectureSocket {
     });
   }
 
-  _endQuestion () {
-    const question = this._currentQuestion();
+  _endQuestion() {
+    const question = this._currentQuestion()
+    if (!question) {
+      // no question to end
+      return
+    };
+    this._persistQuestion(question)
     this.students.forEach(student => {
       student.socket.emit('student/question/end', {question});
     });
     this.current.question = -1;
+  }
+
+  _persistQuestion(question: Question) {
+    Object.keys(this.questions[question.id].answers)
+      .map(answer_id => {
+        const answer = this.questions[question.id].answers
+        rr.createResponse(answer.data, answer.questionId, answer.answerer)
+    })
   }
 
   /**
