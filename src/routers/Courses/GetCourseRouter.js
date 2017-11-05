@@ -10,7 +10,7 @@ class GetCourse extends AppDevNodeRouter<APICourse> {
     return '/courses/:id/';
   }
 
-  async fetchWithId (id) {
+  async fetchWithId (id: number) {
     const course = await CoursesRepo.getCourseById(id);
     return course && {
       id: course.id,
