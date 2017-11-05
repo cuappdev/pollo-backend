@@ -116,29 +116,30 @@ const addStudents = async (id: number, studentIds: number[]) => {
       .setParameters({ courseId: id })
       .getOne();
     var students = course.students;
-    for (var i = 0; i < studentIds.length; i++) {
-      students.push(await UsersRepo.getUserById(studentIds[i]));
-    }
+    students = students.concat(await UsersRepo.getUsersFromIds(studentIds));
+    course.students = students;
     await db().persist(course);
   } catch (e) {
-    console.log(e);
     throw new Error('Problem adding students to course!');
   }
 };
 
 // remove students from course
-const removeStudents = async (id: number) => {
+const removeStudents = async (id: number, studentIds: number[]) => {
   try {
     const course = await db().createQueryBuilder('courses')
       .leftJoinAndSelect('courses.organization', 'organization')
       .leftJoinAndSelect('courses.admins', 'admins')
       .leftJoinAndSelect('courses.lectures', 'lectures')
+      .leftJoinAndSelect('courses.students', 'students')
       .where('courses.id = :courseId')
       .setParameters({ courseId: id })
       .getOne();
+    course.students = course.students.filter(function (student) {
+      return !studentIds.includes(student.id);
+    });
     await db().persist(course);
   } catch (e) {
-    console.log(e);
     throw new Error('Problem removing students from course!');
   }
 };
@@ -155,9 +156,7 @@ const addAdmins = async (id: number, adminIds: number[]) => {
       .setParameters({ courseId: id })
       .getOne();
     var admins = course.admins;
-    for (var i = 0; i < adminIds.length; i++) {
-      admins.push(await UsersRepo.getUserById(adminIds[i]));
-    }
+    admins = admins.concat(await UsersRepo.getUsersFromIds(adminIds));
     course.admins = admins;
     await db().persist(course);
   } catch (e) {
@@ -167,19 +166,24 @@ const addAdmins = async (id: number, adminIds: number[]) => {
 };
 
 // remove admins from course
-const removeAdmins = async (id: number) => {
+const removeAdmins = async (id: number, adminIds: number[]) => {
   try {
     const course = await db().createQueryBuilder('courses')
       .leftJoinAndSelect('courses.organization', 'organization')
       .leftJoinAndSelect('courses.students', 'students')
       .leftJoinAndSelect('courses.lectures', 'lectures')
+      .leftJoinAndSelect('courses.admins', 'admins')
       .where('courses.id = :courseId')
       .setParameters({ courseId: id })
       .getOne();
+
+    course.admins = course.admins.filter(function (admin) {
+      return !adminIds.includes(admin.id);
+    });
     await db().persist(course);
   } catch (e) {
     console.log(e);
-    throw new Error('Problem removing students from course!');
+    throw new Error('Problem removing admins from course!');
   }
 };
 

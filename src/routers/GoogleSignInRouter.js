@@ -3,10 +3,11 @@ import { Request } from 'express';
 import AppDevRouter from '../utils/AppDevRouter';
 
 import appDevUtils from '../utils/appDevUtils';
+import constants from '../utils/constants';
 
 class GoogleSignInRouter extends AppDevRouter {
   constructor () {
-    super('POST');
+    super(constants.REQUEST_TYPES.POST);
   }
 
   getPath (): string {
