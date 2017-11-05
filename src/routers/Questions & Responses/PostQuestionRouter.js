@@ -6,7 +6,7 @@ import constants from '../../utils/constants';
 
 class PostQuestionRouter extends AppDevRouter {
   constructor () {
-    super('POST');
+    super(constants.REQUEST_TYPES.POST);
   }
 
   getPath (): string {
