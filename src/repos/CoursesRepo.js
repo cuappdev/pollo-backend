@@ -94,9 +94,7 @@ const addStudents = async (id: number, studentIds: number[]) => {
       .setParameters({ courseId: id })
       .getOne();
     var students = course.students;
-    for (var i = 0; i < studentIds.length; i++) {
-      students.push(await UsersRepo.getUserById(studentIds[i]));
-    }
+    students = students.concat(await UsersRepo.getUsersFromIds(studentIds));
     course.students = students;
     await db().persist(course);
   } catch (e) {
@@ -136,9 +134,7 @@ const addAdmins = async (id: number, adminIds: number[]) => {
       .setParameters({ courseId: id })
       .getOne();
     var admins = course.admins;
-    for (var i = 0; i < adminIds.length; i++) {
-      admins.push(await UsersRepo.getUserById(adminIds[i]));
-    }
+    admins = admins.concat(await UsersRepo.getUsersFromIds(adminIds));
     course.admins = admins;
     await db().persist(course);
   } catch (e) {

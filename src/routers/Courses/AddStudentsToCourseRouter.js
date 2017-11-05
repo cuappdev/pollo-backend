@@ -18,7 +18,7 @@ class AddStudentsToCourseRouter extends AppDevRouter {
 
     // Students should follow format '[ id, id2, id3 ]'
     var students = req.body.students;
-    if (!students) throw new Error('Students are missing');
+    if (!students) throw new Error('Body parameter \'students\' are missing!');
 
     try {
       students = JSON.parse(students);
@@ -30,7 +30,7 @@ class AddStudentsToCourseRouter extends AppDevRouter {
     }
     await CoursesRepo.addStudents(courseId, students);
 
-    return {};
+    return null;
   }
 }
 
