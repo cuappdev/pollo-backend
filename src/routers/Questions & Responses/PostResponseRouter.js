@@ -16,12 +16,12 @@ class PostResponseRouter extends AppDevRouter {
   async content (req: Request) {
     const questionId = req.params.id;
     const answer = req.body.answer;
-    const user = req.body.user;
+    const userId = /** TODO: GET THIS FROM SENT CREDENTIALS */ 0;
     if (!answer) throw new Error('Answer missing');
-    if (!user) throw new Error('User id missing');
+    if (!userId) throw new Error('User id missing');
 
     // Check if user already responded
-    const currentResponse = await ResponsesRepo.existingResponse(user,
+    const currentResponse = await ResponsesRepo.existingResponse(userId,
       questionId);
     var r;
     if (currentResponse) {
@@ -31,7 +31,7 @@ class PostResponseRouter extends AppDevRouter {
     } else {
       // User hasn't responded so create new response
       r = await ResponsesRepo.createResponse({answer: answer},
-        questionId, user);
+        questionId, userId);
     }
     if (!r) throw new Error('No response created or updated');
 
@@ -39,7 +39,7 @@ class PostResponseRouter extends AppDevRouter {
       node: {
         id: String(r.id),
         question: questionId,
-        answerer: user,
+        answerer: userId,
         type: r.type,
         response: answer,
       }
