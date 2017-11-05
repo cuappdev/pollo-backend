@@ -62,7 +62,8 @@ Note: the response here is marked as empty, but may still be an object with an e
 ### Add students
 #### Request
 
-    POST /v1/courses/${id}/students {
+    POST /v1/course/register {
+      courseCode: string,
       students: Array<string> // IDs
     }
 
@@ -121,4 +122,3 @@ Note: the response here is marked as empty, but may still be an object with an e
     200 OK
 
 Note: the response here is marked as empty, but may still be an object with an errors array if there was an error adding any particular admin.
-

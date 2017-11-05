@@ -10,11 +10,11 @@ class AddStudentsToCourseRouter extends AppDevRouter {
   }
 
   getPath (): string {
-    return '/courses/:id/students/';
+    return '/course/register/';
   }
 
   async content (req: Request) {
-    const courseId = req.params.id;
+    const courseCode = req.body.code;
 
     // Students should follow format '[ id, id2, id3 ]'
     var students = req.body.students;
@@ -28,7 +28,8 @@ class AddStudentsToCourseRouter extends AppDevRouter {
     } catch (e) {
       throw new Error('Students must be a list of student ids');
     }
-    await CoursesRepo.addStudents(courseId, students);
+    const id = await CoursesRepo.getCourseId(courseCode);
+    await CoursesRepo.addStudents(id, students);
 
     return null;
   }

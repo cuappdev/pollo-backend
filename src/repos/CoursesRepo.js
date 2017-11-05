@@ -31,16 +31,15 @@ const createCourse = async (name: string,
     course.term = term;
     course.organization = await OrganizationsRepo.getOrgById(organizationId);
     course.code = randomCode(6);
-    courseCodes[course.code] = course.id;
 
     const admin = await UsersRepo.getUserById(adminId);
     if (!admin) throw new Error('Problem getting admin from id!');
     course.admins = [admin];
 
     await db().persist(course);
+    courseCodes[course.code] = course.id;
     return course;
   } catch (e) {
-    console.log(e);
     throw new Error('Problem creating course!');
   }
 };
@@ -242,6 +241,7 @@ export default {
   createCourse,
   getCourseById,
   getCoursesByOrgId,
+  getCourseId,
   addStudents,
   removeStudents,
   addAdmins,
