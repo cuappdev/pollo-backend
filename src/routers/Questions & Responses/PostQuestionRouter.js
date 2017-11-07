@@ -19,7 +19,8 @@ class PostQuestionRouter extends AppDevRouter {
     const type = req.body.type;
 
     // data must follow this format (ex for multiple choice):
-    // '{"options": {"A": "2", "B": "1"}, "answer": "A"}'
+    // '{"options": [{"id": "A", "description": "1"}, {"id": "B", "description": "2"}],
+    // "answer": "A"}'
     var data = req.body.data;
     try {
       data = JSON.parse(data);
