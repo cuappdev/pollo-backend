@@ -24,10 +24,7 @@ class StartLectureRouter extends AppDevRouter {
     }
 
     const { port } = await LectureManager.startNewLecture(lecture);
-
-    return {
-      port
-    };
+    return {port};
   }
 }
 
