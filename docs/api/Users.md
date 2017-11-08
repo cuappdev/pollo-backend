@@ -19,7 +19,7 @@
 
 ## Courses
 
-## Get coruses a user is enroled in
+## Get courses a user is enrolled in
 ### Request
 
     GET /v1/users/${id}/courses
