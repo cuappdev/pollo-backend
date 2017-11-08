@@ -2,10 +2,11 @@
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import OrganizationsRepo from '../../repos/OrganizationsRepo';
+import constants from '../../utils/constants';
 
 class PostOrganizationRouter extends AppDevRouter {
   constructor () {
-    super('POST');
+    super(constants.REQUEST_TYPES.POST);
   }
 
   getPath (): string {

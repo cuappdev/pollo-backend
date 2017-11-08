@@ -2,10 +2,11 @@
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import UsersRepo from '../../repos/UsersRepo';
+import constants from '../../utils/constants';
 
 class GetUsersRouter extends AppDevRouter {
   constructor () {
-    super('GET');
+    super(constants.REQUEST_TYPES.GET);
   }
 
   getPath (): string {

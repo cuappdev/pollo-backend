@@ -1,23 +1,21 @@
 // @flow
 import { Request } from 'express';
-import AppDevNodeRouter from '../utils/AppDevNodeRouter';
-import constants from '../utils/constants';
-import OrganizationsRepo from '../repos/OrganizationsRepo'
+import AppDevNodeRouter from '../../utils/AppDevNodeRouter';
+import OrganizationsRepo from '../../repos/OrganizationsRepo';
 
-import type { APIOrganization } from './APITypes'
+import type { APIOrganization } from '../APITypes';
 
 class GetOrganization extends AppDevNodeRouter<APIOrganization> {
-
-  getPath(): string {
+  getPath (): string {
     return '/organizations/:id/';
   }
 
-  async fetchWithId(id) {
+  async fetchWithId (id) {
     const org = await OrganizationsRepo.getOrgById(id);
     return org && {
       id: org.id,
       name: org.name,
-    }
+    };
   }
 }
 

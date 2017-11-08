@@ -3,12 +3,13 @@ import { Request } from 'express';
 import AppDevRouter from '../utils/AppDevRouter';
 import SessionsRepo from '../repos/SessionsRepo';
 import UsersRepo from '../repos/UsersRepo';
+import constants from '../utils/constants';
 
 import appDevUtils from '../utils/appDevUtils';
 
 class GetMeRouter extends AppDevRouter {
   constructor () {
-    super('POST');
+    super(constants.REQUEST_TYPES.GET);
   }
 
   getPath (): string {
