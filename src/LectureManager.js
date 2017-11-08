@@ -47,7 +47,22 @@ class LectureManager {
     })
     this.lectureSockets[index].close();
     this.lectureSockets[index] = index;
-    console.log(this.lectureSockets)
+  }
+
+  /**
+   * What ports is this lecture currently running on?
+   */
+  portsForLecture(lecture_id: number): Array<number> {
+    return this.lectureSockets
+      .filter(x => {
+        if (typeof x === 'number') return false;
+        else {
+          return x.lecture.id === lecture_id
+        }
+      })
+      .map((l: LectureSocket) => {
+        return l.port
+      })
   }
 }
 
