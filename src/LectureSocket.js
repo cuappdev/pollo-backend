@@ -46,8 +46,8 @@ export default class LectureSocket {
 
   lecture: Lecture
 
-  admins: Array<{ socket: IOSocket }>
-  students: Array<{ socket: IOSocket }>
+  admins: Array<{ socket: IOSocket }> = []
+  students: Array<{ socket: IOSocket }> = []
 
   /**
    * Stores all questions/answers for the lecture.
@@ -95,16 +95,16 @@ export default class LectureSocket {
     case 'admin':
       console.log(`Admin with id ${client.id} connected to socket`);
       this._setupProfessorEvents(client);
-      this.admins[client.id] = {
+      this.admins.push({
         socket: client
-      };
+      })
       break;
     case 'student':
       console.log(`Student with id ${client.id} connected to socket`);
       this._setupStudentEvents(client);
-      this.students[client.id] = {
+      this.students.push({
         socket: client
-      };
+      })
       break;
     default:
       if (!userType) {
@@ -124,18 +124,6 @@ export default class LectureSocket {
    * - Record the answer in volatile memory
    */
   _setupStudentEvents (client: IOSocket): void {
-    const address: ?string = client.handshake.address;
-    const netId: ?string = client.handshake.query.netId;
-
-    if (!address) {
-      this._clientError(client, 'No client address.');
-      return;
-    }
-
-    if (!netId) {
-      this._clientError(client, 'No client netId.');
-      return;
-    }
 
     client.on('server/question/respond', (answer: Answer) => {
       // todo: prevent spoofing
@@ -206,6 +194,7 @@ export default class LectureSocket {
 
     // Start question
     client.on('server/question/start', (question: Question) => {
+      console.log('starting', question)
       if (this.current.question !== -1) {
         this._endQuestion();
       }
@@ -214,6 +203,7 @@ export default class LectureSocket {
 
     // End question
     client.on('server/question/end', () => {
+      console.log('ending quesiton')
       this._endQuestion();
     });
 
