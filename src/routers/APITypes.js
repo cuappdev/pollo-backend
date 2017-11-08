@@ -24,11 +24,16 @@ export type FreeResponseQuestion = {|
   type: string
 |}
 
+export type option = {|
+  id: string,
+  description: string
+|}
+
 export type MultipleChoiceQuestion = {|
   id: id,
   text: string,
   type: string,
-  options: string,
+  options: option[],
   answer: string
 |}
 
@@ -37,7 +42,7 @@ export type MultipleAnswerQuestion = {|
   id: id,
   text: string,
   type: string,
-  options: string,
+  options: option[],
   answer: string[]
 |}
 

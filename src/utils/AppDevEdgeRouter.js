@@ -1,7 +1,6 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from './AppDevRouter';
-import type {RequestType } from './constants';
 
 export type Cursor = number
 
@@ -25,18 +24,11 @@ type ErrorCollector = Error => void
 }
 
 class AppDevEdgeRouter<T> extends AppDevRouter {
-  constructor(type: RequestType) {
-    super(type);
+  defaultCount () {
+    return 10;
   }
 
-  /**
-   * Default
-   */
-  defaultCount() {
-    return 10
-  }
-
-  async contentArray(
+  async contentArray (
     req: Request,
     pageInfo: PageInfo,
     error: ErrorCollector
@@ -44,34 +36,31 @@ class AppDevEdgeRouter<T> extends AppDevRouter {
     throw new Error(`Didn't implement contentArray for ${this.getPath()}`);
   }
 
-  async content(req: Request) {
-
+  async content (req: Request) {
     const pageInfo = {
       count: req.query.count || this.defaultCount(),
-      cursor: req.query.cursor || undefined,
-    }
+      cursor: req.query.cursor || undefined
+    };
 
-    const errors = []
-    const onerror = err => { errors.push(err) }
+    const errors = [];
+    const onerror = err => { errors.push(err); };
 
     const edges = await this.contentArray(req, pageInfo, onerror);
-
     const response: AppDevEdgesResponse<T> = {
       edges,
       pageInfo: {
         count: edges.length
       }
-    }
+    };
 
     if (errors.length) {
       response.errors = errors.map(err => ({
         message: err.message
-      }))
+      }));
     }
 
-    return response
-
+    return response;
   }
 }
 
-export default AppDevEdgeRouter
+export default AppDevEdgeRouter;

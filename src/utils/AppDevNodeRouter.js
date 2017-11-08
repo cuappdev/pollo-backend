@@ -9,28 +9,21 @@ type id = number
  * NOTE: Expects the path to contain an :id field!
  */
 class AppDevNodeRouter<T> extends AppDevRouter {
-
-  constructor() {
+  constructor () {
     super('GET');
   }
 
-  async fetchWithId(id: id): Promise<?T> {
-    throw new Error(`Not implemented for path ${this.getPath()}`)
+  async fetchWithId (id: id): Promise<?T> {
+    throw new Error(`Not implemented for path ${this.getPath()}`);
   }
 
-  async content(req: Request) {
-
-    const id = parseInt(req.params.id)
-
-    if (isNaN(id)) throw new Error(`Invalid id ${req.params.id}`)
-
+  async content (req: Request) {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) throw new Error(`Invalid id ${req.params.id}`);
     const node: ?T = await this.fetchWithId(id);
-
-    if (!node) throw new Error(`Could not fetch id:${req.params.id}`)
-
-    return { node }
-
+    if (!node) throw new Error(`Could not fetch id:${req.params.id}`);
+    return { node };
   }
 }
 
-export default AppDevNodeRouter
+export default AppDevNodeRouter;
