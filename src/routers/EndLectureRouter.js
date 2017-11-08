@@ -15,7 +15,7 @@ class EndLectureRouter extends AppDevRouter {
     return '/lectures/:id/end/';
   }
 
-  async content(req: Request) {
+  async content (req: Request) {
     const id = req.params.id
     const lecture = await LecturesRepo.getLectureById(id)
 
