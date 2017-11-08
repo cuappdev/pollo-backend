@@ -4,6 +4,7 @@ import {Course} from '../models/Course';
 import {User} from '../models/User';
 import OrganizationsRepo from './OrganizationsRepo';
 import UsersRepo from './UsersRepo';
+import appDevUtils from '../utils/appDevUtils';
 
 const db = (): Repository<Course> => {
   return getConnectionManager().get().getRepository(Course);
@@ -11,16 +12,6 @@ const db = (): Repository<Course> => {
 
 // Contains all course codes used mapped to course id
 var courseCodes = {};
-
-// Generates random alphanumeric string
-function randomCode (length) {
-  var code = Math.round((Math.pow(36, length + 1) - Math.random() *
-    Math.pow(36, length))).toString(36).slice(1).toUpperCase();
-  if (courseCodes[code]) {
-    code = randomCode(length);
-  }
-  return code;
-}
 
 // Create a course
 const createCourse = async (name: string,
@@ -30,7 +21,11 @@ const createCourse = async (name: string,
     course.name = name;
     course.term = term;
     course.organization = await OrganizationsRepo.getOrgById(organizationId);
-    course.code = randomCode(6);
+    var code = appDevUtils.randomCode(6);
+    while (courseCodes[code]) {
+      code = appDevUtils.randomCode(6);
+    }
+    course.code = code;
 
     const admin = await UsersRepo.getUserById(adminId);
     if (!admin) throw new Error('Problem getting admin from id!');
