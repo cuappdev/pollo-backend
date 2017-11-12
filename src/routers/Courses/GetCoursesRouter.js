@@ -3,7 +3,7 @@ import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
 import constants from '../../utils/constants';
 import CoursesRepo from '../../repos/CoursesRepo';
 
-import type { APICourse } from '../APITypes';
+import type { APICourse } from 'clicker-types';
 
 class GetCourses extends AppDevEdgeRouter<APICourse> {
   constructor () {
@@ -26,9 +26,9 @@ class GetCourses extends AppDevEdgeRouter<APICourse> {
           id: course.id,
           name: course.name,
           term: course.term,
-          code: course.code,
+          code: course.code
         },
-        cursor: course.createdAt.valueOf(),
+        cursor: course.createdAt.valueOf()
       }));
   }
 }

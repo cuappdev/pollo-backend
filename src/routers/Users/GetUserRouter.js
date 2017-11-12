@@ -2,7 +2,7 @@
 import AppDevNodeRouter from '../../utils/AppDevNodeRouter';
 import UsersRepo from '../../repos/UsersRepo';
 
-import type { APIUser } from '../APITypes';
+import type { APIUser } from 'clicker-types';
 
 class GetUser extends AppDevNodeRouter<APIUser> {
   getPath (): string {
@@ -15,7 +15,7 @@ class GetUser extends AppDevNodeRouter<APIUser> {
     return user && {
       id: user.id,
       name: user.firstName + ' ' + user.lastName,
-      netid: user.netId,
+      netid: user.netId
     };
   }
 }

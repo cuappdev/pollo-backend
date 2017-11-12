@@ -3,12 +3,11 @@ import type {
   SingleResponse,
   MultipleResponse,
   APIAnswer
-} from '../APITypes';
+} from 'clicker-types';
 
 import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
 import constants from '../../utils/constants';
 import ResponsesRepo from '../../repos/ResponsesRepo';
-import { Request } from 'express';
 
 class GetResponsesRouter extends AppDevEdgeRouter<APIAnswer> {
   constructor () {

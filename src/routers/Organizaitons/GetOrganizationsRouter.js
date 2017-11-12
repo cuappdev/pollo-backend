@@ -3,7 +3,7 @@ import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
 import constants from '../../utils/constants';
 import OrganizationsRepo from '../../repos/OrganizationsRepo';
 
-import type { APIOrganization } from '../APITypes';
+import type { APIOrganization } from 'clicker-types';
 
 class GetOrganizations extends AppDevEdgeRouter<APIOrganization> {
   constructor () {
@@ -24,9 +24,9 @@ class GetOrganizations extends AppDevEdgeRouter<APIOrganization> {
       .map(org => ({
         node: {
           id: org.id,
-          name: org.name,
+          name: org.name
         },
-        cursor: org.createdAt.valueOf(),
+        cursor: org.createdAt.valueOf()
       }));
   }
 }
