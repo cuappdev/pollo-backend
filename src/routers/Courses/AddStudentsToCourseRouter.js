@@ -16,16 +16,11 @@ class AddStudentsToCourseRouter extends AppDevRouter {
   async content (req: Request) {
     const courseId = req.params.id;
 
-    // Students should follow format '[ id, id2, id3 ]'
-    var students = req.body.students;
+    // Students should follow format [ id, id2, id3 ]
+    const students = req.body.students;
     if (!students) throw new Error('Body parameter \'students\' are missing!');
 
-    try {
-      students = JSON.parse(students);
-      if (typeof students !== 'object') {
-        throw new Error('Students must be a list of student ids');
-      }
-    } catch (e) {
+    if (typeof students !== 'object') {
       throw new Error('Students must be a list of student ids');
     }
     await CoursesRepo.addStudents(courseId, students);

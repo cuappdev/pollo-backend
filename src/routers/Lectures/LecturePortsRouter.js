@@ -11,20 +11,20 @@ import constants from '../../utils/constants';
  * ask @mrkev for more info.
  */
 class LecturePortsRouter extends AppDevRouter {
-  constructor() {
+  constructor () {
     super(constants.REQUEST_TYPES.GET);
   }
 
-  getPath(): string {
+  getPath (): string {
     return '/lectures/:id/ports/';
   }
 
-  async content(req: Request) {
+  async content (req: Request) {
     const lectureId = parseInt(req.params.id);
     if (Number.isNaN(lectureId)) {
-      throw new Error(`Invalid lecture id ${req.params.id}`)
+      throw new Error(`Invalid lecture id ${req.params.id}`);
     }
-    const ports = LectureManager.portsForLecture(lectureId)
+    const ports = LectureManager.portsForLecture(lectureId);
     return {
       ports
     };
