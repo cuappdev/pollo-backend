@@ -11,6 +11,7 @@ export type APICourse = {|
   id: id,
   name: string,
   term: string,
+  code: string,
 |}
 
 export type APILecture = {|
