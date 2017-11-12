@@ -99,15 +99,15 @@ const getCoursesByOrgId = async (orgId: number): Promise<Array<?Course>> => {
 };
 
 // add students to course
-const addStudents = async (id: number, studentIds: number[]) => {
+const addStudents = async (courseCode: string, studentIds: number[]) => {
   try {
     const course = await db().createQueryBuilder('courses')
       .leftJoinAndSelect('courses.organization', 'organization')
       .leftJoinAndSelect('courses.admins', 'admins')
       .leftJoinAndSelect('courses.lectures', 'lectures')
       .leftJoinAndSelect('courses.students', 'students')
-      .where('courses.id = :courseId')
-      .setParameters({ courseId: id })
+      .where('courses.code = :courseCode')
+      .setParameters({ courseCode: courseCode })
       .getOne();
     var students = course.students;
     students = students.concat(await UsersRepo.getUsersFromIds(studentIds));

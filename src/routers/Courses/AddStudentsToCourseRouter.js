@@ -23,8 +23,8 @@ class AddStudentsToCourseRouter extends AppDevRouter {
     if (typeof students !== 'object') {
       throw new Error('Students must be a list of student ids');
     }
-    const id = await CoursesRepo.getCourseId(courseCode);
-    await CoursesRepo.addStudents(id, students);
+
+    await CoursesRepo.addStudents(courseCode, students);
 
     return null;
   }

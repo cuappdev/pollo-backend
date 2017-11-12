@@ -45,8 +45,7 @@ test('Add and Get Students', async () => {
     studentList.push(student);
     studentIds.push(student.id);
   }
-  const id = await CoursesRepo.getCourseId(courseCode);
-  await CoursesRepo.addStudents(id, studentIds);
+  await CoursesRepo.addStudents(courseCode, studentIds);
   expect(await CoursesRepo.getStudents(courseId)).toEqual(studentList);
 });
 
