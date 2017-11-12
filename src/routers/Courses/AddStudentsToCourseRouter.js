@@ -18,7 +18,7 @@ class AddStudentsToCourseRouter extends AppDevRouter {
 
     // Students should follow format [ id, id2, id3 ]
     const students = req.body.students;
-    if (!students) throw new Error('Body parameter \'students\' are missing!');
+    if (!students) throw new Error('Body parameter \'students\' is missing!');
 
     if (typeof students !== 'object') {
       throw new Error('Students must be a list of student ids');
