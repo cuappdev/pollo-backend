@@ -19,13 +19,11 @@ class PostQuestionRouter extends AppDevRouter {
     const type = req.body.type;
 
     // data must follow this format (ex for multiple choice):
-    // '{"options": [{"id": "A", "description": "1"}, {"id": "B", "description": "2"}],
-    // "answer": "A"}'
+    // {"options": [{"id": "A", "description": "1"}, {"id": "B", "description": "2"}],
+    // "answer": "A"}
     var data = req.body.data;
-    try {
-      data = JSON.parse(data);
-    } catch (e) {
-      throw new Error('Invalid json in data field');
+    if (typeof data !== 'object') {
+      throw new Error('Data must be a valid json');
     }
     if (!text) throw new Error('Text missing');
     if (!type) throw new Error('Question type missing');
