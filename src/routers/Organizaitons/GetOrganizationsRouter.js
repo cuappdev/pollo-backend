@@ -3,7 +3,7 @@ import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
 import constants from '../../utils/constants';
 import OrganizationsRepo from '../../repos/OrganizationsRepo';
 
-import type { APIOrganization } from 'clicker-types';
+import type { APIOrganization } from 'clicker-api-spec';
 
 class GetOrganizations extends AppDevEdgeRouter<APIOrganization> {
   constructor () {

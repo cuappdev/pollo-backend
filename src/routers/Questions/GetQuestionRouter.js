@@ -8,7 +8,7 @@ import type {
   MultipleChoiceQuestion,
   MultipleAnswerQuestion,
   APIQuestion
-} from 'clicker-types';
+} from 'clicker-api-spec';
 
 class GetQuestion extends AppDevNodeRouter<APIQuestion> {
   getPath (): string {

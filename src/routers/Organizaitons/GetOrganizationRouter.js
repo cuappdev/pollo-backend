@@ -2,7 +2,7 @@
 import AppDevNodeRouter from '../../utils/AppDevNodeRouter';
 import OrganizationsRepo from '../../repos/OrganizationsRepo';
 
-import type { APIOrganization } from 'clicker-types';
+import type { APIOrganization } from 'clicker-api-spec';
 
 class GetOrganization extends AppDevNodeRouter<APIOrganization> {
   getPath (): string {

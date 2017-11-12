@@ -2,7 +2,7 @@
 import AppDevNodeRouter from '../../utils/AppDevNodeRouter';
 import UsersRepo from '../../repos/UsersRepo';
 
-import type { APIUser } from 'clicker-types';
+import type { APIUser } from 'clicker-api-spec';
 
 class GetUser extends AppDevNodeRouter<APIUser> {
   getPath (): string {

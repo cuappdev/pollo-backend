@@ -2,7 +2,7 @@
 import AppDevNodeRouter from '../../utils/AppDevNodeRouter';
 import CoursesRepo from '../../repos/CoursesRepo';
 
-import type { APICourse } from 'clicker-types';
+import type { APICourse } from 'clicker-api-spec';
 
 class GetCourse extends AppDevNodeRouter<APICourse> {
   getPath (): string {
