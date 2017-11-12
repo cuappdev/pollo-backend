@@ -4,7 +4,7 @@ import type {
   MultipleChoiceQuestion,
   MultipleAnswerQuestion,
   APIQuestion
-} from '../APITypes';
+} from 'clicker-api-spec';
 
 import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
 import constants from '../../utils/constants';
