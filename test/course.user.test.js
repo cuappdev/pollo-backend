@@ -4,6 +4,7 @@ import UsersRepo from '../src/repos/UsersRepo';
 import dbConnection from '../src/db/DbConnection';
 
 var courseId;
+var courseCode;
 var adminId;
 var studentIds = [];
 var adminIds = [];
@@ -27,6 +28,7 @@ beforeAll(async () => {
   const course = await CoursesRepo.createCourse(
     'Functional Programming and Data Structures', 'FA \'17', org.id, admin.id);
   courseId = course.id;
+  courseCode = course.code;
 });
 
 test('Add and Get Students', async () => {
@@ -43,7 +45,7 @@ test('Add and Get Students', async () => {
     studentList.push(student);
     studentIds.push(student.id);
   }
-  await CoursesRepo.addStudents(courseId, studentIds);
+  await CoursesRepo.addStudents(courseCode, studentIds);
   expect(await CoursesRepo.getStudents(courseId)).toEqual(studentList);
 });
 

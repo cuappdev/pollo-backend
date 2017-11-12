@@ -4,10 +4,14 @@ import {Course} from '../models/Course';
 import {User} from '../models/User';
 import OrganizationsRepo from './OrganizationsRepo';
 import UsersRepo from './UsersRepo';
+import appDevUtils from '../utils/appDevUtils';
 
 const db = (): Repository<Course> => {
   return getConnectionManager().get().getRepository(Course);
 };
+
+// Contains all course codes used mapped to course id
+var courseCodes = {};
 
 // Create a course
 const createCourse = async (name: string,
@@ -17,15 +21,20 @@ const createCourse = async (name: string,
     course.name = name;
     course.term = term;
     course.organization = await OrganizationsRepo.getOrgById(organizationId);
+    var code = appDevUtils.randomCode(6);
+    while (courseCodes[code]) {
+      code = appDevUtils.randomCode(6);
+    }
+    course.code = code;
 
     const admin = await UsersRepo.getUserById(adminId);
     if (!admin) throw new Error('Problem getting admin from id!');
     course.admins = [admin];
 
     await db().persist(course);
+    courseCodes[course.code] = course.id;
     return course;
   } catch (e) {
-    console.log(e);
     throw new Error('Problem creating course!');
   }
 };
@@ -38,6 +47,13 @@ const getCourseById = async (id: number): Promise<?Course> => {
   } catch (e) {
     throw new Error(`Problem getting course by id: ${id}!`);
   }
+};
+
+// Get a course id from course code
+const getCourseId = (code: string) => {
+  var id = courseCodes[code];
+  if (!id) throw new Error('Could not find course associated with given code.');
+  return id;
 };
 
 // Delete a course by Id
@@ -83,15 +99,15 @@ const getCoursesByOrgId = async (orgId: number): Promise<Array<?Course>> => {
 };
 
 // add students to course
-const addStudents = async (id: number, studentIds: number[]) => {
+const addStudents = async (courseCode: string, studentIds: number[]) => {
   try {
     const course = await db().createQueryBuilder('courses')
       .leftJoinAndSelect('courses.organization', 'organization')
       .leftJoinAndSelect('courses.admins', 'admins')
       .leftJoinAndSelect('courses.lectures', 'lectures')
       .leftJoinAndSelect('courses.students', 'students')
-      .where('courses.id = :courseId')
-      .setParameters({ courseId: id })
+      .where('courses.code = :courseCode')
+      .setParameters({ courseCode: courseCode })
       .getOne();
     var students = course.students;
     students = students.concat(await UsersRepo.getUsersFromIds(studentIds));
@@ -220,6 +236,7 @@ export default {
   createCourse,
   getCourseById,
   getCoursesByOrgId,
+  getCourseId,
   addStudents,
   removeStudents,
   addAdmins,

@@ -31,7 +31,8 @@ class PostCourseRouter extends AppDevRouter {
       node: {
         id: course.id,
         term: course.term,
-        name: course.name
+        name: course.name,
+        code: course.code,
       }
     };
   }

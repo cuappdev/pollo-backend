@@ -1,5 +1,4 @@
 // @flow
-import { Request } from 'express';
 import AppDevNodeRouter from '../../utils/AppDevNodeRouter';
 import CoursesRepo from '../../repos/CoursesRepo';
 
@@ -16,6 +15,7 @@ class GetCourse extends AppDevNodeRouter<APICourse> {
       id: course.id,
       name: course.name,
       term: course.term,
+      code: course.code,
     };
   }
 }

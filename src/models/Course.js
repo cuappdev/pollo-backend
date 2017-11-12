@@ -26,6 +26,9 @@ export class Course extends Base {
   @ManyToOne(type => Organization, organization => organization.courses)
   organization: ?Organization = null;
 
+  @Column('string')
+  code: string = '';
+
   @OneToMany(type => Lecture, lecture => lecture.course)
   lectures: ?Lecture[] = [];
 

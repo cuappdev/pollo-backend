@@ -35,9 +35,16 @@ const netIdFromEmail = (email: string): string => {
   return email.substring(0, email.indexOf('@'));
 };
 
+const randomCode = (length: number): string => {
+  var code = Math.round((Math.pow(36, length + 1) - Math.random() *
+    Math.pow(36, length))).toString(36).slice(1).toUpperCase();
+  return code;
+};
+
 export default {
   encodeUrlParams,
   googleAxios,
   insertIntoMySQLStatement,
-  netIdFromEmail
+  netIdFromEmail,
+  randomCode
 };
