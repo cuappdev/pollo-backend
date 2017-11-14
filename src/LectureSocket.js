@@ -3,6 +3,7 @@ import type { SocketIO } from 'socket.io';
 
 import http from 'http';
 import { Lecture } from './models/Lecture';
+import ResponsesRepo from './repos/ResponsesRepo';
 import { remove } from './utils/lib';
 import socket from 'socket.io';
 
@@ -32,10 +33,6 @@ type CurrentState = {
   question: number,
 }
 
-type AnswerMap = {
-  [number]: Answer
-}
-
 /**
  * Represents a single running lecture
  */
@@ -53,9 +50,11 @@ export default class LectureSocket {
    * Stores all questions/answers for the lecture.
    */
   questions: {
-    [number]: {
+    [string]: {
       question: Question,
-      answers: AnswerMap,
+      answers: {
+        [string]: Answer
+      },
     }
   }
 
@@ -132,7 +131,7 @@ export default class LectureSocket {
         console.log(`Client ${client.id} sanswer on no question`);
         return;
       }
-      this.questions[question.id].answers[answer.answerer] = answer;
+      this.questions[`${question.id}`].answers[`${answer.answerer}`] = answer;
     });
 
     client.on('disconnect', () => {
@@ -147,15 +146,15 @@ export default class LectureSocket {
     if (this.current.question === -1) {
       return null;
     } else {
-      return this.questions[this.current.question].question;
+      return this.questions[`${this.current.question}`].question;
     }
   }
 
   _startQuestion (question: Question) {
     // start new question
     this.current.question = question.id;
-    if (!this.questions[question.id]) {
-      this.questions[question.id] = {
+    if (!this.questions[`${question.id}`]) {
+      this.questions[`${question.id}`] = {
         question,
         answers: {}
       };
@@ -167,10 +166,25 @@ export default class LectureSocket {
 
   _endQuestion () {
     const question = this._currentQuestion();
+    if (!question) {
+      // no question to end
+      return;
+    }
+    this._persistQuestion(question);
     this.students.forEach(student => {
       student.socket.emit('student/question/end', {question});
     });
     this.current.question = -1;
+  }
+
+  _persistQuestion (question: Question) {
+    const answers = this.questions[`${question.id}`].answers;
+    Object.keys(answers)
+      .map(answerKey => {
+        const answer = answers[answerKey];
+        ResponsesRepo
+          .createResponse(answer.data, answer.question, answer.answerer);
+      });
   }
 
   /**
