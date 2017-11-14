@@ -4,7 +4,7 @@ import AppDevRouter from '../../utils/AppDevRouter';
 import CoursesRepo from '../../repos/CoursesRepo';
 import constants from '../../utils/constants';
 
-import type { APICourse } from '../APITypes';
+import type { APICourse } from 'clicker-api-spec';
 
 class PostCourseRouter extends AppDevRouter {
   constructor () {
@@ -32,7 +32,7 @@ class PostCourseRouter extends AppDevRouter {
         id: course.id,
         term: course.term,
         name: course.name,
-        code: course.code,
+        code: course.code
       }
     };
   }

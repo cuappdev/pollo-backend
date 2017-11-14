@@ -3,7 +3,7 @@ import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
 import constants from '../../utils/constants';
 import LecturesRepo from '../../repos/LecturesRepo';
 
-import type { APILecture } from '../APITypes';
+import type { APILecture } from 'clicker-api-spec';
 
 class GetLecturesRouter extends AppDevEdgeRouter<APILecture> {
   constructor () {
@@ -24,9 +24,9 @@ class GetLecturesRouter extends AppDevEdgeRouter<APILecture> {
       .map(lecture => ({
         node: {
           id: lecture.id,
-          dateTime: lecture.dateTime,
+          dateTime: lecture.dateTime
         },
-        cursor: lecture.createdAt.valueOf(),
+        cursor: lecture.createdAt.valueOf()
       }));
   }
 }

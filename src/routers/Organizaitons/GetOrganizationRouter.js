@@ -1,9 +1,8 @@
 // @flow
-import { Request } from 'express';
 import AppDevNodeRouter from '../../utils/AppDevNodeRouter';
 import OrganizationsRepo from '../../repos/OrganizationsRepo';
 
-import type { APIOrganization } from '../APITypes';
+import type { APIOrganization } from 'clicker-api-spec';
 
 class GetOrganization extends AppDevNodeRouter<APIOrganization> {
   getPath (): string {
@@ -14,7 +13,7 @@ class GetOrganization extends AppDevNodeRouter<APIOrganization> {
     const org = await OrganizationsRepo.getOrgById(id);
     return org && {
       id: org.id,
-      name: org.name,
+      name: org.name
     };
   }
 }
