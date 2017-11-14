@@ -49,13 +49,12 @@ Promise<?Question> => {
       .where('question.id = :id')
       .setParameters({ id: id })
       .getOne();
-    question.text = text;
-    question.data = data;
+    if (text) question.text = text;
+    if (data) question.data = data;
     await db().persist(question);
     return question;
   } catch (e) {
-    // throw new Error('Error updating response');
-    throw new Error(e);
+    throw new Error('Error updating response');
   }
 };
 
@@ -86,7 +85,6 @@ Promise<Array<?Question>> => {
 // Returns questions in reverse chronological order starting at the cursor
 const paginateQuestionByLectureId = async (lectureId: number, cursor?: number,
   items: number): Promise<Array<?Question>> => {
-
   if (cursor === undefined) {
     cursor = (new Date()).getTime();
   }
