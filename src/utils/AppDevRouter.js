@@ -62,6 +62,9 @@ class AppDevRouter {
     case constants.REQUEST_TYPES.DELETE:
       this.router.delete(path, this.response);
       break;
+    case constants.REQUEST_TYPES.PUT:
+      this.router.put(path, this.response);
+      break;
     }
   }
 
