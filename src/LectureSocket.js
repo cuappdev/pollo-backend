@@ -65,6 +65,7 @@ export default class LectureSocket {
   constructor ({port, lecture}: LectureSocketConfig) {
     this.port = port;
     this.lecture = lecture;
+    this.questions = {};
   }
 
   start (): Promise<?Error> {
