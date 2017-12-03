@@ -10,7 +10,7 @@ class GetOrganization extends AppDevNodeRouter<APIOrganization> {
     return '/organizations/:id/';
   }
 
-  async fetchWithId (id) {
+  async fetchWithId (id: number) {
     const org = await OrganizationsRepo.getOrgById(id);
     return org && {
       id: org.id,
