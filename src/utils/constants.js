@@ -5,7 +5,8 @@ export type RequestType = 'POST' | 'GET' | 'DELETE' | 'PUT';
 const REQUEST_TYPES = {
   POST: 'POST',
   GET: 'GET',
-  DELETE: 'DELETE'
+  DELETE: 'DELETE',
+  PUT: 'PUT'
 };
 
 export type QuestionType = 'MULTIPLE_CHOICE' | 'FREE_RESPONSE' |
