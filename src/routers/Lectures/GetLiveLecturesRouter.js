@@ -22,7 +22,8 @@ class GetLiveLecturesRouter extends AppDevRouter {
     if (!userId) throw new Error('User id is missing!');
 
     const courses = await UsersRepo.getAssocCoursesByUserId(userId, 'student');
-    const lectures = await LectureManager.liveLectures(courses);
+    const courseIds = courses.filter(Boolean).map(c => { return c.id; });
+    const lectures = await LectureManager.liveLectures(courseIds);
     return lectures
       .filter(Boolean)
       .map(lecture => ({

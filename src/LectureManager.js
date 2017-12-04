@@ -62,8 +62,7 @@ class LectureManager {
       });
   }
 
-  liveLectures (courses: Array<Course>): Array<Lecture> {
-    const courseIds = courses.map(course => course.id);
+  liveLectures (courseIds: Array<number>): Array<Lecture> {
     return this.lectureSockets
       .filter(x => {
         if (typeof x === 'number') return false;
