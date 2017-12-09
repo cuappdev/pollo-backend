@@ -73,10 +73,23 @@ Promise<Array<?Lecture>> => {
   }
 };
 
+// Get a lecture by Id with course
+const getLectureWithCourse = async (id: number): Promise<?Lecture> => {
+  try {
+    const lecture = await db().createQueryBuilder('lectures')
+      .leftJoinAndSelect('lectures.course', 'course')
+      .where('lectures.id = :id')
+      .setParameters({ id: id })
+      .getOne();
+    return lecture;
+  } catch (e) {
+    throw new Error(`Problem getting lecture by id: ${id}!`);
+  }
+};
+
 // Returns lectures in reverse chronological order starting at the cursor
 const paginateLectureByCourseId = async (courseId: number, cursor?: number,
   items: number): Promise<Array<?Lecture>> => {
-
   if (!cursor) {
     cursor = (new Date()).getTime();
   }
@@ -101,5 +114,6 @@ export default {
   deleteLectureById,
   updateLectureById,
   getLecturesByCourseId,
+  getLectureWithCourse,
   paginateLectureByCourseId
 };

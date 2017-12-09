@@ -1,4 +1,5 @@
 import { Lecture } from './models/Lecture';
+import { Course } from './models/Course';
 import LectureSocket from './LectureSocket';
 
 class LectureManager {
@@ -58,6 +59,19 @@ class LectureManager {
       })
       .map((l: LectureSocket) => {
         return l.port;
+      });
+  }
+
+  liveLectures (courseIds: Array<number>): Array<Lecture> {
+    return this.lectureSockets
+      .filter(x => {
+        if (typeof x === 'number') return false;
+        else {
+          return courseIds.includes(x.lecture.course.id);
+        }
+      })
+      .map((l : LectureSocket) => {
+        return l.lecture;
       });
   }
 }

@@ -17,7 +17,7 @@ class StartLectureRouter extends AppDevRouter {
 
   async content (req: Request) {
     const id = req.params.id;
-    const lecture = await LecturesRepo.getLectureById(id);
+    const lecture = await LecturesRepo.getLectureWithCourse(id);
 
     if (!lecture) {
       throw new Error(`No lecture with id ${id} found.`);
