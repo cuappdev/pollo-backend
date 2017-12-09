@@ -16,12 +16,13 @@ export type PageInfo = {
 
 export type ResponseError = { message: string }
 
-type ErrorCollector = Error => void
-
-  type AppDevEdgesResponse< T > = {
-  edges: Array < AppDevEdge < T >>,
-    errors ?: Array < ResponseError >,
+export type AppDevEdgesResponse<T> = {
+  edges: Array <AppDevEdge<T>>,
+  errors?: Array <ResponseError>,
+  pageInfo?: PageInfo,
 }
+
+type ErrorCollector = Error => void
 
 class AppDevEdgeRouter<T> extends AppDevRouter {
   defaultCount () {
