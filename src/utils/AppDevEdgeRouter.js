@@ -24,7 +24,7 @@ export type AppDevEdgesResponse<T> = {
 
 type ErrorCollector = Error => void
 
-class AppDevEdgeRouter<T> extends AppDevRouter {
+class AppDevEdgeRouter<T> extends AppDevRouter<AppDevEdgesResponse<T>> {
   defaultCount () {
     return 10;
   }

@@ -5,7 +5,7 @@ import AppDevRouter from '../utils/AppDevRouter';
 import appDevUtils from '../utils/appDevUtils';
 import constants from '../utils/constants';
 
-class GoogleSignInRouter extends AppDevRouter {
+class GoogleSignInRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.POST);
   }

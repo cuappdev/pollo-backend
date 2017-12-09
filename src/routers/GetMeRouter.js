@@ -7,7 +7,7 @@ import constants from '../utils/constants';
 
 import appDevUtils from '../utils/appDevUtils';
 
-class GetMeRouter extends AppDevRouter {
+class GetMeRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.GET);
   }

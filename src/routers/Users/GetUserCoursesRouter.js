@@ -4,7 +4,7 @@ import AppDevRouter from '../../utils/AppDevRouter';
 import UsersRepo from '../../repos/UsersRepo';
 import constants from '../../utils/constants';
 
-class GetUserCoursesRouter extends AppDevRouter {
+class GetUserCoursesRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.GET);
   }
@@ -24,8 +24,8 @@ class GetUserCoursesRouter extends AppDevRouter {
         node: {
           id: course.id,
           name: course.name,
-          term: course.term,
-        },
+          term: course.term
+        }
       }));
   }
 }

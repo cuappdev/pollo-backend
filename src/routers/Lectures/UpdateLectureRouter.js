@@ -4,7 +4,7 @@ import AppDevRouter from '../../utils/AppDevRouter';
 import LecturesRepo from '../../repos/LecturesRepo';
 import constants from '../../utils/constants';
 
-class UpdateLectureRouter extends AppDevRouter {
+class UpdateLectureRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.PUT);
   }

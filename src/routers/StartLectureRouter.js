@@ -6,7 +6,7 @@ import LecturesRepo from '../repos/LecturesRepo';
 import {Request} from 'express';
 import socket from 'socket.io';
 
-class StartLectureRouter extends AppDevRouter {
+class StartLectureRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.POST);
   }

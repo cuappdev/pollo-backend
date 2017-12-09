@@ -4,7 +4,7 @@ import AppDevRouter from '../../utils/AppDevRouter';
 import QuestionsRepo from '../../repos/QuestionsRepo';
 import constants from '../../utils/constants';
 
-class DeleteQuestionRouter extends AppDevRouter {
+class DeleteQuestionRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.DELETE);
   }

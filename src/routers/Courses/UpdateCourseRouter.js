@@ -6,7 +6,7 @@ import constants from '../../utils/constants';
 
 import type { APICourse } from '../APITypes';
 
-class UpdateCourseRouter extends AppDevRouter {
+class UpdateCourseRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.PUT);
   }

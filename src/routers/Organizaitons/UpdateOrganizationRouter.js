@@ -4,7 +4,7 @@ import AppDevRouter from '../../utils/AppDevRouter';
 import OrganizationsRepo from '../../repos/OrganizationsRepo';
 import constants from '../../utils/constants';
 
-class UpdateOrganizationRouter extends AppDevRouter {
+class UpdateOrganizationRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.PUT);
   }

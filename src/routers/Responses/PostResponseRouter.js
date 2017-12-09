@@ -4,7 +4,7 @@ import AppDevRouter from '../../utils/AppDevRouter';
 import ResponsesRepo from '../../repos/ResponsesRepo';
 import constants from '../../utils/constants';
 
-class PostResponseRouter extends AppDevRouter {
+class PostResponseRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.POST);
   }
