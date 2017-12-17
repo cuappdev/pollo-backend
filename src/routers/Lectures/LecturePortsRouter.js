@@ -10,7 +10,7 @@ import constants from '../../utils/constants';
  * though this is till tbd.
  * ask @mrkev for more info.
  */
-class LecturePortsRouter extends AppDevRouter {
+class LecturePortsRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.GET);
   }

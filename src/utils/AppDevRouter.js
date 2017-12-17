@@ -13,17 +13,20 @@ import {
 
 import constants from './constants';
 
-class AppDevResponse {
+class AppDevResponse<T> {
   success: boolean;
-  data: Object;
+  data: T;
 
-  constructor (success: boolean, data: Object) {
+  constructor (success: boolean, data: T) {
     this.success = success;
     this.data = data;
   }
 }
 
-class AppDevRouter {
+/**
+ * T is the response type for AppDevRouter
+ */
+export default class AppDevRouter<T: Object> {
   router: Router;
   requestType: RequestType;
 
@@ -70,7 +73,7 @@ class AppDevRouter {
 
   response = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const content = await this.content(req);
+      const content: T = await this.content(req);
       res.json(new AppDevResponse(true, content));
     } catch (e) {
       if (e.message === 1) {
@@ -85,5 +88,3 @@ class AppDevRouter {
     throw new Error(1);
   }
 }
-
-export default AppDevRouter;

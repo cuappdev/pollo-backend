@@ -4,7 +4,7 @@ import AppDevRouter from '../../utils/AppDevRouter';
 import UsersRepo from '../../repos/UsersRepo';
 import constants from '../../utils/constants';
 
-class GetUsersRouter extends AppDevRouter {
+class GetUsersRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.GET);
   }

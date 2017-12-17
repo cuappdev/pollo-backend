@@ -6,7 +6,7 @@ import LecturesRepo from '../repos/LecturesRepo';
 import { Request } from 'express';
 import socket from 'socket.io';
 
-class EndLectureRouter extends AppDevRouter {
+class EndLectureRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.POST);
   }
@@ -16,11 +16,11 @@ class EndLectureRouter extends AppDevRouter {
   }
 
   async content (req: Request) {
-    const id = req.params.id
-    const lecture = await LecturesRepo.getLectureById(id)
+    const id = req.params.id;
+    const lecture = await LecturesRepo.getLectureById(id);
 
     if (!lecture) {
-      throw new Error(`No lecture with id ${id} found.`)
+      throw new Error(`No lecture with id ${id} found.`);
     }
 
     LectureManager.endLecture(lecture);

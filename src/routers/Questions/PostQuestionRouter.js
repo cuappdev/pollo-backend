@@ -4,7 +4,7 @@ import AppDevRouter from '../../utils/AppDevRouter';
 import QuestionsRepo from '../../repos/QuestionsRepo';
 import constants from '../../utils/constants';
 
-class PostQuestionRouter extends AppDevRouter {
+class PostQuestionRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.POST);
   }

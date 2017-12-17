@@ -6,7 +6,7 @@ import UsersRepo from '../../repos/UsersRepo';
 import LecturesRepo from '../../repos/LecturesRepo';
 import LectureManager from '../../LectureManager';
 
-class GetLiveLecturesRouter extends AppDevRouter {
+class GetLiveLecturesRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.GET);
   }

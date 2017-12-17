@@ -3,7 +3,7 @@ import { Request } from 'express';
 import AppDevRouter from '../utils/AppDevRouter';
 import constants from '../utils/constants';
 
-class HelloWorldRouter extends AppDevRouter {
+class HelloWorldRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.GET);
   }

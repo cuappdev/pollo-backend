@@ -4,7 +4,7 @@ import AppDevRouter from '../../utils/AppDevRouter';
 import CoursesRepo from '../../repos/CoursesRepo';
 import constants from '../../utils/constants';
 
-class AddAdminsToCourseRouter extends AppDevRouter {
+class AddAdminsToCourseRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.POST);
   }

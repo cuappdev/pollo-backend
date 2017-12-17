@@ -10,7 +10,7 @@ export type AppDevNodeResponse<T> = { node: T }
  * For fetching nodes.
  * NOTE: Expects the path to contain an :id field!
  */
-class AppDevNodeRouter<T> extends AppDevRouter {
+class AppDevNodeRouter<T> extends AppDevRouter<AppDevNodeResponse<T>> {
   constructor () {
     super('GET');
   }

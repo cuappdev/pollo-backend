@@ -4,7 +4,7 @@ import AppDevRouter from '../../utils/AppDevRouter';
 import CoursesRepo from '../../repos/CoursesRepo';
 import constants from '../../utils/constants';
 
-class RemoveStudentsFromCourseRouter extends AppDevRouter {
+class RemoveStudentsFromCourseRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.DELETE);
   }
