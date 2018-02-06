@@ -17,6 +17,14 @@ class API {
   middleware (): void {
     this.express.use(bodyParser.json());
     this.express.use(bodyParser.urlencoded({ extended: false }));
+    if (process.env.NODE_ENV !== 'production') {
+      this.express.use((req, res, next) => {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Headers',
+          'Origin, X-Requested-With, Content-Type, Accept');
+        next();
+      });
+    }
   }
 
   routes (): void {
