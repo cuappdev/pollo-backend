@@ -36,4 +36,5 @@ test('Delete Poll', async () => {
 
 // Teardown
 afterAll(async () => {
+  console.log('Passed all tests');
 });
