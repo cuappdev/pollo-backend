@@ -2,14 +2,13 @@
 import type { SocketIO } from 'socket.io';
 
 import http from 'http';
-import { Lecture } from './models/Lecture';
-import ResponsesRepo from './repos/ResponsesRepo';
+import { Poll } from './models/Poll';
 import { remove } from './utils/lib';
 import socket from 'socket.io';
 
-export type LectureSocketConfig = {
+export type PollSocketConfig = {
   port: number,
-  lecture: Lecture,
+  poll: Poll,
 }
 
 type id = number;
@@ -34,20 +33,20 @@ type CurrentState = {
 }
 
 /**
- * Represents a single running lecture
+ * Represents a single running poll
  */
-export default class LectureSocket {
+export default class PollSocket {
   server: http.Server;
   io: SocketIO.Server;
   port: number;
 
-  lecture: Lecture
+  poll: Poll
 
   admins: Array<{ socket: IOSocket }> = []
   students: Array<{ socket: IOSocket }> = []
 
   /**
-   * Stores all questions/answers for the lecture.
+   * Stores all questions/answers for the poll.
    */
   questions: {
     [string]: {
@@ -62,9 +61,9 @@ export default class LectureSocket {
     question: -1
   }
 
-  constructor ({port, lecture}: LectureSocketConfig) {
+  constructor ({port, poll}: PollSocketConfig) {
     this.port = port;
-    this.lecture = lecture;
+    this.poll = poll;
     this.questions = {};
   }
 
@@ -97,14 +96,14 @@ export default class LectureSocket {
       this._setupProfessorEvents(client);
       this.admins.push({
         socket: client
-      })
+      });
       break;
     case 'student':
       console.log(`Student with id ${client.id} connected to socket`);
       this._setupStudentEvents(client);
       this.students.push({
         socket: client
-      })
+      });
       break;
     default:
       if (!userType) {
@@ -124,7 +123,6 @@ export default class LectureSocket {
    * - Record the answer in volatile memory
    */
   _setupStudentEvents (client: IOSocket): void {
-
     client.on('server/question/respond', (answer: Answer) => {
       // todo: prevent spoofing
       const question = this._currentQuestion();
@@ -171,21 +169,10 @@ export default class LectureSocket {
       // no question to end
       return;
     }
-    this._persistQuestion(question);
     this.students.forEach(student => {
       student.socket.emit('student/question/end', {question});
     });
     this.current.question = -1;
-  }
-
-  _persistQuestion (question: Question) {
-    const answers = this.questions[`${question.id}`].answers;
-    Object.keys(answers)
-      .map(answerKey => {
-        const answer = answers[answerKey];
-        ResponsesRepo
-          .createResponse(answer.data, answer.question, answer.answerer);
-      });
   }
 
   /**
@@ -209,7 +196,7 @@ export default class LectureSocket {
 
     // Start question
     client.on('server/question/start', (question: Question) => {
-      console.log('starting', question)
+      console.log('starting', question);
       if (this.current.question !== -1) {
         this._endQuestion();
       }
@@ -218,7 +205,7 @@ export default class LectureSocket {
 
     // End question
     client.on('server/question/end', () => {
-      console.log('ending quesiton')
+      console.log('ending quesiton');
       this._endQuestion();
     });
 

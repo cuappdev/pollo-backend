@@ -7,13 +7,7 @@ import dotenv from 'dotenv';
 
 // All entities
 import {Base} from '../models/Base';
-import {User} from '../models/User';
-import {Session} from '../models/Session';
-import {Course} from '../models/Course';
-import {Lecture} from '../models/Lecture';
-import {Question} from '../models/Question';
-import {Response} from '../models/Response';
-import {Organization} from '../models/Organization';
+import {Poll} from '../models/Poll';
 
 dotenv.config(); // establish env variables
 
@@ -28,13 +22,7 @@ const driver = {
 
 const entities = [
   Base,
-  User,
-  Session,
-  Course,
-  Lecture,
-  Question,
-  Response,
-  Organization
+  Poll
 ];
 
 const autoSchemaSync = true;
