@@ -2,7 +2,6 @@
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/constants';
-import PollsRepo from '../../repos/PollsRepo';
 import PollManager from '../../PollManager';
 
 class GetLivePollsRouter extends AppDevRouter<Object> {

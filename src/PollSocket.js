@@ -43,7 +43,7 @@ export default class PollSocket {
   poll: Poll
 
   admins: Array<{ socket: IOSocket }> = []
-  students: Array<{ socket: IOSocket }> = []
+  users: Array<{ socket: IOSocket }> = []
 
   /**
    * Stores all questions/answers for the poll.
@@ -93,15 +93,15 @@ export default class PollSocket {
     switch (userType) {
     case 'admin':
       console.log(`Admin with id ${client.id} connected to socket`);
-      this._setupProfessorEvents(client);
+      this._setupAdminEvents(client);
       this.admins.push({
         socket: client
       });
       break;
-    case 'student':
-      console.log(`Student with id ${client.id} connected to socket`);
-      this._setupStudentEvents(client);
-      this.students.push({
+    case 'user':
+      console.log(`User with id ${client.id} connected to socket`);
+      this._setupUserEvents(client);
+      this.users.push({
         socket: client
       });
       break;
@@ -114,15 +114,15 @@ export default class PollSocket {
     }
   }
 
-  /** ***************************** Student Side *************************** **/
+  /** ***************************** User Side *************************** **/
 
   /**
    * Events:
    * /question/respond
-   * : Student wants to update its answer to a question
+   * : User wants to update its answer to a question
    * - Record the answer in volatile memory
    */
-  _setupStudentEvents (client: IOSocket): void {
+  _setupUserEvents (client: IOSocket): void {
     client.on('server/question/respond', (answer: Answer) => {
       // todo: prevent spoofing
       const question = this._currentQuestion();
@@ -134,12 +134,12 @@ export default class PollSocket {
     });
 
     client.on('disconnect', () => {
-      console.log(`Student ${client.id} disconnected.`);
+      console.log(`User ${client.id} disconnected.`);
       remove(this.admins, ({ socket }) => socket.id === client.id);
     });
   }
 
-  /** *************************** Professor Side *************************** **/
+  /** *************************** Admin Side *************************** **/
 
   _currentQuestion (): Question | null {
     if (this.current.question === -1) {
@@ -158,8 +158,8 @@ export default class PollSocket {
         answers: {}
       };
     }
-    this.students.forEach(student => {
-      student.socket.emit('student/question/start', {question});
+    this.users.forEach(user => {
+      user.socket.emit('user/question/start', {question});
     });
   }
 
@@ -169,8 +169,8 @@ export default class PollSocket {
       // no question to end
       return;
     }
-    this.students.forEach(student => {
-      student.socket.emit('student/question/end', {question});
+    this.users.forEach(user => {
+      user.socket.emit('user/question/end', {question});
     });
     this.current.question = -1;
   }
@@ -178,15 +178,15 @@ export default class PollSocket {
   /**
    * Events:
    * /question/start (quesiton: Question)
-   * : Professor wants to start a question
+   * : Admin wants to start a question
    * - Creates cache to store answers
    * - Notifies clients new question has started
    * /question/end (void)
-   * : Professor wants to close a question
+   * : Admin wants to close a question
    * - Persists recieved questions
    * - Notifies clients quesiton is now closed
    */
-  _setupProfessorEvents (client: Object): void {
+  _setupAdminEvents (client: Object): void {
     const address = client.handshake.address;
 
     if (!address) {
