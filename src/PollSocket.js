@@ -18,18 +18,20 @@ type Question = {
   id: number,
   text: string,
   type: string,
+  options: ?string[]
 }
 
 type Answer = {
   id: id,
+  deviceId: id,
   question: id,
-  answerer: id,
-  type: string,
-  data: string,
+  data: string
 }
 
 type CurrentState = {
   question: number,
+  results: {}, // {'A': 1, 'C': 2}
+  answers: {'id': id, 'answer': string}[] // id = client id
 }
 
 /**
@@ -53,12 +55,14 @@ export default class PollSocket {
       question: Question,
       answers: {
         [string]: Answer
-      },
+      }
     }
   }
 
   current: CurrentState = {
-    question: -1
+    question: -1, // id of current question object
+    results: {},
+    answers: []
   }
 
   constructor ({port, poll}: PollSocketConfig) {
@@ -130,7 +134,7 @@ export default class PollSocket {
         console.log(`Client ${client.id} sanswer on no question`);
         return;
       }
-      this.questions[`${question.id}`].answers[`${answer.answerer}`] = answer;
+      this.questions[`${question.id}`].answers[`${answer.deviceId}`] = answer;
     });
 
     client.on('disconnect', () => {
