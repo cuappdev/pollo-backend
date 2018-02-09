@@ -1,23 +1,23 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
-import OrganizationsRepo from '../../repos/OrganizationsRepo';
+import PollsRepo from '../../repos/PollsRepo';
 import constants from '../../utils/constants';
 
-class DeleteOrganizationRouter extends AppDevRouter<Object> {
+class DeletePollRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.DELETE);
   }
 
   getPath (): string {
-    return '/organizations/:id/';
+    return '/polls/:id/';
   }
 
   async content (req: Request) {
-    const orgId = req.params.id;
-    await OrganizationsRepo.deleteOrgById(orgId);
+    const pollId = req.params.id;
+    await PollsRepo.deletePollById(pollId);
     return null;
   }
 }
 
-export default new DeleteOrganizationRouter().router;
+export default new DeletePollRouter().router;

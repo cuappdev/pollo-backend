@@ -2,14 +2,13 @@
 import type { SocketIO } from 'socket.io';
 
 import http from 'http';
-import { Lecture } from './models/Lecture';
-import ResponsesRepo from './repos/ResponsesRepo';
+import { Poll } from './models/Poll';
 import { remove } from './utils/lib';
 import socket from 'socket.io';
 
-export type LectureSocketConfig = {
+export type PollSocketConfig = {
   port: number,
-  lecture: Lecture,
+  poll: Poll,
 }
 
 type id = number;
@@ -19,52 +18,56 @@ type Question = {
   id: number,
   text: string,
   type: string,
+  options: ?string[]
 }
 
 type Answer = {
   id: id,
+  deviceId: id,
   question: id,
-  answerer: id,
-  type: string,
-  data: string,
+  data: string
 }
 
 type CurrentState = {
   question: number,
+  results: {}, // {'A': 1, 'C': 2}
+  answers: {'id': id, 'answer': string}[] // id = client id
 }
 
 /**
- * Represents a single running lecture
+ * Represents a single running poll
  */
-export default class LectureSocket {
+export default class PollSocket {
   server: http.Server;
   io: SocketIO.Server;
   port: number;
 
-  lecture: Lecture
+  poll: Poll
 
   admins: Array<{ socket: IOSocket }> = []
-  students: Array<{ socket: IOSocket }> = []
+  users: Array<{ socket: IOSocket }> = []
 
   /**
-   * Stores all questions/answers for the lecture.
+   * Stores all questions/answers for the poll.
    */
   questions: {
     [string]: {
       question: Question,
       answers: {
         [string]: Answer
-      },
+      }
     }
   }
 
   current: CurrentState = {
-    question: -1
+    question: -1, // id of current question object
+    results: {},
+    answers: []
   }
 
-  constructor ({port, lecture}: LectureSocketConfig) {
+  constructor ({port, poll}: PollSocketConfig) {
     this.port = port;
-    this.lecture = lecture;
+    this.poll = poll;
     this.questions = {};
   }
 
@@ -94,17 +97,17 @@ export default class LectureSocket {
     switch (userType) {
     case 'admin':
       console.log(`Admin with id ${client.id} connected to socket`);
-      this._setupProfessorEvents(client);
+      this._setupAdminEvents(client);
       this.admins.push({
         socket: client
-      })
+      });
       break;
-    case 'student':
-      console.log(`Student with id ${client.id} connected to socket`);
-      this._setupStudentEvents(client);
-      this.students.push({
+    case 'user':
+      console.log(`User with id ${client.id} connected to socket`);
+      this._setupUserEvents(client);
+      this.users.push({
         socket: client
-      })
+      });
       break;
     default:
       if (!userType) {
@@ -115,16 +118,15 @@ export default class LectureSocket {
     }
   }
 
-  /** ***************************** Student Side *************************** **/
+  /** ***************************** User Side *************************** **/
 
   /**
    * Events:
    * /question/respond
-   * : Student wants to update its answer to a question
+   * : User wants to update its answer to a question
    * - Record the answer in volatile memory
    */
-  _setupStudentEvents (client: IOSocket): void {
-
+  _setupUserEvents (client: IOSocket): void {
     client.on('server/question/respond', (answer: Answer) => {
       // todo: prevent spoofing
       const question = this._currentQuestion();
@@ -132,16 +134,16 @@ export default class LectureSocket {
         console.log(`Client ${client.id} sanswer on no question`);
         return;
       }
-      this.questions[`${question.id}`].answers[`${answer.answerer}`] = answer;
+      this.questions[`${question.id}`].answers[`${answer.deviceId}`] = answer;
     });
 
     client.on('disconnect', () => {
-      console.log(`Student ${client.id} disconnected.`);
+      console.log(`User ${client.id} disconnected.`);
       remove(this.admins, ({ socket }) => socket.id === client.id);
     });
   }
 
-  /** *************************** Professor Side *************************** **/
+  /** *************************** Admin Side *************************** **/
 
   _currentQuestion (): Question | null {
     if (this.current.question === -1) {
@@ -160,8 +162,8 @@ export default class LectureSocket {
         answers: {}
       };
     }
-    this.students.forEach(student => {
-      student.socket.emit('student/question/start', {question});
+    this.users.forEach(user => {
+      user.socket.emit('user/question/start', {question});
     });
   }
 
@@ -171,35 +173,24 @@ export default class LectureSocket {
       // no question to end
       return;
     }
-    this._persistQuestion(question);
-    this.students.forEach(student => {
-      student.socket.emit('student/question/end', {question});
+    this.users.forEach(user => {
+      user.socket.emit('user/question/end', {question});
     });
     this.current.question = -1;
-  }
-
-  _persistQuestion (question: Question) {
-    const answers = this.questions[`${question.id}`].answers;
-    Object.keys(answers)
-      .map(answerKey => {
-        const answer = answers[answerKey];
-        ResponsesRepo
-          .createResponse(answer.data, answer.question, answer.answerer);
-      });
   }
 
   /**
    * Events:
    * /question/start (quesiton: Question)
-   * : Professor wants to start a question
+   * : Admin wants to start a question
    * - Creates cache to store answers
    * - Notifies clients new question has started
    * /question/end (void)
-   * : Professor wants to close a question
+   * : Admin wants to close a question
    * - Persists recieved questions
    * - Notifies clients quesiton is now closed
    */
-  _setupProfessorEvents (client: Object): void {
+  _setupAdminEvents (client: Object): void {
     const address = client.handshake.address;
 
     if (!address) {
@@ -209,7 +200,7 @@ export default class LectureSocket {
 
     // Start question
     client.on('server/question/start', (question: Question) => {
-      console.log('starting', question)
+      console.log('starting', question);
       if (this.current.question !== -1) {
         this._endQuestion();
       }
@@ -218,7 +209,7 @@ export default class LectureSocket {
 
     // End question
     client.on('server/question/end', () => {
-      console.log('ending quesiton')
+      console.log('ending quesiton');
       this._endQuestion();
     });
 
