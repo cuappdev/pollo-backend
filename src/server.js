@@ -30,7 +30,7 @@ const onError = (error: Error): void => {
 
 const onListening = (): void => {
   let addr: Object = server.address();
-  console.log(`Listening on ${addr.port}`);
+  console.log(`Listening on ${addr.port} (${process.env.NODE_ENV || 'development'})`);
 };
 
 // Bootstrap everything
