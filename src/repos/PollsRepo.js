@@ -18,6 +18,7 @@ const createPoll = async (name: string, code: string): Promise<Poll> => {
     poll.code = code;
 
     await db().persist(poll);
+    if (pollCodes[poll.code]) throw new Error('Poll code is already in use');
     pollCodes[poll.code] = poll.id;
     return poll;
   } catch (e) {
@@ -59,6 +60,9 @@ const getPollId = async (code: string) => {
 const deletePollById = async (id: number) => {
   try {
     const poll = await db().findOneById(id);
+    if (poll.code in pollCodes) {
+      delete pollCodes[poll.code];
+    }
     await db().remove(poll);
   } catch (e) {
     throw new Error(`Problem deleting poll by id: ${id}!`);

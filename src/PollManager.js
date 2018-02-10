@@ -27,7 +27,6 @@ class PollManager {
 
     this.pollSockets[id] = new PollSocket({port, poll});
     const err = await this.pollSockets[id].start();
-
     if (err) {
       throw err;
     }
@@ -37,12 +36,11 @@ class PollManager {
 
   endPoll (poll: Poll): void {
     const index = this.pollSockets.findIndex(x => {
-      if (typeof x !== 'number') return false;
+      if (!x || !x.poll) return false;
       return (x.poll.id === poll.id);
     });
     this.pollSockets[index].close();
     this.pollSockets[index] = index;
-    console.log(this.pollSockets);
   }
 
   /**
