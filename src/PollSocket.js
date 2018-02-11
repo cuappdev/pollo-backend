@@ -151,13 +151,13 @@ export default class PollSocket {
       let nextState = {...this.current};
       const prev = nextState.answers[answer.deviceId];
       nextState.answers[answer.deviceId] = answer.data; // update/input user's response
-      if(!prev) {
+      if(prev) {// if truthy
         // has selected something before
         nextState.results[prev] -= 1;
       }
 
       let cur_tally = nextState.results[answer.data];
-      if(!cur_tally) {
+      if(cur_tally) { // if truthy
         nextState.results[answer.data] += 1;
       } else {
         nextState.results[answer.data] = 1; 
