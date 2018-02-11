@@ -31,7 +31,7 @@ type Answer = {
 type CurrentState = {
   question: number,
   results: {}, // {'A': 1, 'C': 2}
-  answers: {'id': id, 'answer': string}[] // id = client id
+  answers: {} // id = client id, answer = "current answer"
 }
 
 /**
@@ -62,7 +62,7 @@ export default class PollSocket {
   current: CurrentState = {
     question: -1, // id of current question object
     results: {},
-    answers: []
+    answers: {}
   }
 
   constructor ({port, poll}: PollSocketConfig) {
@@ -119,7 +119,7 @@ export default class PollSocket {
   }
 
   /** ***************************** User Side *************************** **/
-
+  // i.e. the server hears 'server/question/respond
   /**
    * Events:
    * /question/respond
@@ -135,6 +135,38 @@ export default class PollSocket {
         return;
       }
       this.questions[`${question.id}`].answers[`${answer.deviceId}`] = answer;
+    });
+
+    client.on('server/question/tally', (answer: Answer) => {
+      const question = this._currentQuestion();
+      if (question === null) {
+        console.log(`Client ${client.id} sanswer on no question`);
+        return;
+      }
+      if(question !== answer.question) {
+        console.log(`Question ${answer.question} is not the current question`);
+        return;
+      }
+
+      let nextState = {...this.current};
+      const prev = nextState.answers[answer.deviceId];
+      nextState.answers[answer.deviceId] = answer.data; // update/input user's response
+      if(!prev) {
+        // has selected something before
+        nextState.results[prev] -= 1;
+      }
+
+      let cur_tally = nextState.results[answer.data];
+      if(!cur_tally) {
+        nextState.results[answer.data] += 1;
+      } else {
+        nextState.results[answer.data] = 1; 
+      }
+
+      this.current = nextState;
+      this.admins.forEach(admin => {
+        admin.socket.emit('admin/question/updateTally', this.current);
+      })
     });
 
     client.on('disconnect', () => {
