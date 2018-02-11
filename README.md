@@ -1,5 +1,7 @@
 # Clicker Backend
 
+[Clicker API Docs](https://github.com/cuappdev/clicker-api-spec)
+
 To run:
 ````bash
 npm start
