@@ -256,7 +256,7 @@ export default class PollSocket {
 
     // save poll code
     client.on('server/poll/save', () => {
-      console.log('@users: save this polling session');
+      console.log('save this polling session on user side');
       this.users.forEach(user => {
         user.socket.emit('user/poll/save', this.poll);
       });
