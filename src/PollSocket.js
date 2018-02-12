@@ -239,6 +239,29 @@ export default class PollSocket {
       this._startQuestion(question);
     });
 
+    // share results
+    client.on('server/question/results', (state: CurrentState) => {
+      const question = this._currentQuestion();
+      if (question === null) {
+        console.log(`Admin ${client.id} sharing results on no question`);
+        return;
+      }
+      console.log('sharing results');
+      const current = this.current;
+      this.users.forEach(user => {
+        user.socket.emit('user/question/results', current);
+      });
+
+    });
+
+    // save poll code
+    client.on('server/poll/save', () => {
+      console.log('@users: save this polling session');
+      this.users.forEach(user => {
+        user.socket.emit('user/poll/save', this.poll);
+      });
+    });
+
     // End question
     client.on('server/question/end', () => {
       console.log('ending quesiton');
