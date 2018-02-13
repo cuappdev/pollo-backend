@@ -11,12 +11,23 @@ class StartPollRouter extends AppDevRouter<Object> {
   }
 
   getPath (): string {
-    return '/polls/:id/start/';
+    return '/start/poll/';
   }
 
   async content (req: Request) {
-    const id = req.params.id;
-    const poll = await PollsRepo.getPollById(id);
+    const id = req.body.id;
+    const code = req.body.code;
+    var name = req.body.name;
+    if (!name) name = '';
+    var poll = await PollsRepo.getPollById(id);
+
+    if (!id && !code) {
+      throw new Error('Poll id or code required.');
+    }
+
+    if (!id) {
+      poll = await PollsRepo.createPoll(name, code);
+    }
 
     if (!poll) {
       throw new Error(`No poll with id ${id} found.`);

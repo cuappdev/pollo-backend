@@ -16,13 +16,17 @@ class EndPollRouter extends AppDevRouter<Object> {
 
   async content (req: Request) {
     const id = req.params.id;
-    const poll = await PollsRepo.getPollById(id);
+    const save = req.body.save;
 
+    const poll = await PollsRepo.getPollById(id);
     if (!poll) {
       throw new Error(`No poll with id ${id} found.`);
     }
 
-    PollManager.endPoll(poll);
+    await PollManager.endPoll(poll);
+    if (save === false) {
+      await PollsRepo.deletePollById(id);
+    }
     return {};
   }
 }

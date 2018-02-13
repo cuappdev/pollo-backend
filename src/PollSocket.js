@@ -83,8 +83,8 @@ export default class PollSocket {
   }
 
   close () {
-    this.io.server.close();
-    this.io.httpServer.close();
+    if (this.io.server) this.io.server.close();
+    if (this.io.httpServer) this.io.httpServer.close();
   }
 
   _clientError (client: IOSocket, msg: string): void {
