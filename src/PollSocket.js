@@ -23,7 +23,7 @@ type Question = {
 
 type Answer = {
   id: id,
-  deviceId: id,
+  deviceId: string,
   question: id,
   data: string
 }
@@ -59,8 +59,9 @@ export default class PollSocket {
     }
   }
 
-  questionId = 0;
-  answerId = 0;
+  // Counter for generating question/answer ids
+  questionId: number;
+  answerId: number;
 
   current: CurrentState = {
     question: -1, // id of current question object
@@ -72,6 +73,8 @@ export default class PollSocket {
     this.port = port;
     this.poll = poll;
     this.questions = {};
+    this.questionId = 0;
+    this.answerId = 0;
   }
 
   start (): Promise<?Error> {
@@ -152,7 +155,7 @@ export default class PollSocket {
         console.log(`Client ${client.id} sanswer on no question`);
         return;
       }
-      if (question !== answer.question) {
+      if (question.id !== answer.question) {
         console.log(`Question ${answer.question} is not the current question`);
         return;
       }
