@@ -23,7 +23,7 @@ type Question = {
 
 type Answer = {
   id: id,
-  deviceId: id,
+  deviceId: string,
   question: id,
   data: string
 }
@@ -59,6 +59,10 @@ export default class PollSocket {
     }
   }
 
+  // Counter for generating question/answer ids
+  questionId: number;
+  answerId: number;
+
   current: CurrentState = {
     question: -1, // id of current question object
     results: {},
@@ -69,6 +73,8 @@ export default class PollSocket {
     this.port = port;
     this.poll = poll;
     this.questions = {};
+    this.questionId = 0;
+    this.answerId = 0;
   }
 
   start (): Promise<?Error> {
@@ -127,23 +133,29 @@ export default class PollSocket {
    * - Record the answer in volatile memory
    */
   _setupUserEvents (client: IOSocket): void {
-    client.on('server/question/respond', (answer: Answer) => {
-      // todo: prevent spoofing
-      const question = this._currentQuestion();
-      if (question === null) {
-        console.log(`Client ${client.id} sanswer on no question`);
-        return;
-      }
-      this.questions[`${question.id}`].answers[`${answer.deviceId}`] = answer;
-    });
+    // client.on('server/question/respond', (answer: Answer) => {
+    //   const question = this._currentQuestion();
+    //   if (question === null) {
+    //     console.log(`Client ${client.id} sanswer on no question`);
+    //     return;
+    //   }
+    //   this.questions[`${question.id}`].answers[`${answer.deviceId}`] = answer;
+    // });
 
-    client.on('server/question/tally', (answer: Answer) => {
+    client.on('server/question/tally', (answerObject: Object) => {
+      const answer: Answer = {
+        id: this.answerId,
+        deviceId: answerObject.deviceId,
+        question: answerObject.question,
+        data: answerObject.data
+      };
+      this.answerId++;
       const question = this._currentQuestion();
       if (question === null) {
         console.log(`Client ${client.id} sanswer on no question`);
         return;
       }
-      if(question !== answer.question) {
+      if (question.id !== answer.question) {
         console.log(`Question ${answer.question} is not the current question`);
         return;
       }
@@ -151,22 +163,22 @@ export default class PollSocket {
       let nextState = {...this.current};
       const prev = nextState.answers[answer.deviceId];
       nextState.answers[answer.deviceId] = answer.data; // update/input user's response
-      if(prev) {// if truthy
+      if (prev) { // if truthy
         // has selected something before
         nextState.results[prev] -= 1;
       }
 
-      let cur_tally = nextState.results[answer.data];
-      if(cur_tally) { // if truthy
+      let curTally = nextState.results[answer.data];
+      if (curTally) { // if truthy
         nextState.results[answer.data] += 1;
       } else {
-        nextState.results[answer.data] = 1; 
+        nextState.results[answer.data] = 1;
       }
 
       this.current = nextState;
       this.admins.forEach(admin => {
         admin.socket.emit('admin/question/updateTally', this.current);
-      })
+      });
     });
 
     client.on('disconnect', () => {
@@ -231,7 +243,14 @@ export default class PollSocket {
     }
 
     // Start question
-    client.on('server/question/start', (question: Question) => {
+    client.on('server/question/start', (questionObject: Object) => {
+      const question: Question = {
+        id: this.questionId,
+        text: questionObject.text,
+        type: questionObject.type,
+        options: questionObject.options
+      };
+      this.questionId++;
       console.log('starting', question);
       if (this.current.question !== -1) {
         this._endQuestion();
@@ -240,7 +259,7 @@ export default class PollSocket {
     });
 
     // share results
-    client.on('server/question/results', (state: CurrentState) => {
+    client.on('server/question/results', () => {
       const question = this._currentQuestion();
       if (question === null) {
         console.log(`Admin ${client.id} sharing results on no question`);
@@ -251,7 +270,6 @@ export default class PollSocket {
       this.users.forEach(user => {
         user.socket.emit('user/question/results', current);
       });
-
     });
 
     // save poll code
