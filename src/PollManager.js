@@ -1,5 +1,7 @@
 import { Poll } from './models/Poll';
+// import { PollSocket, Question } messes up start poll router
 import PollSocket from './PollSocket';
+import { Question } from './PollSocket';
 
 class PollManager {
   /**
@@ -71,6 +73,15 @@ class PollManager {
       .map((l : PollSocket) => {
         return l.poll;
       });
+  }
+
+  questionForPort (port: number): ?Question {
+    const p = this.pollSockets.find(function (x) {
+      return x && x.port === port;
+    });
+    if (!p) throw new Error('Poll not found for port number');
+    const currId = p.current.question;
+    return p.questions[`${currId}`].question;
   }
 }
 
