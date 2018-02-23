@@ -43,8 +43,10 @@ class API {
     });
 
     // Fallback prints all registered routes
-    this.express.get('*', (req, res, next) =>
-      res.send(`Registered:\n${registered.join('\n')}`));
+    if (process.env.NODE_ENV !== 'production') {
+      this.express.get('*', (req, res, next) =>
+        res.send(`Registered:\n${registered.join('\n')}`));
+    }
   }
 }
 
