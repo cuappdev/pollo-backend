@@ -22,3 +22,9 @@ export type APIPoll = {|
   name: string,
   code: string,
 |}
+
+export type APIQuestion = {|
+  id: id,
+  text: string,
+  results: Object
+|}

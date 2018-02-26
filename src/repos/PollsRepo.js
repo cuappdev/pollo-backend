@@ -17,9 +17,11 @@ const createPoll = async (name: string, code: string): Promise<Poll> => {
     poll.name = name;
     poll.code = code;
 
+    if (pollCodes[code]) throw new Error('Poll code is already in use');
+    
     await db().persist(poll);
-    if (pollCodes[poll.code]) throw new Error('Poll code is already in use');
     pollCodes[poll.code] = poll.id;
+
     return poll;
   } catch (e) {
     throw new Error('Problem creating poll!');

@@ -2,6 +2,7 @@ import PollsRepo from '../src/repos/PollsRepo';
 import dbConnection from '../src/db/DbConnection';
 
 var id;
+var code;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
@@ -12,16 +13,17 @@ beforeAll(async () => {
 });
 
 test('Create Poll', async () => {
-  const poll = await PollsRepo.createPoll('Poll', 'ABC123');
+  code = PollsRepo.createCode();
+  const poll = await PollsRepo.createPoll('Poll', code);
   expect(poll.name).toBe('Poll');
-  expect(poll.code).toBe('ABC123');
+  expect(poll.code).toBe(code);
   id = poll.id;
 });
 
 test('Get Poll', async () => {
   const poll = await PollsRepo.getPollById(id);
   expect(poll.name).toBe('Poll');
-  expect(poll.code).toBe('ABC123');
+  expect(poll.code).toBe(code);
 });
 
 test('Update Poll', async () => {
