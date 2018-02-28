@@ -14,7 +14,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^21.1.1",
-    "babel-cli": "^6.24.1",
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.25.0",
     "babel-eslint": "^7.2.3",
     "babel-jest": "^20.0.3",
@@ -38,6 +38,8 @@
     "express": "^4.15.3",
     "globby": "^6.1.0",
     "mysql": "^2.13.0",
+    "pg": "^7.4.1",
+    "reflect-metadata": "^0.1.12",
     "socket.io": "^2.0.3",
     "typeorm": "0.0.11"
   }
