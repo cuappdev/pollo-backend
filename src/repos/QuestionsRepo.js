@@ -23,6 +23,16 @@ const createQuestion = async (text: string, poll: Poll, results: json):
   }
 };
 
+// Get a question by id
+const getQuestionById = async (id: number): Promise<?Question> => {
+  try {
+    const question = await db().findOneById(id);
+    return question;
+  } catch (e) {
+    throw new Error(`Problem getting question by id: ${id}!`);
+  }
+};
+
 // Delete a question
 const deleteQuestionById = async (id: number) => {
   try {
@@ -33,7 +43,25 @@ const deleteQuestionById = async (id: number) => {
   }
 };
 
+const updateQuestionById = async (id: number, text: ?string):
+  Promise<?Question> => {
+    try {
+      var field = {};
+      if (name) field.text = text;
+      await db().createQueryBuilder('questions')
+        .where('questions.id = :questionId')
+        .setParameters({ questionId: id })
+        .update(field)
+        .execute();
+      return await db().findOneById(id);
+    } catch (e) {
+      throw new Error(`Problem updating question by id: ${id}!`);
+    }
+  }
+
 export default {
   createQuestion,
-  deleteQuestionById
+  deleteQuestionById,
+  getQuestionById,
+  updateQuestionById
 };
