@@ -20,7 +20,7 @@ test('Create Question', async () => {
   expect(question.text).toBe('Question');
   expect(question.poll.id).toBe(poll.id);
   expect(question.results).toEqual({});
-  id = question.poll.id;
+  id = question.id;
 });
 
 test('Get Question', async () => {
