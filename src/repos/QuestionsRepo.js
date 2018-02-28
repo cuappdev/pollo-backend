@@ -43,11 +43,11 @@ const deleteQuestionById = async (id: number) => {
   }
 };
 
-const updateQuestionById = async (id: number, name: ?string):
+const updateQuestionById = async (id: number, text: ?string):
   Promise<?Question> => {
     try {
       var field = {};
-      if (name) field.name = name;
+      if (name) field.text = text;
       await db().createQueryBuilder('questions')
         .where('questions.id = :questionId')
         .setParameters({ questionId: id })

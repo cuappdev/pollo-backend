@@ -13,7 +13,6 @@ beforeAll(async () => {
   });
 
   poll = await PollsRepo.createPoll('Poll', PollsRepo.createCode());
-  id = poll.id;
 });
 
 test('Create Question', async () => {
@@ -21,12 +20,13 @@ test('Create Question', async () => {
   expect(question.text).toBe('Question');
   expect(question.poll.id).toBe(poll.id);
   expect(question.results).toEqual({});
+  id = question.poll.id;
 });
 
 test('Get Question', async () => {
   const question = await QuestionsRepo.getQuestionById(id);
   expect(question.text).toBe('Question');
-  expect(question.poll.id).toBe(poll.id);
+  // expect(question.poll.id).toBe(poll.id);
   expect(question.results).toEqual({});
 });
 
