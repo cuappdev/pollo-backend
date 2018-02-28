@@ -24,7 +24,7 @@ const createQuestion = async (text: string, poll: Poll, results: json):
 };
 
 // Get a question by id
-const getQuestionById = async (id: number): Promise<?Poll> => {
+const getQuestionById = async (id: number): Promise<?Question> => {
   try {
     const question = await db().findOneById(id);
     return question;
@@ -44,7 +44,7 @@ const deleteQuestionById = async (id: number) => {
 };
 
 const updateQuestionById = async (id: number, name: ?string):
-  Promise<?Poll> => {
+  Promise<?Question> => {
     try {
       var field = {};
       if (name) field.name = name;

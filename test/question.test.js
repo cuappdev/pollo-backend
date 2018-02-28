@@ -3,6 +3,7 @@ import QuestionsRepo from '../src/repos/QuestionsRepo';
 import dbConnection from '../src/db/DbConnection';
 
 var poll;
+var id;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
@@ -12,6 +13,7 @@ beforeAll(async () => {
   });
 
   poll = await PollsRepo.createPoll('Poll', PollsRepo.createCode());
+  id = poll.id;
 });
 
 test('Create Question', async () => {
@@ -30,7 +32,7 @@ test('Get Question', async () => {
 
 test('Update Question', async () => {
   const question = await QuestionsRepo.updateQuestionById(id, 'New Question');
-  expect(question.text)
+  expect(question.text).toBe('New Question');
 });
 
 test('Delete Question', async () => {
