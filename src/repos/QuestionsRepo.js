@@ -43,25 +43,57 @@ const deleteQuestionById = async (id: number) => {
   }
 };
 
-const updateQuestionById = async (id: number, text: ?string):
+// Update a question by id
+const updateQuestionById = async (id: number, text: ?string, results: ?json):
   Promise<?Question> => {
-    try {
-      var field = {};
-      if (name) field.text = text;
-      await db().createQueryBuilder('questions')
-        .where('questions.id = :questionId')
-        .setParameters({ questionId: id })
-        .update(field)
-        .execute();
-      return await db().findOneById(id);
-    } catch (e) {
-      throw new Error(`Problem updating question by id: ${id}!`);
-    }
+  try {
+    var field = {};
+    if (text) field.text = text;
+    if (results) field.results = results;
+
+    await db().createQueryBuilder('questions')
+      .where('questions.id = :questionId')
+      .setParameters({ questionId: id })
+      .update(field)
+      .execute();
+    return await db().findOneById(id);
+  } catch (e) {
+    console.log(e);
+    throw new Error(`Problem updating question by id: ${id}!`);
   }
+};
+
+// Get questions from a poll id
+const getQuestionsFromPollId = async (id: number):
+  Promise<Array<?Question>> => {
+  try {
+    const questions = await db().createQueryBuilder('questions')
+      .innerJoin('questions.poll', 'poll', 'poll.id = :pollId')
+      .setParameters({ pollId: id })
+      .getMany();
+    return questions;
+  } catch (e) {
+    throw new Error(`Problem getting questions for poll with id: ${id}!`);
+  }
+};
+
+// Delete questions where question.poll = null, typeorm's cascade doesn't work
+const deleteQuestionsWithoutPoll = async () => {
+  try {
+    await db().createQueryBuilder('questions')
+      .delete()
+      .where('questions.poll is NULL')
+      .execute();
+  } catch (e) {
+    throw new Error('Problem removing questions with no poll reference.');
+  }
+};
 
 export default {
   createQuestion,
   deleteQuestionById,
   getQuestionById,
-  updateQuestionById
+  updateQuestionById,
+  getQuestionsFromPollId,
+  deleteQuestionsWithoutPoll
 };

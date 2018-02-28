@@ -35,6 +35,12 @@ test('Update Question', async () => {
   expect(question.text).toBe('New Question');
 });
 
+test('Get Questions from Poll', async () => {
+  const questions = await QuestionsRepo.getQuestionsFromPollId(poll.id);
+  expect(questions.length).toEqual(1);
+  expect(questions[0].text).toBe('New Question');
+});
+
 test('Delete Question', async () => {
   await QuestionsRepo.deleteQuestionById(id);
   expect(await QuestionsRepo.getQuestionById(id)).not.toBeDefined();
@@ -42,6 +48,6 @@ test('Delete Question', async () => {
 
 // Teardown
 afterAll(async () => {
-  await QuestionsRepo.deleteQuestionById(poll.id);
+  await PollsRepo.deletePollById(poll.id);
   console.log('Passed all tests');
 });

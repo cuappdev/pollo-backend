@@ -4,7 +4,7 @@ import PollsRepo from '../../repos/PollsRepo';
 
 import type { APIPoll } from '../APITypes';
 
-class GetPoll extends AppDevNodeRouter<APIPoll> {
+class GetPollRouter extends AppDevNodeRouter<APIPoll> {
   getPath (): string {
     return '/polls/:id/';
   }
@@ -19,4 +19,4 @@ class GetPoll extends AppDevNodeRouter<APIPoll> {
   }
 }
 
-export default new GetPoll().router;
+export default new GetPollRouter().router;

@@ -2,6 +2,7 @@
 import { getConnectionManager, Repository } from 'typeorm';
 import {Poll} from '../models/Poll';
 import appDevUtils from '../utils/appDevUtils';
+import QuestionsRepo from '../repos/QuestionsRepo';
 
 const db = (): Repository<Poll> => {
   return getConnectionManager().get().getRepository(Poll);
@@ -18,7 +19,7 @@ const createPoll = async (name: string, code: string): Promise<Poll> => {
     poll.code = code;
 
     if (pollCodes[code]) throw new Error('Poll code is already in use');
-    
+
     await db().persist(poll);
     pollCodes[poll.code] = poll.id;
 
@@ -66,6 +67,7 @@ const deletePollById = async (id: number) => {
       delete pollCodes[poll.code];
     }
     await db().remove(poll);
+    await QuestionsRepo.deleteQuestionsWithoutPoll();
   } catch (e) {
     throw new Error(`Problem deleting poll by id: ${id}!`);
   }
