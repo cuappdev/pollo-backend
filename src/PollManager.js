@@ -1,7 +1,5 @@
 import { Poll } from './models/Poll';
-// import { PollSocket, Question } messes up start poll router
-import PollSocket from './PollSocket';
-import { Question } from './PollSocket';
+import PollSocket, { Question } from './PollSocket';
 
 class PollManager {
   /**

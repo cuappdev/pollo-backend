@@ -13,7 +13,7 @@ class PostQuestionRouter extends AppDevRouter<Object> {
   }
 
   getPath (): string {
-    return '/poll/:id/question/';
+    return '/polls/:id/question/';
   }
 
   async content (req: Request): Promise<{ node: APIQuestion }> {

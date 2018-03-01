@@ -9,7 +9,7 @@ import {
 import { Base } from './Base';
 import { Poll } from './Poll';
 
-@Entity('question')
+@Entity('questions')
 export class Question extends Base {
   @PrimaryGeneratedColumn()
   id: any = null;
@@ -17,7 +17,9 @@ export class Question extends Base {
   @Column('string')
   text: string = '';
 
-  @ManyToOne(type => Poll, poll => poll.questions)
+  @ManyToOne(type => Poll, poll => poll.questions, {
+    onDelete: 'CASCADE'
+  })
   poll: ?Poll = null;
 
   @Column('json')
