@@ -9,8 +9,8 @@ class PollManager {
   pollSockets: Array<PollSocket> = []
   io: SocketIO.Server
 
-  constructor () {
-    this.io = SocketIO(5000);
+  constructor (server) {
+    this.io = SocketIO(server);
   }
 
   async startNewPoll (poll: Poll): void {
@@ -68,4 +68,4 @@ class PollManager {
   }
 }
 
-export default new PollManager();
+export default PollManager;

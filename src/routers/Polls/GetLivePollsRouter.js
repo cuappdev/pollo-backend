@@ -2,7 +2,6 @@
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/constants';
-import PollManager from '../../PollManager';
 
 class GetLivePollsRouter extends AppDevRouter<Object> {
   constructor () {
@@ -18,7 +17,7 @@ class GetLivePollsRouter extends AppDevRouter<Object> {
 
     if (!codes) throw new Error('Poll codes are missing!');
 
-    const polls = await PollManager.livePolls(codes);
+    const polls = await req.app.pollManager.livePolls(codes);
     return polls
       .filter(Boolean)
       .map(poll => ({

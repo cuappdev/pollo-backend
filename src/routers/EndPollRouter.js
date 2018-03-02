@@ -1,7 +1,6 @@
 // @flow
 import AppDevRouter from '../utils/AppDevRouter';
 import constants from '../utils/constants';
-import PollManager from '../PollManager';
 import PollsRepo from '../repos/PollsRepo';
 import { Request } from 'express';
 
@@ -23,7 +22,7 @@ class EndPollRouter extends AppDevRouter<Object> {
       throw new Error(`No poll with id ${id} found.`);
     }
 
-    await PollManager.endPoll(poll);
+    await req.app.pollManager.endPoll(poll);
     if (save === false) {
       await PollsRepo.deletePollById(id);
     }
