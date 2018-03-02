@@ -79,6 +79,7 @@ export default class AppDevRouter<T: Object> {
       if (e.message === 1) {
         throw new Error('You must implement content()!');
       } else {
+        console.error(e);
         res.json(new AppDevResponse(false, {errors: [e.message]}));
       }
     }

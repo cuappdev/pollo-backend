@@ -33,8 +33,9 @@ class StartPollRouter extends AppDevRouter<Object> {
       throw new Error(`No poll with id ${id} found.`);
     }
 
-    const { port } = await PollManager.startNewPoll(poll);
-    return {port};
+    await PollManager.startNewPoll(poll);
+
+    return {};
   }
 }
 
