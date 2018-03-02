@@ -35,7 +35,7 @@ class StartPollRouter extends AppDevRouter<Object> {
 
     await PollManager.startNewPoll(poll);
 
-    return {};
+    return poll;
   }
 }
 
