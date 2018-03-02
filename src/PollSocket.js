@@ -44,9 +44,6 @@ export default class PollSocket {
 
   poll: Poll
 
-  admins: Array<{ socket: IOSocket }> = []
-  users: Array<{ socket: IOSocket }> = []
-
   /**
    * Stores all questions/answers for the poll.
    */
@@ -104,16 +101,12 @@ export default class PollSocket {
     case 'admin':
       console.log(`Admin with id ${client.id} connected to socket`);
       this._setupAdminEvents(client);
-      this.admins.push({
-        socket: client
-      });
+      client.join('admins');
       break;
     case 'user':
       console.log(`User with id ${client.id} connected to socket`);
       this._setupUserEvents(client);
-      this.users.push({
-        socket: client
-      });
+      client.join('users');
       break;
     default:
       if (!userType) {
@@ -176,14 +169,11 @@ export default class PollSocket {
       }
 
       this.current = nextState;
-      this.admins.forEach(admin => {
-        admin.socket.emit('admin/question/updateTally', this.current);
-      });
+      this.io.to('admins').emit('admin/question/updateTally', this.current);
     });
 
     client.on('disconnect', () => {
       console.log(`User ${client.id} disconnected.`);
-      remove(this.admins, ({ socket }) => socket.id === client.id);
     });
   }
 
@@ -206,9 +196,7 @@ export default class PollSocket {
         answers: {}
       };
     }
-    this.users.forEach(user => {
-      user.socket.emit('user/question/start', {question});
-    });
+    this.io.to('users').emit('user/question/start', {question});
   }
 
   _endQuestion () {
@@ -217,9 +205,7 @@ export default class PollSocket {
       // no question to end
       return;
     }
-    this.users.forEach(user => {
-      user.socket.emit('user/question/end', {question});
-    });
+    this.io.to('users').emit('user/question/end', {question});
     this.current.question = -1;
   }
 
@@ -267,17 +253,13 @@ export default class PollSocket {
       }
       console.log('sharing results');
       const current = this.current;
-      this.users.forEach(user => {
-        user.socket.emit('user/question/results', current);
-      });
+      this.io.to('users').emit('user/question/results', current);
     });
 
     // save poll code
     client.on('server/poll/save', () => {
       console.log('save this polling session on user side');
-      this.users.forEach(user => {
-        user.socket.emit('user/poll/save', this.poll);
-      });
+      this.io.to('users').emit('user/poll/save', this.poll);
     });
 
     // End question
@@ -288,7 +270,6 @@ export default class PollSocket {
 
     client.on('disconnect', () => {
       console.log(`Admin ${client.id} disconnected.`);
-      remove(this.admins, ({ socket }) => socket.id === client.id);
     });
   }
 }
