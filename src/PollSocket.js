@@ -6,7 +6,8 @@ import SocketIO from 'socket.io';
 
 export type PollSocketConfig = {
   poll: Poll,
-  nsp: SocketIO.Namespace
+  nsp: SocketIO.Namespace,
+  onClose: void => void
 }
 
 type id = number;
@@ -37,7 +38,8 @@ type CurrentState = {
  */
 export default class PollSocket {
   poll: Poll
-  nsp: SocketIO.Namespace;
+  nsp: SocketIO.Namespace
+  onClose: void => void
 
   /**
    * Stores all questions/answers for the poll.
@@ -61,25 +63,19 @@ export default class PollSocket {
     answers: {}
   }
 
-  constructor ({ poll, nsp }: PollSocketConfig) {
+  constructor ({ poll, nsp, onClose }: PollSocketConfig) {
     this.poll = poll;
     this.nsp = nsp
+    this.nsp.on('connect', this._onConnect.bind(this));
+    this.onClose = onClose;
+
     this.questions = {};
     this.questionId = 0;
     this.answerId = 0;
   }
 
-  close () {
-    const connectedSockets = Object.keys(this.nsp.connected);
-    connectedSockets.forEach((id) => {
-      this.nsp.connected[id].disconnect();
-    })
-    this.nsp.removeAllListeners();
-  }
-
   _clientError (client: IOSocket, msg: string): void {
     console.log(msg);
-    // client.close()
   }
 
   _onConnect (client: IOSocket): void {
@@ -94,6 +90,11 @@ export default class PollSocket {
       console.log(`User with id ${client.id} connected to socket`);
       this._setupUserEvents(client);
       client.join('users');
+
+      const currentQuestion = this._currentQuestion();
+      if (currentQuestion) {
+        client.emit('user/question/start', { question: currentQuestion });
+      }
       break;
     default:
       if (!userType) {
@@ -183,7 +184,8 @@ export default class PollSocket {
         answers: {}
       };
     }
-    this.nsp.to('users').emit('user/question/start', {question});
+
+    this.nsp.to('users').emit('user/question/start', { question });
   }
 
   _endQuestion () {
@@ -257,6 +259,7 @@ export default class PollSocket {
 
     client.on('disconnect', () => {
       console.log(`Admin ${client.id} disconnected.`);
+      this.onClose();
     });
   }
 }
