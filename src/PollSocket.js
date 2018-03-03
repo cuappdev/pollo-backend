@@ -1,14 +1,13 @@
 // @flow
-import type { SocketIO } from 'socket.io';
-
 import http from 'http';
 import { Poll } from './models/Poll';
 import { remove } from './utils/lib';
-import socket from 'socket.io';
+import SocketIO from 'socket.io';
 
 export type PollSocketConfig = {
-  port: number,
   poll: Poll,
+  nsp: SocketIO.Namespace,
+  onClose: void => void
 }
 
 type id = number;
@@ -38,14 +37,9 @@ type CurrentState = {
  * Represents a single running poll
  */
 export default class PollSocket {
-  server: http.Server;
-  io: SocketIO.Server;
-  port: number;
-
   poll: Poll
-
-  admins: Array<{ socket: IOSocket }> = []
-  users: Array<{ socket: IOSocket }> = []
+  nsp: SocketIO.Namespace
+  onClose: void => void
 
   /**
    * Stores all questions/answers for the poll.
@@ -69,33 +63,19 @@ export default class PollSocket {
     answers: {}
   }
 
-  constructor ({port, poll}: PollSocketConfig) {
-    this.port = port;
+  constructor ({ poll, nsp, onClose }: PollSocketConfig) {
     this.poll = poll;
+    this.nsp = nsp
+    this.nsp.on('connect', this._onConnect.bind(this));
+    this.onClose = onClose;
+
     this.questions = {};
     this.questionId = 0;
     this.answerId = 0;
   }
 
-  start (): Promise<?Error> {
-    return new Promise((resolve, reject) => {
-      this.io = socket.listen(this.port);
-      // Whitelist all origins
-      this.io.origins('*:*');
-      this.io.on('connect', this._onConnect.bind(this));
-      this.io.httpServer.on('listening', resolve);
-      this.io.httpServer.on('error', reject);
-    });
-  }
-
-  close () {
-    if (this.io.server) this.io.server.close();
-    if (this.io.httpServer) this.io.httpServer.close();
-  }
-
   _clientError (client: IOSocket, msg: string): void {
     console.log(msg);
-    // client.close()
   }
 
   _onConnect (client: IOSocket): void {
@@ -104,16 +84,17 @@ export default class PollSocket {
     case 'admin':
       console.log(`Admin with id ${client.id} connected to socket`);
       this._setupAdminEvents(client);
-      this.admins.push({
-        socket: client
-      });
+      client.join('admins');
       break;
     case 'user':
       console.log(`User with id ${client.id} connected to socket`);
       this._setupUserEvents(client);
-      this.users.push({
-        socket: client
-      });
+      client.join('users');
+
+      const currentQuestion = this._currentQuestion();
+      if (currentQuestion) {
+        client.emit('user/question/start', { question: currentQuestion });
+      }
       break;
     default:
       if (!userType) {
@@ -176,14 +157,11 @@ export default class PollSocket {
       }
 
       this.current = nextState;
-      this.admins.forEach(admin => {
-        admin.socket.emit('admin/question/updateTally', this.current);
-      });
+      this.nsp.to('admins').emit('admin/question/updateTally', this.current);
     });
 
     client.on('disconnect', () => {
       console.log(`User ${client.id} disconnected.`);
-      remove(this.admins, ({ socket }) => socket.id === client.id);
     });
   }
 
@@ -206,9 +184,8 @@ export default class PollSocket {
         answers: {}
       };
     }
-    this.users.forEach(user => {
-      user.socket.emit('user/question/start', {question});
-    });
+
+    this.nsp.to('users').emit('user/question/start', { question });
   }
 
   _endQuestion () {
@@ -217,9 +194,7 @@ export default class PollSocket {
       // no question to end
       return;
     }
-    this.users.forEach(user => {
-      user.socket.emit('user/question/end', {question});
-    });
+    this.nsp.to('users').emit('user/question/end', {question});
     this.current.question = -1;
   }
 
@@ -267,17 +242,13 @@ export default class PollSocket {
       }
       console.log('sharing results');
       const current = this.current;
-      this.users.forEach(user => {
-        user.socket.emit('user/question/results', current);
-      });
+      this.nsp.to('users').emit('user/question/results', current);
     });
 
     // save poll code
     client.on('server/poll/save', () => {
       console.log('save this polling session on user side');
-      this.users.forEach(user => {
-        user.socket.emit('user/poll/save', this.poll);
-      });
+      this.nsp.to('users').emit('user/poll/save', this.poll);
     });
 
     // End question
@@ -288,7 +259,7 @@ export default class PollSocket {
 
     client.on('disconnect', () => {
       console.log(`Admin ${client.id} disconnected.`);
-      remove(this.admins, ({ socket }) => socket.id === client.id);
+      this.onClose();
     });
   }
 }

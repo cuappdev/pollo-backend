@@ -1,37 +1,24 @@
 import { Poll } from './models/Poll';
 import PollSocket, { Question } from './PollSocket';
+import SocketIO from 'socket.io';
 
 class PollManager {
   /**
    * All the polls currently running.
-   * All available slots contain their ID instead of a PollSocket
    */
-  pollSockets: Array<PollSocket | number> =
-    new Array(5).fill(null).map((_, i) => i)
+  pollSockets: Array<PollSocket> = []
+  io: SocketIO.Server
 
-  _getSocketID (): number {
-    let id = this.pollSockets.find(x => typeof x === 'number');
-    /** Our array is full. throw in an extra slot in there. */
-    if (id === undefined) {
-      id = this.pollSockets.length;
-      this.pollSockets.push(id);
-    }
-    // We need this cause flow is dumb
-    if (typeof id !== 'number') throw new Error('Impossible');
-    return id;
+  constructor (server) {
+    this.io = SocketIO(server);
   }
 
-  async startNewPoll (poll: Poll): {port: number} {
-    const id = this._getSocketID();
-    const port = id + 4000;
-
-    this.pollSockets[id] = new PollSocket({port, poll});
-    const err = await this.pollSockets[id].start();
-    if (err) {
-      throw err;
-    }
-
-    return {port};
+  async startNewPoll (poll: Poll): void {
+    const nsp = this.io.of(`/${poll.id}`)
+    this.pollSockets.push(new PollSocket({ poll: poll, nsp: nsp, onClose: () => {
+      this.endPoll(poll);
+      console.log('Sockets:', this.pollSockets);
+    }}));
   }
 
   endPoll (poll: Poll): void {
@@ -39,24 +26,31 @@ class PollManager {
       if (!x || !x.poll) return false;
       return (x.poll.id === poll.id);
     });
-    this.pollSockets[index].close();
-    this.pollSockets[index] = index;
+
+    if (index !== -1) {
+      let socket = this.pollSockets[index];
+
+      const connectedSockets = Object.keys(socket.nsp.connected);
+      connectedSockets.forEach((id) => {
+        socket.nsp.connected[id].disconnect();
+      })
+      socket.nsp.removeAllListeners();
+
+      this.pollSockets.splice(index, 1);
+      delete this.io.nsps[`/${poll.id}`]
+    }
   }
 
-  /**
-   * What ports is this poll currently running on?
-   */
-  portsForPoll (pollId: number): Array<number> {
-    return this.pollSockets
-      .filter(x => {
-        if (typeof x === 'number') return false;
-        else {
-          return x.poll.id === pollId;
-        }
-      })
-      .map((l: PollSocket) => {
-        return l.port;
-      });
+  _socketClosed (socket: PollSocket): void {
+    const index = this.pollSockets.findIndex(x => {
+      if (!x || !x.poll) return false;
+      return (x.poll.id === poll.id);
+    });
+
+    if (index !== -1) {
+      this.pollSockets.splice(index, 1);
+      delete this.io.nsps[`/${poll.id}`]
+    }
   }
 
   livePolls (pollCodes: Array<string>): Array<Poll> {
@@ -72,15 +66,6 @@ class PollManager {
         return l.poll;
       });
   }
-
-  questionForPort (port: number): ?Question {
-    const p = this.pollSockets.find(function (x) {
-      return x && x.port === port;
-    });
-    if (!p) throw new Error('Poll not found for port number');
-    const currId = p.current.question;
-    return p.questions[`${currId}`].question;
-  }
 }
 
-export default new PollManager();
+export default PollManager;
