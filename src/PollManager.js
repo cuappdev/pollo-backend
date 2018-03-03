@@ -1,5 +1,5 @@
 import { Poll } from './models/Poll';
-import PollSocket, { Question } from './PollSocket';
+import PollSocket from './PollSocket';
 import SocketIO from 'socket.io';
 
 class PollManager {
@@ -14,11 +14,13 @@ class PollManager {
   }
 
   async startNewPoll (poll: Poll): void {
-    const nsp = this.io.of(`/${poll.id}`)
-    this.pollSockets.push(new PollSocket({ poll: poll, nsp: nsp, onClose: () => {
-      this.endPoll(poll);
-      console.log('Sockets:', this.pollSockets);
-    }}));
+    const nsp = this.io.of(`/${poll.id}`);
+    this.pollSockets.push(new PollSocket({ poll: poll,
+      nsp: nsp,
+      onClose: () => {
+        this.endPoll(poll);
+        console.log('Sockets:', this.pollSockets);
+      }}));
   }
 
   endPoll (poll: Poll): void {
@@ -33,23 +35,23 @@ class PollManager {
       const connectedSockets = Object.keys(socket.nsp.connected);
       connectedSockets.forEach((id) => {
         socket.nsp.connected[id].disconnect();
-      })
+      });
       socket.nsp.removeAllListeners();
 
       this.pollSockets.splice(index, 1);
-      delete this.io.nsps[`/${poll.id}`]
+      delete this.io.nsps[`/${poll.id}`];
     }
   }
 
   _socketClosed (socket: PollSocket): void {
     const index = this.pollSockets.findIndex(x => {
       if (!x || !x.poll) return false;
-      return (x.poll.id === poll.id);
+      return (x.poll.id === socket.poll.id);
     });
 
     if (index !== -1) {
       this.pollSockets.splice(index, 1);
-      delete this.io.nsps[`/${poll.id}`]
+      delete this.io.nsps[`/${socket.poll.id}`];
     }
   }
 
