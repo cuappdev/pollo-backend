@@ -20,11 +20,7 @@ class UpdateQuestionRouter extends AppDevRouter<Object> {
     var text = req.body.text;
     var results = req.body.results;
 
-    const prevQuestion = await QuestionsRepo.getQuestionById(questionId);
-    if (!prevQuestion) throw new Error(`Poll with id ${questionId} was not found!`);
-
-    if (!text) text = prevQuestion.text;
-    if (!results) throw new Error(`No fields specified to update.`);
+    if (!results && !text) throw new Error('No fields specified to update.');
 
     const question = await QuestionsRepo.updateQuestionById(questionId, text, results);
     if (!question) throw new Error(`Poll with id ${questionId} was not found!`);
