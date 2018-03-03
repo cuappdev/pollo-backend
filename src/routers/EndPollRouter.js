@@ -27,7 +27,7 @@ class EndPollRouter extends AppDevRouter<Object> {
       await PollsRepo.deletePollById(id);
     }
 
-    return poll;
+    return null;
   }
 }
 
