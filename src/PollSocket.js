@@ -1,8 +1,7 @@
 // @flow
-import http from 'http';
 import { Poll } from './models/Poll';
-import { remove } from './utils/lib';
 import SocketIO from 'socket.io';
+import QuestionsRepo from './repos/QuestionsRepo';
 
 export type PollSocketConfig = {
   poll: Poll,
@@ -66,7 +65,7 @@ export default class PollSocket {
 
   constructor ({ poll, nsp, onClose }: PollSocketConfig) {
     this.poll = poll;
-    this.nsp = nsp
+    this.nsp = nsp;
     this.nsp.on('connect', this._onConnect.bind(this));
     this.onClose = onClose;
 
@@ -120,15 +119,6 @@ export default class PollSocket {
    * - Record the answer in volatile memory
    */
   _setupUserEvents (client: IOSocket): void {
-    // client.on('server/question/respond', (answer: Answer) => {
-    //   const question = this._currentQuestion();
-    //   if (question === null) {
-    //     console.log(`Client ${client.id} sanswer on no question`);
-    //     return;
-    //   }
-    //   this.questions[`${question.id}`].answers[`${answer.deviceId}`] = answer;
-    // });
-
     client.on('server/question/tally', (answerObject: Object) => {
       const answer: Answer = {
         id: this.answerId,
@@ -194,13 +184,16 @@ export default class PollSocket {
     this.nsp.to('users').emit('user/question/start', { question });
   }
 
-  _endQuestion () {
+  _endQuestion = async () => {
     const question = this._currentQuestion();
     if (!question) {
-      // no question to end
       return;
     }
+    await QuestionsRepo.createQuestion(question.text, this.poll,
+      this.current.results);
     this.nsp.to('users').emit('user/question/end', {question});
+    this.current.answers = {};
+    this.current.results = {};
     this.current.question = -1;
   }
 

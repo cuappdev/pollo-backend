@@ -1,5 +1,5 @@
 import { Poll } from './models/Poll';
-import PollSocket, { Question } from './PollSocket';
+import PollSocket from './PollSocket';
 import SocketIO from 'socket.io';
 
 class PollManager {
@@ -14,10 +14,14 @@ class PollManager {
   }
 
   async startNewPoll (poll: Poll): void {
-    const nsp = this.io.of(`/${poll.id}`)
-    this.pollSockets.push(new PollSocket({ poll: poll, nsp: nsp, onClose: () => {
-      this.endPoll(poll);
-    }}));
+    const nsp = this.io.of(`/${poll.id}`);
+    this.pollSockets.push(new PollSocket({
+      poll: poll,
+      nsp: nsp,
+      onClose: () => {
+        this.endPoll(poll);
+      }
+    }));
   }
 
   endPoll (poll: Poll, save: Boolean): void {
@@ -39,11 +43,11 @@ class PollManager {
       const connectedSockets = Object.keys(socket.nsp.connected);
       connectedSockets.forEach((id) => {
         socket.nsp.connected[id].disconnect();
-      })
+      });
       socket.nsp.removeAllListeners();
 
       this.pollSockets.splice(index, 1);
-      delete this.io.nsps[`/${poll.id}`]
+      delete this.io.nsps[`/${poll.id}`];
     }
   }
 
