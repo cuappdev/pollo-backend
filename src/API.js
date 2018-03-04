@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import globby from 'globby';
 import path from 'path';
+import cors from 'cors';
 
 class API {
   express: Express;
@@ -17,14 +18,18 @@ class API {
   middleware (): void {
     this.express.use(bodyParser.json());
     this.express.use(bodyParser.urlencoded({ extended: false }));
-    if (process.env.NODE_ENV !== 'production') {
-      this.express.use((req, res, next) => {
-        res.header('Access-Control-Allow-Origin', '*');
-        res.header('Access-Control-Allow-Headers',
-          'Origin, X-Requested-With, Content-Type, Accept');
-        next();
-      });
+
+    const whitelist = ['http://pollo.cornellappdev.com', 'https://pollo.cornellappdev.com'];
+    const corsOptions = {
+      origin: (origin, callback) => {
+        if (whitelist.indexOf(origin) !== -1) {
+          callback(null, true)
+        } else {
+          callback(new Error('Not allowed by CORS'))
+        }
+      }
     }
+    this.express.use(cors(corsOptions));
   }
 
   routes (): void {
