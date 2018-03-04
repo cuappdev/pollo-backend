@@ -10,7 +10,7 @@
     "flow": "node_modules/.bin/flow",
     "flow-stop": "node_modules/.bin/flow stop"
   },
-  "author": "CUAppDev",
+  "author": "Cornell AppDev",
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^21.1.1",
