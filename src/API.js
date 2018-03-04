@@ -19,7 +19,13 @@ class API {
     this.express.use(bodyParser.json());
     this.express.use(bodyParser.urlencoded({ extended: false }));
 
-    const whitelist = ['http://pollo.cornellappdev.com', 'https://pollo.cornellappdev.com'];
+    const whitelist = [
+      'http://pollo.cornellappdev.com',
+      'https://pollo.cornellappdev.com',
+      'http://localhost:3000',
+      'http://localhost:8080'
+    ];
+
     const corsOptions = {
       origin: (origin, callback) => {
         if (whitelist.indexOf(origin) !== -1) {
