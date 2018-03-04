@@ -15,22 +15,30 @@ class PollManager {
 
   async startNewPoll (poll: Poll): void {
     const nsp = this.io.of(`/${poll.id}`);
-    this.pollSockets.push(new PollSocket({ poll: poll,
+    this.pollSockets.push(new PollSocket({
+      poll: poll,
       nsp: nsp,
       onClose: () => {
         this.endPoll(poll);
-        console.log('Sockets:', this.pollSockets);
-      }}));
+      }
+    }));
   }
 
-  endPoll (poll: Poll): void {
+  endPoll (poll: Poll, save: Boolean): void {
     const index = this.pollSockets.findIndex(x => {
       if (!x || !x.poll) return false;
       return (x.poll.id === poll.id);
     });
 
     if (index !== -1) {
-      let socket = this.pollSockets[index];
+      const socket = this.pollSockets[index];
+
+      if (socket.closing) return;
+      socket.closing = true;
+
+      if (save) {
+        socket.savePoll();
+      }
 
       const connectedSockets = Object.keys(socket.nsp.connected);
       connectedSockets.forEach((id) => {
@@ -40,18 +48,6 @@ class PollManager {
 
       this.pollSockets.splice(index, 1);
       delete this.io.nsps[`/${poll.id}`];
-    }
-  }
-
-  _socketClosed (socket: PollSocket): void {
-    const index = this.pollSockets.findIndex(x => {
-      if (!x || !x.poll) return false;
-      return (x.poll.id === socket.poll.id);
-    });
-
-    if (index !== -1) {
-      this.pollSockets.splice(index, 1);
-      delete this.io.nsps[`/${socket.poll.id}`];
     }
   }
 

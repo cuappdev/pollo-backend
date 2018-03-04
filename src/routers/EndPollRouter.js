@@ -22,10 +22,11 @@ class EndPollRouter extends AppDevRouter<Object> {
       throw new Error(`No poll with id ${id} found.`);
     }
 
-    await req.app.pollManager.endPoll(poll);
     if (save === false) {
       await PollsRepo.deletePollById(id);
     }
+
+    req.app.pollManager.endPoll(poll, save);
 
     return null;
   }
