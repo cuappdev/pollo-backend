@@ -249,7 +249,6 @@ export default class PollSocket {
     client.on('server/poll/save', () => {
       console.log('save this polling session on user side');
       this.nsp.to('users').emit('user/poll/save', this.poll);
-      this.onClose();
     });
 
     // End question
