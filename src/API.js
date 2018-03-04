@@ -33,10 +33,13 @@ class API {
         } else {
           callback(new Error('Not allowed by CORS'));
         }
-      }
+      },
+      methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+      preflightContinue: false,
+      optionsSuccessStatus: 204
     };
 
-    this.express.use(cors(corsOptions));
+    this.express.use(cors());
   }
 
   routes (): void {

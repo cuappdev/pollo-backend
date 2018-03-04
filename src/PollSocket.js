@@ -40,6 +40,7 @@ export default class PollSocket {
   poll: Poll
   nsp: SocketIO.Namespace
   onClose: void => void
+  closing: boolean = false
 
   /**
    * Stores all questions/answers for the poll.
@@ -72,6 +73,11 @@ export default class PollSocket {
     this.questions = {};
     this.questionId = 0;
     this.answerId = 0;
+  }
+
+  savePoll () {
+    console.log('save this polling session on user side');
+    this.nsp.to('users').emit('user/poll/save', this.poll);
   }
 
   _clientError (client: IOSocket, msg: string): void {
@@ -243,12 +249,6 @@ export default class PollSocket {
       console.log('sharing results');
       const current = this.current;
       this.nsp.to('users').emit('user/question/results', current);
-    });
-
-    // save poll code
-    client.on('server/poll/save', () => {
-      console.log('save this polling session on user side');
-      this.nsp.to('users').emit('user/poll/save', this.poll);
     });
 
     // End question
