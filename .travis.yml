@@ -2,8 +2,8 @@ language: node_js
 node_js:
   - "6"
 services:
-  - mysql
+  - postgresql
 before_install:
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS clicker;'
+  - psql -c 'create database clicker;' -U postgres
 env:
-  - MYSQL_HOST='127.0.0.1' MYSQL_USER='root' MYSQL_PASSWORD='' MYSQL_DB='clicker'
+  - DB_HOST='127.0.0.1' DB_USERNAME='postgres' DB_PASSWORD='' DB_NAME='clicker'
