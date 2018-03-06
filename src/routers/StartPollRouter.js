@@ -15,6 +15,7 @@ class StartPollRouter extends AppDevRouter<Object> {
 
   async content (req: Request) {
     const id = req.body.id;
+    const deviceId = req.body.deviceId;
     const code = req.body.code;
     var name = req.body.name;
     if (!name) name = '';
@@ -25,7 +26,7 @@ class StartPollRouter extends AppDevRouter<Object> {
     }
 
     if (!id) {
-      poll = await PollsRepo.createPoll(name, code);
+      poll = await PollsRepo.createPoll(name, code, deviceId);
     }
 
     if (!poll) {
