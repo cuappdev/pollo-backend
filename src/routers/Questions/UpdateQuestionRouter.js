@@ -22,17 +22,17 @@ class UpdateQuestionRouter extends AppDevRouter<Object> {
 
     if (!results && !text) throw new Error('No fields specified to update.');
 
-    const question = await QuestionsRepo.updateQuestionById(questionId, text, results);
+    const question = await QuestionsRepo.updateQuestionById(questionId, text,
+      results);
     if (!question) throw new Error(`Poll with id ${questionId} was not found!`);
 
     return {
-      node : {
+      node: {
         id: question.id,
         text: question.text,
         results: question.results
       }
     };
-
   }
 }
 
