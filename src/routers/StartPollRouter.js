@@ -18,11 +18,12 @@ class StartPollRouter extends AppDevRouter<Object> {
     const deviceId = req.body.deviceId;
     const code = req.body.code;
     var name = req.body.name;
+
     if (!name) name = '';
     var poll = await PollsRepo.getPollById(id);
 
-    if (!id && !code) {
-      throw new Error('Poll id or code required.');
+    if (!(id || (code && deviceId))) {
+      throw new Error('Poll id, or code and device id required.');
     }
 
     if (!id) {

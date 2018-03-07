@@ -20,9 +20,11 @@ class UpdatePollRouter extends AppDevRouter<Object> {
     const pollId = req.params.id;
     const deviceId = req.body.deviceId;
 
-    var poll = PollsRepo.getPollById(pollId);
+    var poll = await PollsRepo.getPollById(pollId);
+    if (!poll) throw new Error(`Poll with id ${pollId} was not found!`);
+
     if (deviceId !== poll.deviceId) {
-      throw new Error('You are not authorized to update this poll!')
+      throw new Error('You are not authorized to update this poll!');
     }
 
     if (!name) throw new Error('No fields specified to update.');

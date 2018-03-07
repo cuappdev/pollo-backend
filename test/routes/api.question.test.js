@@ -6,10 +6,12 @@ const { get, post, del, put } = require('./lib');
 
 var poll;
 var question;
+var deviceId;
 
 beforeAll(async () => {
   // Create a poll
-  const opts = {name: 'Test poll', code: '123456'};
+  const opts = {name: 'Test poll', code: '123456', deviceId: 'IPHONE'};
+  deviceId = 'IPHONE';
   const result = await request(post('/polls/', opts));
   poll = JSON.parse(result).data.node;
   expect(JSON.parse(result).success).toBeTruthy();
@@ -47,5 +49,11 @@ test('update question', async () => {
 
 test('delete question', async () => {
   const result = await request(del(`/questions/${question.id}`));
+  expect(JSON.parse(result).success).toBeTruthy();
+});
+
+afterAll(async () => {
+  const result =
+    await request(del(`/polls/${poll.id}/${deviceId}`));
   expect(JSON.parse(result).success).toBeTruthy();
 });
