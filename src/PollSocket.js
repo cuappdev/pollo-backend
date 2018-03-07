@@ -28,7 +28,7 @@ type Answer = {
 
 type CurrentState = {
   question: number,
-  results: {}, // {'A': 1, 'C': 2}
+  results: {}, // {'A': {'text': 'blue', 'count': 1}}
   answers: {} // id = client id, answer = "current answer"
 }
 
@@ -250,9 +250,14 @@ export default class PollSocket {
       this._endQuestion();
     });
 
+    client.on('server/poll/end', () => {
+      console.log('ending poll');
+      this.onClose();
+    });
+
     client.on('disconnect', () => {
       console.log(`Admin ${client.id} disconnected.`);
-      this.onClose();
+      // this.onClose();
     });
   }
 }
