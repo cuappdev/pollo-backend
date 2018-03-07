@@ -9,8 +9,8 @@ npm start
 
 Required variables:
 ````bash
-MYSQL_HOST
-MYSQL_USER
-MYSQL_PASSWORD
-MYSQL_DB
+DB_HOST
+DB_USERNAME
+DB_PASSWORD
+DB_NAME
 ````

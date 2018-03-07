@@ -2,11 +2,13 @@ language: node_js
 node_js:
   - "6"
 services:
-  - mysql
+  - postgresql
+addons:
+  postgresql: "9.6"
 before_install:
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS clicker;'
+  - psql --host=localhost -c 'CREATE DATABASE clicker;' -U postgres
 env:
-  - MYSQL_HOST='127.0.0.1' MYSQL_USER='root' MYSQL_PASSWORD='' MYSQL_DB='clicker'
+  - DB_HOST='localhost' DB_USERNAME='postgres' DB_PASSWORD='' DB_NAME='clicker'
 script:
   - npm run start &
   - sleep 10; npm run test
