@@ -19,6 +19,9 @@ export class Poll extends Base {
   @Column('string')
   code: string = '';
 
+  @Column('string')
+  deviceId: string = '';
+
   @OneToMany(type => Question, question => question.poll)
   questions: ?Question[] = [];
 }

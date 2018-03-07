@@ -4,15 +4,17 @@ import dbConnection from '../src/db/DbConnection';
 
 var poll;
 var id;
+var deviceId;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
+  deviceId = 'iphone8';
   await dbConnection().catch(function (e) {
     console.log('Error connecting to database');
     process.exit();
   });
 
-  poll = await PollsRepo.createPoll('Poll', PollsRepo.createCode());
+  poll = await PollsRepo.createPoll('Poll', PollsRepo.createCode(), deviceId);
 });
 
 test('Create Question', async () => {
