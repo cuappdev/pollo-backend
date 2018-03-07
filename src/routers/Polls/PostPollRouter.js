@@ -20,9 +20,8 @@ class PostPollRouter extends AppDevRouter<Object> {
     const code = req.body.code;
     const deviceId = req.body.deviceId;
 
-    if (!name) {
-      name = '';
-    }
+    if (!name) name = '';
+    if (!deviceId) throw new Error('Device id missing');
     if (!code) throw new Error('Code missing');
 
     const poll = await PollsRepo.createPoll(name, code, deviceId);
