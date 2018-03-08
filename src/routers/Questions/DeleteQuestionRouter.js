@@ -10,11 +10,20 @@ class DeleteQuestionRouter extends AppDevRouter<Object> {
   }
 
   getPath (): string {
-    return '/questions/:id/';
+    return '/questions/:id/:deviceId/';
   }
 
   async content (req: Request) {
     const questionId = req.params.id;
+    const deviceId = req.params.deviceId;
+
+    const poll = await QuestionsRepo.getPollFromQuestionId(questionId);
+    if (!poll) {
+      throw new Error(`Couldn't find poll with question ${questionId}`);
+    }
+    if (poll.deviceId !== deviceId) {
+      throw new Error('Not authorized to delete this question!');
+    }
     await QuestionsRepo.deleteQuestionById(questionId);
     return null;
   }

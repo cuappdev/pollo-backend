@@ -18,7 +18,7 @@ beforeAll(async () => {
 });
 
 test('create question', async () => {
-  const opts = {text: 'Question text', results: {}};
+  const opts = {text: 'Question text', results: {}, deviceId: 'IPHONE'};
   const result = await request(post(`/polls/${poll.id}/question`, opts));
   question = JSON.parse(result).data.node;
   expect(JSON.parse(result).success).toBeTruthy();
@@ -39,7 +39,11 @@ test('get questions', async () => {
 });
 
 test('update question', async () => {
-  const opts = {text: 'Updated text', results: JSON.stringify({'A': 1})};
+  const opts = {
+    text: 'Updated text',
+    results: JSON.stringify({'A': 1}),
+    deviceId: 'IPHONE'
+  };
   const getstr = await request(put(`/questions/${question.id}`, opts));
   const getres = JSON.parse(getstr);
   expect(getres.success).toBeTruthy();
@@ -48,7 +52,7 @@ test('update question', async () => {
 });
 
 test('delete question', async () => {
-  const result = await request(del(`/questions/${question.id}`));
+  const result = await request(del(`/questions/${question.id}/${deviceId}`));
   expect(JSON.parse(result).success).toBeTruthy();
 });
 
