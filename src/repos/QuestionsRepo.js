@@ -1,5 +1,5 @@
 // @flow
-import { getConnectionManager, Repository, json } from 'typeorm';
+import { getConnectionManager, Repository, json, leftJoinAndSelect } from 'typeorm';
 import { Poll } from '../models/Poll';
 import { Question } from '../models/Question';
 
@@ -89,11 +89,25 @@ const deleteQuestionsWithoutPoll = async () => {
   }
 };
 
+// Get a poll from question
+const getPollFromQuestionId = async (id: number) : Promise<?Poll> => {
+  try {
+    const question = await db().createQueryBuilder('questions')
+      .leftJoinAndSelect('questions.poll', 'poll')
+      .where('questions.id = :questionId', {questionId: id})
+      .getOne();
+    return question.poll;
+  } catch (e) {
+    throw new Error(`Problem getting poll from quesiton with id: ${id}!`);
+  }
+};
+
 export default {
   createQuestion,
   deleteQuestionById,
   getQuestionById,
   updateQuestionById,
   getQuestionsFromPollId,
-  deleteQuestionsWithoutPoll
+  deleteQuestionsWithoutPoll,
+  getPollFromQuestionId
 };

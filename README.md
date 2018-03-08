@@ -27,6 +27,3 @@ Run the following commands in separate windows (server must be running to test r
 npm start
 npm test
 ````
-
-### API Docs:
-The API docs can be found [here](https://github.com/cuappdev/clicker-api-spec).

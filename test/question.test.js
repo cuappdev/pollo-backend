@@ -43,6 +43,11 @@ test('Get Questions from Poll', async () => {
   expect(questions[0].text).toBe('New Question');
 });
 
+test('Get Poll from Question', async () => {
+  const p = await QuestionsRepo.getPollFromQuestionId(id);
+  expect(p.id).toBe(poll.id);
+});
+
 test('Delete Question', async () => {
   await QuestionsRepo.deleteQuestionById(id);
   expect(await QuestionsRepo.getQuestionById(id)).not.toBeDefined();
