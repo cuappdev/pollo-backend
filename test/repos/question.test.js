@@ -1,6 +1,6 @@
-import PollsRepo from '../src/repos/PollsRepo';
-import QuestionsRepo from '../src/repos/QuestionsRepo';
-import dbConnection from '../src/db/DbConnection';
+import PollsRepo from '../../src/repos/PollsRepo';
+import QuestionsRepo from '../../src/repos/QuestionsRepo';
+import dbConnection from '../../src/db/DbConnection';
 
 var poll;
 var id;

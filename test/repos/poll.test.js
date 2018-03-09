@@ -1,5 +1,5 @@
-import PollsRepo from '../src/repos/PollsRepo';
-import dbConnection from '../src/db/DbConnection';
+import PollsRepo from '../../src/repos/PollsRepo';
+import dbConnection from '../../src/db/DbConnection';
 
 var id;
 var code;

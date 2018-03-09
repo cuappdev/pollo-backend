@@ -19,12 +19,18 @@ class UpdateQuestionRouter extends AppDevRouter<Object> {
     const questionId = req.params.id;
     var text = req.body.text;
     var results = req.body.results;
+    var deviceId = req.body.deviceId;
 
     if (!results && !text) throw new Error('No fields specified to update.');
 
+    const poll = await QuestionsRepo.getPollFromQuestionId(questionId);
+    if (!poll) throw new Error(`Question with id ${questionId} has no poll!`);
+    if (poll.deviceId !== deviceId) {
+      throw new Error('Not authorized to update this question!');
+    }
     const question = await QuestionsRepo.updateQuestionById(questionId, text,
       results);
-    if (!question) throw new Error(`Poll with id ${questionId} was not found!`);
+    if (!question) throw new Error(`Question with id ${questionId} was not found!`);
 
     return {
       node: {
