@@ -12,11 +12,12 @@ const db = (): Repository<Poll> => {
 var pollCodes = {};
 
 // Create a poll
-const createPoll = async (name: string, code: string): Promise<Poll> => {
+const createPoll = async (name: string, code: string, deviceId: string): Promise<Poll> => {
   try {
     const poll = new Poll();
     poll.name = name;
     poll.code = code;
+    poll.deviceId = deviceId;
 
     if (pollCodes[code]) throw new Error('Poll code is already in use');
 

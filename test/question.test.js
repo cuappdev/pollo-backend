@@ -4,15 +4,17 @@ import dbConnection from '../src/db/DbConnection';
 
 var poll;
 var id;
+var deviceId;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
+  deviceId = 'iphone8';
   await dbConnection().catch(function (e) {
     console.log('Error connecting to database');
     process.exit();
   });
 
-  poll = await PollsRepo.createPoll('Poll', PollsRepo.createCode());
+  poll = await PollsRepo.createPoll('Poll', PollsRepo.createCode(), deviceId);
 });
 
 test('Create Question', async () => {
@@ -39,6 +41,11 @@ test('Get Questions from Poll', async () => {
   const questions = await QuestionsRepo.getQuestionsFromPollId(poll.id);
   expect(questions.length).toEqual(1);
   expect(questions[0].text).toBe('New Question');
+});
+
+test('Get Poll from Question', async () => {
+  const p = await QuestionsRepo.getPollFromQuestionId(id);
+  expect(p.id).toBe(poll.id);
 });
 
 test('Delete Question', async () => {

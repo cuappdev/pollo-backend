@@ -3,6 +3,7 @@ import dbConnection from '../src/db/DbConnection';
 
 var id;
 var code;
+var deviceId;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
@@ -14,9 +15,11 @@ beforeAll(async () => {
 
 test('Create Poll', async () => {
   code = PollsRepo.createCode();
-  const poll = await PollsRepo.createPoll('Poll', code);
+  deviceId = 'iphone8';
+  const poll = await PollsRepo.createPoll('Poll', code, deviceId);
   expect(poll.name).toBe('Poll');
   expect(poll.code).toBe(code);
+  expect(poll.deviceId).toBe(deviceId);
   id = poll.id;
 });
 
@@ -24,11 +27,13 @@ test('Get Poll', async () => {
   const poll = await PollsRepo.getPollById(id);
   expect(poll.name).toBe('Poll');
   expect(poll.code).toBe(code);
+  expect(poll.deviceId).toBe(deviceId);
 });
 
 test('Update Poll', async () => {
   const poll = await PollsRepo.updatePollById(id, 'New Poll');
   expect(poll.name).toBe('New Poll');
+  expect(poll.deviceId).toBe(deviceId);
 });
 
 test('Delete Poll', async () => {

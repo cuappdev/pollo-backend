@@ -15,17 +15,19 @@ class StartPollRouter extends AppDevRouter<Object> {
 
   async content (req: Request) {
     const id = req.body.id;
+    const deviceId = req.body.deviceId;
     const code = req.body.code;
     var name = req.body.name;
+
     if (!name) name = '';
     var poll = await PollsRepo.getPollById(id);
 
-    if (!id && !code) {
-      throw new Error('Poll id or code required.');
+    if (!(id || (code && deviceId))) {
+      throw new Error('Poll id, or code and device id required.');
     }
 
     if (!id) {
-      poll = await PollsRepo.createPoll(name, code);
+      poll = await PollsRepo.createPoll(name, code, deviceId);
     }
 
     if (!poll) {
