@@ -1,4 +1,4 @@
-# Clicker Backend
+# Clicker Backend [![Build Status](https://travis-ci.org/cuappdev/clicker-backend.svg?branch=master)](https://travis-ci.org/cuappdev/clicker-backend)
 
 ### Setting up database:
 Make sure `PostgreSQL` is installed. After installation, start `PostgreSQL` and run the command
