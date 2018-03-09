@@ -144,7 +144,7 @@ export default class PollSocket {
       nextState.answers[answer.deviceId] = answer.choice; // update/input user's response
       if (prev) { // if truthy
         // has selected something before
-        nextState.results[prev.choice].count -= 1;
+        nextState.results[prev].count -= 1;
       }
 
       let curTally = nextState.results[answer.choice];
