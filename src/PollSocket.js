@@ -23,13 +23,14 @@ type Answer = {
   id: id,
   deviceId: string,
   question: id,
-  data: string
+  choice: string,
+  text: string
 }
 
 type CurrentState = {
   question: number,
-  results: {}, // {'A': 1, 'C': 2}
-  answers: {} // id = client id, answer = "current answer"
+  results: {}, // {'A': {'text': 'blue', 'count': 1}}
+  answers: {} // id = client id, answer = current choice
 }
 
 /**
@@ -124,7 +125,8 @@ export default class PollSocket {
         id: this.answerId,
         deviceId: answerObject.deviceId,
         question: answerObject.question,
-        data: answerObject.data
+        choice: answerObject.choice,
+        text: answerObject.text
       };
       this.answerId++;
       const question = this._currentQuestion();
@@ -139,17 +141,17 @@ export default class PollSocket {
 
       let nextState = {...this.current};
       const prev = nextState.answers[answer.deviceId];
-      nextState.answers[answer.deviceId] = answer.data; // update/input user's response
+      nextState.answers[answer.deviceId] = answer.choice; // update/input user's response
       if (prev) { // if truthy
         // has selected something before
-        nextState.results[prev] -= 1;
+        nextState.results[prev].count -= 1;
       }
 
-      let curTally = nextState.results[answer.data];
+      let curTally = nextState.results[answer.choice];
       if (curTally) { // if truthy
-        nextState.results[answer.data] += 1;
+        nextState.results[answer.choice].count += 1;
       } else {
-        nextState.results[answer.data] = 1;
+        nextState.results[answer.choice] = {'text': answer.text, 'count': 1};
       }
 
       this.current = nextState;
@@ -158,6 +160,9 @@ export default class PollSocket {
 
     client.on('disconnect', () => {
       console.log(`User ${client.id} disconnected.`);
+      if (this.nsp.connected.length === 0) {
+        this.onClose();
+      }
     });
   }
 
@@ -180,6 +185,14 @@ export default class PollSocket {
         answers: {}
       };
     }
+    var results = {};
+    if (question.options) {
+      for (var i = 0; i < question.options.length; i++) {
+        results[String.fromCharCode(65 + i)] =
+          {'text': question.options[i], 'count': 0};
+      }
+    }
+    this.current.results = results;
 
     this.nsp.to('users').emit('user/question/start', { question });
   }
@@ -252,7 +265,9 @@ export default class PollSocket {
 
     client.on('disconnect', () => {
       console.log(`Admin ${client.id} disconnected.`);
-      this.onClose();
+      if (this.nsp.connected.length === 0) {
+        this.onClose();
+      }
     });
   }
 }
