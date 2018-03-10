@@ -28,3 +28,9 @@ export type APIQuestion = {|
   text: string,
   results: Object
 |}
+
+export type APIUser = {|
+  id: id,
+  name: string,
+  netId: string
+|}

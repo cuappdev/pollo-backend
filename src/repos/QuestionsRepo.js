@@ -1,5 +1,5 @@
 // @flow
-import { getConnectionManager, Repository, json, leftJoinAndSelect } from 'typeorm';
+import { getConnectionManager, Repository, json } from 'typeorm';
 import { Poll } from '../models/Poll';
 import { Question } from '../models/Question';
 

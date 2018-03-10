@@ -5,6 +5,9 @@ import express from 'express';
 import globby from 'globby';
 import path from 'path';
 import cors from 'cors';
+import passport from 'passport';
+import UsersRepo from './repos/UsersRepo';
+import SessionsRepo from './repos/SessionsRepo';
 
 class API {
   express: Express;
@@ -12,6 +15,7 @@ class API {
   constructor () {
     this.express = express();
     this.middleware();
+    this.auth();
     this.routes();
   }
 
@@ -40,6 +44,52 @@ class API {
     };
 
     this.express.use(cors());
+  }
+
+  auth (): void {
+    const GoogleStrategy = require('passport-google-oauth20').Strategy;
+
+    passport.serializeUser(function (token, done) {
+      done(null, token);
+    });
+
+    passport.deserializeUser(function (token, done) {
+      done(null, token);
+    });
+
+    passport.use(new GoogleStrategy({
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_REDIRECT_URI
+    },
+    async function (accessToken, refreshToken, profile, done) {
+      var user = await UsersRepo.getUserByGoogleId(profile.id);
+      if (!user) {
+        user = await UsersRepo.createUser(profile);
+      }
+      const session = await SessionsRepo
+        .createOrUpdateSession(user, accessToken, refreshToken);
+      const response = {
+        accessToken: session.sessionToken,
+        refreshToken: session.updateToken,
+        sessionExpiration: session.expiresAt
+      };
+      return done(null, response);
+    }
+    ));
+
+    this.express.use(passport.initialize());
+    this.express.use(passport.session());
+
+    this.express.get('/auth/google',
+      passport.authenticate('google', { scope: ['profile', 'email'] }));
+    this.express.get('/auth/google/callback',
+      passport.authenticate('google', { failureRedirect: '/error' }),
+      function (req, res) {
+        res.send(req.token);
+      });
+    this.express.get('/error',
+      (req, res) => res.send('Error authenticating!'));
   }
 
   routes (): void {
