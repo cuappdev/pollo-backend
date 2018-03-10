@@ -5,6 +5,11 @@ Make sure `PostgreSQL` is installed. After installation, start `PostgreSQL` and 
 ````
 CREATE DATABASE clicker;
 ````
+If you get a database error, upon running `npm start` and you already have the database created try
+````
+DROP DATABASE clicker;
+CREATE DATABASE clicker;
+````
 
 ### Required variables:
 ````bash
