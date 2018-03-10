@@ -12,6 +12,33 @@ import {
 } from 'express';
 
 import constants from './constants';
+import SessionsRepo from '../repos/SessionsRepo';
+
+// Checks authentication header for token
+async function ensureAuthenticated (req, res, next) {
+  const header = req.get('Authorization');
+  if (!header) {
+    res.send(new AppDevResponse(false,
+      {errors: ['Authorization header missing!']}));
+    return next(true);
+  }
+  const bearerToken = header.replace('Bearer ', '').trim();
+  if (!bearerToken) {
+    res.send(new AppDevResponse(false,
+      {errors: ['Invalid authorization header!']}));
+    return next(true);
+  }
+
+  if (!await SessionsRepo.verifySession(bearerToken)) {
+    res.send(new AppDevResponse(false,
+      {errors: ['Invalid session token']}));
+    return next(true);
+  }
+  const user = await SessionsRepo.getUserFromToken(bearerToken);
+  req.user = user;
+
+  return next();
+}
 
 class AppDevResponse<T> {
   success: boolean;
@@ -57,16 +84,16 @@ export default class AppDevRouter<T: Object> {
     // Attach content to router
     switch (this.requestType) {
     case constants.REQUEST_TYPES.GET:
-      this.router.get(path, this.response);
+      this.router.get(path, ensureAuthenticated, this.response);
       break;
     case constants.REQUEST_TYPES.POST:
-      this.router.post(path, this.response);
+      this.router.post(path, ensureAuthenticated, this.response);
       break;
     case constants.REQUEST_TYPES.DELETE:
-      this.router.delete(path, this.response);
+      this.router.delete(path, ensureAuthenticated, this.response);
       break;
     case constants.REQUEST_TYPES.PUT:
-      this.router.put(path, this.response);
+      this.router.put(path, ensureAuthenticated, this.response);
       break;
     }
   }
