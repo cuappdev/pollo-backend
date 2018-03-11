@@ -3,8 +3,9 @@ import AppDevRouter from '../utils/AppDevRouter';
 import constants from '../utils/constants';
 import PollsRepo from '../repos/PollsRepo';
 import {Request} from 'express';
+import type { APIPoll } from './APITypes';
 
-class StartPollRouter extends AppDevRouter<Object> {
+class StartPollRouter extends AppDevRouter<APIPoll> {
   constructor () {
     super(constants.REQUEST_TYPES.POST);
   }
@@ -36,7 +37,13 @@ class StartPollRouter extends AppDevRouter<Object> {
 
     await req.app.pollManager.startNewPoll(poll);
 
-    return poll;
+    return {
+      node: {
+        id: poll.id,
+        name: poll.name,
+        code: poll.code
+      }
+    };
   }
 }
 
