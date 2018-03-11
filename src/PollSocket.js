@@ -193,6 +193,7 @@ export default class PollSocket {
       }
     }
     this.current.results = results;
+    this.current.answers = {};
 
     this.nsp.to('users').emit('user/question/start', { question });
   }
@@ -227,7 +228,7 @@ export default class PollSocket {
     }
 
     // Start question
-    client.on('server/question/start', (questionObject: Object) => {
+    client.on('server/question/start', async (questionObject: Object) => {
       const question: Question = {
         id: this.questionId,
         text: questionObject.text,
@@ -237,7 +238,7 @@ export default class PollSocket {
       this.questionId++;
       console.log('starting', question);
       if (this.current.question !== -1) {
-        this._endQuestion();
+        await this._endQuestion();
       }
       this._startQuestion(question);
     });
