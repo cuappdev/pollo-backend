@@ -8,6 +8,8 @@ import cors from 'cors';
 import passport from 'passport';
 import UsersRepo from './repos/UsersRepo';
 import SessionsRepo from './repos/SessionsRepo';
+import AppDevResponse from './utils/AppDevRouter';
+import type { APISession } from './routers/APITypes';
 
 class API {
   express: Express;
@@ -72,7 +74,8 @@ class API {
       const response = {
         accessToken: session.sessionToken,
         refreshToken: session.updateToken,
-        sessionExpiration: session.expiresAt
+        sessionExpiration: session.expiresAt,
+        isActive: session.isActive
       };
       return done(null, response);
     }
@@ -86,7 +89,7 @@ class API {
     this.express.get('/auth/google/callback',
       passport.authenticate('google', { failureRedirect: '/error' }),
       function (req, res) {
-        res.send(req.token);
+        res.send({'success': true, 'data': req.token});
       });
     this.express.get('/error',
       (req, res) => res.send('Error authenticating!'));
