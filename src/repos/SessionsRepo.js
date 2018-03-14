@@ -43,7 +43,8 @@ const verifySession = async (accessToken: string): Promise<boolean> => {
     .where('sessions.sessionToken = :accessToken', {accessToken: accessToken})
     .getOne();
   if (!session) return false;
-  return session.expiresAt > Math.floor(new Date().getTime() / 1000);
+  return session.isActive &&
+    session.expiresAt > Math.floor(new Date().getTime() / 1000);
 };
 
 export default {

@@ -34,3 +34,10 @@ export type APIUser = {|
   name: string,
   netId: string
 |}
+
+export type APISession = {|
+  accessToken: string,
+  refreshToken: string,
+  sessionExpiration: number,
+  isActive: boolean
+|}
