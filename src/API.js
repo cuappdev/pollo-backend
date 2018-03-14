@@ -8,8 +8,7 @@ import cors from 'cors';
 import passport from 'passport';
 import UsersRepo from './repos/UsersRepo';
 import SessionsRepo from './repos/SessionsRepo';
-import AppDevResponse from './utils/AppDevRouter';
-import type { APISession } from './routers/APITypes';
+import dotenv from 'dotenv';
 
 class API {
   express: Express;
@@ -51,14 +50,15 @@ class API {
   auth (): void {
     const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
-    passport.serializeUser(function (token, done) {
-      done(null, token);
+    passport.serializeUser(function (user, done) {
+      done(null, user);
     });
 
-    passport.deserializeUser(function (token, done) {
-      done(null, token);
+    passport.deserializeUser(function (user, done) {
+      done(null, user);
     });
 
+    dotenv.config();
     passport.use(new GoogleStrategy({
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
@@ -89,7 +89,8 @@ class API {
     this.express.get('/auth/google/callback',
       passport.authenticate('google', { failureRedirect: '/error' }),
       function (req, res) {
-        res.send({'success': true, 'data': req.token});
+        const r = {success: true, data: req.user};
+        res.json(r);
       });
     this.express.get('/error',
       (req, res) => res.send('Error authenticating!'));
