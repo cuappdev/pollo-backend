@@ -46,3 +46,7 @@
 //     await request(del(`/polls/${pollres.data.node.id}/${opts.deviceId}`));
 //   expect(JSON.parse(result).success).toBeTruthy();
 // });
+
+test('placeholder', () => {
+  expect(1 + 1).toBe(2);
+});
