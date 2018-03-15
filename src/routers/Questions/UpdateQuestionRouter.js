@@ -3,6 +3,7 @@ import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import QuestionsRepo from '../../repos/QuestionsRepo';
 import constants from '../../utils/constants';
+import PollsRepo from '../../repos/PollsRepo';
 
 import type { APIQuestion } from '../APITypes';
 
@@ -19,14 +20,15 @@ class UpdateQuestionRouter extends AppDevRouter<Object> {
     const questionId = req.params.id;
     var text = req.body.text;
     var results = req.body.results;
-    var deviceId = req.body.deviceId;
+    var user = req.user;
 
     if (!results && !text) throw new Error('No fields specified to update.');
 
     const poll = await QuestionsRepo.getPollFromQuestionId(questionId);
     if (!poll) throw new Error(`Question with id ${questionId} has no poll!`);
-    if (poll.deviceId !== deviceId) {
-      throw new Error('Not authorized to update this question!');
+    
+    if (PollsRepo.isAdmin(poll.id, user)) {
+      throw new Error('You are not authorized to update this question!');
     }
     const question = await QuestionsRepo.updateQuestionById(questionId, text,
       results);

@@ -3,7 +3,7 @@ import dbConnection from '../../src/db/DbConnection';
 
 var id;
 var code;
-var deviceId;
+var user;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
@@ -15,11 +15,12 @@ beforeAll(async () => {
 
 test('Create Poll', async () => {
   code = PollsRepo.createCode();
-  deviceId = 'iphone8';
-  const poll = await PollsRepo.createPoll('Poll', code, deviceId);
+  user = new User();
+  user.googleId = '1234';
+  const poll = await PollsRepo.createPoll('Poll', code, user);
   expect(poll.name).toBe('Poll');
   expect(poll.code).toBe(code);
-  expect(poll.deviceId).toBe(deviceId);
+  expect(poll.user).toBe(user);
   id = poll.id;
 });
 
@@ -27,13 +28,13 @@ test('Get Poll', async () => {
   const poll = await PollsRepo.getPollById(id);
   expect(poll.name).toBe('Poll');
   expect(poll.code).toBe(code);
-  expect(poll.deviceId).toBe(deviceId);
+  expect(poll.user).toBe(user);
 });
 
 test('Update Poll', async () => {
   const poll = await PollsRepo.updatePollById(id, 'New Poll');
   expect(poll.name).toBe('New Poll');
-  expect(poll.deviceId).toBe(deviceId);
+  expect(poll.user).toBe(user);
 });
 
 test('Delete Poll', async () => {
