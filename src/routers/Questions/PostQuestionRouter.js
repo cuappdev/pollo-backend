@@ -17,26 +17,22 @@ class PostQuestionRouter extends AppDevRouter<Object> {
   }
 
   async content (req: Request): Promise<{ node: APIQuestion }> {
-    const id = req.params.id;
+    const pollId = req.params.pollId;
     var text = req.body.text;
     var results = req.body.results;
-    var deviceId = req.body.deviceId;
+    var user = req.user;
 
-    if (!text) {
-      text = '';
+    if (!text) text = '';
+    if (!results) results = {};
+
+    const poll = await PollsRepo.getPollById(pollId);
+    if (!poll) throw new Error(`Couldn't find poll with id ${pollId}`);
+
+    if (PollsRepo.isAdmin(pollId, user)) {
+      throw new Error('You are not authorized to post a question!');
     }
 
-    if (!results) {
-      results = {};
-    }
-
-    const p = await PollsRepo.getPollById(id);
-    if (!p) throw new Error(`Couldn't find poll with id ${id}`);
-    if (p.deviceId !== deviceId) {
-      throw new Error('Not authorized to post this question!');
-    }
-
-    const question = await QuestionsRepo.createQuestion(text, p, results);
+    const question = await QuestionsRepo.createQuestion(text, poll, results);
 
     return {
       node: {

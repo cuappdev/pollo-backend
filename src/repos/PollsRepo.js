@@ -1,6 +1,7 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
 import {Poll} from '../models/Poll';
+import {User} from '../models/User';
 import appDevUtils from '../utils/appDevUtils';
 import QuestionsRepo from '../repos/QuestionsRepo';
 
@@ -12,13 +13,13 @@ const db = (): Repository<Poll> => {
 var pollCodes = {};
 
 // Create a poll
-const createPoll = async (name: string, code: string, deviceId: string):
+const createPoll = async (name: string, code: string, user: User):
   Promise<Poll> => {
   try {
     const poll = new Poll();
     poll.name = name;
     poll.code = code;
-    poll.deviceId = deviceId;
+    poll.admins = [user];
 
     if (pollCodes[code]) throw new Error('Poll code is already in use');
 
@@ -92,11 +93,58 @@ const updatePollById = async (id: number, name: ?string):
   }
 };
 
+// Add admin to a poll by Id
+const addAdminByPollId = async (id: number, user: User):
+  Promise<?Poll> => {
+    try {
+      const poll = await db().findOneById(id);
+      poll.admins.push(user);
+      return poll;
+    } catch (e) {
+      throw new Error(`Problem adding admin to poll by id: ${id}`);
+    }
+  };
+
+// Remove admin of a poll by Id
+const removeAdminByPollId = async (id:number, user: User):
+  Promise<?Poll> => {
+    try {
+      const poll = await db().findOneById(id);
+      const index = poll.admins.indexOf(user);
+      if (index > -1) {
+        poll.admins.splice(index,1);
+      }
+      return poll;
+    } catch (e) {
+      throw new Error(`Problem adding admin to poll by id: ${id}`);
+    }
+  };
+
+  const isAdmin = async (id: number, user: User):
+    Promise<?boolean> => {
+      try {
+        const poll = await db().findOneById(id);
+        const admins = poll.admins;
+        var i;
+        for (i in poll.admins) {
+          if (admins[i].googleId == user.googleId) {
+            return true;
+          }
+        }
+        return false;
+      } catch (e) {
+        throw new Error(`Problem verifying admin status for poll ${id}`);
+      }
+    };
+
 export default {
   createPoll,
   createCode,
   getPollById,
   getPollId,
   updatePollById,
-  deletePollById
+  deletePollById,
+  addAdminByPollId,
+  removeAdminByPollId,
+  isAdmin
 };

@@ -18,13 +18,13 @@ class PostPollRouter extends AppDevRouter<Object> {
   async content (req: Request): Promise<{ node: APIPoll }> {
     var name = req.body.name;
     const code = req.body.code;
-    const deviceId = req.body.deviceId;
+    const user = req.user;
 
     if (!name) name = '';
-    if (!deviceId) throw new Error('Device id missing');
+    if (!user) throw new Error('User missing');
     if (!code) throw new Error('Code missing');
 
-    const poll = await PollsRepo.createPoll(name, code, deviceId);
+    const poll = await PollsRepo.createPoll(name, code, user);
 
     return {
       node: {

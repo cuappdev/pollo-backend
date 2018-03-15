@@ -6,7 +6,7 @@ import {
   OneToMany,
   ManyToMany
 } from 'typeorm';
-import {Base} from './Base';
+import { Base } from './Base';
 import { Question } from './Question';
 import { User } from './User';
 
@@ -21,8 +21,8 @@ export class Poll extends Base {
   @Column('string')
   code: string = '';
 
-  @Column('string')
-  deviceId: string = '';
+  @ManyToMany(type => User, user => user.polls)
+  admins: ?User[] = [];
 
   @OneToMany(type => Question, question => question.poll)
   questions: ?Question[] = [];

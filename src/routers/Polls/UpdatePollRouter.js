@@ -18,12 +18,12 @@ class UpdatePollRouter extends AppDevRouter<Object> {
   async content (req: Request): Promise<{ node: APIPoll }> {
     const name = req.body.name;
     const pollId = req.params.id;
-    const deviceId = req.body.deviceId;
+    const user = req.user;
 
     var poll = await PollsRepo.getPollById(pollId);
     if (!poll) throw new Error(`Poll with id ${pollId} was not found!`);
 
-    if (deviceId !== poll.deviceId) {
+    if (PollsRepo.isAdmin(pollId, user)) {
       throw new Error('You are not authorized to update this poll!');
     }
 
