@@ -30,13 +30,13 @@ export class User extends Base {
   @Column('string')
   lastName: string = '';
 
-  @ManyToMany(type => Poll, poll => poll.admins)
+  @ManyToMany(type => Poll)
   @JoinTable()
-  myPolls: ?Poll[] = [];
+  adminPolls: ?Poll[] = [];
 
-  @ManyToMany(type => Poll, poll => poll.users)
+  @ManyToMany(type => Poll)
   @JoinTable()
-  polls: ?Poll[] = [];
+  memberPolls: ?Poll[] = [];
 
   static dummy (id: string): User {
     const user = new User();

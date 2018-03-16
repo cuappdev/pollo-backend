@@ -28,7 +28,7 @@ class PostQuestionRouter extends AppDevRouter<Object> {
     const poll = await PollsRepo.getPollById(pollId);
     if (!poll) throw new Error(`Couldn't find poll with id ${pollId}`);
 
-    if (PollsRepo.isAdmin(pollId, user)) {
+    if (await PollsRepo.isAdmin(pollId, user)) {
       throw new Error('You are not authorized to post a question!');
     }
 

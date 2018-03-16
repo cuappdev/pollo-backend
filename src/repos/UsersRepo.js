@@ -21,6 +21,7 @@ const createDummyUser = async (id: string): Promise<User> => {
 const createUser = async (fields: Object): Promise<User> => {
   try {
     const user = await db().persist(User.fromGoogleCreds(fields));
+    console.log(fields);
     return user;
   } catch (e) {
     console.log(e);

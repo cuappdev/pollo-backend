@@ -22,7 +22,7 @@ test('Create Poll', async () => {
   const poll = await PollsRepo.createPoll('Poll', code, user);
   expect(poll.name).toBe('Poll');
   expect(poll.code).toBe(code);
-  expect(poll.adminId).toBe(user.googleId);
+  expect(poll.admins[0].googleId).toBe(user.googleId);
   id = poll.id;
 });
 
@@ -30,13 +30,18 @@ test('Get Poll', async () => {
   const poll = await PollsRepo.getPollById(id);
   expect(poll.name).toBe('Poll');
   expect(poll.code).toBe(code);
-  expect(poll.adminId).toBe(user.googleId);
 });
 
 test('Update Poll', async () => {
   const poll = await PollsRepo.updatePollById(id, 'New Poll');
   expect(poll.name).toBe('New Poll');
-  expect(poll.adminId).toBe(user.googleId);
+});
+
+test('Get Admins From Poll', async () => {
+  const admins = await PollsRepo.getAdminsByPollId(id);
+  expect(admins.length).toEqual(1);
+  console.log(admins);
+  expect(admins[0].googleId).toBe(user.googleId);
 });
 
 test('Delete Poll', async () => {

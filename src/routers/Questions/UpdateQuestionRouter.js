@@ -26,8 +26,8 @@ class UpdateQuestionRouter extends AppDevRouter<Object> {
 
     const poll = await QuestionsRepo.getPollFromQuestionId(questionId);
     if (!poll) throw new Error(`Question with id ${questionId} has no poll!`);
-    
-    if (PollsRepo.isAdmin(poll.id, user)) {
+
+    if (await PollsRepo.isAdmin(poll.id, user)) {
       throw new Error('You are not authorized to update this question!');
     }
     const question = await QuestionsRepo.updateQuestionById(questionId, text,
