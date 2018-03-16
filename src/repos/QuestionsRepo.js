@@ -58,7 +58,6 @@ const updateQuestionById = async (id: number, text: ?string, results: ?json):
       .execute();
     return await db().findOneById(id);
   } catch (e) {
-    console.log(e);
     throw new Error(`Problem updating question by id: ${id}!`);
   }
 };
