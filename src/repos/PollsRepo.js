@@ -95,26 +95,41 @@ const updatePollById = async (id: number, name: ?string):
 
 // Add admin to a poll by Id
 const addAdminByPollId = async (id: number, user: User):
-  Promise<?Poll> => {
+  Promise<Array<?User>> => {
     try {
       const poll = await db().findOneById(id);
-      poll.admins.push(user);
-      return poll;
+      if (user) {
+        const admins = poll.admins.push(user);
+        var field = {};
+        field.admins = admins;
+        // Need to figure out how to update a relational table
+        return admins;
+      }
+
+      return poll.admins;
     } catch (e) {
+      console.log(e);
       throw new Error(`Problem adding admin to poll by id: ${id}`);
     }
   };
 
 // Remove admin of a poll by Id
 const removeAdminByPollId = async (id:number, user: User):
-  Promise<?Poll> => {
+  Promise<Array<?User>> => {
     try {
       const poll = await db().findOneById(id);
-      const index = poll.admins.indexOf(user);
-      if (index > -1) {
-        poll.admins.splice(index,1);
+      if (user) {
+        var field = {};
+        var admins = poll.admins;
+        const index = admins.indexOf(user);
+        if (index > -1) {
+          field.admins = admins.splice(index,1);
+        }
+        // Need to figure out how to update a relational table
+        return admins;
       }
-      return poll;
+
+      return poll.admins;
     } catch (e) {
       throw new Error(`Problem adding admin to poll by id: ${id}`);
     }

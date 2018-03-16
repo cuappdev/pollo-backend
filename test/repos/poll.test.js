@@ -6,6 +6,7 @@ import User from '../../src/models/User';
 var id;
 var code;
 var user;
+var user2;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
@@ -43,6 +44,20 @@ test('Get Admins From Poll', async () => {
   console.log(admins);
   expect(admins[0].googleId).toBe(user.googleId);
 });
+
+// test('Add Admins To Poll', async () => {
+//   user2 = await UsersRepo.createDummyUser('5678');
+//   const admins = await PollsRepo.addAdminByPollId(id, user2);
+//   expect(admins.length).toEqual(2);
+//   expect(admins[1].googleId).toBe(user2.googleId);
+// });
+
+// test('Remove Admins From Poll', async () => {
+//   const admins = await PollsRepo.getAdminsByPollId(id);
+//   expect(admins.length).toEqual(1);
+//   console.log(admins);
+//   expect(admins[0].googleId).toBe(user.googleId);
+// });
 
 test('Delete Poll', async () => {
   await PollsRepo.deletePollById(id);
