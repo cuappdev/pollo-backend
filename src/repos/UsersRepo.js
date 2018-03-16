@@ -12,7 +12,6 @@ const createDummyUser = async (id: string): Promise<User> => {
     const user = await db().persist(User.dummy(id));
     return user;
   } catch (e) {
-    console.log(e);
     throw new Error('Problem creating user!');
   }
 };
@@ -21,10 +20,8 @@ const createDummyUser = async (id: string): Promise<User> => {
 const createUser = async (fields: Object): Promise<User> => {
   try {
     const user = await db().persist(User.fromGoogleCreds(fields));
-    console.log(fields);
     return user;
   } catch (e) {
-    console.log(e);
     throw new Error('Problem creating user!');
   }
 };
@@ -47,7 +44,6 @@ const getUserByGoogleId = async (googleId: string): Promise<?User> => {
       .getOne();
     return user;
   } catch (e) {
-    console.log(e);
     throw new Error('Problem getting user by google ID!');
   }
 };

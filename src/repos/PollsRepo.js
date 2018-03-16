@@ -169,7 +169,6 @@ const removeAdminByPollId = async (id:number, user: User):
           .getOne();
         return poll.admins;
       } catch (e) {
-        console.log(e);
         throw new Error(`Problem getting admins for poll with id: ${id}!`);
       }
     };
