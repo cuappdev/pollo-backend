@@ -4,7 +4,8 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
-  ManyToMany
+  ManyToMany,
+  JoinTable
 } from 'typeorm';
 import { Base } from './Base';
 import { Question } from './Question';
@@ -21,15 +22,14 @@ export class Poll extends Base {
   @Column('string')
   code: string = '';
 
-  @ManyToMany(type => User, user => user.myPolls)
+  @ManyToMany(type => User)
+  @JoinTable()
   admins: ?User[] = [];
-
-  @Column('string')
-  adminId: string = '';
 
   @OneToMany(type => Question, question => question.poll)
   questions: ?Question[] = [];
 
-  @ManyToMany(type => User, user => user.polls)
+  @ManyToMany(type => User)
+  @JoinTable()
   users: ?User[] = [];
 }

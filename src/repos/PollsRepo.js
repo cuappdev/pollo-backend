@@ -20,7 +20,6 @@ const createPoll = async (name: string, code: string, user: User):
     poll.name = name;
     poll.code = code;
     poll.admins = [user];
-    poll.adminId = user.googleId;
 
     if (pollCodes[code]) throw new Error('Poll code is already in use');
 
@@ -139,17 +138,19 @@ const removeAdminByPollId = async (id:number, user: User):
       }
     };
 
-    // Get users from a poll id
-    const getAdminsFromPollId = async (id: number):
+    // Get admins from a poll id
+    const getAdminsByPollId = async (id: number):
       Promise<Array<?User>> => {
       try {
-        const questions = await db().createQueryBuilder('questions')
-          .innerJoin('questions.poll', 'poll', 'poll.id = :pollId')
+        const poll = await db().createQueryBuilder("polls")
+          .leftJoinAndSelect("polls.admins", "users")
+          .where('polls.id = :pollId')
           .setParameters({ pollId: id })
-          .getMany();
-        return questions;
+          .getOne();
+        return poll.admins;
       } catch (e) {
-        throw new Error(`Problem getting users for poll with id: ${id}!`);
+        console.log(e);
+        throw new Error(`Problem getting admins for poll with id: ${id}!`);
       }
     };
 
@@ -162,5 +163,6 @@ export default {
   deletePollById,
   addAdminByPollId,
   removeAdminByPollId,
+  getAdminsByPollId,
   isAdmin
 };

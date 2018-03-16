@@ -23,7 +23,7 @@ class UpdatePollRouter extends AppDevRouter<Object> {
     var poll = await PollsRepo.getPollById(pollId);
     if (!poll) throw new Error(`Poll with id ${pollId} was not found!`);
 
-    if (PollsRepo.isAdmin(pollId, user)) {
+    if (await PollsRepo.isAdmin(pollId, user)) {
       throw new Error('You are not authorized to update this poll!');
     }
 
