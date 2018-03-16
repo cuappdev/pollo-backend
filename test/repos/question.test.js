@@ -55,5 +55,6 @@ test('Delete Question', async () => {
 // Teardown
 afterAll(async () => {
   await PollsRepo.deletePollById(poll.id);
+  await UsersRepo.deleteUserById(user.id);
   console.log('Passed all tests');
 });

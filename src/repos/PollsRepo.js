@@ -141,7 +141,7 @@ const removeAdminByPollId = async (id:number, user: User):
   }
 };
 
-  // Return true if user is an admin of a poll by id
+// Return true if user is an admin of a poll by id
 const isAdmin = async (id: number, user: User):
     Promise<?boolean> => {
   try {
@@ -165,7 +165,7 @@ const isAdmin = async (id: number, user: User):
 
 // Get admins from a poll id
 const getAdminsByPollId = async (id: number):
-      Promise<Array<?User>> => {
+    Promise<Array<?User>> => {
   try {
     const poll = await db().createQueryBuilder('polls')
       .leftJoinAndSelect('polls.admins', 'users')

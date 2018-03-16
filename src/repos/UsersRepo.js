@@ -1,6 +1,7 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
 import { User } from '../models/User';
+import { Poll } from '../models/Poll';
 
 const db = (): Repository<User> => {
   return getConnectionManager().get().getRepository(User);
@@ -82,6 +83,28 @@ const deleteUserById = async (id: number) => {
   }
 };
 
+// Get polls by userId
+const getPollsById = async (id: number, role: ?string):
+    Promise<Array<?Poll>> => {
+  try {
+    const user = await db().createQueryBuilder('users')
+      .leftJoinAndSelect('users.memberPolls', 'memberPolls')
+      .leftJoinAndSelect('users.adminPolls', 'adminPolls')
+      .where('users.id = :userId')
+      .setParameters({ userId : id})
+      .getOne();
+    if (role == 'admin') {
+      return user.adminPolls;
+    } else if (role == 'member') {
+      return user.memberPolls;
+    } else {
+      return user.memberPolls.concat(user.adminPolls);
+    }
+  } catch (e) {
+    throw new Error(`Problem getting member polls for user: ${id}`);
+  }
+};
+
 export default {
   getUsers,
   createUser,
@@ -89,5 +112,6 @@ export default {
   getUserById,
   getUserByGoogleId,
   getUsersFromIds,
-  deleteUserById
+  deleteUserById,
+  getPollsById
 };

@@ -17,7 +17,7 @@ beforeAll(async () => {
 
 test('Create Poll', async () => {
   code = PollsRepo.createCode();
-  user = await UsersRepo.createDummyUser('1234');
+  user = await UsersRepo.createDummyUser('polltest1');
 
   const poll = await PollsRepo.createPoll('Poll', code, user);
   expect(poll.name).toBe('Poll');
@@ -44,7 +44,7 @@ test('Get Admins From Poll', async () => {
 });
 
 test('Add Admins To Poll', async () => {
-  user2 = await UsersRepo.createDummyUser('5678');
+  user2 = await UsersRepo.createDummyUser('polltest2');
   const admins = await PollsRepo.addAdminByPollId(id, user2);
   expect(admins.length).toEqual(2);
   expect(admins[1].googleId).toBe(user2.googleId);
@@ -58,6 +58,10 @@ test('Remove Admins From Poll', async () => {
 
 test('Delete Poll', async () => {
   await PollsRepo.deletePollById(id);
+  await UsersRepo.deleteUserById(user.id);
+  await UsersRepo.deleteUserById(user2.id);
+  expect(await UsersRepo.getUserById(user.id)).not.toBeDefined();
+  expect(await UsersRepo.getUserById(user2.id)).not.toBeDefined();
   expect(await PollsRepo.getPollById(id)).not.toBeDefined();
 });
 
