@@ -11,6 +11,7 @@ import {Poll} from '../models/Poll';
 import {Question} from '../models/Question';
 import {User} from '../models/User';
 import {Session} from '../models/Session';
+import {Change1521233644145} from './migrations/Change1521233644145';
 
 dotenv.config(); // establish env variables
 
@@ -38,11 +39,23 @@ const connectionOptions: ConnectionOptions = {
   driver: driver,
   entities: entities,
   autoSchemaSync: autoSchemaSync,
-  migrations: ['./migrations/*.js']
+  migrations: [Change1521233644145],
+  cli: {
+    entitiesDir: 'src/models',
+    migrationsDir: 'src/db/migrations'
+  }
 };
 
 const dbConnection = (): Promise<any> => {
-  return createConnection(connectionOptions);
+  return createConnection(connectionOptions).then(async connection => {
+    // run all migrations
+    // await connection.runMigrations();
+
+    // and undo previous migration
+    // await connection.undoLastMigration();
+
+    // console.log('Done. We run two migrations then reverted them.');
+  });
 };
 
 export default dbConnection;
