@@ -98,7 +98,9 @@ const addAdminByPollId = async (id: number, user: User):
   Promise<Array<?User>> => {
     try {
       const poll = await db().createQueryBuilder("polls")
-        .leftJoinAndSelect("polls.admins", "users")
+        .leftJoinAndSelect("polls.admins", "admins")
+        .leftJoinAndSelect("polls.members", "members")
+        .leftJoinAndSelect("polls.questions", "questions")
         .where('polls.id = :pollId')
         .setParameters({ pollId: id })
         .getOne();
@@ -119,7 +121,9 @@ const removeAdminByPollId = async (id:number, user: User):
   Promise<Array<?User>> => {
     try {
       const poll = await db().createQueryBuilder("polls")
-        .leftJoinAndSelect("polls.admins", "users")
+        .leftJoinAndSelect("polls.admins", "admins")
+        .leftJoinAndSelect("polls.members", "members")
+        .leftJoinAndSelect("polls.questions", "questions")
         .where('polls.id = :pollId')
         .setParameters({ pollId: id })
         .getOne();
@@ -132,6 +136,7 @@ const removeAdminByPollId = async (id:number, user: User):
 
       return poll.admins;
     } catch (e) {
+      console.log(e);
       throw new Error(`Problem removing admin from poll by id: ${id}`);
     }
   };
@@ -141,7 +146,7 @@ const removeAdminByPollId = async (id:number, user: User):
     Promise<?boolean> => {
       try {
         const poll = await db().createQueryBuilder("polls")
-          .leftJoinAndSelect("polls.admins", "users")
+          .leftJoinAndSelect("polls.admins", "admins")
           .where('polls.id = :pollId')
           .setParameters({ pollId: id })
           .getOne();
