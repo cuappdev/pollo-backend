@@ -37,7 +37,8 @@ const autoSchemaSync = true;
 const connectionOptions: ConnectionOptions = {
   driver: driver,
   entities: entities,
-  autoSchemaSync: autoSchemaSync
+  autoSchemaSync: autoSchemaSync,
+  migrations: ['./migrations/*.js']
 };
 
 const dbConnection = (): Promise<any> => {
