@@ -38,7 +38,7 @@ test('Update Poll', async () => {
 });
 
 test('Get Admins From Poll', async () => {
-  const admins = await PollsRepo.getAdminsByPollId(id);
+  const admins = await PollsRepo.getUsersByPollId(id, 'admin');
   expect(admins.length).toEqual(1);
   expect(admins[0].googleId).toBe(user.googleId);
 });
