@@ -30,9 +30,23 @@ export class User extends Base {
   @Column('string')
   lastName: string = '';
 
+  @ManyToMany(type => Poll, poll => poll.admins)
+  @JoinTable()
+  myPolls: ?Poll[] = [];
+
   @ManyToMany(type => Poll, poll => poll.users)
   @JoinTable()
   polls: ?Poll[] = [];
+
+  static dummy (id: string): User {
+    const user = new User();
+    user.googleId = id;
+    user.firstName = '';
+    user.lastName = '';
+    user.email = '';
+    user.netId = '';
+    return user;
+  }
 
   static fromGoogleCreds (creds: Object): User {
     const user = new User();

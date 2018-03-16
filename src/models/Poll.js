@@ -21,8 +21,11 @@ export class Poll extends Base {
   @Column('string')
   code: string = '';
 
-  @ManyToMany(type => User, user => user.polls)
+  @ManyToMany(type => User, user => user.myPolls)
   admins: ?User[] = [];
+
+  @Column('string')
+  adminId: string = '';
 
   @OneToMany(type => Question, question => question.poll)
   questions: ?Question[] = [];
