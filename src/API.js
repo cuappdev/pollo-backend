@@ -9,6 +9,7 @@ import passport from 'passport';
 import UsersRepo from './repos/UsersRepo';
 import SessionsRepo from './repos/SessionsRepo';
 import dotenv from 'dotenv';
+import lib from './utils/lib';
 
 class API {
   express: Express;
@@ -92,6 +93,10 @@ class API {
         const r = {success: true, data: req.user};
         res.json(r);
       });
+    this.express.post('/auth/refresh', lib.updateSession, function (req, res) {
+      const r = {success: true, data: req.session};
+      res.json(r);
+    });
     this.express.get('/error',
       (req, res) => res.send('Error authenticating!'));
   }

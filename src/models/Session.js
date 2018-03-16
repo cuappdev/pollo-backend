@@ -51,7 +51,8 @@ export class Session extends Base {
     } else {
       this.updateToken = crypto.randomBytes(64).toString('hex');
     }
-    this.expiresAt = Math.floor(new Date().getTime() / 1000) + 60 * 60 * 24 * 7;
+    // Session length is 1 day
+    this.expiresAt = Math.floor(new Date().getTime() / 1000) + 60 * 60 * 24;
     this.activate();
     return this;
   }

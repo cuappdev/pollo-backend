@@ -37,6 +37,23 @@ const getUserFromToken = async (accessToken: string): Promise<?User> => {
   return session.user;
 };
 
+// Update session from refresh token
+const updateSession = async (refreshToken: string): Promise<?Object> => {
+  var session = await db().createQueryBuilder('sessions')
+    .leftJoinAndSelect('sessions.user', 'user')
+    .where('sessions.updateToken = :token', {token: refreshToken})
+    .getOne();
+  if (!session) return null;
+  session = session.update();
+  await db().persist(session);
+  return {
+    accessToken: session.sessionToken,
+    refreshToken: session.updateToken,
+    sessionExpiration: session.expiresAt,
+    isActive: session.isActive
+  };
+};
+
 // Make sure access token is related to active, valid session
 const verifySession = async (accessToken: string): Promise<boolean> => {
   const session = await db().createQueryBuilder('sessions')
@@ -50,5 +67,6 @@ const verifySession = async (accessToken: string): Promise<boolean> => {
 export default {
   createOrUpdateSession,
   getUserFromToken,
+  updateSession,
   verifySession
 };
