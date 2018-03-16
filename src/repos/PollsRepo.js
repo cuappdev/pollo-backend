@@ -97,13 +97,14 @@ const updatePollById = async (id: number, name: ?string):
 const addAdminByPollId = async (id: number, user: User):
   Promise<Array<?User>> => {
     try {
-      const poll = await db().findOneById(id);
+      const poll = await db().createQueryBuilder("polls")
+        .leftJoinAndSelect("polls.admins", "users")
+        .where('polls.id = :pollId')
+        .setParameters({ pollId: id })
+        .getOne();
       if (user) {
-        const admins = poll.admins.push(user);
-        var field = {};
-        field.admins = admins;
-        // Need to figure out how to update a relational table
-        return admins;
+        poll.admins = poll.admins.concat(user);
+        await db().persist(poll);
       }
 
       return poll.admins;
@@ -117,21 +118,21 @@ const addAdminByPollId = async (id: number, user: User):
 const removeAdminByPollId = async (id:number, user: User):
   Promise<Array<?User>> => {
     try {
-      const poll = await db().findOneById(id);
+      const poll = await db().createQueryBuilder("polls")
+        .leftJoinAndSelect("polls.admins", "users")
+        .where('polls.id = :pollId')
+        .setParameters({ pollId: id })
+        .getOne();
       if (user) {
-        var field = {};
-        var admins = poll.admins;
-        const index = admins.indexOf(user);
-        if (index > -1) {
-          field.admins = admins.splice(index,1);
-        }
-        // Need to figure out how to update a relational table
-        return admins;
+        poll.admins = poll.admins.filter(function (admin) {
+          return (admin.googleId !== user.googleId)
+        });
+        await db().persist(poll);
       }
 
       return poll.admins;
     } catch (e) {
-      throw new Error(`Problem adding admin to poll by id: ${id}`);
+      throw new Error(`Problem removing admin from poll by id: ${id}`);
     }
   };
 
@@ -139,7 +140,11 @@ const removeAdminByPollId = async (id:number, user: User):
   const isAdmin = async (id: number, user: User):
     Promise<?boolean> => {
       try {
-        const poll = await db().findOneById(id);
+        const poll = await db().createQueryBuilder("polls")
+          .leftJoinAndSelect("polls.admins", "users")
+          .where('polls.id = :pollId')
+          .setParameters({ pollId: id })
+          .getOne();
         const admins = poll.admins;
         var i;
         for (i in poll.admins) {

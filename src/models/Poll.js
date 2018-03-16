@@ -22,14 +22,14 @@ export class Poll extends Base {
   @Column('string')
   code: string = '';
 
-  @ManyToMany(type => User)
+  @ManyToMany(type => User, user => user.adminPolls)
   @JoinTable()
   admins: ?User[] = [];
 
   @OneToMany(type => Question, question => question.poll)
   questions: ?Question[] = [];
 
-  @ManyToMany(type => User)
+  @ManyToMany(type => User, user => user.memberPolls)
   @JoinTable()
-  users: ?User[] = [];
+  members: ?User[] = [];
 }
