@@ -6,12 +6,24 @@ const db = (): Repository<User> => {
   return getConnectionManager().get().getRepository(User);
 };
 
+// Create a user without fields
+const createDummyUser = async (id: string): Promise<User> => {
+  try {
+    const user = await db().persist(User.dummy(id));
+    return user;
+  } catch (e) {
+    console.log(e);
+    throw new Error('Problem creating user!');
+  }
+};
+
 // Create a user with fields
 const createUser = async (fields: Object): Promise<User> => {
   try {
     const user = await db().persist(User.fromGoogleCreds(fields));
     return user;
   } catch (e) {
+    console.log(e);
     throw new Error('Problem creating user!');
   }
 };
@@ -76,6 +88,7 @@ const deleteUserById = async (id: number) => {
 export default {
   getUsers,
   createUser,
+  createDummyUser,
   getUserById,
   getUserByGoogleId,
   getUsersFromIds,

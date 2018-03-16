@@ -1,6 +1,8 @@
 import PollsRepo from '../../src/repos/PollsRepo';
 import QuestionsRepo from '../../src/repos/QuestionsRepo';
+import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
+import User from '../../src/models/User';
 
 var poll;
 var id;
@@ -8,13 +10,11 @@ var user;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
-  user = new User();
-  user.googleId = '1234';
   await dbConnection().catch(function (e) {
     console.log('Error connecting to database');
     process.exit();
   });
-
+  user = await UsersRepo.createDummyUser('1234');
   poll = await PollsRepo.createPoll('Poll', PollsRepo.createCode(), user);
 });
 
@@ -29,7 +29,6 @@ test('Create Question', async () => {
 test('Get Question', async () => {
   const question = await QuestionsRepo.getQuestionById(id);
   expect(question.text).toBe('Question');
-  // expect(question.poll.id).toBe(poll.id);
   expect(question.results).toEqual({});
 });
 

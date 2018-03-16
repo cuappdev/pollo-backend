@@ -1,5 +1,7 @@
 import PollsRepo from '../../src/repos/PollsRepo';
+import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
+import User from '../../src/models/User';
 
 var id;
 var code;
@@ -15,12 +17,12 @@ beforeAll(async () => {
 
 test('Create Poll', async () => {
   code = PollsRepo.createCode();
-  user = new User();
-  user.googleId = '1234';
+  user = await UsersRepo.createDummyUser('1234');
+
   const poll = await PollsRepo.createPoll('Poll', code, user);
   expect(poll.name).toBe('Poll');
   expect(poll.code).toBe(code);
-  expect(poll.user).toBe(user);
+  expect(poll.adminId).toBe(user.googleId);
   id = poll.id;
 });
 
@@ -28,13 +30,13 @@ test('Get Poll', async () => {
   const poll = await PollsRepo.getPollById(id);
   expect(poll.name).toBe('Poll');
   expect(poll.code).toBe(code);
-  expect(poll.user).toBe(user);
+  expect(poll.adminId).toBe(user.googleId);
 });
 
 test('Update Poll', async () => {
   const poll = await PollsRepo.updatePollById(id, 'New Poll');
   expect(poll.name).toBe('New Poll');
-  expect(poll.user).toBe(user);
+  expect(poll.adminId).toBe(user.googleId);
 });
 
 test('Delete Poll', async () => {

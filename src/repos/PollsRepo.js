@@ -20,6 +20,7 @@ const createPoll = async (name: string, code: string, user: User):
     poll.name = name;
     poll.code = code;
     poll.admins = [user];
+    poll.adminId = user.googleId;
 
     if (pollCodes[code]) throw new Error('Poll code is already in use');
 
@@ -120,6 +121,7 @@ const removeAdminByPollId = async (id:number, user: User):
     }
   };
 
+  // Return true if user is an admin of a poll by id
   const isAdmin = async (id: number, user: User):
     Promise<?boolean> => {
       try {
@@ -134,6 +136,20 @@ const removeAdminByPollId = async (id:number, user: User):
         return false;
       } catch (e) {
         throw new Error(`Problem verifying admin status for poll ${id}`);
+      }
+    };
+
+    // Get users from a poll id
+    const getAdminsFromPollId = async (id: number):
+      Promise<Array<?User>> => {
+      try {
+        const questions = await db().createQueryBuilder('questions')
+          .innerJoin('questions.poll', 'poll', 'poll.id = :pollId')
+          .setParameters({ pollId: id })
+          .getMany();
+        return questions;
+      } catch (e) {
+        throw new Error(`Problem getting users for poll with id: ${id}!`);
       }
     };
 
