@@ -25,7 +25,6 @@ class DeleteQuestionRouter extends AppDevRouter<Object> {
     if (await PollsRepo.isAdmin(poll.id, user)) {
       throw new Error('You are not authorized to delete this question!');
     }
-    console.log(":DLKFJLDKSJFLKSDJFLKJDLSKSJFLKSDJFLSKDJFLDKJFDKLFS");
     await QuestionsRepo.deleteQuestionById(questionId);
     return null;
   }
