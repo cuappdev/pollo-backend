@@ -3,8 +3,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToMany,
-  JoinTable
+  ManyToMany
 } from 'typeorm';
 import { Base } from './Base';
 import { Poll } from './Poll';

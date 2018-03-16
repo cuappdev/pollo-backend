@@ -22,7 +22,7 @@ class DeletePollRouter extends AppDevRouter<Object> {
 
     if (await PollsRepo.isAdmin(pollId, user)) {
       throw new Error('You are not authorized to delete this poll!');
-    };
+    }
 
     await PollsRepo.deletePollById(pollId);
     return null;

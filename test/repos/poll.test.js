@@ -1,7 +1,6 @@
 import PollsRepo from '../../src/repos/PollsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
-import User from '../../src/models/User';
 
 var id;
 var code;

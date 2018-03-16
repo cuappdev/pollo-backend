@@ -32,7 +32,9 @@ class UpdateQuestionRouter extends AppDevRouter<Object> {
     }
     const question = await QuestionsRepo.updateQuestionById(questionId, text,
       results);
-    if (!question) throw new Error(`Question with id ${questionId} was not found!`);
+    if (!question) {
+      throw new Error(`Question with id ${questionId} was not found!`);
+    }
 
     return {
       node: {
