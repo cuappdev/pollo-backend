@@ -179,7 +179,8 @@ const getUsersByPollId = async (id: number, role: ?string):
     Promise<Array<?User>> => {
   try {
     const poll = await db().createQueryBuilder('polls')
-      .leftJoinAndSelect('polls.admins', 'users')
+      .leftJoinAndSelect('polls.admins', 'admins')
+      .leftJoinAndSelect('polls.members', 'members')
       .where('polls.id = :pollId')
       .setParameters({ pollId: id })
       .getOne();

@@ -43,17 +43,40 @@ test('Get Admins From Poll', async () => {
   expect(admins[0].googleId).toBe(user.googleId);
 });
 
-test('Add Admins To Poll', async () => {
+test('Add Admin To Poll', async () => {
   user2 = await UsersRepo.createDummyUser('polltest2');
-  const admins = await PollsRepo.addAdminByPollId(id, user2);
+  const admins = (await PollsRepo.addUserByPollId(id, user2, 'admin')).admins;
   expect(admins.length).toEqual(2);
   expect(admins[1].googleId).toBe(user2.googleId);
 });
 
-test('Remove Admins From Poll', async () => {
-  const admins = await PollsRepo.removeAdminByPollId(id, user2);
+test('Remove Admin From Poll', async () => {
+  const poll = await PollsRepo.removeUserByPollId(id, user2, 'admin');
+  const admins = poll.admins;
   expect(admins.length).toEqual(1);
   expect(admins[0].googleId).toBe(user.googleId);
+  id = poll.id;
+  expect(await PollsRepo.isAdmin(id, user2)).toBe(false);
+  expect(await PollsRepo.isAdmin(id, user)).toBe(true);
+});
+
+test('Add Member To Poll', async () => {
+  const members = (await PollsRepo.addUserByPollId(id, user2, 'member')).members;
+  expect(members.length).toEqual(1);
+  expect(members[0].googleId).toBe(user2.googleId);
+});
+
+test('Get Members Of Poll', async () => {
+  const members = await PollsRepo.getUsersByPollId(id, 'member');
+  expect(members.length).toEqual(1);
+  expect(members[0].googleId).toBe(user2.googleId);
+});
+
+test('Remove Member From Poll', async () => {
+  const poll = await PollsRepo.removeUserByPollId(id, user2, 'member');
+  const members = poll.members;
+  expect(members.length).toEqual(0);
+  id = poll.id;
 });
 
 test('Delete Poll', async () => {
