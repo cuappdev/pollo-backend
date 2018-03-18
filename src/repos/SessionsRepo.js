@@ -74,10 +74,23 @@ const deleteSession = async (id: number) => {
   }
 };
 
+const deleteSessionFromUserId = async (userId: number) => {
+  try {
+    const session = await db().createQueryBuilder('sessions')
+      .innerJoin('sessions.user', 'user', 'user.id = :userId')
+      .setParameters({ userId: userId })
+      .getOne();
+    if (session) db().remove(session);
+  } catch (e) {
+    throw new Error('Problem deleting session!');
+  }
+};
+
 export default {
   createOrUpdateSession,
   getUserFromToken,
   updateSession,
   verifySession,
-  deleteSession
+  deleteSession,
+  deleteSessionFromUserId
 };

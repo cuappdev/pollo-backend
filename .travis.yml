@@ -9,5 +9,6 @@ before_install:
   - psql --host=localhost -c 'CREATE DATABASE clicker;' -U postgres
 env:
   - DB_HOST='localhost' DB_USERNAME='postgres' DB_PASSWORD='' DB_NAME='clicker'
+  - GOOGLE_CLIENT_ID='?' GOOGLE_CLIENT_SECRET='?' GOOGLE_REDIRECT_URI='?'
 script:
   - npm run test

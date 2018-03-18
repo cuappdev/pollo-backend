@@ -3,10 +3,12 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToMany
+  ManyToMany,
+  JoinTable
 } from 'typeorm';
 import { Base } from './Base';
 import { Poll } from './Poll';
+import { Group } from './Group';
 import appDevUtils from '../utils/appDevUtils';
 
 @Entity('users')
@@ -34,6 +36,14 @@ export class User extends Base {
 
   @ManyToMany(type => Poll, poll => poll.members)
   memberPolls: ?Poll[] = [];
+
+  @ManyToMany(type => Group, group => group.adminGroups)
+  @JoinTable()
+  adminGroups: ?Group[] = [];
+
+  @ManyToMany(type => Group, group => group.memberGroups)
+  @JoinTable()
+  memberGroups: ?Group[] = [];
 
   static dummy (id: string): User {
     const user = new User();

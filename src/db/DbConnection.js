@@ -11,6 +11,7 @@ import {Poll} from '../models/Poll';
 import {Question} from '../models/Question';
 import {User} from '../models/User';
 import {Session} from '../models/Session';
+import {Group} from '../models/Group';
 import {Change1521233644145} from './migrations/Change1521233644145';
 
 dotenv.config(); // establish env variables
@@ -29,7 +30,8 @@ const entities = [
   Poll,
   Question,
   User,
-  Session
+  Session,
+  Group
 ];
 
 const autoSchemaSync = true;

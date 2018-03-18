@@ -1,10 +1,10 @@
 import PollsRepo from '../../src/repos/PollsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
+import appDevUtils from '../../src/utils/appDevUtils';
 
-var id;
-var poll;
-const googleId = 'usertest1';
+var id, poll, testUser;
+const googleId = appDevUtils.randomCode(6);
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
@@ -19,6 +19,7 @@ test('Create User', async () => {
   expect(user.googleId).toBe(googleId);
   expect(user.netId).toBe('');
   id = user.id;
+  testUser = user;
 });
 
 test('Get User by Id', async () => {
@@ -35,10 +36,10 @@ test('Get User by googleId', async () => {
 
 test('Get Users', async () => {
   const users = await UsersRepo.getUsers();
-  const user = users[0];
-  expect(users.length).toEqual(1);
-  expect(user.id).toBe(id);
-  expect(user.googleId).toBe(googleId);
+  const user = users.find(function (u) {
+    return u.id === id;
+  });
+  expect(user).toBeDefined();
 });
 
 test('Get Polls', async () => {

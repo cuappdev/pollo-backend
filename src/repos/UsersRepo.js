@@ -2,6 +2,7 @@
 import { getConnectionManager, Repository } from 'typeorm';
 import { User } from '../models/User';
 import { Poll } from '../models/Poll';
+import SessionsRepo from '../repos/SessionsRepo';
 
 const db = (): Repository<User> => {
   return getConnectionManager().get().getRepository(User);
@@ -77,6 +78,7 @@ const getUsersFromIds = async (userIds: number[]): Promise<Array<?User>> => {
 const deleteUserById = async (id: number) => {
   try {
     const user = await db().findOneById(id);
+    await SessionsRepo.deleteSessionFromUserId(id);
     await db().remove(user);
   } catch (e) {
     throw new Error(`Problem deleting user by id: ${id}!`);

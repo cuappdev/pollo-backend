@@ -24,4 +24,7 @@ export class Question extends Base {
 
   @Column('json')
   results: json = {};
+
+  @Column('boolean')
+  canShare: boolean = true;
 }
