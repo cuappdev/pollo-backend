@@ -33,7 +33,7 @@ const getUserFromToken = async (accessToken: string): Promise<?User> => {
     .leftJoinAndSelect('sessions.user', 'user')
     .where('sessions.sessionToken = :accessToken', {accessToken: accessToken})
     .getOne();
-
+  if (!session) return null;
   return session.user;
 };
 
@@ -64,9 +64,20 @@ const verifySession = async (accessToken: string): Promise<boolean> => {
     session.expiresAt > Math.floor(new Date().getTime() / 1000);
 };
 
+// Delete session
+const deleteSession = async (id: number) => {
+  try {
+    const session = await db().findOneById(id);
+    await db().remove(session);
+  } catch (e) {
+    throw new Error(`Problem deleting session by id: ${id}!`);
+  }
+};
+
 export default {
   createOrUpdateSession,
   getUserFromToken,
   updateSession,
-  verifySession
+  verifySession,
+  deleteSession
 };

@@ -3,7 +3,6 @@ import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
 
 var id;
-var code;
 var poll;
 const googleId = 'usertest1';
 

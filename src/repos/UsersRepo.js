@@ -91,11 +91,11 @@ const getPollsById = async (id: number, role: ?string):
       .leftJoinAndSelect('users.memberPolls', 'memberPolls')
       .leftJoinAndSelect('users.adminPolls', 'adminPolls')
       .where('users.id = :userId')
-      .setParameters({ userId : id})
+      .setParameters({ userId: id })
       .getOne();
-    if (role == 'admin') {
+    if (role === 'admin') {
       return user.adminPolls;
-    } else if (role == 'member') {
+    } else if (role === 'member') {
       return user.memberPolls;
     } else {
       return user.memberPolls.concat(user.adminPolls);

@@ -106,7 +106,7 @@ const addUserByPollId = async (id: number, user: User, role: ?string):
       .getOne();
 
     if (user) {
-      if (role == 'admin') {
+      if (role === 'admin') {
         poll.admins = poll.admins.concat(user);
       } else {
         poll.members = poll.members.concat(user);
@@ -133,7 +133,7 @@ const removeUserByPollId = async (id: number, user: User, role: ?string):
       .setParameters({ pollId: id })
       .getOne();
     if (user) {
-      if (role == 'admin') {
+      if (role === 'admin') {
         poll.admins = poll.admins.filter(function (admin) {
           return (admin.googleId !== user.googleId);
         });
@@ -184,9 +184,9 @@ const getUsersByPollId = async (id: number, role: ?string):
       .where('polls.id = :pollId')
       .setParameters({ pollId: id })
       .getOne();
-    if (role == 'admin') {
+    if (role === 'admin') {
       return poll.admins;
-    } else if (role == 'member') {
+    } else if (role === 'member') {
       return poll.members;
     } else {
       return poll.admins.concat(poll.members);
