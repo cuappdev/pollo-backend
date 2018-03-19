@@ -27,8 +27,9 @@ const createGroup = async (name: string,
     if (members) group.members = members;
     if (poll) group.polls = [poll];
 
-    if (groupCodes[code]) throw new Error('Group code is already in use');
-
+    if (groupCodes[code] || PollsRepo.pollCodes[code]) {
+      throw new Error('Group code is already in use');
+    }
     await db().persist(group);
     groupCodes[group.code] = group.id;
 
@@ -59,14 +60,15 @@ const getGroupById = async (id: number): Promise<?Group> => {
 
 // Get a group id from group code
 const getGroupIdByCode = async (code: string) => {
-  var poll =
+  var group =
     await db().createQueryBuilder('groups')
       .where('groups.code = :groupCode')
       .setParameters({ groupCode: code })
       .getOne();
-    if (!poll) {
+    if (!group) {
       throw new Error(`Could not find poll associated with code ${code}`)
     }
+    return group.id;
 };
 
 // Delete a group by Id
@@ -77,10 +79,9 @@ const deleteGroupById = async (id: number) => {
       delete groupCodes[group.code];
     }
     await db().remove(group);
-    // TODO : This method is not currently implemented in PollsRepo
     await PollsRepo.deletePollsWithOutGroup();
   } catch (e) {
-    throw new Error(`Problem deleting poll by id: ${id}!`);
+    throw new Error(`Problem deleting group by id: ${id}!`);
   }
 };
 
@@ -257,6 +258,7 @@ const getPollsById = async (id: number): Promise<Array<?Poll>> => {
 }
 
 export default {
+  groupCodes,
   createGroup,
   createCode,
   getGroupById,

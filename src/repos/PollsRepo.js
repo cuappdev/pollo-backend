@@ -1,9 +1,10 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
-import {Poll} from '../models/Poll';
-import {User} from '../models/User';
+import { Poll } from '../models/Poll';
+import { User } from '../models/User';
 import appDevUtils from '../utils/appDevUtils';
 import QuestionsRepo from '../repos/QuestionsRepo';
+import GroupsRepo from './GroupsRepo';
 
 const db = (): Repository<Poll> => {
   return getConnectionManager().get().getRepository(Poll);
@@ -21,7 +22,9 @@ const createPoll = async (name: string, code: string, user: User):
     poll.code = code;
     poll.admins = [user];
 
-    if (pollCodes[code]) throw new Error('Poll code is already in use');
+    if (pollCodes[code] && GroupsRepo.groupCodes[code]) {
+      throw new Error('Poll code is already in use');
+    }
 
     await db().persist(poll);
     pollCodes[poll.code] = poll.id;
@@ -202,7 +205,7 @@ const deletePollsWithOutGroup = async () => {
     await db().createQueryBuilder('polls')
       .delete()
       .where('polls.group is NULL')
-      .where('polls.code is NULL')
+      .andWhere('polls.code is NULL')
       .execute();
   } catch (e) {
     throw new Error('Problem removing polls with no group reference.');
@@ -210,6 +213,7 @@ const deletePollsWithOutGroup = async () => {
 }
 
 export default {
+  pollCodes,
   createPoll,
   createCode,
   getPollById,
