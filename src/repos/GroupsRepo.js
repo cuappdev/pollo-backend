@@ -5,6 +5,7 @@ import { User } from '../models/User';
 import { Poll } from '../models/Poll';
 import appDevUtils from '../utils/appDevUtils';
 import PollsRepo from '../repos/PollsRepo';
+import UsersRepo from './UsersRepo';
 
 const db = (): Repository<Group> => {
   return getConnectionManager().get().getRepository(Group);
@@ -107,8 +108,8 @@ const updateGroupById = async (id: number, name: ?string):
     }
 };
 
-// Add admin/member to a group by Id
-const addUserByGroupId = async (id: number, user: User, role: ?string):
+// Add admin/members to a group by Id
+const addUsers = async (id: number, userIds: number[], role: ?string):
   Promise<?Group> => {
   try {
     const group = await db().createQueryBuilder('groups')
@@ -118,25 +119,22 @@ const addUserByGroupId = async (id: number, user: User, role: ?string):
       .where('groups.id = :groupId')
       .setParameters({ groupId: id })
       .getOne();
-
-    if (user) {
-      if (role === 'admin') {
-        group.admins = group.admins.concat(user);
-      } else {
-        group.members = group.members.concat(user);
-      }
-      await db().persist(group);
+    const users = await UsersRepo.getUsersFromIds(userIds);
+    if (role === 'admin') {
+      group.admins = group.admins.concat(users);
+    } else {
+      group.members = group.members.concat(users);
     }
-
+    await db().persist(group);
     return group;
   } catch (e) {
     console.log(e);
-    throw new Error(`Problem adding admin to group by id: ${id}`);
+    throw new Error(`Problem adding users to group by id: ${id}`);
   }
 };
 
-// Remove admin/member of a group by Id
-const removeUserByGroupId = async (id: number, user: User, role: ?string):
+// Remove admin/members of a group by Id
+const removeUsers = async (id: number, userIds: number[], role: ?string):
   Promise<?Group> => {
   try {
     const group = await db().createQueryBuilder('groups')
@@ -146,19 +144,16 @@ const removeUserByGroupId = async (id: number, user: User, role: ?string):
       .where('groups.id = :groupId')
       .setParameters({ groupId: id })
       .getOne();
-    if (user) {
-      if (role === 'admin') {
-        group.admins = group.admins.filter(function (admin) {
-          return (admin.googleId !== user.googleId);
-        });
-      } else {
-        group.members = group.members.filter(function (member) {
-          return (member.googleId !== user.googleId);
-        });
-      }
-      await db().persist(group);
+    if (role === 'admin') {
+      group.admins = group.admins.filter(function (admin) {
+        return !(userIds.includes(admin.id));
+      });
+    } else {
+      group.members = group.members.filter(function (member) {
+        return !(userIds.includes(member.id));
+      });
     }
-
+    await db().persist(group);
     return group;
   } catch (e) {
     throw new Error(`Problem removing admin from group by id: ${id}`);
@@ -270,8 +265,8 @@ export default {
   getGroupIdByCode,
   updateGroupById,
   deleteGroupById,
-  addUserByGroupId,
-  removeUserByGroupId,
+  addUsers,
+  removeUsers,
   getUsersByGroupId,
   isAdmin,
   addPollByGroupId,

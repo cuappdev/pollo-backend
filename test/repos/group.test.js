@@ -48,7 +48,7 @@ test('Update Group', async () => {
 });
 
 test('Add Member To Group', async () => {
-  const group = await GroupsRepo.addUserByGroupId(groupId, user1, 'member');
+  const group = await GroupsRepo.addUsers(groupId, [user1.id], 'member');
   const members = await GroupsRepo.getUsersByGroupId(groupId, 'member');
   const admins = await GroupsRepo.getUsersByGroupId(groupId, 'admin');
   expect(members.length).toBe(1);
@@ -57,7 +57,7 @@ test('Add Member To Group', async () => {
 });
 
 test('Add Admin To Group', async () => {
-  const group = await GroupsRepo.addUserByGroupId(groupId, user2, 'admin');
+  const group = await GroupsRepo.addUsers(groupId, [user2.id], 'admin');
   const isAdmin = await GroupsRepo.isAdmin(groupId, user2);
   const members = await GroupsRepo.getUsersByGroupId(groupId, 'member');
   const admins = await GroupsRepo.getUsersByGroupId(groupId, 'admin');
@@ -69,7 +69,7 @@ test('Add Admin To Group', async () => {
 });
 
 test('Remove Member From Group', async () => {
-  const group = await GroupsRepo.removeUserByGroupId(groupId, user1, 'member');
+  const group = await GroupsRepo.removeUsers(groupId, [user1.id], 'member');
   const members = await GroupsRepo.getUsersByGroupId(groupId, 'member');
   const admins = await GroupsRepo.getUsersByGroupId(groupId, 'admin');
   expect(members.length).toBe(0);
@@ -77,7 +77,7 @@ test('Remove Member From Group', async () => {
 });
 
 test('Remove Admin From Group', async () => {
-  const group = await GroupsRepo.removeUserByGroupId(groupId, user2, 'admin');
+  const group = await GroupsRepo.removeUsers(groupId, [user2.id], 'admin');
   const isAdmin = await GroupsRepo.isAdmin(groupId, user2);
   const members = await GroupsRepo.getUsersByGroupId(groupId, 'member');
   const admins = await GroupsRepo.getUsersByGroupId(groupId, 'admin');
