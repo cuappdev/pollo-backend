@@ -31,6 +31,7 @@ const createPoll = async (name: string, code: string, user: User):
 
     return poll;
   } catch (e) {
+    console.log(e);
     throw new Error('Problem creating poll!');
   }
 };
@@ -78,6 +79,27 @@ const deletePollById = async (id: number) => {
     throw new Error(`Problem deleting poll by id: ${id}!`);
   }
 };
+
+// Delete code for a poll
+const deleteCodeById = async (id: number): Promise<Poll> => {
+  try {
+    const poll = await db().findOneById(id);
+    if (poll.code in pollCodes) {
+      delete pollCodes[poll.code];
+    }
+    var field = {};
+    field.code = '';
+    await db().createQueryBuilder('polls')
+      .where('polls.id = :pollId')
+      .setParameters({ pollId: id })
+      .update(field)
+      .execute();
+    return await db().findOneById(id);
+  } catch (e) {
+    console.log(e);
+    throw new Error(`Problem deleting code for poll by id: ${id}`);
+  }
+}
 
 // Update a poll by Id
 const updatePollById = async (id: number, name: ?string):
@@ -216,6 +238,7 @@ export default {
   pollCodes,
   createPoll,
   createCode,
+  deleteCodeById,
   getPollById,
   getPollId,
   updatePollById,
