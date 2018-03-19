@@ -4,8 +4,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
-  ManyToMany,
-  JoinTable
+  ManyToMany
 } from 'typeorm';
 import { Base } from './Base';
 import { Poll } from './Poll';

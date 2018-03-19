@@ -210,7 +210,7 @@ const deletePollsWithOutGroup = async () => {
   } catch (e) {
     throw new Error('Problem removing polls with no group reference.');
   }
-}
+};
 
 export default {
   pollCodes,

@@ -23,6 +23,12 @@ export type APIPoll = {|
   code: string,
 |}
 
+export type APIGroup = {|
+  id: id,
+  name: string,
+  code: string
+|}
+
 export type APIQuestion = {|
   id: id,
   text: string,
