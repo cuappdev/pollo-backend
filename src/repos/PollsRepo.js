@@ -147,14 +147,13 @@ const removeUserByPollId = async (id: number, user: User, role: ?string):
 
     return poll;
   } catch (e) {
-    console.log(e);
     throw new Error(`Problem removing admin from poll by id: ${id}`);
   }
 };
 
 // Return true if user is an admin of a poll by id
 const isAdmin = async (id: number, user: User):
-    Promise<?boolean> => {
+  Promise<?boolean> => {
   try {
     const poll = await db().createQueryBuilder('polls')
       .leftJoinAndSelect('polls.admins', 'admins')
@@ -163,7 +162,7 @@ const isAdmin = async (id: number, user: User):
       .getOne();
     const admins = poll.admins;
     var i;
-    for (i in poll.admins) {
+    for (i in admins) {
       if (admins[i].googleId === user.googleId) {
         return true;
       }
@@ -176,7 +175,7 @@ const isAdmin = async (id: number, user: User):
 
 // Get admins/members from a poll id
 const getUsersByPollId = async (id: number, role: ?string):
-    Promise<Array<?User>> => {
+  Promise<Array<?User>> => {
   try {
     const poll = await db().createQueryBuilder('polls')
       .leftJoinAndSelect('polls.admins', 'admins')
@@ -196,6 +195,20 @@ const getUsersByPollId = async (id: number, role: ?string):
   }
 };
 
+// Delete polls where poll.group = null AND
+// poll.code = null or ''
+const deletePollsWithOutGroup = async () => {
+  try {
+    await db().createQueryBuilder('polls')
+      .delete()
+      .where('polls.group is NULL')
+      .where('polls.code is NULL')
+      .execute();
+  } catch (e) {
+    throw new Error('Problem removing polls with no group reference.');
+  }
+}
+
 export default {
   createPoll,
   createCode,
@@ -206,5 +219,6 @@ export default {
   addUserByPollId,
   removeUserByPollId,
   getUsersByPollId,
-  isAdmin
+  isAdmin,
+  deletePollsWithOutGroup
 };
