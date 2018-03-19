@@ -25,7 +25,10 @@ const createGroup = async (name: string,
     group.code = code;
     group.admins = [user];
     if (members) group.members = members;
-    if (poll) group.polls = [poll];
+    if (poll) {
+      poll = await PollsRepo.deleteCodeById(poll.id);
+      group.polls = [poll];
+    }
 
     if (groupCodes[code] || PollsRepo.pollCodes[code]) {
       throw new Error('Group code is already in use');
@@ -35,6 +38,7 @@ const createGroup = async (name: string,
 
     return group;
   } catch (e) {
+    console.log(e);
     throw new Error('Problem creating group!');
   }
 };
@@ -81,6 +85,7 @@ const deleteGroupById = async (id: number) => {
     await db().remove(group);
     await PollsRepo.deletePollsWithOutGroup();
   } catch (e) {
+    console.log(e);
     throw new Error(`Problem deleting group by id: ${id}!`);
   }
 };

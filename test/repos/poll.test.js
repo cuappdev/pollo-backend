@@ -81,9 +81,9 @@ test('Remove Member From Poll', async () => {
 
 test('Delete Poll', async () => {
   await PollsRepo.deletePollById(id);
-  expect(await PollsRepo.getPollById(id)).not.toBeDefined();
   await UsersRepo.deleteUserById(user.id);
   await UsersRepo.deleteUserById(user2.id);
+  expect(await PollsRepo.getPollById(id)).not.toBeDefined();
   expect(await UsersRepo.getUserById(user.id)).not.toBeDefined();
   expect(await UsersRepo.getUserById(user2.id)).not.toBeDefined();
 });

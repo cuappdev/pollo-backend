@@ -37,11 +37,11 @@ export class User extends Base {
   @ManyToMany(type => Poll, poll => poll.members)
   memberPolls: ?Poll[] = [];
 
-  @ManyToMany(type => Group, group => group.adminGroups)
+  @ManyToMany(type => Group, group => group.admins)
   @JoinTable()
   adminGroups: ?Group[] = [];
 
-  @ManyToMany(type => Group, group => group.memberGroups)
+  @ManyToMany(type => Group, group => group.members)
   @JoinTable()
   memberGroups: ?Group[] = [];
 
