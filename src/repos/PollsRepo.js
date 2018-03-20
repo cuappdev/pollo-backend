@@ -31,7 +31,6 @@ const createPoll = async (name: string, code: string, user: User):
 
     return poll;
   } catch (e) {
-    console.log(e);
     throw new Error('Problem creating poll!');
   }
 };
@@ -96,10 +95,9 @@ const deleteCodeById = async (id: number): Promise<Poll> => {
       .execute();
     return await db().findOneById(id);
   } catch (e) {
-    console.log(e);
     throw new Error(`Problem deleting code for poll by id: ${id}`);
   }
-}
+};
 
 // Update a poll by Id
 const updatePollById = async (id: number, name: ?string):
@@ -141,7 +139,6 @@ const addUserByPollId = async (id: number, user: User, role: ?string):
 
     return poll;
   } catch (e) {
-    console.log(e);
     throw new Error(`Problem adding admin to poll by id: ${id}`);
   }
 };
@@ -186,9 +183,8 @@ const isAdmin = async (id: number, user: User):
       .setParameters({ pollId: id })
       .getOne();
     const admins = poll.admins;
-    var i;
-    for (i in admins) {
-      if (admins[i].googleId === user.googleId) {
+    for (var admin in admins) {
+      if (admin.googleId === user.googleId) {
         return true;
       }
     }

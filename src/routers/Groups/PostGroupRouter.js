@@ -2,6 +2,7 @@
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import GroupsRepo from '../../repos/GroupsRepo';
+import UsersRepo from '../../repos/UsersRepo';
 import PollsRepo from '../../repos/PollsRepo';
 import constants from '../../utils/constants';
 
@@ -21,6 +22,8 @@ class PostGroupRouter extends AppDevRouter<APIGroup> {
     const code = req.body.code;
     const user = req.user;
     const pollId = req.body.pollId;
+    const memberIds = req.body.memberIds;
+
     var poll = null;
     var members = [];
 
@@ -29,6 +32,7 @@ class PostGroupRouter extends AppDevRouter<APIGroup> {
     if (!code) throw new Error('Code missing');
 
     if (pollId) poll = await PollsRepo.getPollById(pollId);
+    if (memberIds) members = await UsersRepo.getUsersFromIds(memberIds);
 
     const group = await GroupsRepo.createGroup(name, code, user, poll, members);
 

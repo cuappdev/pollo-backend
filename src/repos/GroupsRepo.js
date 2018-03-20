@@ -36,7 +36,6 @@ const createGroup = async (name: string, code: string, user: User, poll: ?Poll,
 
     return group;
   } catch (e) {
-    console.log(e);
     throw new Error('Problem creating group!');
   }
 };
@@ -83,7 +82,6 @@ const deleteGroupById = async (id: number) => {
     await db().remove(group);
     await PollsRepo.deletePollsWithOutGroup();
   } catch (e) {
-    console.log(e);
     throw new Error(`Problem deleting group by id: ${id}!`);
   }
 };
@@ -125,7 +123,6 @@ const addUsers = async (id: number, userIds: number[], role: ?string):
     await db().persist(group);
     return group;
   } catch (e) {
-    console.log(e);
     throw new Error(`Problem adding users to group by id: ${id}`);
   }
 };
@@ -167,9 +164,8 @@ const isAdmin = async (id: number, user: User):
       .setParameters({ groupId: id })
       .getOne();
     const admins = group.admins;
-    var i;
-    for (i in admins) {
-      if (admins[i].googleId === user.googleId) {
+    for (var admin in admins) {
+      if (admin.googleId === user.googleId) {
         return true;
       }
     }
