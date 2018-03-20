@@ -8,13 +8,15 @@ const db = (): Repository<Question> => {
 };
 
 // Create a question
-const createQuestion = async (text: string, poll: Poll, results: json):
+const createQuestion = async (text: string, poll: Poll, results: json,
+  canShare: boolean):
   Promise <Question> => {
   try {
     const question = new Question();
     question.text = text;
     question.poll = poll;
     question.results = results;
+    question.shared = canShare;
 
     await db().persist(question);
     return question;
@@ -44,12 +46,14 @@ const deleteQuestionById = async (id: number) => {
 };
 
 // Update a question by id
-const updateQuestionById = async (id: number, text: ?string, results: ?json):
+const updateQuestionById = async (id: number, text: ?string, results: ?json,
+  canShare: ?boolean):
   Promise<?Question> => {
   try {
     var field = {};
     if (text) field.text = text;
     if (results) field.results = results;
+    if (canShare !== null) field.shared = canShare;
 
     await db().createQueryBuilder('questions')
       .where('questions.id = :questionId')
@@ -62,12 +66,27 @@ const updateQuestionById = async (id: number, text: ?string, results: ?json):
   }
 };
 
-// Get questions from a poll id
+// Get all questions from a poll id
 const getQuestionsFromPollId = async (id: number):
   Promise<Array<?Question>> => {
   try {
     const questions = await db().createQueryBuilder('questions')
       .innerJoin('questions.poll', 'poll', 'poll.id = :pollId')
+      .setParameters({ pollId: id })
+      .getMany();
+    return questions;
+  } catch (e) {
+    throw new Error(`Problem getting questions for poll with id: ${id}!`);
+  }
+};
+
+// Get shared questions from a poll id
+const getSharedQuestionsFromPollId = async (id: number):
+  Promise<Array<?Question>> => {
+  try {
+    const questions = await db().createQueryBuilder('questions')
+      .innerJoin('questions.poll', 'poll', 'poll.id = :pollId')
+      .where('questions.shared')
       .setParameters({ pollId: id })
       .getMany();
     return questions;
@@ -108,5 +127,6 @@ export default {
   updateQuestionById,
   getQuestionsFromPollId,
   deleteQuestionsWithoutPoll,
-  getPollFromQuestionId
+  getPollFromQuestionId,
+  getSharedQuestionsFromPollId
 };
