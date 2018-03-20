@@ -20,7 +20,7 @@ class DeleteGroupRouter extends AppDevRouter<Object> {
     const group = await GroupsRepo.getGroupById(groupId);
     if (!group) throw new Error(`Group with id ${groupId} not found!`);
 
-    if (await GroupsRepo.isAdmin(groupId, user)) {
+    if (!await GroupsRepo.isAdmin(groupId, user)) {
       throw new Error('You are not authorized to delete this group!');
     }
 

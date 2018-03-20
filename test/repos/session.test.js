@@ -50,5 +50,5 @@ test('Update session', async () => {
 afterAll(async () => {
   await SessionsRepo.deleteSession(sessionId);
   await UsersRepo.deleteUserById(user.id);
-  console.log('Passed all tests');
+  console.log('Passed all session tests');
 });

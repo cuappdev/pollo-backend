@@ -114,12 +114,16 @@ const addUsers = async (id: number, userIds: number[], role: ?string):
       .where('groups.id = :groupId')
       .setParameters({ groupId: id })
       .getOne();
+
     const users = await UsersRepo.getUsersFromIds(userIds);
-    if (role === 'admin') {
-      group.admins = group.admins.concat(users);
-    } else {
-      group.members = group.members.concat(users);
+    if (users) {
+      if (role === 'admin') {
+        group.admins = group.admins.concat(users);
+      } else {
+        group.members = group.members.concat(users);
+      }
     }
+
     await db().persist(group);
     return group;
   } catch (e) {
@@ -163,9 +167,10 @@ const isAdmin = async (id: number, user: User):
       .where('groups.id = :groupId')
       .setParameters({ groupId: id })
       .getOne();
+
     const admins = group.admins;
-    for (var admin in admins) {
-      if (admin.googleId === user.googleId) {
+    for (var i in group.admins) {
+      if (admins[i].googleId === user.googleId) {
         return true;
       }
     }

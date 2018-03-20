@@ -182,9 +182,10 @@ const isAdmin = async (id: number, user: User):
       .where('polls.id = :pollId')
       .setParameters({ pollId: id })
       .getOne();
+
     const admins = poll.admins;
-    for (var admin in admins) {
-      if (admin.googleId === user.googleId) {
+    for (var i in admins) {
+      if (admins[i].googleId === user.googleId) {
         return true;
       }
     }
