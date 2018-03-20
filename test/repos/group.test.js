@@ -8,7 +8,7 @@ var groupId;
 var groupCode;
 // Admin stuff
 var user1;
-var user2
+var user2;
 // Poll info
 var pollOneCode;
 var pollOne;
@@ -30,7 +30,8 @@ beforeAll(async () => {
 });
 
 test('Create Group', async () => {
-  const group = await GroupsRepo.createGroup('Group', groupCode, user1, pollOne);
+  const group =
+    await GroupsRepo.createGroup('Group', groupCode, user1, pollOne);
 
   expect(group.name).toBe('Group');
   expect(group.admins.length).toBe(1);
@@ -48,7 +49,7 @@ test('Update Group', async () => {
 });
 
 test('Add Member To Group', async () => {
-  const group = await GroupsRepo.addUsers(groupId, [user1.id], 'member');
+  await GroupsRepo.addUsers(groupId, [user1.id], 'member');
   const members = await GroupsRepo.getUsersByGroupId(groupId, 'member');
   const admins = await GroupsRepo.getUsersByGroupId(groupId, 'admin');
   expect(members.length).toBe(1);
@@ -57,7 +58,7 @@ test('Add Member To Group', async () => {
 });
 
 test('Add Admin To Group', async () => {
-  const group = await GroupsRepo.addUsers(groupId, [user2.id], 'admin');
+  await GroupsRepo.addUsers(groupId, [user2.id], 'admin');
   const isAdmin = await GroupsRepo.isAdmin(groupId, user2);
   const members = await GroupsRepo.getUsersByGroupId(groupId, 'member');
   const admins = await GroupsRepo.getUsersByGroupId(groupId, 'admin');
@@ -69,7 +70,7 @@ test('Add Admin To Group', async () => {
 });
 
 test('Remove Member From Group', async () => {
-  const group = await GroupsRepo.removeUsers(groupId, [user1.id], 'member');
+  await GroupsRepo.removeUsers(groupId, [user1.id], 'member');
   const members = await GroupsRepo.getUsersByGroupId(groupId, 'member');
   const admins = await GroupsRepo.getUsersByGroupId(groupId, 'admin');
   expect(members.length).toBe(0);
@@ -77,7 +78,7 @@ test('Remove Member From Group', async () => {
 });
 
 test('Remove Admin From Group', async () => {
-  const group = await GroupsRepo.removeUsers(groupId, [user2.id], 'admin');
+  await GroupsRepo.removeUsers(groupId, [user2.id], 'admin');
   const isAdmin = await GroupsRepo.isAdmin(groupId, user2);
   const members = await GroupsRepo.getUsersByGroupId(groupId, 'member');
   const admins = await GroupsRepo.getUsersByGroupId(groupId, 'admin');
@@ -87,7 +88,7 @@ test('Remove Admin From Group', async () => {
 });
 
 test('Add Poll To Group', async () => {
-  const group = await GroupsRepo.addPollByGroupId(groupId, pollTwo);
+  await GroupsRepo.addPollByGroupId(groupId, pollTwo);
   const polls = await GroupsRepo.getPollsById(groupId);
   expect(polls.length).toBe(2);
   expect(polls[0].id).toBe(pollOne.id);
@@ -95,26 +96,22 @@ test('Add Poll To Group', async () => {
 });
 
 test('Remove Poll From Group', async () => {
-  const group = await GroupsRepo.removePollByGroupId(groupId, pollOne);
+  await GroupsRepo.removePollByGroupId(groupId, pollOne);
   const polls = await GroupsRepo.getPollsById(groupId);
   expect(polls.length).toBe(1);
   expect(polls[0].id).toBe(pollTwo.id);
 });
 
-test('Remove test data', async () => {
-  await UsersRepo.deleteUserById(user1.id);
-  await UsersRepo.deleteUserById(user2.id);
-  await GroupsRepo.deleteGroupById(groupId);
+test('Delete group', async () => {
   await PollsRepo.deletePollById(pollOne.id);
-  await PollsRepo.deletePollById(pollTwo.id)
-  expect(await UsersRepo.getUserById(user1.id)).not.toBeDefined();
-  expect(await UsersRepo.getUserById(user2.id)).not.toBeDefined();
+  await PollsRepo.deletePollById(pollTwo.id);
+  await GroupsRepo.deleteGroupById(groupId);
   expect(await GroupsRepo.getGroupById(groupId)).not.toBeDefined();
-  expect(await PollsRepo.getPollById(pollOne.id)).not.toBeDefined();
-  expect(await PollsRepo.getPollById(pollTwo.id)).not.toBeDefined();
 });
 
 // Teardown
 afterAll(async () => {
-  console.log('Passed all tests');
+  await UsersRepo.deleteUserById(user1.id);
+  await UsersRepo.deleteUserById(user2.id);
+  console.log('Passed all group tests');
 });

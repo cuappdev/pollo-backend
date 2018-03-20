@@ -22,7 +22,7 @@ class DeleteQuestionRouter extends AppDevRouter<Object> {
     if (!poll) {
       throw new Error(`Couldn't find poll with question ${questionId}`);
     }
-    if (await PollsRepo.isAdmin(poll.id, user)) {
+    if (!await PollsRepo.isAdmin(poll.id, user)) {
       throw new Error('You are not authorized to delete this question!');
     }
     await QuestionsRepo.deleteQuestionById(questionId);

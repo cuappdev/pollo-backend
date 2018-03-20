@@ -61,7 +61,8 @@ test('Remove Admin From Poll', async () => {
 });
 
 test('Add Member To Poll', async () => {
-  const members = (await PollsRepo.addUserByPollId(id, user2, 'member')).members;
+  const members =
+    (await PollsRepo.addUserByPollId(id, user2, 'member')).members;
   expect(members.length).toEqual(1);
   expect(members[0].googleId).toBe(user2.googleId);
 });
@@ -81,14 +82,12 @@ test('Remove Member From Poll', async () => {
 
 test('Delete Poll', async () => {
   await PollsRepo.deletePollById(id);
-  await UsersRepo.deleteUserById(user.id);
-  await UsersRepo.deleteUserById(user2.id);
   expect(await PollsRepo.getPollById(id)).not.toBeDefined();
-  expect(await UsersRepo.getUserById(user.id)).not.toBeDefined();
-  expect(await UsersRepo.getUserById(user2.id)).not.toBeDefined();
 });
 
 // Teardown
 afterAll(async () => {
-  console.log('Passed all tests');
+  await UsersRepo.deleteUserById(user.id);
+  await UsersRepo.deleteUserById(user2.id);
+  console.log('Passed all poll tests');
 });

@@ -20,7 +20,7 @@ class DeletePollRouter extends AppDevRouter<Object> {
     const poll = await PollsRepo.getPollById(pollId);
     if (!poll) throw new Error(`Poll with id ${pollId} not found!`);
 
-    if (await PollsRepo.isAdmin(pollId, user)) {
+    if (!await PollsRepo.isAdmin(pollId, user)) {
       throw new Error('You are not authorized to delete this poll!');
     }
 

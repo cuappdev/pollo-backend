@@ -3,7 +3,7 @@ import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
 import appDevUtils from '../../src/utils/appDevUtils';
 
-var id, poll, testUser;
+var id, poll;
 const googleId = appDevUtils.randomCode(6);
 
 // Connects to db before running tests and does setup
@@ -19,7 +19,6 @@ test('Create User', async () => {
   expect(user.googleId).toBe(googleId);
   expect(user.netId).toBe('');
   id = user.id;
-  testUser = user;
 });
 
 test('Get User by Id', async () => {
@@ -61,5 +60,5 @@ test('Delete User', async () => {
 
 // Teardown
 afterAll(async () => {
-  console.log('Passed all tests');
+  console.log('Passed all user tests');
 });

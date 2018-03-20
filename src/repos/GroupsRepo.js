@@ -15,11 +15,8 @@ const db = (): Repository<Group> => {
 var groupCodes = {};
 
 // Create a group
-const createGroup = async (name: string,
-                            code: string,
-                            user: User,
-                            poll: ?Poll,
-                            members: ?User[]): Promise<Group> => {
+const createGroup = async (name: string, code: string, user: User, poll: ?Poll,
+  members: ?User[]): Promise<Group> => {
   try {
     const group = new Group();
     group.name = name;
@@ -39,7 +36,6 @@ const createGroup = async (name: string,
 
     return group;
   } catch (e) {
-    console.log(e);
     throw new Error('Problem creating group!');
   }
 };
@@ -70,10 +66,10 @@ const getGroupIdByCode = async (code: string) => {
       .where('groups.code = :groupCode')
       .setParameters({ groupCode: code })
       .getOne();
-    if (!group) {
-      throw new Error(`Could not find poll associated with code ${code}`)
-    }
-    return group.id;
+  if (!group) {
+    throw new Error(`Could not find poll associated with code ${code}`);
+  }
+  return group.id;
 };
 
 // Delete a group by Id
@@ -86,7 +82,6 @@ const deleteGroupById = async (id: number) => {
     await db().remove(group);
     await PollsRepo.deletePollsWithOutGroup();
   } catch (e) {
-    console.log(e);
     throw new Error(`Problem deleting group by id: ${id}!`);
   }
 };
@@ -94,18 +89,18 @@ const deleteGroupById = async (id: number) => {
 // Update a group by Id
 const updateGroupById = async (id: number, name: ?string):
   Promise<?Group> => {
-    try {
-      var field = {};
-      if (name) field.name = name;
-      await db().createQueryBuilder('groups')
-        .where('groups.id = :groupId')
-        .setParameters({ groupId: id })
-        .update(field)
-        .execute();
-      return await db().findOneById(id);
-    } catch (e) {
-      throw new Error(`Problem updating group by id: ${id}!`);
-    }
+  try {
+    var field = {};
+    if (name) field.name = name;
+    await db().createQueryBuilder('groups')
+      .where('groups.id = :groupId')
+      .setParameters({ groupId: id })
+      .update(field)
+      .execute();
+    return await db().findOneById(id);
+  } catch (e) {
+    throw new Error(`Problem updating group by id: ${id}!`);
+  }
 };
 
 // Add admin/members to a group by Id
@@ -119,16 +114,19 @@ const addUsers = async (id: number, userIds: number[], role: ?string):
       .where('groups.id = :groupId')
       .setParameters({ groupId: id })
       .getOne();
+
     const users = await UsersRepo.getUsersFromIds(userIds);
-    if (role === 'admin') {
-      group.admins = group.admins.concat(users);
-    } else {
-      group.members = group.members.concat(users);
+    if (users) {
+      if (role === 'admin') {
+        group.admins = group.admins.concat(users);
+      } else {
+        group.members = group.members.concat(users);
+      }
     }
+
     await db().persist(group);
     return group;
   } catch (e) {
-    console.log(e);
     throw new Error(`Problem adding users to group by id: ${id}`);
   }
 };
@@ -163,23 +161,23 @@ const removeUsers = async (id: number, userIds: number[], role: ?string):
 // Return true if user is an admin of a group by id
 const isAdmin = async (id: number, user: User):
     Promise<?boolean> => {
-    try {
-      const group = await db().createQueryBuilder('groups')
-        .leftJoinAndSelect('groups.admins', 'admins')
-        .where('groups.id = :groupId')
-        .setParameters({ groupId: id })
-        .getOne();
-      const admins = group.admins;
-      var i;
-      for (i in admins) {
-        if (admins[i].googleId === user.googleId) {
-          return true;
-        }
+  try {
+    const group = await db().createQueryBuilder('groups')
+      .leftJoinAndSelect('groups.admins', 'admins')
+      .where('groups.id = :groupId')
+      .setParameters({ groupId: id })
+      .getOne();
+
+    const admins = group.admins;
+    for (var i in group.admins) {
+      if (admins[i].googleId === user.googleId) {
+        return true;
       }
-      return false;
-    } catch (e) {
-      throw new Error(`Problem verifying admin status for group ${id}`);
     }
+    return false;
+  } catch (e) {
+    throw new Error(`Problem verifying admin status for group ${id}`);
+  }
 };
 
 // Get admins/members from a group id
@@ -255,7 +253,7 @@ const getPollsById = async (id: number): Promise<Array<?Poll>> => {
   } catch (e) {
     throw new Error(`Problem getting polls for group by id: ${id}`);
   }
-}
+};
 
 export default {
   groupCodes,
