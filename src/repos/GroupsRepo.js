@@ -242,6 +242,7 @@ const removePollByGroupId = async (id: number, poll: Poll): Promise<?Group> => {
   }
 };
 
+// Get polls from a group id
 const getPollsById = async (id: number): Promise<Array<?Poll>> => {
   try {
     const group = await db().createQueryBuilder('groups')

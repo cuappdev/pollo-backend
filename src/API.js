@@ -99,6 +99,29 @@ class API {
     });
     this.express.get('/error',
       (req, res) => res.send('Error authenticating!'));
+    this.express.post('/auth/mobile', async function (req, res) {
+      const googleId = req.body.userId;
+      const first = req.body.givenName;
+      const last = req.body.familyName;
+      const email = req.body.email;
+      const token = req.body.idToken;
+
+      var user = await UsersRepo.getUserByGoogleId(googleId);
+      if (!user) {
+        user = await UsersRepo.createUserWithFields(googleId, first, last,
+          email);
+      }
+
+      const session = await SessionsRepo
+        .createOrUpdateSession(user, token, null);
+      const response = {
+        accessToken: session.sessionToken,
+        refreshToken: session.updateToken,
+        sessionExpiration: session.expiresAt,
+        isActive: session.isActive
+      };
+      res.json({success: true, data: response});
+    });
   }
 
   routes (): void {

@@ -58,6 +58,8 @@ export default class PollSocket {
   questionId: number;
   answerId: number;
 
+  lastQuestion = null;
+
   current: CurrentState = {
     question: -1, // id of current question object
     results: {},
@@ -73,7 +75,6 @@ export default class PollSocket {
     this.questions = {};
     this.questionId = 0;
     this.answerId = 0;
-    this.lastQuestion = null;
   }
 
   savePoll () {
@@ -204,8 +205,8 @@ export default class PollSocket {
     if (!question) {
       return;
     }
-    await QuestionsRepo.createQuestion(question.text, this.poll,
-      this.current.results, false);
+    this.lastQuestion = await QuestionsRepo.createQuestion(question.text,
+      this.poll, this.current.results, false);
     this.nsp.to('users').emit('user/question/end', {question});
   }
 
@@ -253,8 +254,10 @@ export default class PollSocket {
       }
       console.log('sharing results');
       // Update question to 'shared'
-      await QuestionsRepo.updateQuestionById(this.lastQuestion.id, null,
-        null, true);
+      if (this.lastQuestion) {
+        await QuestionsRepo.updateQuestionById(this.lastQuestion.id, null,
+          null, true);
+      }
       const current = this.current;
       this.nsp.to('users').emit('user/question/results', current);
     });

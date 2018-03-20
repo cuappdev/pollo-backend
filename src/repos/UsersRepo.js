@@ -3,6 +3,7 @@ import { getConnectionManager, Repository } from 'typeorm';
 import { User } from '../models/User';
 import { Poll } from '../models/Poll';
 import SessionsRepo from '../repos/SessionsRepo';
+import appDevUtils from '../utils/appDevUtils';
 
 const db = (): Repository<User> => {
   return getConnectionManager().get().getRepository(User);
@@ -18,10 +19,27 @@ const createDummyUser = async (id: string): Promise<User> => {
   }
 };
 
-// Create a user with fields
+// Create a user from google creds
 const createUser = async (fields: Object): Promise<User> => {
   try {
     const user = await db().persist(User.fromGoogleCreds(fields));
+    return user;
+  } catch (e) {
+    throw new Error('Problem creating user!');
+  }
+};
+
+const createUserWithFields = async (googleId: string, firstName: string,
+  lastName: string, email: string): Promise<User> => {
+  try {
+    const user = new User();
+    user.googleId = googleId;
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.email = email;
+    user.netId = appDevUtils.netIdFromEmail(email);
+
+    await db().persist(user);
     return user;
   } catch (e) {
     throw new Error('Problem creating user!');
@@ -110,6 +128,7 @@ const getPollsById = async (id: number, role: ?string):
 export default {
   getUsers,
   createUser,
+  createUserWithFields,
   createDummyUser,
   getUserById,
   getUserByGoogleId,
