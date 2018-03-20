@@ -204,7 +204,7 @@ export default class PollSocket {
       return;
     }
     await QuestionsRepo.createQuestion(question.text, this.poll,
-      this.current.results);
+      this.current.results, false);
     this.nsp.to('users').emit('user/question/end', {question});
   }
 

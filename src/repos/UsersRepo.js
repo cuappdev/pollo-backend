@@ -62,7 +62,7 @@ const getUsers = async (): Promise<Array<?User>> => {
 };
 
 // Get users from list of ids
-const getUsersFromIds = async (userIds: number[]): Promise<Array<?User>> => {
+const getUsersFromIds = async (userIds: number[]): Promise<?Array<User>> => {
   try {
     var ids = '(' + String(userIds) + ')';
     const users = await db().createQueryBuilder('users')

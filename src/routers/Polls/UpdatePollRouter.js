@@ -30,6 +30,7 @@ class UpdatePollRouter extends AppDevRouter<APIPoll> {
     }
 
     poll = await PollsRepo.updatePollById(pollId, name);
+    if (!poll) throw new Error(`Poll with id ${pollId} was not found!`);
     return {
       node: {
         id: poll.id,

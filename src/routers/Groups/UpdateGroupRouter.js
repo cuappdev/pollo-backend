@@ -29,7 +29,8 @@ class UpdateGroupRouter extends AppDevRouter<APIGroup> {
       throw new Error('You are not authorized to update this group!');
     }
 
-    group = await GroupsRepo.updateGroupById(groupId, name);
+    group = await GroupsRepo.updateGroupById(group.id, name);
+    if (!group) throw new Error(`Group with id ${groupId} was not found!`);
     return {
       node: {
         id: group.id,
