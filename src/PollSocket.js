@@ -21,7 +21,7 @@ type Question = {
 
 type Answer = {
   id: id,
-  deviceId: string,
+  googleId: string,
   question: id,
   choice: string,
   text: string
@@ -73,6 +73,7 @@ export default class PollSocket {
     this.questions = {};
     this.questionId = 0;
     this.answerId = 0;
+    this.lastQuestion = null;
   }
 
   savePoll () {
@@ -123,7 +124,7 @@ export default class PollSocket {
     client.on('server/question/tally', (answerObject: Object) => {
       const answer: Answer = {
         id: this.answerId,
-        deviceId: answerObject.deviceId,
+        googleId: answerObject.googleId,
         question: answerObject.question,
         choice: answerObject.choice,
         text: answerObject.text
@@ -140,8 +141,8 @@ export default class PollSocket {
       }
 
       let nextState = {...this.current};
-      const prev = nextState.answers[answer.deviceId];
-      nextState.answers[answer.deviceId] = answer.choice; // update/add response
+      const prev = nextState.answers[answer.googleId];
+      nextState.answers[answer.googleId] = answer.choice; // update/add response
       if (prev) { // if truthy
         // has selected something before
         nextState.results[prev].count -= 1;
@@ -244,13 +245,16 @@ export default class PollSocket {
     });
 
     // share results
-    client.on('server/question/results', () => {
+    client.on('server/question/results', async () => {
       const question = this._currentQuestion();
       if (question === null) {
         console.log(`Admin ${client.id} sharing results on no question`);
         return;
       }
       console.log('sharing results');
+      // Update question to 'shared'
+      await QuestionsRepo.updateQuestionById(this.lastQuestion.id, null,
+        null, true);
       const current = this.current;
       this.nsp.to('users').emit('user/question/results', current);
     });
