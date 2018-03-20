@@ -28,14 +28,14 @@ beforeAll(async () => {
 });
 
 test('create question', async () => {
-  const opts = {text: 'Question text', results: {}};
+  const opts = {text: 'Question text', results: {}, shared: true};
   const result = await request(post(`/polls/${poll.id}/question`, opts, token));
   question = JSON.parse(result).data.node;
   expect(JSON.parse(result).success).toBeTruthy();
 });
 
 test('create question with invalid token', async () => {
-  const opts = {text: 'Question text', results: {}};
+  const opts = {text: 'Question text', results: {}, shared: true};
   const result =
     await request(post(`/polls/${poll.id}/question`, opts, 'invalid'));
   expect(JSON.parse(result).success).toBeFalsy();
@@ -58,12 +58,14 @@ test('get questions', async () => {
 test('update question', async () => {
   const opts = {
     text: 'Updated text',
-    results: JSON.stringify({'A': 1})
+    results: JSON.stringify({'A': 1}),
+    shared: false
   };
   const getstr = await request(put(`/questions/${question.id}`, opts, token));
   const getres = JSON.parse(getstr);
   expect(getres.success).toBeTruthy();
   expect(getres.data.node.text).toBe('Updated text');
+  expect(getres.data.node.shared).toBeFalsy();
   expect(getres.data.node.results).toMatchObject({'A': 1});
 });
 

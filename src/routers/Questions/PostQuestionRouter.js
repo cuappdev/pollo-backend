@@ -20,10 +20,12 @@ class PostQuestionRouter extends AppDevRouter<Object> {
     const pollId = req.params.id;
     var text = req.body.text;
     var results = req.body.results;
+    var shared = req.body.shared;
     var user = req.user;
 
     if (!text) text = '';
     if (!results) results = {};
+    if (shared === null) shared = false;
 
     const poll = await PollsRepo.getPollById(pollId);
     if (!poll) throw new Error(`Couldn't find poll with id ${pollId}`);
@@ -32,7 +34,8 @@ class PostQuestionRouter extends AppDevRouter<Object> {
       throw new Error('You are not authorized to post a question!');
     }
 
-    const question = await QuestionsRepo.createQuestion(text, poll, results);
+    const question =
+      await QuestionsRepo.createQuestion(text, poll, results, shared);
 
     return {
       node: {

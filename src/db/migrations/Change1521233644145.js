@@ -5,11 +5,11 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 export class Change1521233644145 implements MigrationInterface {
   async up (queryRunner: QueryRunner): Promise<any> {
     await queryRunner
-      .query('ALTER TABLE "users" RENAME COLUMN "netId" TO "net"');
+      .query('ALTER TABLE "questions" RENAME COLUMN "canShare" TO "shared"');
   }
 
   async down (queryRunner: QueryRunner): Promise<any> {
     await queryRunner
-      .query('ALTER TABLE "users" RENAME COLUMN "net" TO "netId"');
+      .query('ALTER TABLE "questions" RENAME COLUMN "shared" TO "canShare"');
   }
 }

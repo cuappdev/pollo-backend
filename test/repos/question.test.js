@@ -18,7 +18,8 @@ beforeAll(async () => {
 });
 
 test('Create Question', async () => {
-  const question = await QuestionsRepo.createQuestion('Question', poll, {});
+  const question =
+    await QuestionsRepo.createQuestion('Question', poll, {}, true);
   expect(question.text).toBe('Question');
   expect(question.poll.id).toBe(poll.id);
   expect(question.results).toEqual({});
@@ -31,15 +32,25 @@ test('Get Question', async () => {
   expect(question.results).toEqual({});
 });
 
-test('Update Question', async () => {
-  const question = await QuestionsRepo.updateQuestionById(id, 'New Question');
-  expect(question.text).toBe('New Question');
-});
-
 test('Get Questions from Poll', async () => {
   const questions = await QuestionsRepo.getQuestionsFromPollId(poll.id);
+  const sharedQuestions =
+    await QuestionsRepo.getSharedQuestionsFromPollId(poll.id);
   expect(questions.length).toEqual(1);
-  expect(questions[0].text).toBe('New Question');
+  expect(questions[0].text).toBe('Question');
+  expect(questions).toEqual(sharedQuestions);
+});
+
+test('Update Question', async () => {
+  const question =
+    await QuestionsRepo.updateQuestionById(id, 'New Question', null, false);
+  expect(question.text).toBe('New Question');
+  expect(question.canShare).toBeFalsy();
+});
+
+test('Get Shared Questions from Poll', async () => {
+  const questions = await QuestionsRepo.getSharedQuestionsFromPollId(poll.id);
+  expect(questions.length).toEqual(0);
 });
 
 test('Get Poll from Question', async () => {
