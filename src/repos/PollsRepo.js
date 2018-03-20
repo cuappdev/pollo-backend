@@ -2,6 +2,7 @@
 import { getConnectionManager, Repository } from 'typeorm';
 import { Poll } from '../models/Poll';
 import { User } from '../models/User';
+import { Group } from '../models/Group';
 import appDevUtils from '../utils/appDevUtils';
 import QuestionsRepo from '../repos/QuestionsRepo';
 import GroupsRepo from './GroupsRepo';
@@ -14,15 +15,17 @@ const db = (): Repository<Poll> => {
 var pollCodes = {};
 
 // Create a poll
-const createPoll = async (name: string, code: string, user: User):
+const createPoll = async (name: string, code: string, user: User,
+  group: ?Group):
   Promise<Poll> => {
   try {
     const poll = new Poll();
     poll.name = name;
     poll.code = code;
     poll.admins = [user];
+    if (group) poll.group = group;
 
-    if (pollCodes[code] && GroupsRepo.groupCodes[code]) {
+    if (pollCodes[code] || GroupsRepo.groupCodes[code]) {
       throw new Error('Poll code is already in use');
     }
 

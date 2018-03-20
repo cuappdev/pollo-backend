@@ -1,7 +1,7 @@
 // @flow
 import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
 import QuestionsRepo from '../../repos/QuestionsRepo';
-
+import PollsRepo from '../../repos/PollsRepo';
 import constants from '../../utils/constants';
 import type { APIQuestion } from '../APITypes';
 
@@ -16,7 +16,14 @@ class GetQuestionsRouter extends AppDevEdgeRouter<APIQuestion> {
 
   async contentArray (req, pageInfo, error) {
     const id = req.params.id;
-    const questions = await QuestionsRepo.getQuestionsFromPollId(id);
+    var questions;
+
+    if (await PollsRepo.isAdmin(id, req.user)) {
+      questions = await QuestionsRepo.getQuestionsFromPollId(id);
+    } else {
+      questions = await QuestionsRepo.getSharedQuestionsFromPollId(id);
+    }
+
     return questions
       .filter(Boolean)
       .map(function (question) {
