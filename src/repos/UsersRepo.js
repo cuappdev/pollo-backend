@@ -70,7 +70,21 @@ const getUsersFromIds = async (userIds: number[]): Promise<?Array<User>> => {
       .getMany();
     return users;
   } catch (e) {
-    throw new Error('Problem getting users!');
+    throw new Error('Problem getting users from ids!');
+  }
+};
+
+// Get users from list of googleIds
+const getUsersByGoogleIds = async (googleIds: number[]):
+  Promise<?Array<User>> => {
+  try {
+    var ids = '(' + String(googleIds) + ')';
+    const users = await db().createQueryBuilder('users')
+      .where('users.googleId IN ' + ids)
+      .getMany();
+    return users;
+  } catch (e) {
+    throw new Error('Problem getting users from googleIds!');
   }
 };
 
@@ -113,6 +127,7 @@ export default {
   createDummyUser,
   getUserById,
   getUserByGoogleId,
+  getUsersByGoogleIds,
   getUsersFromIds,
   deleteUserById,
   getPollsById
