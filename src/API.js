@@ -104,7 +104,6 @@ class API {
       const first = req.body.givenName;
       const last = req.body.familyName;
       const email = req.body.email;
-      const token = req.body.idToken;
 
       var user = await UsersRepo.getUserByGoogleId(googleId);
       if (!user) {
@@ -113,7 +112,7 @@ class API {
       }
 
       const session = await SessionsRepo
-        .createOrUpdateSession(user, token, null);
+        .createOrUpdateSession(user, null, null);
       const response = {
         accessToken: session.sessionToken,
         refreshToken: session.updateToken,
