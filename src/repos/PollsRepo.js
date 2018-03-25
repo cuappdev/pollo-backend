@@ -121,8 +121,8 @@ const updatePollById = async (id: number, name: ?string):
 };
 
 // Add a list of admins/member googleIds to a poll by googleId
-const addUsersByGoogleIds = async (id: number, googleIds: number[], role: ?string):
-  Promise<?Poll> => {
+const addUsersByGoogleIds = async (id: number, googleIds: string[],
+  role: ?string): Promise<?Poll> => {
   try {
     const poll = await db().createQueryBuilder('polls')
       .leftJoinAndSelect('polls.admins', 'admins')
@@ -144,9 +144,9 @@ const addUsersByGoogleIds = async (id: number, googleIds: number[], role: ?strin
     await db().persist(poll);
     return poll;
   } catch (e) {
-    throw new Error(`Problem adding users to poll by groupIds!`)
+    throw new Error('Problem adding users to poll by groupIds!');
   }
-}
+};
 
 // Add admin/member to a poll by Id
 const addUserByPollId = async (id: number, user: User, role: ?string):

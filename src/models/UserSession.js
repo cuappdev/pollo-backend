@@ -11,8 +11,8 @@ import {User} from './User';
 
 import crypto from 'crypto';
 
-@Entity('sessions')
-export class Session extends Base {
+@Entity('usersessions')
+export class UserSession extends Base {
   @PrimaryGeneratedColumn()
   id: any = null;
 
@@ -33,14 +33,14 @@ export class Session extends Base {
   user: ?User = null;
 
   static fromUser (user: User, accessToken: ?string, refreshToken: ?string):
-    Session {
-    const session = new Session();
+    UserSession {
+    const session = new UserSession();
     session.user = user;
     session.update(accessToken, refreshToken);
     return session;
   }
 
-  update (accessToken: ?string, updateToken: ?string): Session {
+  update (accessToken: ?string, updateToken: ?string): UserSession {
     if (accessToken) {
       this.sessionToken = accessToken;
     } else {
@@ -57,12 +57,12 @@ export class Session extends Base {
     return this;
   }
 
-  activate (): Session {
+  activate (): UserSession {
     this.isActive = true;
     return this;
   }
 
-  logOut (): Session {
+  logOut (): UserSession {
     this.isActive = false;
     return this;
   }

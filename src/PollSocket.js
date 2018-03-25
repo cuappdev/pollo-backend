@@ -2,6 +2,7 @@
 import { Poll } from './models/Poll';
 import SocketIO from 'socket.io';
 import QuestionsRepo from './repos/QuestionsRepo';
+import PollsRepo from './repos/PollsRepo';
 
 export type PollSocketConfig = {
   poll: Poll,
@@ -60,6 +61,10 @@ export default class PollSocket {
 
   lastQuestion = null;
 
+  // Google ids of every admin/user who has joined the poll
+  adminGoogleIds = [];
+  userGoogleIds = [];
+
   current: CurrentState = {
     question: -1, // id of current question object
     results: {},
@@ -88,14 +93,22 @@ export default class PollSocket {
 
   _onConnect (client: IOSocket): void {
     const userType: ?string = client.handshake.query.userType || null;
+    const googleId: ?string = client.handshake.query.googleId || null;
+
     switch (userType) {
     case 'admin':
       console.log(`Admin with id ${client.id} connected to socket`);
+      if (googleId && !this.adminGoogleIds.includes(googleId)) {
+        this.adminGoogleIds.push(googleId);
+      }
       this._setupAdminEvents(client);
       client.join('admins');
       break;
     case 'user':
       console.log(`User with id ${client.id} connected to socket`);
+      if (googleId && !this.userGoogleIds.includes(googleId)) {
+        this.userGoogleIds.push(googleId);
+      }
       this._setupUserEvents(client);
       client.join('users');
 
@@ -274,8 +287,12 @@ export default class PollSocket {
       this._endQuestion();
     });
 
-    client.on('disconnect', () => {
+    client.on('disconnect', async () => {
       console.log(`Admin ${client.id} disconnected.`);
+      await PollsRepo.addUsersByGoogleIds(this.poll.id, this.userGoogleIds,
+        'user');
+      await PollsRepo.addUsersByGoogleIds(this.poll.id, this.adminGoogleIds,
+        'admin');
       if (this.nsp.connected.length === 0) {
         this.onClose();
       }

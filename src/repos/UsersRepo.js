@@ -2,7 +2,7 @@
 import { getConnectionManager, Repository } from 'typeorm';
 import { User } from '../models/User';
 import { Poll } from '../models/Poll';
-import SessionsRepo from '../repos/SessionsRepo';
+import UserSessionsRepo from '../repos/UserSessionsRepo';
 import appDevUtils from '../utils/appDevUtils';
 
 const db = (): Repository<User> => {
@@ -93,7 +93,7 @@ const getUsersFromIds = async (userIds: number[]): Promise<?Array<User>> => {
 };
 
 // Get users from list of googleIds
-const getUsersByGoogleIds = async (googleIds: number[]):
+const getUsersByGoogleIds = async (googleIds: string[]):
   Promise<?Array<User>> => {
   try {
     var ids = '(' + String(googleIds) + ')';
@@ -110,7 +110,7 @@ const getUsersByGoogleIds = async (googleIds: number[]):
 const deleteUserById = async (id: number) => {
   try {
     const user = await db().findOneById(id);
-    await SessionsRepo.deleteSessionFromUserId(id);
+    await UserSessionsRepo.deleteSessionFromUserId(id);
     await db().remove(user);
   } catch (e) {
     throw new Error(`Problem deleting user by id: ${id}!`);

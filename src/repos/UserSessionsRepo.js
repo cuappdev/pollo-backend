@@ -1,19 +1,19 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
-import { Session } from '../models/Session';
+import { UserSession } from '../models/UserSession';
 import { User } from '../models/User';
 
-const db = (): Repository<Session> => {
-  return getConnectionManager().get().getRepository(Session);
+const db = (): Repository<UserSession> => {
+  return getConnectionManager().get().getRepository(UserSession);
 };
 
 // Create or update session
 const createOrUpdateSession = async (
   user: User, accessToken: ?string, refreshToken: ?string
-): Promise<Session> => {
-  const optionalSession = await db().createQueryBuilder('sessions')
-    .where('sessions.user = :userId', { userId: user.id })
-    .innerJoinAndSelect('sessions.user', 'users')
+): Promise<UserSession> => {
+  const optionalSession = await db().createQueryBuilder('usersessions')
+    .where('usersessions.user = :userId', { userId: user.id })
+    .innerJoinAndSelect('usersessions.user', 'users')
     .getOne();
 
   var session;
@@ -23,15 +23,16 @@ const createOrUpdateSession = async (
     return session;
   }
   session = await
-    db().persist(Session.fromUser(user, accessToken, refreshToken));
+    db().persist(UserSession.fromUser(user, accessToken, refreshToken));
   return session;
 };
 
 // Get user from access token
 const getUserFromToken = async (accessToken: string): Promise<?User> => {
-  const session = await db().createQueryBuilder('sessions')
-    .leftJoinAndSelect('sessions.user', 'user')
-    .where('sessions.sessionToken = :accessToken', {accessToken: accessToken})
+  const session = await db().createQueryBuilder('usersessions')
+    .leftJoinAndSelect('usersessions.user', 'user')
+    .where('usersessions.sessionToken = :accessToken',
+      {accessToken: accessToken})
     .getOne();
   if (!session) return null;
   return session.user;
@@ -39,9 +40,9 @@ const getUserFromToken = async (accessToken: string): Promise<?User> => {
 
 // Update session from refresh token
 const updateSession = async (refreshToken: string): Promise<?Object> => {
-  var session = await db().createQueryBuilder('sessions')
-    .leftJoinAndSelect('sessions.user', 'user')
-    .where('sessions.updateToken = :token', {token: refreshToken})
+  var session = await db().createQueryBuilder('usersessions')
+    .leftJoinAndSelect('usersessions.user', 'user')
+    .where('usersessions.updateToken = :token', {token: refreshToken})
     .getOne();
   if (!session) return null;
   session = session.update();
@@ -56,8 +57,9 @@ const updateSession = async (refreshToken: string): Promise<?Object> => {
 
 // Make sure access token is related to active, valid session
 const verifySession = async (accessToken: string): Promise<boolean> => {
-  const session = await db().createQueryBuilder('sessions')
-    .where('sessions.sessionToken = :accessToken', {accessToken: accessToken})
+  const session = await db().createQueryBuilder('usersessions')
+    .where('usersessions.sessionToken = :accessToken',
+      {accessToken: accessToken})
     .getOne();
   if (!session) return false;
   return session.isActive &&
@@ -76,8 +78,8 @@ const deleteSession = async (id: number) => {
 
 const deleteSessionFromUserId = async (userId: number) => {
   try {
-    const session = await db().createQueryBuilder('sessions')
-      .innerJoin('sessions.user', 'user', 'user.id = :userId')
+    const session = await db().createQueryBuilder('usersessions')
+      .innerJoin('usersessions.user', 'user', 'user.id = :userId')
       .setParameters({ userId: userId })
       .getOne();
     if (session) db().remove(session);

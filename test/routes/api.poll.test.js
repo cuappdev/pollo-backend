@@ -1,6 +1,6 @@
 import dbConnection from '../../src/db/DbConnection';
 import UsersRepo from '../../src/repos/UsersRepo';
-import SessionsRepo from '../../src/repos/SessionsRepo';
+import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
 const request = require('request-promise-native');
 const { get, post, del, put } = require('./lib');
 
@@ -21,7 +21,7 @@ beforeAll(async () => {
 
   const user = await UsersRepo.createDummyUser(googleId);
   userId = user.id;
-  session = await SessionsRepo.createOrUpdateSession(user, null, null);
+  session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
   token = session.sessionToken;
 });
 
@@ -67,6 +67,6 @@ test('delete poll', async () => {
 
 afterAll(async () => {
   await UsersRepo.deleteUserById(userId);
-  await SessionsRepo.deleteSession(session.id);
+  await UserSessionsRepo.deleteSession(session.id);
   console.log('Passed all poll route tests');
 });

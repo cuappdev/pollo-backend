@@ -10,7 +10,7 @@ import {Base} from '../models/Base';
 import {Poll} from '../models/Poll';
 import {Question} from '../models/Question';
 import {User} from '../models/User';
-import {Session} from '../models/Session';
+import {UserSession} from '../models/UserSession';
 import {Group} from '../models/Group';
 import {Change1521233644145} from './migrations/Change1521233644145';
 
@@ -30,7 +30,7 @@ const entities = [
   Poll,
   Question,
   User,
-  Session,
+  UserSession,
   Group
 ];
 

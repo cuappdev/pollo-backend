@@ -41,7 +41,7 @@ export type APIUser = {|
   netId: string
 |}
 
-export type APISession = {|
+export type APIUserSession = {|
   accessToken: string,
   refreshToken: string,
   sessionExpiration: number,
