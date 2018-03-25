@@ -147,6 +147,12 @@ export default class PollSocket {
       if (prev) { // if truthy
         // has selected something before
         nextState.results[prev].count -= 1;
+        const question = this._currentQuestion();
+        if (question && question.type === 'FREE_RESPONSE') {
+          if (nextState.results[prev].count <= 0) {
+            delete nextState.results[prev];
+          }
+        }
       }
 
       let curTally = nextState.results[answer.choice];

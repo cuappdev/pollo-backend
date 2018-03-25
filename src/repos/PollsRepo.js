@@ -6,6 +6,7 @@ import { Group } from '../models/Group';
 import appDevUtils from '../utils/appDevUtils';
 import QuestionsRepo from '../repos/QuestionsRepo';
 import GroupsRepo from './GroupsRepo';
+import UsersRepo from './UsersRepo';
 
 const db = (): Repository<Poll> => {
   return getConnectionManager().get().getRepository(Poll);
@@ -118,6 +119,34 @@ const updatePollById = async (id: number, name: ?string):
     throw new Error(`Problem updating poll by id: ${id}!`);
   }
 };
+
+// Add a list of admins/member googleIds to a poll by googleId
+const addUsersByGoogleIds = async (id: number, googleIds: number[], role: ?string):
+  Promise<?Poll> => {
+  try {
+    const poll = await db().createQueryBuilder('polls')
+      .leftJoinAndSelect('polls.admins', 'admins')
+      .leftJoinAndSelect('polls.members', 'members')
+      .leftJoinAndSelect('polls.questions', 'questions')
+      .where('polls.id = :pollId')
+      .setParameters({ pollId: id })
+      .getOne();
+
+    const users = await UsersRepo.getUsersByGoogleIds(googleIds);
+    if (users) {
+      if (role === 'admin') {
+        poll.admins = poll.admins.concat(users);
+      } else {
+        poll.members = poll.members.concat(users);
+      }
+    }
+
+    await db().persist(poll);
+    return poll;
+  } catch (e) {
+    throw new Error(`Problem adding users to poll by groupIds!`)
+  }
+}
 
 // Add admin/member to a poll by Id
 const addUserByPollId = async (id: number, user: User, role: ?string):
@@ -244,6 +273,7 @@ export default {
   updatePollById,
   deletePollById,
   addUserByPollId,
+  addUsersByGoogleIds,
   removeUserByPollId,
   getUsersByPollId,
   isAdmin,
