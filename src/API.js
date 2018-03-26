@@ -7,7 +7,7 @@ import path from 'path';
 import cors from 'cors';
 import passport from 'passport';
 import UsersRepo from './repos/UsersRepo';
-import SessionsRepo from './repos/SessionsRepo';
+import UserSessionsRepo from './repos/UserSessionsRepo';
 import dotenv from 'dotenv';
 import lib from './utils/lib';
 
@@ -70,7 +70,7 @@ class API {
       if (!user) {
         user = await UsersRepo.createUser(profile);
       }
-      const session = await SessionsRepo
+      const session = await UserSessionsRepo
         .createOrUpdateSession(user, accessToken, refreshToken);
       const response = {
         accessToken: session.sessionToken,
@@ -99,6 +99,28 @@ class API {
     });
     this.express.get('/error',
       (req, res) => res.send('Error authenticating!'));
+    this.express.post('/api/v2/auth/mobile', async function (req, res) {
+      const googleId = req.body.userId;
+      const first = req.body.givenName;
+      const last = req.body.familyName;
+      const email = req.body.email;
+
+      var user = await UsersRepo.getUserByGoogleId(googleId);
+      if (!user) {
+        user = await UsersRepo.createUserWithFields(googleId, first, last,
+          email);
+      }
+
+      const session = await UserSessionsRepo
+        .createOrUpdateSession(user, null, null);
+      const response = {
+        accessToken: session.sessionToken,
+        refreshToken: session.updateToken,
+        sessionExpiration: session.expiresAt,
+        isActive: session.isActive
+      };
+      res.json({success: true, data: response});
+    });
   }
 
   routes (): void {

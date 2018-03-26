@@ -1,6 +1,6 @@
 // @flow
 import AppDevResponse from './AppDevResponse';
-import SessionsRepo from '../repos/SessionsRepo';
+import UserSessionsRepo from '../repos/UserSessionsRepo';
 
 import {
   Request,
@@ -33,12 +33,12 @@ async function ensureAuthenticated (req: Request, res: Response,
     return next(true);
   }
 
-  if (!await SessionsRepo.verifySession(bearerToken)) {
+  if (!await UserSessionsRepo.verifySession(bearerToken)) {
     res.send(new AppDevResponse(false,
       {errors: ['Invalid session token']}));
     return next(true);
   }
-  const user = await SessionsRepo.getUserFromToken(bearerToken);
+  const user = await UserSessionsRepo.getUserFromToken(bearerToken);
   req.user = user;
 
   return next();
@@ -59,7 +59,7 @@ async function updateSession (req: Request, res: Response, next: NextFunction) {
     return next(true);
   }
 
-  const session = await SessionsRepo.updateSession(bearerToken);
+  const session = await UserSessionsRepo.updateSession(bearerToken);
   if (!session) {
     res.send(new AppDevResponse(false,
       {errors: ['Invalid refresh token!']}));

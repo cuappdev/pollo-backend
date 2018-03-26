@@ -2,6 +2,7 @@
 import { Poll } from './models/Poll';
 import SocketIO from 'socket.io';
 import QuestionsRepo from './repos/QuestionsRepo';
+import PollsRepo from './repos/PollsRepo';
 
 export type PollSocketConfig = {
   poll: Poll,
@@ -21,7 +22,7 @@ type Question = {
 
 type Answer = {
   id: id,
-  deviceId: string,
+  googleId: string,
   question: id,
   choice: string,
   text: string
@@ -58,6 +59,12 @@ export default class PollSocket {
   questionId: number;
   answerId: number;
 
+  lastQuestion = null;
+
+  // Google ids of every admin/user who has joined the poll
+  adminGoogleIds = [];
+  userGoogleIds = [];
+
   current: CurrentState = {
     question: -1, // id of current question object
     results: {},
@@ -86,14 +93,22 @@ export default class PollSocket {
 
   _onConnect (client: IOSocket): void {
     const userType: ?string = client.handshake.query.userType || null;
+    const googleId: ?string = client.handshake.query.googleId || null;
+
     switch (userType) {
     case 'admin':
       console.log(`Admin with id ${client.id} connected to socket`);
+      if (googleId && !this.adminGoogleIds.includes(googleId)) {
+        this.adminGoogleIds.push(googleId);
+      }
       this._setupAdminEvents(client);
       client.join('admins');
       break;
     case 'user':
       console.log(`User with id ${client.id} connected to socket`);
+      if (googleId && !this.userGoogleIds.includes(googleId)) {
+        this.userGoogleIds.push(googleId);
+      }
       this._setupUserEvents(client);
       client.join('users');
 
@@ -123,7 +138,7 @@ export default class PollSocket {
     client.on('server/question/tally', (answerObject: Object) => {
       const answer: Answer = {
         id: this.answerId,
-        deviceId: answerObject.deviceId,
+        googleId: answerObject.googleId,
         question: answerObject.question,
         choice: answerObject.choice,
         text: answerObject.text
@@ -140,8 +155,8 @@ export default class PollSocket {
       }
 
       let nextState = {...this.current};
-      const prev = nextState.answers[answer.deviceId];
-      nextState.answers[answer.deviceId] = answer.choice; // update/add response
+      const prev = nextState.answers[answer.googleId];
+      nextState.answers[answer.googleId] = answer.choice; // update/add response
       if (prev) { // if truthy
         // has selected something before
         nextState.results[prev].count -= 1;
@@ -209,8 +224,8 @@ export default class PollSocket {
     if (!question) {
       return;
     }
-    await QuestionsRepo.createQuestion(question.text, this.poll,
-      this.current.results, false);
+    this.lastQuestion = await QuestionsRepo.createQuestion(question.text,
+      this.poll, this.current.results, false);
     this.nsp.to('users').emit('user/question/end', {question});
   }
 
@@ -250,13 +265,18 @@ export default class PollSocket {
     });
 
     // share results
-    client.on('server/question/results', () => {
+    client.on('server/question/results', async () => {
       const question = this._currentQuestion();
       if (question === null) {
         console.log(`Admin ${client.id} sharing results on no question`);
         return;
       }
       console.log('sharing results');
+      // Update question to 'shared'
+      if (this.lastQuestion) {
+        await QuestionsRepo.updateQuestionById(this.lastQuestion.id, null,
+          null, true);
+      }
       const current = this.current;
       this.nsp.to('users').emit('user/question/results', current);
     });
@@ -267,8 +287,12 @@ export default class PollSocket {
       this._endQuestion();
     });
 
-    client.on('disconnect', () => {
+    client.on('disconnect', async () => {
       console.log(`Admin ${client.id} disconnected.`);
+      await PollsRepo.addUsersByGoogleIds(this.poll.id, this.userGoogleIds,
+        'user');
+      await PollsRepo.addUsersByGoogleIds(this.poll.id, this.adminGoogleIds,
+        'admin');
       if (this.nsp.connected.length === 0) {
         this.onClose();
       }

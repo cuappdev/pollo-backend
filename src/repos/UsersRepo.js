@@ -2,7 +2,8 @@
 import { getConnectionManager, Repository } from 'typeorm';
 import { User } from '../models/User';
 import { Poll } from '../models/Poll';
-import SessionsRepo from '../repos/SessionsRepo';
+import UserSessionsRepo from '../repos/UserSessionsRepo';
+import appDevUtils from '../utils/appDevUtils';
 
 const db = (): Repository<User> => {
   return getConnectionManager().get().getRepository(User);
@@ -18,10 +19,27 @@ const createDummyUser = async (id: string): Promise<User> => {
   }
 };
 
-// Create a user with fields
+// Create a user from google creds
 const createUser = async (fields: Object): Promise<User> => {
   try {
     const user = await db().persist(User.fromGoogleCreds(fields));
+    return user;
+  } catch (e) {
+    throw new Error('Problem creating user!');
+  }
+};
+
+const createUserWithFields = async (googleId: string, firstName: string,
+  lastName: string, email: string): Promise<User> => {
+  try {
+    const user = new User();
+    user.googleId = googleId;
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.email = email;
+    user.netId = appDevUtils.netIdFromEmail(email);
+
+    await db().persist(user);
     return user;
   } catch (e) {
     throw new Error('Problem creating user!');
@@ -75,7 +93,7 @@ const getUsersFromIds = async (userIds: number[]): Promise<?Array<User>> => {
 };
 
 // Get users from list of googleIds
-const getUsersByGoogleIds = async (googleIds: number[]):
+const getUsersByGoogleIds = async (googleIds: string[]):
   Promise<?Array<User>> => {
   try {
     var ids = '(' + String(googleIds) + ')';
@@ -92,7 +110,7 @@ const getUsersByGoogleIds = async (googleIds: number[]):
 const deleteUserById = async (id: number) => {
   try {
     const user = await db().findOneById(id);
-    await SessionsRepo.deleteSessionFromUserId(id);
+    await UserSessionsRepo.deleteSessionFromUserId(id);
     await db().remove(user);
   } catch (e) {
     throw new Error(`Problem deleting user by id: ${id}!`);
@@ -124,6 +142,7 @@ const getPollsById = async (id: number, role: ?string):
 export default {
   getUsers,
   createUser,
+  createUserWithFields,
   createDummyUser,
   getUserById,
   getUserByGoogleId,

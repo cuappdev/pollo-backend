@@ -1,4 +1,4 @@
-import SessionsRepo from '../../src/repos/SessionsRepo';
+import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
 
@@ -18,7 +18,7 @@ beforeAll(async () => {
 
 test('Create Session', async () => {
   const session =
-    await SessionsRepo.createOrUpdateSession(user, 'access', 'refresh');
+    await UserSessionsRepo.createOrUpdateSession(user, 'access', 'refresh');
   sessionId = session.id;
   expect(session.isActive).toBeTruthy();
   expect(session.sessionToken).toBe('access');
@@ -26,29 +26,29 @@ test('Create Session', async () => {
 });
 
 test('Get User From Token', async () => {
-  user = await SessionsRepo.getUserFromToken('access');
+  user = await UserSessionsRepo.getUserFromToken('access');
   expect(user.googleId).toEqual(googleId);
-  const nullUser = await SessionsRepo.getUserFromToken('invalid');
+  const nullUser = await UserSessionsRepo.getUserFromToken('invalid');
   expect(nullUser).toBeNull();
 });
 
 test('Verify session', async () => {
-  const valid = await SessionsRepo.verifySession('access');
+  const valid = await UserSessionsRepo.verifySession('access');
   expect(valid).toBeTruthy();
-  const invalid = await SessionsRepo.verifySession('invalid');
+  const invalid = await UserSessionsRepo.verifySession('invalid');
   expect(invalid).toBeFalsy();
 });
 
 test('Update session', async () => {
-  const nullObj = await SessionsRepo.updateSession('invalid');
+  const nullObj = await UserSessionsRepo.updateSession('invalid');
   expect(nullObj).toBeNull();
-  const obj = await SessionsRepo.updateSession('refresh');
+  const obj = await UserSessionsRepo.updateSession('refresh');
   expect(obj.isActive).toBeTruthy();
 });
 
 // Teardown
 afterAll(async () => {
-  await SessionsRepo.deleteSession(sessionId);
+  await UserSessionsRepo.deleteSession(sessionId);
   await UsersRepo.deleteUserById(user.id);
   console.log('Passed all session tests');
 });
