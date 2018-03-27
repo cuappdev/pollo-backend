@@ -1,9 +1,9 @@
-import PollsRepo from '../../src/repos/PollsRepo';
+import SessionsRepo from '../../src/repos/SessionsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
 import appDevUtils from '../../src/utils/appDevUtils';
 
-var id, poll;
+var id, session;
 const googleId = appDevUtils.randomCode(6);
 
 // Connects to db before running tests and does setup
@@ -41,16 +41,16 @@ test('Get Users', async () => {
   expect(user).toBeDefined();
 });
 
-test('Get Polls', async () => {
+test('Get Sessions', async () => {
   const user = await UsersRepo.getUserById(id);
-  const code = await PollsRepo.createCode();
-  poll = await PollsRepo.createPoll('name', code, user);
-  const adminPolls = await UsersRepo.getPollsById(id, 'admin');
-  const memberPolls = await UsersRepo.getPollsById(id, 'member');
-  expect(adminPolls.length).toEqual(1);
-  expect(memberPolls.length).toEqual(0);
-  expect(adminPolls[0].id).toBe(poll.id);
-  await PollsRepo.deletePollById(poll.id);
+  const code = await SessionsRepo.createCode();
+  session = await SessionsRepo.createSession('name', code, user);
+  const adminSessions = await UsersRepo.getSessionsById(id, 'admin');
+  const memberSessions = await UsersRepo.getSessionsById(id, 'member');
+  expect(adminSessions.length).toEqual(1);
+  expect(memberSessions.length).toEqual(0);
+  expect(adminSessions[0].id).toBe(session.id);
+  await SessionsRepo.deleteSessionById(session.id);
 });
 
 test('Delete User', async () => {

@@ -1,4 +1,4 @@
-import PollsRepo from '../../src/repos/PollsRepo';
+import SessionsRepo from '../../src/repos/SessionsRepo';
 import dbConnection from '../../src/db/DbConnection';
 import GroupsRepo from '../../src/repos/GroupsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
@@ -9,11 +9,11 @@ var groupCode;
 // Admin stuff
 var user1;
 var user2;
-// Poll info
-var pollOneCode;
-var pollOne;
-var pollTwoCode;
-var pollTwo;
+// Session info
+var sessionOneCode;
+var sessionOne;
+var sessionTwoCode;
+var sessionTwo;
 
 beforeAll(async () => {
   await dbConnection().catch(function (e) {
@@ -21,23 +21,23 @@ beforeAll(async () => {
     process.exit();
   });
   groupCode = GroupsRepo.createCode();
-  pollOneCode = PollsRepo.createCode();
-  pollTwoCode = PollsRepo.createCode();
+  sessionOneCode = SessionsRepo.createCode();
+  sessionTwoCode = SessionsRepo.createCode();
   user1 = await UsersRepo.createDummyUser('grouptest1');
   user2 = await UsersRepo.createDummyUser('grouptest2');
-  pollOne = await PollsRepo.createPoll('Poll1', pollOneCode, user1);
-  pollTwo = await PollsRepo.createPoll('Poll2', pollTwoCode, user1);
+  sessionOne = await SessionsRepo.createSession('Session1', sessionOneCode, user1);
+  sessionTwo = await SessionsRepo.createSession('Session2', sessionTwoCode, user1);
 });
 
 test('Create Group', async () => {
   const group =
-    await GroupsRepo.createGroup('Group', groupCode, user1, pollOne);
+    await GroupsRepo.createGroup('Group', groupCode, user1, sessionOne);
 
   expect(group.name).toBe('Group');
   expect(group.admins.length).toBe(1);
   expect(group.members.length).toBe(0);
-  expect(group.polls.length).toBe(1);
-  expect(group.polls[0].code).toBe('');
+  expect(group.sessions.length).toBe(1);
+  expect(group.sessions[0].code).toBe('');
 
   groupId = group.id;
 });
@@ -87,24 +87,24 @@ test('Remove Admin From Group', async () => {
   expect(admins.length).toBe(1);
 });
 
-test('Add Poll To Group', async () => {
-  await GroupsRepo.addPollByGroupId(groupId, pollTwo);
-  const polls = await GroupsRepo.getPollsById(groupId);
-  expect(polls.length).toBe(2);
-  expect(polls[0].id).toBe(pollOne.id);
-  expect(polls[1].id).toBe(pollTwo.id);
+test('Add Session To Group', async () => {
+  await GroupsRepo.addSessionByGroupId(groupId, sessionTwo);
+  const sessions = await GroupsRepo.getSessionsById(groupId);
+  expect(sessions.length).toBe(2);
+  expect(sessions[0].id).toBe(sessionOne.id);
+  expect(sessions[1].id).toBe(sessionTwo.id);
 });
 
-test('Remove Poll From Group', async () => {
-  await GroupsRepo.removePollByGroupId(groupId, pollOne);
-  const polls = await GroupsRepo.getPollsById(groupId);
-  expect(polls.length).toBe(1);
-  expect(polls[0].id).toBe(pollTwo.id);
+test('Remove Session From Group', async () => {
+  await GroupsRepo.removeSessionByGroupId(groupId, sessionOne);
+  const sessions = await GroupsRepo.getSessionsById(groupId);
+  expect(sessions.length).toBe(1);
+  expect(sessions[0].id).toBe(sessionTwo.id);
 });
 
 test('Delete group', async () => {
-  await PollsRepo.deletePollById(pollOne.id);
-  await PollsRepo.deletePollById(pollTwo.id);
+  await SessionsRepo.deleteSessionById(sessionOne.id);
+  await SessionsRepo.deleteSessionById(sessionTwo.id);
   await GroupsRepo.deleteGroupById(groupId);
   expect(await GroupsRepo.getGroupById(groupId)).not.toBeDefined();
 });

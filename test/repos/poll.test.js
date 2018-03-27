@@ -1,11 +1,11 @@
+import SessionsRepo from '../../src/repos/SessionsRepo';
 import PollsRepo from '../../src/repos/PollsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
 
+var session;
 var id;
-var code;
 var user;
-var user2;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
@@ -13,71 +13,49 @@ beforeAll(async () => {
     console.log('Error connecting to database');
     process.exit();
   });
+  user = await UsersRepo.createDummyUser('1234');
+  session = await SessionsRepo.createSession('Session', SessionsRepo.createCode(), user);
 });
 
 test('Create Poll', async () => {
-  code = PollsRepo.createCode();
-  user = await UsersRepo.createDummyUser('polltest1');
-
-  const poll = await PollsRepo.createPoll('Poll', code, user);
-  expect(poll.name).toBe('Poll');
-  expect(poll.code).toBe(code);
-  expect(poll.admins[0].googleId).toBe(user.googleId);
+  const poll =
+    await PollsRepo.createPoll('Poll', session, {}, true);
+  expect(poll.text).toBe('Poll');
+  expect(poll.session.id).toBe(session.id);
+  expect(poll.results).toEqual({});
   id = poll.id;
 });
 
 test('Get Poll', async () => {
   const poll = await PollsRepo.getPollById(id);
-  expect(poll.name).toBe('Poll');
-  expect(poll.code).toBe(code);
+  expect(poll.text).toBe('Poll');
+  expect(poll.results).toEqual({});
+});
+
+test('Get Polls from Session', async () => {
+  const polls = await PollsRepo.getPollsFromSessionId(session.id);
+  const sharedPolls =
+    await PollsRepo.getSharedPollsFromSessionId(session.id);
+  expect(polls.length).toEqual(1);
+  expect(polls[0].text).toBe('Poll');
+  expect(polls).toEqual(sharedPolls);
 });
 
 test('Update Poll', async () => {
-  const poll = await PollsRepo.updatePollById(id, 'New Poll');
-  expect(poll.name).toBe('New Poll');
+  const poll =
+    await PollsRepo.updatePollById(id, 'New Poll', null, false);
+  expect(poll.text).toBe('New Poll');
+  expect(poll.canShare).toBeFalsy();
 });
 
-test('Get Admins From Poll', async () => {
-  const admins = await PollsRepo.getUsersByPollId(id, 'admin');
-  expect(admins.length).toEqual(1);
-  expect(admins[0].googleId).toBe(user.googleId);
+test('Get Shared Polls from Session', async () => {
+  const polls = await PollsRepo.getSharedPollsFromSessionId(session.id);
+  expect(polls.length).toEqual(0);
 });
 
-test('Add Admin To Poll', async () => {
-  user2 = await UsersRepo.createDummyUser('polltest2');
-  const admins = (await PollsRepo.addUserByPollId(id, user2, 'admin')).admins;
-  expect(admins.length).toEqual(2);
-  expect(admins[1].googleId).toBe(user2.googleId);
-});
-
-test('Remove Admin From Poll', async () => {
-  const poll = await PollsRepo.removeUserByPollId(id, user2, 'admin');
-  const admins = poll.admins;
-  expect(admins.length).toEqual(1);
-  expect(admins[0].googleId).toBe(user.googleId);
-  id = poll.id;
-  expect(await PollsRepo.isAdmin(id, user2)).toBe(false);
-  expect(await PollsRepo.isAdmin(id, user)).toBe(true);
-});
-
-test('Add Member To Poll', async () => {
-  const members =
-    (await PollsRepo.addUserByPollId(id, user2, 'member')).members;
-  expect(members.length).toEqual(1);
-  expect(members[0].googleId).toBe(user2.googleId);
-});
-
-test('Get Members Of Poll', async () => {
-  const members = await PollsRepo.getUsersByPollId(id, 'member');
-  expect(members.length).toEqual(1);
-  expect(members[0].googleId).toBe(user2.googleId);
-});
-
-test('Remove Member From Poll', async () => {
-  const poll = await PollsRepo.removeUserByPollId(id, user2, 'member');
-  const members = poll.members;
-  expect(members.length).toEqual(0);
-  id = poll.id;
+test('Get Session from Poll', async () => {
+  const p = await PollsRepo.getSessionFromPollId(id);
+  expect(p.id).toBe(session.id);
 });
 
 test('Delete Poll', async () => {
@@ -87,7 +65,7 @@ test('Delete Poll', async () => {
 
 // Teardown
 afterAll(async () => {
+  await SessionsRepo.deleteSessionById(session.id);
   await UsersRepo.deleteUserById(user.id);
-  await UsersRepo.deleteUserById(user2.id);
   console.log('Passed all poll tests');
 });
