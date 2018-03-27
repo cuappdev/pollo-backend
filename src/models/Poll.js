@@ -3,15 +3,11 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToMany,
-  ManyToMany,
-  JoinTable,
-  ManyToOne
+  ManyToOne,
+  json
 } from 'typeorm';
 import { Base } from './Base';
-import { Question } from './Question';
-import { User } from './User';
-import { Group } from './Group';
+import { Session } from './Session';
 
 @Entity('polls')
 export class Poll extends Base {
@@ -19,22 +15,16 @@ export class Poll extends Base {
   id: any = null;
 
   @Column('string')
-  name: string = '';
+  text: string = '';
 
-  @Column('string')
-  code: string = '';
+  @ManyToOne(type => Session, session => session.polls, {
+    onDelete: 'CASCADE'
+  })
+  session: ?Session = null;
 
-  @ManyToMany(type => User, user => user.adminPolls)
-  @JoinTable()
-  admins: ?User[] = [];
+  @Column('json')
+  results: json = {};
 
-  @OneToMany(type => Question, question => question.poll)
-  questions: ?Question[] = [];
-
-  @ManyToMany(type => User, user => user.memberPolls)
-  @JoinTable()
-  members: ?User[] = [];
-
-  @ManyToOne(type => Group, group => group.polls)
-  group: ?Group = null;
+  @Column('boolean')
+  shared: boolean = true;
 }

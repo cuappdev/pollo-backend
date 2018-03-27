@@ -1,6 +1,7 @@
 // @flow
 import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
-import GroupsRepo from '../../repos/GroupsRepo';
+import PollsRepo from '../../repos/PollsRepo';
+import SessionsRepo from '../../repos/SessionsRepo';
 import constants from '../../utils/constants';
 import type { APIPoll } from '../APITypes';
 
@@ -10,20 +11,27 @@ class GetPollsRouter extends AppDevEdgeRouter<APIPoll> {
   }
 
   getPath (): string {
-    return '/groups/:id/polls/';
+    return '/sessions/:id/polls/';
   }
 
   async contentArray (req, pageInfo, error) {
     const id = req.params.id;
-    const polls = await GroupsRepo.getPollsById(id);
+    var polls;
+
+    if (await SessionsRepo.isAdmin(id, req.user)) {
+      polls = await PollsRepo.getPollsFromSessionId(id);
+    } else {
+      polls = await PollsRepo.getSharedPollsFromSessionId(id);
+    }
+
     return polls
       .filter(Boolean)
       .map(function (poll) {
         return {
           node: {
             id: poll.id,
-            name: poll.name,
-            code: poll.code
+            text: poll.text,
+            results: poll.results
           },
           cursor: poll.createdAt.valueOf()
         };

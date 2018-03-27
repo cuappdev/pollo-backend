@@ -3,6 +3,7 @@ import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import PollsRepo from '../../repos/PollsRepo';
 import constants from '../../utils/constants';
+import SessionsRepo from '../../repos/SessionsRepo';
 
 class DeletePollRouter extends AppDevRouter<Object> {
   constructor () {
@@ -17,13 +18,13 @@ class DeletePollRouter extends AppDevRouter<Object> {
     const pollId = req.params.id;
     const user = req.user;
 
-    const poll = await PollsRepo.getPollById(pollId);
-    if (!poll) throw new Error(`Poll with id ${pollId} not found!`);
-
-    if (!await PollsRepo.isAdmin(pollId, user)) {
+    const session = await PollsRepo.getSessionFromPollId(pollId);
+    if (!session) {
+      throw new Error(`Couldn't find session with poll ${pollId}`);
+    }
+    if (!await SessionsRepo.isAdmin(session.id, user)) {
       throw new Error('You are not authorized to delete this poll!');
     }
-
     await PollsRepo.deletePollById(pollId);
     return null;
   }

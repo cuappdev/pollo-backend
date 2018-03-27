@@ -1,6 +1,6 @@
 // @flow
 import AppDevRouter from '../utils/AppDevRouter';
-import PollsRepo from '../repos/PollsRepo';
+import SessionsRepo from '../repos/SessionsRepo';
 import constants from '../utils/constants';
 import {Request} from 'express';
 
@@ -15,7 +15,7 @@ class GenerateCodeRouter extends AppDevRouter<Object> {
 
   async content (req: Request) {
     return {
-      code: PollsRepo.createCode()
+      code: SessionsRepo.createCode()
     };
   }
 }
