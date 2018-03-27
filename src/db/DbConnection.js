@@ -7,8 +7,8 @@ import dotenv from 'dotenv';
 
 // All entities
 import {Base} from '../models/Base';
+import {Session} from '../models/Session';
 import {Poll} from '../models/Poll';
-import {Question} from '../models/Question';
 import {User} from '../models/User';
 import {UserSession} from '../models/UserSession';
 import {Group} from '../models/Group';
@@ -27,8 +27,8 @@ const driver = {
 
 const entities = [
   Base,
+  Session,
   Poll,
-  Question,
   User,
   UserSession,
   Group

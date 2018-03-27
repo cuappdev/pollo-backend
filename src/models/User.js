@@ -7,7 +7,7 @@ import {
   JoinTable
 } from 'typeorm';
 import { Base } from './Base';
-import { Poll } from './Poll';
+import { Session } from './Session';
 import { Group } from './Group';
 import appDevUtils from '../utils/appDevUtils';
 
@@ -31,11 +31,11 @@ export class User extends Base {
   @Column('string')
   lastName: string = '';
 
-  @ManyToMany(type => Poll, poll => poll.admins)
-  adminPolls: ?Poll[] = [];
+  @ManyToMany(type => Session, session => session.admins)
+  adminSessions: ?Session[] = [];
 
-  @ManyToMany(type => Poll, poll => poll.members)
-  memberPolls: ?Poll[] = [];
+  @ManyToMany(type => Session, session => session.members)
+  memberSessions: ?Session[] = [];
 
   @ManyToMany(type => Group, group => group.admins)
   @JoinTable()

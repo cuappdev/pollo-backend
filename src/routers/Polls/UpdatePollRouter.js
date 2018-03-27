@@ -3,10 +3,11 @@ import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import PollsRepo from '../../repos/PollsRepo';
 import constants from '../../utils/constants';
+import SessionsRepo from '../../repos/SessionsRepo';
 
 import type { APIPoll } from '../APITypes';
 
-class UpdatePollRouter extends AppDevRouter<APIPoll> {
+class UpdatePollRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.PUT);
   }
@@ -16,26 +17,33 @@ class UpdatePollRouter extends AppDevRouter<APIPoll> {
   }
 
   async content (req: Request): Promise<{ node: APIPoll }> {
-    const name = req.body.name;
     const pollId = req.params.id;
-    const user = req.user;
+    var text = req.body.text;
+    var results = req.body.results;
+    var shared = req.body.shared;
+    var user = req.user;
 
-    if (!name) throw new Error('No fields specified to update.');
-
-    var poll = await PollsRepo.getPollById(pollId);
-    if (!poll) throw new Error(`Poll with id ${pollId} was not found!`);
-
-    if (!await PollsRepo.isAdmin(pollId, user)) {
-      throw new Error('You are not authorized to update this poll!');
+    if (!results && !text && shared === null) {
+      throw new Error('No fields specified to update.');
     }
 
-    poll = await PollsRepo.updatePollById(pollId, name);
-    if (!poll) throw new Error(`Poll with id ${pollId} was not found!`);
+    const session = await PollsRepo.getSessionFromPollId(pollId);
+    if (!session) throw new Error(`Poll with id ${pollId} has no session!`);
+
+    if (!await SessionsRepo.isAdmin(session.id, user)) {
+      throw new Error('You are not authorized to update this poll!');
+    }
+    const poll = await PollsRepo.updatePollById(pollId, text,
+      results, shared);
+    if (!poll) {
+      throw new Error(`Poll with id ${pollId} was not found!`);
+    }
+
     return {
       node: {
         id: poll.id,
-        name: poll.name,
-        code: poll.code
+        text: poll.text,
+        results: poll.results
       }
     };
   }

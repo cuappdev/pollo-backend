@@ -17,7 +17,7 @@ export type NodeResponse<T> = Response<AppDevNodeResponse<T>>
 export type EdgesResponse<T> = Response<AppDevEdgesResponse<T>>
 
 /** ************************* CLICKER OBJECT TYPES ************************* **/
-export type APIPoll = {|
+export type APISession = {|
   id: id,
   name: string,
   code: string,
@@ -29,7 +29,7 @@ export type APIGroup = {|
   code: string
 |}
 
-export type APIQuestion = {|
+export type APIPoll = {|
   id: id,
   text: string,
   results: Object

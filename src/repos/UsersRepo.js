@@ -1,7 +1,7 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
 import { User } from '../models/User';
-import { Poll } from '../models/Poll';
+import { Session } from '../models/Session';
 import UserSessionsRepo from '../repos/UserSessionsRepo';
 import appDevUtils from '../utils/appDevUtils';
 
@@ -117,25 +117,25 @@ const deleteUserById = async (id: number) => {
   }
 };
 
-// Get polls by userId
-const getPollsById = async (id: number, role: ?string):
-    Promise<Array<?Poll>> => {
+// Get sessions by userId
+const getSessionsById = async (id: number, role: ?string):
+    Promise<Array<?Session>> => {
   try {
     const user = await db().createQueryBuilder('users')
-      .leftJoinAndSelect('users.memberPolls', 'memberPolls')
-      .leftJoinAndSelect('users.adminPolls', 'adminPolls')
+      .leftJoinAndSelect('users.memberSessions', 'memberSessions')
+      .leftJoinAndSelect('users.adminSessions', 'adminSessions')
       .where('users.id = :userId')
       .setParameters({ userId: id })
       .getOne();
     if (role === 'admin') {
-      return user.adminPolls;
+      return user.adminSessions;
     } else if (role === 'member') {
-      return user.memberPolls;
+      return user.memberSessions;
     } else {
-      return user.memberPolls.concat(user.adminPolls);
+      return user.memberSessions.concat(user.adminSessions);
     }
   } catch (e) {
-    throw new Error(`Problem getting member polls for user: ${id}`);
+    throw new Error(`Problem getting member sessions for user: ${id}`);
   }
 };
 
@@ -149,5 +149,5 @@ export default {
   getUsersByGoogleIds,
   getUsersFromIds,
   deleteUserById,
-  getPollsById
+  getSessionsById
 };

@@ -1,17 +1,17 @@
 // @flow
 import AppDevRouter from '../utils/AppDevRouter';
 import constants from '../utils/constants';
-import PollsRepo from '../repos/PollsRepo';
+import SessionsRepo from '../repos/SessionsRepo';
 import {Request} from 'express';
-import type { APIPoll } from './APITypes';
+import type { APISession } from './APITypes';
 
-class StartPollRouter extends AppDevRouter<APIPoll> {
+class StartSessionRouter extends AppDevRouter<APISession> {
   constructor () {
     super(constants.REQUEST_TYPES.POST);
   }
 
   getPath (): string {
-    return '/start/poll/';
+    return '/start/session/';
   }
 
   async content (req: Request) {
@@ -21,30 +21,30 @@ class StartPollRouter extends AppDevRouter<APIPoll> {
     var name = req.body.name;
 
     if (!name) name = '';
-    var poll = await PollsRepo.getPollById(id);
+    var session = await SessionsRepo.getSessionById(id);
 
     if (!(id || (code && deviceId))) {
-      throw new Error('Poll id, or code and device id required.');
+      throw new Error('Session id, or code and device id required.');
     }
 
     if (!id) {
-      poll = await PollsRepo.createPoll(name, code, deviceId);
+      session = await SessionsRepo.createSession(name, code, deviceId);
     }
 
-    if (!poll) {
-      throw new Error(`No poll with id ${id} found.`);
+    if (!session) {
+      throw new Error(`No session with id ${id} found.`);
     }
 
-    await req.app.pollManager.startNewPoll(poll);
+    await req.app.sessionManager.startNewSession(session);
 
     return {
       node: {
-        id: poll.id,
-        name: poll.name,
-        code: poll.code
+        id: session.id,
+        name: session.name,
+        code: session.code
       }
     };
   }
 }
 
-export default new StartPollRouter().router;
+export default new StartSessionRouter().router;

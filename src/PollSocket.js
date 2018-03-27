@@ -1,11 +1,11 @@
 // @flow
-import { Poll } from './models/Poll';
+import { Session } from './models/Session';
 import SocketIO from 'socket.io';
-import QuestionsRepo from './repos/QuestionsRepo';
 import PollsRepo from './repos/PollsRepo';
+import SessionsRepo from './repos/SessionsRepo';
 
-export type PollSocketConfig = {
-  poll: Poll,
+export type SessionSocketConfig = {
+  session: Session,
   nsp: SocketIO.Namespace,
   onClose: void => void
 }
@@ -13,7 +13,7 @@ export type PollSocketConfig = {
 type id = number;
 type IOSocket = Object;
 
-type Question = {
+type Poll = {
   id: number,
   text: string,
   type: string,
@@ -23,68 +23,68 @@ type Question = {
 type Answer = {
   id: id,
   googleId: string,
-  question: id,
+  poll: id,
   choice: string,
   text: string
 }
 
 type CurrentState = {
-  question: number,
+  poll: number,
   results: {}, // {'A': {'text': 'blue', 'count': 1}}
   answers: {} // id = client id, answer = current choice
 }
 
 /**
- * Represents a single running poll
+ * Represents a single running session
  */
-export default class PollSocket {
-  poll: Poll
+export default class SessionSocket {
+  session: Session
   nsp: SocketIO.Namespace
   onClose: void => void
   closing: boolean = false
 
   /**
-   * Stores all questions/answers for the poll.
+   * Stores all polls/answers for the session.
    */
-  questions: {
+  polls: {
     [string]: {
-      question: Question,
+      poll: Poll,
       answers: {
         [string]: Answer
       }
     }
   }
 
-  // Counter for generating question/answer ids
-  questionId: number;
+  // Counter for generating poll/answer ids
+  pollId: number;
   answerId: number;
 
-  lastQuestion = null;
+  lastPoll = null;
 
-  // Google ids of every admin/user who has joined the poll
+  // Google ids of every admin/user who has joined the session
   adminGoogleIds = [];
   userGoogleIds = [];
 
   current: CurrentState = {
-    question: -1, // id of current question object
+    poll: -1, // id of current poll object
     results: {},
     answers: {}
   }
 
-  constructor ({ poll, nsp, onClose }: PollSocketConfig) {
-    this.poll = poll;
+  constructor ({ session, nsp, onClose }: SessionSocketConfig) {
+    this.session = session;
     this.nsp = nsp;
     this.nsp.on('connect', this._onConnect.bind(this));
     this.onClose = onClose;
 
-    this.questions = {};
-    this.questionId = 0;
+    this.polls = {};
+    this.pollId = 0;
     this.answerId = 0;
   }
 
-  savePoll () {
-    console.log('save this polling session on user side');
-    this.nsp.to('users').emit('user/poll/save', this.poll);
+  saveSession () {
+    console.log('save this sessioning session on user side');
+    this.nsp.to('users').emit('user/session/save', this.session);
   }
 
   _clientError (client: IOSocket, msg: string): void {
@@ -112,9 +112,9 @@ export default class PollSocket {
       this._setupUserEvents(client);
       client.join('users');
 
-      const currentQuestion = this._currentQuestion();
-      if (currentQuestion) {
-        client.emit('user/question/start', { question: currentQuestion });
+      const currentPoll = this._currentPoll();
+      if (currentPoll) {
+        client.emit('user/poll/start', { poll: currentPoll });
       }
       break;
     default:
@@ -127,30 +127,30 @@ export default class PollSocket {
   }
 
   /** ***************************** User Side *************************** **/
-  // i.e. the server hears 'server/question/respond
+  // i.e. the server hears 'server/poll/respond
   /**
    * Events:
-   * /question/respond
-   * : User wants to update its answer to a question
+   * /poll/respond
+   * : User wants to update its answer to a poll
    * - Record the answer in volatile memory
    */
   _setupUserEvents (client: IOSocket): void {
-    client.on('server/question/tally', (answerObject: Object) => {
+    client.on('server/poll/tally', (answerObject: Object) => {
       const answer: Answer = {
         id: this.answerId,
         googleId: answerObject.googleId,
-        question: answerObject.question,
+        poll: answerObject.poll,
         choice: answerObject.choice,
         text: answerObject.text
       };
       this.answerId++;
-      const question = this._currentQuestion();
-      if (question === null) {
-        console.log(`Client ${client.id} sanswer on no question`);
+      const poll = this._currentPoll();
+      if (poll === null) {
+        console.log(`Client ${client.id} sanswer on no poll`);
         return;
       }
-      if (question.id !== answer.question) {
-        console.log(`Question ${answer.question} is not the current question`);
+      if (poll.id !== answer.poll) {
+        console.log(`Poll ${answer.poll} is not the current poll`);
         return;
       }
 
@@ -160,8 +160,8 @@ export default class PollSocket {
       if (prev) { // if truthy
         // has selected something before
         nextState.results[prev].count -= 1;
-        const question = this._currentQuestion();
-        if (question && question.type === 'FREE_RESPONSE') {
+        const poll = this._currentPoll();
+        if (poll && poll.type === 'FREE_RESPONSE') {
           if (nextState.results[prev].count <= 0) {
             delete nextState.results[prev];
           }
@@ -176,7 +176,7 @@ export default class PollSocket {
       }
 
       this.current = nextState;
-      this.nsp.to('admins').emit('admin/question/updateTally', this.current);
+      this.nsp.to('admins').emit('admin/poll/updateTally', this.current);
     });
 
     client.on('disconnect', () => {
@@ -189,55 +189,55 @@ export default class PollSocket {
 
   /** *************************** Admin Side *************************** **/
 
-  _currentQuestion (): Question | null {
-    if (this.current.question === -1) {
+  _currentPoll (): Poll | null {
+    if (this.current.poll === -1) {
       return null;
     } else {
-      return this.questions[`${this.current.question}`].question;
+      return this.polls[`${this.current.poll}`].poll;
     }
   }
 
-  _startQuestion (question: Question) {
-    // start new question
-    this.current.question = question.id;
-    if (!this.questions[`${question.id}`]) {
-      this.questions[`${question.id}`] = {
-        question,
+  _startPoll (poll: Poll) {
+    // start new poll
+    this.current.poll = poll.id;
+    if (!this.polls[`${poll.id}`]) {
+      this.polls[`${poll.id}`] = {
+        poll,
         answers: {}
       };
     }
     var results = {};
-    if (question.options) {
-      for (var i = 0; i < question.options.length; i++) {
+    if (poll.options) {
+      for (var i = 0; i < poll.options.length; i++) {
         results[String.fromCharCode(65 + i)] =
-          {'text': question.options[i], 'count': 0};
+          {'text': poll.options[i], 'count': 0};
       }
     }
     this.current.results = results;
     this.current.answers = {};
 
-    this.nsp.to('users').emit('user/question/start', { question });
+    this.nsp.to('users').emit('user/poll/start', { poll });
   }
 
-  _endQuestion = async () => {
-    const question = this._currentQuestion();
-    if (!question) {
+  _endPoll = async () => {
+    const poll = this._currentPoll();
+    if (!poll) {
       return;
     }
-    this.lastQuestion = await QuestionsRepo.createQuestion(question.text,
-      this.poll, this.current.results, false);
-    this.nsp.to('users').emit('user/question/end', {question});
+    this.lastPoll = await PollsRepo.createPoll(poll.text,
+      this.session, this.current.results, false);
+    this.nsp.to('users').emit('user/poll/end', {poll});
   }
 
   /**
    * Events:
-   * /question/start (quesiton: Question)
-   * : Admin wants to start a question
+   * /poll/start (quesiton: Poll)
+   * : Admin wants to start a poll
    * - Creates cache to store answers
-   * - Notifies clients new question has started
-   * /question/end (void)
-   * : Admin wants to close a question
-   * - Persists recieved questions
+   * - Notifies clients new poll has started
+   * /poll/end (void)
+   * : Admin wants to close a poll
+   * - Persists recieved polls
    * - Notifies clients quesiton is now closed
    */
   _setupAdminEvents (client: Object): void {
@@ -248,50 +248,50 @@ export default class PollSocket {
       return;
     }
 
-    // Start question
-    client.on('server/question/start', async (questionObject: Object) => {
-      const question: Question = {
-        id: this.questionId,
-        text: questionObject.text,
-        type: questionObject.type,
-        options: questionObject.options
+    // Start poll
+    client.on('server/poll/start', async (pollObject: Object) => {
+      const poll: Poll = {
+        id: this.pollId,
+        text: pollObject.text,
+        type: pollObject.type,
+        options: pollObject.options
       };
-      this.questionId++;
-      console.log('starting', question);
-      if (this.current.question !== -1) {
-        await this._endQuestion();
+      this.pollId++;
+      console.log('starting', poll);
+      if (this.current.poll !== -1) {
+        await this._endPoll();
       }
-      this._startQuestion(question);
+      this._startPoll(poll);
     });
 
     // share results
-    client.on('server/question/results', async () => {
-      const question = this._currentQuestion();
-      if (question === null) {
-        console.log(`Admin ${client.id} sharing results on no question`);
+    client.on('server/poll/results', async () => {
+      const poll = this._currentPoll();
+      if (poll === null) {
+        console.log(`Admin ${client.id} sharing results on no poll`);
         return;
       }
       console.log('sharing results');
-      // Update question to 'shared'
-      if (this.lastQuestion) {
-        await QuestionsRepo.updateQuestionById(this.lastQuestion.id, null,
+      // Update poll to 'shared'
+      if (this.lastPoll) {
+        await PollsRepo.updatePollById(this.lastPoll.id, null,
           null, true);
       }
       const current = this.current;
-      this.nsp.to('users').emit('user/question/results', current);
+      this.nsp.to('users').emit('user/poll/results', current);
     });
 
-    // End question
-    client.on('server/question/end', () => {
+    // End poll
+    client.on('server/poll/end', () => {
       console.log('ending quesiton');
-      this._endQuestion();
+      this._endPoll();
     });
 
     client.on('disconnect', async () => {
       console.log(`Admin ${client.id} disconnected.`);
-      await PollsRepo.addUsersByGoogleIds(this.poll.id, this.userGoogleIds,
+      await SessionsRepo.addUsersByGoogleIds(this.session.id, this.userGoogleIds,
         'user');
-      await PollsRepo.addUsersByGoogleIds(this.poll.id, this.adminGoogleIds,
+      await SessionsRepo.addUsersByGoogleIds(this.session.id, this.adminGoogleIds,
         'admin');
       if (this.nsp.connected.length === 0) {
         this.onClose();

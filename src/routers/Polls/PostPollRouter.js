@@ -2,7 +2,7 @@
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import PollsRepo from '../../repos/PollsRepo';
-import GroupsRepo from '../../repos/GroupsRepo';
+import SessionsRepo from '../../repos/SessionsRepo';
 import constants from '../../utils/constants';
 
 import type { APIPoll } from '../APITypes';
@@ -13,29 +13,35 @@ class PostPollRouter extends AppDevRouter<Object> {
   }
 
   getPath (): string {
-    return '/polls/';
+    return '/sessions/:id/poll/';
   }
 
   async content (req: Request): Promise<{ node: APIPoll }> {
-    var name = req.body.name;
-    const code = req.body.code;
-    const user = req.user;
-    const groupId = req.body.groupId;
+    const sessionId = req.params.id;
+    var text = req.body.text;
+    var results = req.body.results;
+    var shared = req.body.shared;
+    var user = req.user;
 
-    var group;
-    if (groupId) group = await GroupsRepo.getGroupById(groupId);
+    if (!text) text = '';
+    if (!results) results = {};
+    if (shared === null) shared = false;
 
-    if (!name) name = '';
-    if (!user) throw new Error('User missing');
-    if (!code) throw new Error('Code missing');
+    const session = await SessionsRepo.getSessionById(sessionId);
+    if (!session) throw new Error(`Couldn't find session with id ${sessionId}`);
 
-    const poll = await PollsRepo.createPoll(name, code, user, group);
+    if (!await SessionsRepo.isAdmin(sessionId, user)) {
+      throw new Error('You are not authorized to post a poll!');
+    }
+
+    const poll =
+      await PollsRepo.createPoll(text, session, results, shared);
 
     return {
       node: {
         id: poll.id,
-        name: poll.name,
-        code: poll.code
+        text: poll.text,
+        results: poll.results
       }
     };
   }
