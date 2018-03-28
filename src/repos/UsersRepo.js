@@ -79,12 +79,18 @@ const getUsers = async (): Promise<Array<?User>> => {
   }
 };
 
-// Get users from list of ids
-const getUsersFromIds = async (userIds: number[]): Promise<?Array<User>> => {
+// Get users from list of ids but filters out users with ids in filter
+const getUsersFromIds = async (userIds: number[], filter: ?number[]):
+Promise<?Array<User>> => {
   try {
     var ids = '(' + String(userIds) + ')';
+    var query = 'users.id IN ' + ids;
+    if (filter && filter.length > 0) {
+      var f = '(' + String(filter) + ')';
+      query += ' AND users.id not IN ' + f;
+    }
     const users = await db().createQueryBuilder('users')
-      .where('users.id IN ' + ids)
+      .where(query)
       .getMany();
     return users;
   } catch (e) {
