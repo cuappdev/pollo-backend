@@ -15,8 +15,8 @@ const db = (): Repository<Group> => {
 var groupCodes = {};
 
 // Create a group
-const createGroup = async (name: string, code: string, user: User, session: ?Session,
-  members: ?User[]): Promise<Group> => {
+const createGroup = async (name: string, code: string, user: User,
+  session: ?Session, members: ?User[]): Promise<Group> => {
   try {
     const group = new Group();
     group.name = name;
@@ -115,11 +115,18 @@ const addUsers = async (id: number, userIds: number[], role: ?string):
       .setParameters({ groupId: id })
       .getOne();
 
-    const users = await UsersRepo.getUsersFromIds(userIds);
-    if (users) {
+    if (group) {
       if (role === 'admin') {
-        group.admins = group.admins.concat(users);
+        const currAdminIds = group.admins.map(function (admin) {
+          return admin.id;
+        });
+        const admins = await UsersRepo.getUsersFromIds(userIds, currAdminIds);
+        group.admins = group.admins.concat(admins);
       } else {
+        const currUserIds = group.members.map(function (user) {
+          return user.id;
+        });
+        const users = await UsersRepo.getUsersFromIds(userIds, currUserIds);
         group.members = group.members.concat(users);
       }
     }
@@ -203,7 +210,8 @@ const getUsersByGroupId = async (id: number, role: ?string):
 };
 
 // Add a session to a group
-const addSessionByGroupId = async (id: number, session: Session): Promise<?Group> => {
+const addSessionByGroupId = async (id: number, session: Session):
+  Promise<?Group> => {
   try {
     const group = await db().createQueryBuilder('groups')
       .leftJoinAndSelect('groups.admins', 'admins')
@@ -221,7 +229,8 @@ const addSessionByGroupId = async (id: number, session: Session): Promise<?Group
 };
 
 // Remove a session from a group
-const removeSessionByGroupId = async (id: number, session: Session): Promise<?Group> => {
+const removeSessionByGroupId = async (id: number, session: Session):
+  Promise<?Group> => {
   try {
     const group = await db().createQueryBuilder('groups')
       .leftJoinAndSelect('groups.admins', 'admins')

@@ -65,7 +65,9 @@ const getSessionId = async (code: string) => {
       .where('sessions.code = :sessionCode')
       .setParameters({ sessionCode: code })
       .getOne();
-  if (!session) throw new Error('Could not find session associated with given code.');
+  if (!session) {
+    throw new Error('Could not find session associated with given code.');
+  }
   return session.id;
 };
 
