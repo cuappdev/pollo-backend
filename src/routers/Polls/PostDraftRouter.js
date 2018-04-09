@@ -1,11 +1,11 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
-import PollsRepo from '../../repos/PollsRepo';
+import DraftsRepo from '../../repos/DraftsRepo';
 import SessionsRepo from '../../repos/SessionsRepo';
 import constants from '../../utils/constants';
 
-import type { APIPoll } from '../APITypes';
+import type { APIDraft } from '../APITypes';
 
 class PostDraftRouter extends AppDevRouter<Object> {
   constructor () {
@@ -16,20 +16,21 @@ class PostDraftRouter extends AppDevRouter<Object> {
     return '/poll/';
   }
 
-  async content (req: Request): Promise<{ node: APIPoll }> {
+  async content (req: Request): Promise<{ node: APIDraft }> {
     var text = req.body.text;
+    var options = req.body.options;
     var user = req.user;
 
     if (!text) text = '';
+    if (!options) options = [];
 
-    const poll =
-      await PollsRepo.createDraft(text);
+    const draft = await DraftsRepo.createDraft(text, options);
 
     return {
       node: {
-        id: poll.id,
-        text: poll.text,
-        results: poll.results
+        id: draft.id,
+        text: draft.text,
+        options: draft.options
       }
     };
   }

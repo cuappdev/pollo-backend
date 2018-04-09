@@ -149,24 +149,8 @@ const getSessionFromPollId = async (id: number) : Promise<?Session> => {
   }
 };
 
-// Get the drafts of the user associated with [id]
-const getDrafts = async (id: number): Promise<Array<?Poll>> => {
-  try {
-    const user = await db().createQueryBuilder('users')
-      .leftJoinAndSelect('users.drafts', 'drafts')
-      .where('users.id = :userId')
-      .andWhere('drafts.session is NULL')
-      .setParameters({ userId: id })
-      .getOne();
-    return user.drafts;
-  } catch (e) {
-    throw new Error(`Problem getting drafts for user: ${id}`);
-  }
-}
-
 export default {
   createPoll,
-  createDraft,
   deletePollById,
   getPollById,
   updatePollById,
@@ -174,6 +158,5 @@ export default {
   deletePollsWithoutSession,
   deletePollsForSession,
   getSessionFromPollId,
-  getSharedPollsFromSessionId,
-  getDrafts
+  getSharedPollsFromSessionId
 };

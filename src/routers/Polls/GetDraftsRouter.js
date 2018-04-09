@@ -1,11 +1,11 @@
 // @flow
 import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
-import PollsRepo from '../../repos/PollsRepo';
+import DraftsRepo from '../../repos/DraftsRepo';
 import SessionsRepo from '../../repos/SessionsRepo';
 import constants from '../../utils/constants';
-import type { APIPoll } from '../APITypes';
+import type { APIDraft } from '../APITypes';
 
-class GetDraftsRouter extends AppDevEdgeRouter<APIPoll> {
+class GetDraftsRouter extends AppDevEdgeRouter<APIDraft> {
   constructor () {
     super(constants.REQUEST_TYPES.GET);
   }
@@ -15,18 +15,18 @@ class GetDraftsRouter extends AppDevEdgeRouter<APIPoll> {
   }
 
   async contentArray (req, pageInfo, error) {
-    var polls = await PollsRepo.getDrafts(req.user.id);
+    var drafts = await DraftsRepo.getDraftsByUser(req.user.id);
 
-    return polls
+    return drafts
       .filter(Boolean)
-      .map(function (poll) {
+      .map(function (draft) {
         return {
           node: {
-            id: poll.id,
-            text: poll.text,
-            results: poll.results
+            id: draft.id,
+            text: draft.text,
+            options: draft.options
           },
-          cursor: poll.createdAt.valueOf()
+          cursor: draft.createdAt.valueOf()
         };
       });
   }

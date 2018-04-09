@@ -7,10 +7,10 @@ import {
   OneToMany,
   JoinTable
 } from 'typeorm';
+import { Draft } from './Draft';
 import { Base } from './Base';
 import { Session } from './Session';
 import { Group } from './Group';
-import { Poll } from './Poll';
 import appDevUtils from '../utils/appDevUtils';
 
 @Entity('users')
@@ -47,9 +47,9 @@ export class User extends Base {
   @JoinTable()
   memberGroups: ?Group[] = [];
 
-  @OneToMany(type => Poll, poll => poll.user)
+  @OneToMany(type => Draft, draft => draft.user)
   @JoinTable()
-  drafts: ?Poll[] = [];
+  drafts: ?Draft[] = [];
 
   static dummy (id: string): User {
     const user = new User();
