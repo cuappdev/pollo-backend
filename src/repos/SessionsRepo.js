@@ -78,8 +78,8 @@ const deleteSessionById = async (id: number) => {
     if (session.code in sessionCodes) {
       delete sessionCodes[session.code];
     }
+    await PollsRepo.deletePollsForSession(id);
     await db().remove(session);
-    await PollsRepo.deletePollsWithoutSession();
   } catch (e) {
     throw new Error(`Problem deleting session by id: ${id}!`);
   }

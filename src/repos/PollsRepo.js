@@ -25,6 +25,21 @@ const createPoll = async (text: string, session: Session, results: json,
   }
 };
 
+// Create a draft
+const createDraft = async (text: string):
+  Promise <Poll> => {
+  try {
+    const poll = new Poll();
+    poll.text = text;
+    poll.shared = false;
+
+    await db().persist(poll);
+    return poll;
+  } catch (e) {
+    throw new Error('Problem creating poll!');
+  }
+};
+
 // Get a poll by id
 const getPollById = async (id: number): Promise<?Poll> => {
   try {
@@ -107,6 +122,20 @@ const deletePollsWithoutSession = async () => {
   }
 };
 
+// Delete polls where poll.session.id = id, typeorm's cascade doesn't work
+const deletePollsForSession = async (id: number) => {
+  try {
+    await db().createQueryBuilder('polls')
+      .leftJoinAndSelect('polls.session', 'session')
+      .delete()
+      .where('session.id = :sessionId')
+      .setParameters({ sessionId: id })
+      .execute();
+  } catch (e) {
+    throw new Error('Problem removing polls with no session reference.');
+  }
+};
+
 // Get a session from poll
 const getSessionFromPollId = async (id: number) : Promise<?Session> => {
   try {
@@ -120,13 +149,31 @@ const getSessionFromPollId = async (id: number) : Promise<?Session> => {
   }
 };
 
+// Get the drafts of the user associated with [id]
+const getDrafts = async (id: number): Promise<Array<?Poll>> => {
+  try {
+    const user = await db().createQueryBuilder('users')
+      .leftJoinAndSelect('users.drafts', 'drafts')
+      .where('users.id = :userId')
+      .andWhere('drafts.session is NULL')
+      .setParameters({ userId: id })
+      .getOne();
+    return user.drafts;
+  } catch (e) {
+    throw new Error(`Problem getting drafts for user: ${id}`);
+  }
+}
+
 export default {
   createPoll,
+  createDraft,
   deletePollById,
   getPollById,
   updatePollById,
   getPollsFromSessionId,
   deletePollsWithoutSession,
+  deletePollsForSession,
   getSessionFromPollId,
-  getSharedPollsFromSessionId
+  getSharedPollsFromSessionId,
+  getDrafts
 };

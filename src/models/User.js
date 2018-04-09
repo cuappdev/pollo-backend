@@ -4,11 +4,13 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToMany,
+  OneToMany,
   JoinTable
 } from 'typeorm';
 import { Base } from './Base';
 import { Session } from './Session';
 import { Group } from './Group';
+import { Poll } from './Poll';
 import appDevUtils from '../utils/appDevUtils';
 
 @Entity('users')
@@ -44,6 +46,10 @@ export class User extends Base {
   @ManyToMany(type => Group, group => group.members)
   @JoinTable()
   memberGroups: ?Group[] = [];
+
+  @OneToMany(type => Poll)
+  @JoinTable()
+  drafts: ?Poll[] = [];
 
   static dummy (id: string): User {
     const user = new User();
