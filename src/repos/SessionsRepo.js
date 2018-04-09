@@ -78,7 +78,8 @@ const deleteSessionById = async (id: number) => {
     if (session.code in sessionCodes) {
       delete sessionCodes[session.code];
     }
-    await PollsRepo.deletePollsForSession(id);
+    // Cascading does work???
+    // await PollsRepo.deletePollsForSession(id);
     await db().remove(session);
   } catch (e) {
     throw new Error(`Problem deleting session by id: ${id}!`);

@@ -47,7 +47,7 @@ export class User extends Base {
   @JoinTable()
   memberGroups: ?Group[] = [];
 
-  @OneToMany(type => Poll)
+  @OneToMany(type => Poll, poll => poll.user)
   @JoinTable()
   drafts: ?Poll[] = [];
 

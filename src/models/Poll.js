@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Base } from './Base';
 import { Session } from './Session';
+import { User } from './User';
 
 @Entity('polls')
 export class Poll extends Base {
@@ -27,4 +28,7 @@ export class Poll extends Base {
 
   @Column('boolean')
   shared: boolean = true;
+
+  @ManyToOne(type => User, user => user.drafts)
+  user: ?User = null;
 }
