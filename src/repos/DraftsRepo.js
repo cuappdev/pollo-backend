@@ -35,7 +35,27 @@ const getDraftsByUser = async (id: number): Promise<Array<?Draft>> => {
   }
 }
 
+// Update draft by id
+const updateDraft = async (id: number, text: ?string, options: ?string[]): Promise<?Draft> => {
+  try {
+    const draft = db().findOneById(id);
+    var field = {};
+    if (text) field.text = text;
+    if (options) field.options = options;
+
+    await db().createQueryBuilder('drafts')
+      .where('drafts.id = :draftId')
+      .setParameters({ draftId: id })
+      .update(field)
+      .execute();
+    return await db().findOneById(id);
+  } catch (e) {
+    throw new Error(`Problem updating draft with id: ${id}`);
+  }
+}
+
 export default {
   createDraft,
-  getDraftsByUser
+  getDraftsByUser,
+  updateDraft
 };
