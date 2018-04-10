@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToMany,
+  OneToMany,
   JoinTable
 } from 'typeorm';
+import { Draft } from './Draft';
 import { Base } from './Base';
 import { Session } from './Session';
 import { Group } from './Group';
@@ -44,6 +46,9 @@ export class User extends Base {
   @ManyToMany(type => Group, group => group.members)
   @JoinTable()
   memberGroups: ?Group[] = [];
+
+  @OneToMany(type => Draft, draft => draft.user)
+  drafts: ?Draft[] = [];
 
   static dummy (id: string): User {
     const user = new User();

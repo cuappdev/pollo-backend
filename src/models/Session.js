@@ -28,7 +28,9 @@ export class Session extends Base {
   @JoinTable()
   admins: ?User[] = [];
 
-  @OneToMany(type => Poll, poll => poll.session)
+  @OneToMany(type => Poll, poll => poll.session, {
+        cascadeRemove: true
+    })
   polls: ?Poll[] = [];
 
   @ManyToMany(type => User, user => user.memberSessions)

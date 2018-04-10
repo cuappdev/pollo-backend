@@ -35,6 +35,12 @@ export type APIPoll = {|
   results: Object
 |}
 
+export type APIDraft = {|
+  id: id,
+  text: string,
+  options: string[]
+|}
+
 export type APIUser = {|
   id: id,
   name: string,
