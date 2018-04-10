@@ -11,7 +11,7 @@ class GetDraftsRouter extends AppDevEdgeRouter<APIDraft> {
   }
 
   getPath (): string {
-    return '/polls/';
+    return '/drafts/';
   }
 
   async contentArray (req, pageInfo, error) {

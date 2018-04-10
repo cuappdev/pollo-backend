@@ -8,7 +8,6 @@ import {
 } from 'typeorm';
 import { Base } from './Base';
 import { Session } from './Session';
-import { User } from './User';
 
 @Entity('polls')
 export class Poll extends Base {

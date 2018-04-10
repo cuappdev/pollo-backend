@@ -13,7 +13,7 @@ class PostDraftRouter extends AppDevRouter<Object> {
   }
 
   getPath (): string {
-    return '/poll/';
+    return '/drafts/';
   }
 
   async content (req: Request): Promise<{ node: APIDraft }> {

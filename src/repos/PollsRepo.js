@@ -25,21 +25,6 @@ const createPoll = async (text: string, session: Session, results: json,
   }
 };
 
-// Create a draft
-const createDraft = async (text: string):
-  Promise <Poll> => {
-  try {
-    const poll = new Poll();
-    poll.text = text;
-    poll.shared = false;
-
-    await db().persist(poll);
-    return poll;
-  } catch (e) {
-    throw new Error('Problem creating poll!');
-  }
-};
-
 // Get a poll by id
 const getPollById = async (id: number): Promise<?Poll> => {
   try {
@@ -110,32 +95,6 @@ const getSharedPollsFromSessionId = async (id: number):
   }
 };
 
-// Delete polls where poll.session = null, typeorm's cascade doesn't work
-const deletePollsWithoutSession = async () => {
-  try {
-    await db().createQueryBuilder('polls')
-      .delete()
-      .where('polls.session is NULL')
-      .execute();
-  } catch (e) {
-    throw new Error('Problem removing polls with no session reference.');
-  }
-};
-
-// Delete polls where poll.session.id = id, typeorm's cascade doesn't work
-const deletePollsForSession = async (id: number) => {
-  try {
-    await db().createQueryBuilder('polls')
-      .leftJoinAndSelect('polls.session', 'session')
-      .delete()
-      .where('session.id = :sessionId')
-      .setParameters({ sessionId: id })
-      .execute();
-  } catch (e) {
-    throw new Error('Problem removing polls with no session reference.');
-  }
-};
-
 // Get a session from poll
 const getSessionFromPollId = async (id: number) : Promise<?Session> => {
   try {
@@ -155,8 +114,6 @@ export default {
   getPollById,
   updatePollById,
   getPollsFromSessionId,
-  deletePollsWithoutSession,
-  deletePollsForSession,
   getSessionFromPollId,
   getSharedPollsFromSessionId
 };

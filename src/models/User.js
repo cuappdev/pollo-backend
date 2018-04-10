@@ -48,7 +48,6 @@ export class User extends Base {
   memberGroups: ?Group[] = [];
 
   @OneToMany(type => Draft, draft => draft.user)
-  @JoinTable()
   drafts: ?Draft[] = [];
 
   static dummy (id: string): User {

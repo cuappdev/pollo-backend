@@ -27,7 +27,7 @@ class UpdateDraftRouter extends AppDevRouter<Object> {
 
     const draft = await DraftsRepo.updateDraft(draftId, text, options);
     if (!draft) {
-      throw new Error(`Poll with id ${draftId} was not found!`);
+      throw new Error(`Draft with id ${draftId} was not found!`);
     }
 
     return {

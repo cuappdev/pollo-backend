@@ -20,7 +20,7 @@ const createDraft = async (text: string, options: string[], user: User):
     await db().persist(draft);
     return draft;
   } catch (e) {
-    throw new Error('Problem creating poll!');
+    throw new Error('Problem creating draft!');
   }
 };
 
