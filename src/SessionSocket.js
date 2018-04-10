@@ -289,10 +289,10 @@ export default class SessionSocket {
 
     client.on('disconnect', async () => {
       console.log(`Admin ${client.id} disconnected.`);
-      await SessionsRepo.addUsersByGoogleIds(this.session.id, this.userGoogleIds,
-        'user');
-      await SessionsRepo.addUsersByGoogleIds(this.session.id, this.adminGoogleIds,
-        'admin');
+      await SessionsRepo.addUsersByGoogleIds(this.session.id,
+        this.userGoogleIds, 'user');
+      await SessionsRepo.addUsersByGoogleIds(this.session.id,
+        this.adminGoogleIds, 'admin');
       if (this.nsp.connected.length === 0) {
         this.onClose();
       }
