@@ -24,7 +24,7 @@ class PostDraftRouter extends AppDevRouter<Object> {
     if (!text) text = '';
     if (!options) options = [];
 
-    const draft = await DraftsRepo.createDraft(text, options);
+    const draft = await DraftsRepo.createDraft(text, options, user);
 
     return {
       node: {

@@ -8,11 +8,13 @@ const db = (): Repository<Draft> => {
 };
 
 // Create a draft
-const createDraft = async (text: string, options: string[]): Promise<Draft> => {
+const createDraft = async (text: string, options: string[], user: User):
+  Promise<Draft> => {
   try {
     const draft = new Draft();
     draft.text = text;
     draft.options = options;
+    draft.user = user;
 
 
     await db().persist(draft);
@@ -21,6 +23,20 @@ const createDraft = async (text: string, options: string[]): Promise<Draft> => {
     throw new Error('Problem creating poll!');
   }
 };
+
+// Get draft by id
+const getDraft = async (id: number): Promise<Draft> => {
+  try {
+    const draft = await db().createQueryBuilder('drafts')
+      .leftJoinAndSelect('drafts.user', 'users')
+      .where('drafts.id = :draftId')
+      .setParameters({ draftId: id })
+      .getOne();
+    return draft;
+  } catch (e) {
+    throw new Error(`Problem getting draft with id: ${id}`);
+  }
+}
 
 // Get drafts by user id
 const getDraftsByUser = async (id: number): Promise<Array<?Draft>> => {
@@ -54,8 +70,20 @@ const updateDraft = async (id: number, text: ?string, options: ?string[]): Promi
   }
 }
 
+// Delete draft by id
+const deleteDraft = async (id: number) => {
+  try {
+    const draft = await db().findOneById(id);
+    await db().remove(draft);
+  } catch (e) {
+    throw new Error(`Problem deleting draft with id: ${id}`);
+  }
+}
+
 export default {
   createDraft,
   getDraftsByUser,
-  updateDraft
+  updateDraft,
+  deleteDraft,
+  getDraft
 };
