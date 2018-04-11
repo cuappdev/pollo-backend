@@ -59,13 +59,14 @@ test('Get Session from Poll', async () => {
 });
 
 test('Delete Poll', async () => {
-  await PollsRepo.deletePollById(id);
+  await SessionsRepo.deleteSessionById(session.id);
+  // await PollsRepo.deletePollById(id);
   expect(await PollsRepo.getPollById(id)).not.toBeDefined();
 });
 
 // Teardown
 afterAll(async () => {
-  await SessionsRepo.deleteSessionById(session.id);
+  // await SessionsRepo.deleteSessionById(session.id);
   await UsersRepo.deleteUserById(user.id);
   console.log('Passed all poll tests');
 });

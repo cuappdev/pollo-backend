@@ -95,18 +95,6 @@ const getSharedPollsFromSessionId = async (id: number):
   }
 };
 
-// Delete polls where poll.session = null, typeorm's cascade doesn't work
-const deletePollsWithoutSession = async () => {
-  try {
-    await db().createQueryBuilder('polls')
-      .delete()
-      .where('polls.session is NULL')
-      .execute();
-  } catch (e) {
-    throw new Error('Problem removing polls with no session reference.');
-  }
-};
-
 // Get a session from poll
 const getSessionFromPollId = async (id: number) : Promise<?Session> => {
   try {
@@ -126,7 +114,6 @@ export default {
   getPollById,
   updatePollById,
   getPollsFromSessionId,
-  deletePollsWithoutSession,
   getSessionFromPollId,
   getSharedPollsFromSessionId
 };
