@@ -11,7 +11,7 @@ class GetUser extends AppDevNodeRouter<APIUser> {
 
   async fetchWithId (id: number) {
     const user = await UsersRepo.getUserById(id);
-    if (!user) throw new Error(`Can not find user with id ${id}!`);
+    if (!user) throw new Error(`Cannot find user with id ${id}!`);
     return user && {
       id: user.id,
       name: user.firstName + ' ' + user.lastName,

@@ -8,7 +8,7 @@ const { get, post, del, put } = require('./lib');
 // Must be running server to test
 
 const googleId = 'usertest';
-var session, poll, userId, session, token;
+var session, poll, userId, token;
 
 beforeAll(async () => {
   await dbConnection().catch(function (e) {

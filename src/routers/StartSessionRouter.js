@@ -2,6 +2,7 @@
 import AppDevRouter from '../utils/AppDevRouter';
 import constants from '../utils/constants';
 import SessionsRepo from '../repos/SessionsRepo';
+import GroupsRepo from '../repos/GroupsRepo';
 import {Request} from 'express';
 import type { APISession } from './APITypes';
 
@@ -16,19 +17,24 @@ class StartSessionRouter extends AppDevRouter<APISession> {
 
   async content (req: Request) {
     const id = req.body.id;
-    const deviceId = req.body.deviceId;
     const code = req.body.code;
+    const groupId = req.body.groupId;
     var name = req.body.name;
 
     if (!name) name = '';
     var session = await SessionsRepo.getSessionById(id);
 
-    if (!(id || (code && deviceId))) {
+    if (!(id || code)) {
       throw new Error('Session id, or code and device id required.');
     }
 
     if (!id) {
-      session = await SessionsRepo.createSession(name, code, deviceId);
+      if (!groupId) {
+        session = await SessionsRepo.createSession(name, code, req.user);
+      } else {
+        const group = await GroupsRepo.getGroupById(groupId);
+        session = await SessionsRepo.createSession(name, code, req.user, group);
+      }
     }
 
     if (!session) {
