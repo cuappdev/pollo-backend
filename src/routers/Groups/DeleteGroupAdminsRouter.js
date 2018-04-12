@@ -16,7 +16,7 @@ class DeleteGroupAdminsRouter extends AppDevRouter<Object> {
   async content (req: Request) {
     const groupId = req.params.id;
     const user = req.user;
-    const adminIds = req.body.adminIds;
+    const adminIds = JSON.parse(req.body.adminIds);
 
     if (!adminIds) throw new Error('List of admin ids missing!');
 

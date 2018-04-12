@@ -16,7 +16,7 @@ class PostGroupMembersRouter extends AppDevRouter<Object> {
   async content (req: Request) {
     const id = req.params.id;
     const user = req.user;
-    const memberIds = req.body.memberIds;
+    const memberIds = JSON.parse(req.body.memberIds);
 
     if (!memberIds) throw new Error('List of member ids missing!');
 
