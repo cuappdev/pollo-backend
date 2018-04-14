@@ -7,7 +7,7 @@ import {
   ManyToMany
 } from 'typeorm';
 import { Base } from './Base';
-import { Session } from './Session';
+import { Poll } from './Poll';
 import { User } from './User';
 
 @Entity('groups')
@@ -24,8 +24,8 @@ export class Group extends Base {
   @ManyToMany(type => User, user => user.adminGroups)
   admins: ?User[] = [];
 
-  @OneToMany(type => Session, session => session.group)
-  sessions: ?Session[] = [];
+  @OneToMany(type => Poll, poll => poll.group)
+  polls: ?Poll[] = [];
 
   @ManyToMany(type => User, user => user.memberGroups)
   members: ?User[] = [];

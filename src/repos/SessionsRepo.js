@@ -4,7 +4,6 @@ import { Session } from '../models/Session';
 import { User } from '../models/User';
 import { Group } from '../models/Group';
 import appDevUtils from '../utils/appDevUtils';
-import PollsRepo from '../repos/PollsRepo';
 import GroupsRepo from './GroupsRepo';
 import UsersRepo from './UsersRepo';
 

@@ -51,7 +51,8 @@ const getDraftsByUser = async (id: number): Promise<Array<?Draft>> => {
 };
 
 // Update draft by id
-const updateDraft = async (id: number, text: ?string, options: ?string[]): Promise<?Draft> => {
+const updateDraft = async (id: number, text: ?string, options: ?string[]):
+  Promise<?Draft> => {
   try {
     var field = {};
     if (text) field.text = text;
@@ -78,10 +79,26 @@ const deleteDraft = async (id: number) => {
   }
 };
 
+// Get owner of draft by id
+const getOwnerById = async (id: number): Promise<?User> => {
+  try {
+    const draft = await db().createQueryBuilder('drafts')
+      .leftJoinAndSelect('drafts.user', 'user')
+      .where('drafts.id = :draftId')
+      .setParameters({ draftId: id })
+      .getOne();
+
+    return draft.user;
+  } catch (e) {
+    throw new Error(`Problem getting owner of draft with id: ${id}`);
+  }
+};
+
 export default {
   createDraft,
   getDraftsByUser,
   updateDraft,
   deleteDraft,
-  getDraft
+  getDraft,
+  getOwnerById
 };

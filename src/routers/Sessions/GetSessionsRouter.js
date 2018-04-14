@@ -2,33 +2,33 @@
 import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
 import GroupsRepo from '../../repos/GroupsRepo';
 import constants from '../../utils/constants';
-import type { APISession } from '../APITypes';
+import type { APIPoll } from '../APITypes';
 
-class GetSessionsRouter extends AppDevEdgeRouter<APISession> {
+class GetPollsRouter extends AppDevEdgeRouter<APIPoll> {
   constructor () {
     super(constants.REQUEST_TYPES.GET);
   }
 
   getPath (): string {
-    return '/groups/:id/sessions/';
+    return '/groups/:id/polls/';
   }
 
   async contentArray (req, pageInfo, error) {
     const id = req.params.id;
-    const sessions = await GroupsRepo.getSessionsById(id);
-    return sessions
+    const polls = await GroupsRepo.getPollsById(id);
+    return polls
       .filter(Boolean)
-      .map(function (session) {
+      .map(function (poll) {
         return {
           node: {
-            id: session.id,
-            name: session.name,
-            code: session.code
+            id: poll.id,
+            text: poll.text,
+            results: poll.results
           },
-          cursor: session.createdAt.valueOf()
+          cursor: poll.createdAt.valueOf()
         };
       });
   }
 }
 
-export default new GetSessionsRouter().router;
+export default new GetPollsRouter().router;
