@@ -1,7 +1,6 @@
 // @flow
 import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
 import DraftsRepo from '../../repos/DraftsRepo';
-import SessionsRepo from '../../repos/SessionsRepo';
 import constants from '../../utils/constants';
 import type { APIDraft } from '../APITypes';
 

@@ -1,5 +1,5 @@
 // @flow
-import { getConnectionManager, Repository, json } from 'typeorm';
+import { getConnectionManager, Repository } from 'typeorm';
 import { User } from '../models/User';
 import { Draft } from '../models/Draft';
 
@@ -15,7 +15,6 @@ const createDraft = async (text: string, options: string[], user: User):
     draft.text = text;
     draft.options = options;
     draft.user = user;
-
 
     await db().persist(draft);
     return draft;
@@ -36,7 +35,7 @@ const getDraft = async (id: number): Promise<Draft> => {
   } catch (e) {
     throw new Error(`Problem getting draft with id: ${id}`);
   }
-}
+};
 
 // Get drafts by user id
 const getDraftsByUser = async (id: number): Promise<Array<?Draft>> => {
@@ -49,12 +48,11 @@ const getDraftsByUser = async (id: number): Promise<Array<?Draft>> => {
   } catch (e) {
     throw new Error(`Problem getting drafts for user with id: ${id}`);
   }
-}
+};
 
 // Update draft by id
 const updateDraft = async (id: number, text: ?string, options: ?string[]): Promise<?Draft> => {
   try {
-    const draft = db().findOneById(id);
     var field = {};
     if (text) field.text = text;
     if (options) field.options = options;
@@ -68,7 +66,7 @@ const updateDraft = async (id: number, text: ?string, options: ?string[]): Promi
   } catch (e) {
     throw new Error(`Problem updating draft with id: ${id}`);
   }
-}
+};
 
 // Delete draft by id
 const deleteDraft = async (id: number) => {
@@ -78,7 +76,7 @@ const deleteDraft = async (id: number) => {
   } catch (e) {
     throw new Error(`Problem deleting draft with id: ${id}`);
   }
-}
+};
 
 export default {
   createDraft,
