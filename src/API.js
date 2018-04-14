@@ -133,9 +133,9 @@ class API {
 
       registered.push(...router.stack
         .filter(r => r.route)
-        .map(r => `/api/v1${r.route.path}`));
+        .map(r => `/api/v2${r.route.path}`));
 
-      this.express.use('/api/v1', router);
+      this.express.use('/api/v2', router);
     });
 
     // Fallback prints all registered routes

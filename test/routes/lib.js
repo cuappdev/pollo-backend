@@ -5,7 +5,7 @@ const post = (path, body, token) => {
     method: 'POST',
     headers: { 'content-type': 'application/x-www-form-urlencoded',
       'Authorization': 'Bearer ' + token},
-    uri: 'http://localhost:3000/api/v1' + path,
+    uri: 'http://localhost:3000/api/v2' + path,
     body: formurlencoded(body)
   };
 };
@@ -15,7 +15,7 @@ const put = (path, body, token) => {
     method: 'PUT',
     headers: { 'content-type': 'application/x-www-form-urlencoded',
       'Authorization': 'Bearer ' + token },
-    uri: 'http://localhost:3000/api/v1' + path,
+    uri: 'http://localhost:3000/api/v2' + path,
     body: formurlencoded(body)
   };
 };
@@ -24,7 +24,7 @@ const get = (path, token) => {
   return {
     method: 'GET',
     headers: { 'Authorization': 'Bearer ' + token },
-    uri: 'http://localhost:3000/api/v1' + path
+    uri: 'http://localhost:3000/api/v2' + path
   };
 };
 
@@ -32,7 +32,7 @@ const del = (path, token) => {
   return {
     method: 'DELETE',
     headers: { 'Authorization': 'Bearer ' + token },
-    uri: 'http://localhost:3000/api/v1' + path
+    uri: 'http://localhost:3000/api/v2' + path
   };
 };
 
