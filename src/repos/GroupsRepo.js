@@ -81,7 +81,6 @@ const deleteGroupById = async (id: number) => {
       delete groupCodes[group.code];
     }
     await db().remove(group);
-    await SessionsRepo.deleteSessionsWithOutGroup();
   } catch (e) {
     throw new Error(`Problem deleting group by id: ${id}!`);
   }

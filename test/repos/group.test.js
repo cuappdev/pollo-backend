@@ -36,8 +36,7 @@ test('Create Group', async () => {
   expect(group.name).toBe('Group');
   expect(group.admins.length).toBe(1);
   expect(group.members.length).toBe(0);
-  expect(group.sessions.length).toBe(1);
-  expect(group.sessions[0].code).toBe('');
+  expect(group.polls.length).toBe(0);
 
   groupId = group.id;
 });
@@ -85,21 +84,6 @@ test('Remove Admin From Group', async () => {
   expect(isAdmin).toBe(false);
   expect(members.length).toBe(0);
   expect(admins.length).toBe(1);
-});
-
-test('Add Session To Group', async () => {
-  await GroupsRepo.addSessionByGroupId(groupId, sessionTwo);
-  const sessions = await GroupsRepo.getSessionsById(groupId);
-  expect(sessions.length).toBe(2);
-  expect(sessions[0].id).toBe(sessionOne.id);
-  expect(sessions[1].id).toBe(sessionTwo.id);
-});
-
-test('Remove Session From Group', async () => {
-  await GroupsRepo.removeSessionByGroupId(groupId, sessionOne);
-  const sessions = await GroupsRepo.getSessionsById(groupId);
-  expect(sessions.length).toBe(1);
-  expect(sessions[0].id).toBe(sessionTwo.id);
 });
 
 test('Delete group', async () => {
