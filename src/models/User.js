@@ -4,13 +4,11 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToMany,
-  OneToMany,
-  JoinTable
+  OneToMany
 } from 'typeorm';
 import { Draft } from './Draft';
 import { Base } from './Base';
 import { Session } from './Session';
-import { Group } from './Group';
 import appDevUtils from '../utils/appDevUtils';
 
 @Entity('users')
@@ -38,14 +36,6 @@ export class User extends Base {
 
   @ManyToMany(type => Session, session => session.members)
   memberSessions: ?Session[] = [];
-
-  @ManyToMany(type => Group, group => group.admins)
-  @JoinTable()
-  adminGroups: ?Group[] = [];
-
-  @ManyToMany(type => Group, group => group.members)
-  @JoinTable()
-  memberGroups: ?Group[] = [];
 
   @OneToMany(type => Draft, draft => draft.user)
   drafts: ?Draft[] = [];

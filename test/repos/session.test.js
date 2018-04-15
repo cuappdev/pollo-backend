@@ -19,7 +19,7 @@ test('Create Session', async () => {
   code = SessionsRepo.createCode();
   user = await UsersRepo.createDummyUser('sessiontest1');
 
-  const session = await SessionsRepo.createSession('Session', code, user);
+  const session = await SessionsRepo.createSession('Session', code, user, false);
   expect(session.name).toBe('Session');
   expect(session.code).toBe(code);
   expect(session.admins[0].googleId).toBe(user.googleId);

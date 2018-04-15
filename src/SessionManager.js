@@ -64,6 +64,16 @@ class SessionManager {
         return l.session;
       });
   }
+
+  isLive (sessionCode: ?string, id: ?number): Boolean {
+    const socket = this.sessionSockets.find(function (x) {
+      if (x && x.session) {
+        return x.session.code === sessionCode || x.session.id === id;
+      }
+      return false;
+    });
+    return (socket !== undefined);
+  }
 }
 
 export default SessionManager;

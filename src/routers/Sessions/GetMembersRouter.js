@@ -1,21 +1,21 @@
 // @flow
 import AppDevEdgeRouter from '../../utils/AppDevEdgeRouter';
-import GroupsRepo from '../../repos/GroupsRepo';
+import SessionsRepo from '../../repos/SessionsRepo';
 import constants from '../../utils/constants';
 import type { APIUser } from '../APITypes';
 
-class GetGroupMembersRouter extends AppDevEdgeRouter<APIUser> {
+class GetMembersRouter extends AppDevEdgeRouter<APIUser> {
   constructor () {
     super(constants.REQUEST_TYPES.GET);
   }
 
   getPath (): string {
-    return '/groups/:id/members/';
+    return '/sessions/:id/members/';
   }
 
   async contentArray (req, pageInfo, error) {
     const id = req.params.id;
-    const users = await GroupsRepo.getUsersByGroupId(id, 'member');
+    const users = await SessionsRepo.getUsersBySessionId(id, 'member');
     return users
       .filter(Boolean)
       .map(function (user) {
@@ -31,4 +31,4 @@ class GetGroupMembersRouter extends AppDevEdgeRouter<APIUser> {
   }
 }
 
-export default new GetGroupMembersRouter().router;
+export default new GetMembersRouter().router;

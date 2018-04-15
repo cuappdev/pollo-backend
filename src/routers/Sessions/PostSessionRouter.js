@@ -2,7 +2,6 @@
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import SessionsRepo from '../../repos/SessionsRepo';
-import GroupsRepo from '../../repos/GroupsRepo';
 import constants from '../../utils/constants';
 
 import type { APISession } from '../APITypes';
@@ -19,23 +18,24 @@ class PostSessionRouter extends AppDevRouter<Object> {
   async content (req: Request): Promise<{ node: APISession }> {
     var name = req.body.name;
     const code = req.body.code;
+    var isGroup = req.body.isGroup;
     const user = req.user;
-    const groupId = req.body.groupId;
-
-    var group;
-    if (groupId) group = await GroupsRepo.getGroupById(groupId);
 
     if (!name) name = '';
     if (!user) throw new Error('User missing');
     if (!code) throw new Error('Code missing');
+    if (isGroup === null || isGroup === undefined) isGroup = false;
 
-    const session = await SessionsRepo.createSession(name, code, user, group);
+    console.log(isGroup);
+
+    const session = await SessionsRepo.createSession(name, code, user, isGroup);
 
     return {
       node: {
         id: session.id,
         name: session.name,
-        code: session.code
+        code: session.code,
+        isGroup: session.isGroup
       }
     };
   }

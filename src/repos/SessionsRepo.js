@@ -2,9 +2,8 @@
 import { getConnectionManager, Repository } from 'typeorm';
 import { Session } from '../models/Session';
 import { User } from '../models/User';
-import { Group } from '../models/Group';
+import { Poll } from '../models/Poll';
 import appDevUtils from '../utils/appDevUtils';
-import GroupsRepo from './GroupsRepo';
 import UsersRepo from './UsersRepo';
 
 const db = (): Repository<Session> => {
@@ -16,16 +15,18 @@ var sessionCodes = {};
 
 // Create a session
 const createSession = async (name: string, code: string, user: User,
-  group: ?Group):
+  isGroup: boolean):
   Promise<Session> => {
   try {
     const session = new Session();
     session.name = name;
     session.code = code;
+    if (isGroup !== null && isGroup !== undefined) {
+      session.isGroup = isGroup;
+    }
     session.admins = [user];
-    if (group) session.group = group;
 
-    if (sessionCodes[code] || GroupsRepo.groupCodes[code]) {
+    if (sessionCodes[code]) {
       throw new Error('Session code is already in use');
     }
 
@@ -133,8 +134,34 @@ const addUsersByGoogleIds = async (id: number, googleIds: string[],
       .where('sessions.id = :sessionId')
       .setParameters({ sessionId: id })
       .getOne();
-
     const users = await UsersRepo.getUsersByGoogleIds(googleIds);
+    if (users) {
+      if (role === 'admin') {
+        session.admins = session.admins.concat(users);
+      } else {
+        session.members = session.members.concat(users);
+      }
+    }
+
+    await db().persist(session);
+    return session;
+  } catch (e) {
+    throw new Error('Problem adding users to session by groupIds!');
+  }
+};
+
+// Add a list of admins/member ids to a session
+const addUsersByIds = async (id: number, userIds: number[],
+  role: ?string): Promise<?Session> => {
+  try {
+    const session = await db().createQueryBuilder('sessions')
+      .leftJoinAndSelect('sessions.admins', 'admins')
+      .leftJoinAndSelect('sessions.members', 'members')
+      .leftJoinAndSelect('sessions.polls', 'polls')
+      .where('sessions.id = :sessionId')
+      .setParameters({ sessionId: id })
+      .getOne();
+    const users = await UsersRepo.getUsersFromIds(userIds);
     if (users) {
       if (role === 'admin') {
         session.admins = session.admins.concat(users);
@@ -251,6 +278,24 @@ const getUsersBySessionId = async (id: number, role: ?string):
   }
 };
 
+// Get polls before a specified date
+const getPollsBeforeDate = async (id: number, cursor: ?number):
+  Promise<Array<?Poll>> => {
+  if (!cursor) cursor = (new Date()).getTime();
+  try {
+    const session = await db().createQueryBuilder('sessions')
+      .innerJoin('session.polls', 'polls')
+      .where('polls.createdAt <= :c')
+      .setParameters({ c: cursor })
+      .orderBy('polls.createdAt', 'DESC')
+      .getOne();
+
+    return session.polls;
+  } catch (e) {
+    throw new Error('Problem getting polls before date');
+  }
+};
+
 export default {
   sessionCodes,
   createSession,
@@ -264,5 +309,7 @@ export default {
   addUsersByGoogleIds,
   removeUserBySessionId,
   getUsersBySessionId,
-  isAdmin
+  isAdmin,
+  getPollsBeforeDate,
+  addUsersByIds
 };

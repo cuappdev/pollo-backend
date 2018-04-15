@@ -2,15 +2,15 @@
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/constants';
-import GroupsRepo from '../../repos/GroupsRepo';
+import SessionsRepo from '../../repos/SessionsRepo';
 
-class DeleteGroupAdminsRouter extends AppDevRouter<Object> {
+class DeleteAdminsRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.PUT);
   }
 
   getPath (): string {
-    return '/groups/:id/admins/';
+    return '/sessions/:id/admins/';
   }
 
   async content (req: Request) {
@@ -20,13 +20,13 @@ class DeleteGroupAdminsRouter extends AppDevRouter<Object> {
 
     if (!adminIds) throw new Error('List of admin ids missing!');
 
-    if (!await GroupsRepo.isAdmin(groupId, user)) {
+    if (!await SessionsRepo.isAdmin(groupId, user)) {
       throw new Error('You are not authorized to remove admins from this group!');
     }
 
-    await GroupsRepo.removeUsers(groupId, adminIds, 'admin');
+    await SessionsRepo.removeUserBySessionId(groupId, adminIds, 'admin');
     return null;
   }
 }
 
-export default new DeleteGroupAdminsRouter().router;
+export default new DeleteAdminsRouter().router;

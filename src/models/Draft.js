@@ -6,7 +6,6 @@ import {
   ManyToOne
 } from 'typeorm';
 import { Base } from './Base';
-import { Session } from './Session';
 import { User } from './User';
 
 @Entity('drafts')

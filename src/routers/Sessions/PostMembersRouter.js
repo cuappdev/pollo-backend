@@ -1,32 +1,32 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
-import GroupsRepo from '../../repos/GroupsRepo';
+import SessionsRepo from '../../repos/SessionsRepo';
 import constants from '../../utils/constants';
 
-class PostGroupMembersRouter extends AppDevRouter<Object> {
+class PostMembersRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.POST);
   }
 
   getPath (): string {
-    return '/groups/:id/members/';
+    return '/sessions/:id/members/';
   }
 
   async content (req: Request) {
     const id = req.params.id;
     const user = req.user;
-    const memberIds = JSON.parse(req.body.memberIds);
+    const memberIds = req.body.memberIds;
 
     if (!memberIds) throw new Error('List of member ids missing!');
 
-    if (!await GroupsRepo.isAdmin(id, user)) {
+    if (!await SessionsRepo.isAdmin(id, user)) {
       throw new Error('You are not authorized to add members to this group!');
     }
 
-    await GroupsRepo.addUsers(id, memberIds, 'member');
+    await SessionsRepo.addUsersByIds(id, memberIds, 'member');
     return null;
   }
 }
 
-export default new PostGroupMembersRouter().router;
+export default new PostMembersRouter().router;
