@@ -7,13 +7,13 @@ import constants from '../../utils/constants';
 
 import type { APIPoll } from '../APITypes';
 
-class PostPollRouter extends AppDevRouter<Object> {
+class PostPollToSessionRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.POST);
   }
 
   getPath (): string {
-    return '/sessions/:id/poll/';
+    return '/sessions/:id/polls/';
   }
 
   async content (req: Request): Promise<{ node: APIPoll }> {
@@ -47,4 +47,4 @@ class PostPollRouter extends AppDevRouter<Object> {
   }
 }
 
-export default new PostPollRouter().router;
+export default new PostPollToSessionRouter().router;

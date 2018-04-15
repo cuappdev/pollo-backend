@@ -268,6 +268,7 @@ const getPollsById = async (id: number): Promise<Array<?Poll>> => {
 // Get polls before a specified date
 const getPollsBeforeDate = async (id: number, cursor: ?number):
   Promise<Array<?Poll>> => {
+  if (!cursor) cursor = (new Date()).getTime();
   try {
     const group = await db().createQueryBuilder('groups')
       .innerJoin('groups.polls', 'polls')
