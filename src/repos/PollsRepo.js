@@ -2,14 +2,15 @@
 import { getConnectionManager, Repository, json } from 'typeorm';
 import { Session } from '../models/Session';
 import { Poll } from '../models/Poll';
+import { Group } from '../models/Group';
 
 const db = (): Repository<Poll> => {
   return getConnectionManager().get().getRepository(Poll);
 };
 
 // Create a poll
-const createPoll = async (text: string, session: Session, results: json,
-  canShare: boolean):
+const createPoll = async (text: string, session: ?Session, results: json,
+  canShare: boolean, group: ?Group):
   Promise <Poll> => {
   try {
     const poll = new Poll();
@@ -17,6 +18,7 @@ const createPoll = async (text: string, session: Session, results: json,
     poll.session = session;
     poll.results = results;
     poll.shared = canShare;
+    poll.group = group;
 
     await db().persist(poll);
     return poll;

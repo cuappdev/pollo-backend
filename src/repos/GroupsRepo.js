@@ -3,6 +3,7 @@ import { getConnectionManager, Repository } from 'typeorm';
 import { Group } from '../models/Group';
 import { User } from '../models/User';
 import { Session } from '../models/Session';
+import { Poll } from '../models/Poll';
 import appDevUtils from '../utils/appDevUtils';
 import SessionsRepo from '../repos/SessionsRepo';
 import UsersRepo from './UsersRepo';
@@ -25,7 +26,7 @@ const createGroup = async (name: string, code: string, user: User,
     if (members) group.members = members;
     if (session) {
       session = await SessionsRepo.deleteCodeById(session.id);
-      group.sessions = [session];
+      group.polls = session.polls;
     }
 
     if (groupCodes[code] || SessionsRepo.sessionCodes[code]) {
@@ -80,7 +81,6 @@ const deleteGroupById = async (id: number) => {
       delete groupCodes[group.code];
     }
     await db().remove(group);
-    await SessionsRepo.deleteSessionsWithOutGroup();
   } catch (e) {
     throw new Error(`Problem deleting group by id: ${id}!`);
   }
@@ -110,7 +110,7 @@ const addUsers = async (id: number, userIds: number[], role: ?string):
     const group = await db().createQueryBuilder('groups')
       .leftJoinAndSelect('groups.admins', 'admins')
       .leftJoinAndSelect('groups.members', 'members')
-      .leftJoinAndSelect('groups.sessions', 'sessions')
+      .leftJoinAndSelect('groups.polls', 'polls')
       .where('groups.id = :groupId')
       .setParameters({ groupId: id })
       .getOne();
@@ -145,7 +145,7 @@ const removeUsers = async (id: number, userIds: number[], role: ?string):
     const group = await db().createQueryBuilder('groups')
       .leftJoinAndSelect('groups.admins', 'admins')
       .leftJoinAndSelect('groups.members', 'members')
-      .leftJoinAndSelect('groups.sessions', 'sessions')
+      .leftJoinAndSelect('groups.polls', 'polls')
       .where('groups.id = :groupId')
       .setParameters({ groupId: id })
       .getOne();
@@ -216,11 +216,11 @@ const addSessionByGroupId = async (id: number, session: Session):
     const group = await db().createQueryBuilder('groups')
       .leftJoinAndSelect('groups.admins', 'admins')
       .leftJoinAndSelect('groups.members', 'members')
-      .leftJoinAndSelect('groups.sessions', 'sessions')
+      .leftJoinAndSelect('groups.polls', 'polls')
       .where('groups.id = :groupId')
       .setParameters({ groupId: id })
       .getOne();
-    if (session) group.sessions = group.sessions.concat(session);
+    if (session) group.polls = group.polls.concat(session.polls);
     await db().persist(group);
     return group;
   } catch (e) {
@@ -228,40 +228,58 @@ const addSessionByGroupId = async (id: number, session: Session):
   }
 };
 
-// Remove a session from a group
-const removeSessionByGroupId = async (id: number, session: Session):
+// Remove a poll from a group
+const removePollByGroupId = async (id: number, poll: Poll):
   Promise<?Group> => {
   try {
     const group = await db().createQueryBuilder('groups')
       .leftJoinAndSelect('groups.admins', 'admins')
       .leftJoinAndSelect('groups.members', 'members')
-      .leftJoinAndSelect('groups.sessions', 'sessions')
+      .leftJoinAndSelect('groups.polls', 'polls')
       .where('groups.id = :groupId')
       .setParameters({ groupId: id })
       .getOne();
-    if (session) {
-      group.sessions = group.sessions.filter(function (p) {
-        return (p.id !== session.id);
+    if (poll) {
+      group.polls = group.polls.filter(function (p) {
+        return (p.id !== poll.id);
       });
     }
     await db().persist(group);
     return group;
   } catch (e) {
-    throw new Error('Problem removing session from group!');
+    throw new Error('Problem removing poll from group!');
   }
 };
 
-// Get sessions from a group id
-const getSessionsById = async (id: number): Promise<Array<?Session>> => {
+// Get polls from a group id
+const getPollsById = async (id: number): Promise<Array<?Poll>> => {
   try {
     const group = await db().createQueryBuilder('groups')
-      .leftJoinAndSelect('groups.sessions', 'sessions')
+      .leftJoinAndSelect('groups.polls', 'polls')
       .where('groups.id = :groupId')
       .setParameters({ groupId: id })
       .getOne();
-    return group.sessions;
+    return group.polls;
   } catch (e) {
-    throw new Error(`Problem getting sessions for group by id: ${id}`);
+    throw new Error(`Problem getting polls for group by id: ${id}`);
+  }
+};
+
+// Get polls before a specified date
+const getPollsBeforeDate = async (id: number, cursor: ?number):
+  Promise<Array<?Poll>> => {
+  if (!cursor) cursor = (new Date()).getTime();
+  try {
+    const group = await db().createQueryBuilder('groups')
+      .innerJoin('groups.polls', 'polls')
+      .where('polls.createdAt <= :c')
+      .setParameters({ c: cursor })
+      .orderBy('polls.createdAt', 'DESC')
+      .getOne();
+
+    return group.polls;
+  } catch (e) {
+    throw new Error('Problem getting polls before date');
   }
 };
 
@@ -278,6 +296,7 @@ export default {
   getUsersByGroupId,
   isAdmin,
   addSessionByGroupId,
-  removeSessionByGroupId,
-  getSessionsById
+  removePollByGroupId,
+  getPollsById,
+  getPollsBeforeDate
 };

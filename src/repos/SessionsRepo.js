@@ -4,7 +4,6 @@ import { Session } from '../models/Session';
 import { User } from '../models/User';
 import { Group } from '../models/Group';
 import appDevUtils from '../utils/appDevUtils';
-import PollsRepo from '../repos/PollsRepo';
 import GroupsRepo from './GroupsRepo';
 import UsersRepo from './UsersRepo';
 
@@ -252,20 +251,6 @@ const getUsersBySessionId = async (id: number, role: ?string):
   }
 };
 
-// Delete sessions where session.group = null AND
-// session.code = null or ''
-const deleteSessionsWithOutGroup = async () => {
-  try {
-    await db().createQueryBuilder('sessions')
-      .delete()
-      .where('sessions.group is NULL')
-      .andWhere('sessions.code is NULL')
-      .execute();
-  } catch (e) {
-    throw new Error('Problem removing sessions with no group reference.');
-  }
-};
-
 export default {
   sessionCodes,
   createSession,
@@ -279,6 +264,5 @@ export default {
   addUsersByGoogleIds,
   removeUserBySessionId,
   getUsersBySessionId,
-  isAdmin,
-  deleteSessionsWithOutGroup
+  isAdmin
 };
