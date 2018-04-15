@@ -29,7 +29,7 @@ beforeAll(async () => {
 
 test('create poll', async () => {
   const opts = {text: 'Poll text', results: {}, shared: true};
-  const result = await request(post(`/sessions/${session.id}/poll`, opts, token));
+  const result = await request(post(`/sessions/${session.id}/polls`, opts, token));
   poll = JSON.parse(result).data.node;
   expect(JSON.parse(result).success).toBeTruthy();
 });
@@ -37,7 +37,7 @@ test('create poll', async () => {
 test('create poll with invalid token', async () => {
   const opts = {text: 'Poll text', results: {}, shared: true};
   const result =
-    await request(post(`/sessions/${session.id}/poll`, opts, 'invalid'));
+    await request(post(`/sessions/${session.id}/polls`, opts, 'invalid'));
   expect(JSON.parse(result).success).toBeFalsy();
 });
 

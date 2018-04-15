@@ -4,8 +4,6 @@ import AppDevRouter from '../../utils/AppDevRouter';
 import DraftsRepo from '../../repos/DraftsRepo';
 import constants from '../../utils/constants';
 
-import type { APIDraft } from '../APITypes';
-
 class DeleteDraftRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.DELETE);
@@ -17,7 +15,11 @@ class DeleteDraftRouter extends AppDevRouter<Object> {
 
   async content (req: Request) {
     var id = req.params.id;
-    var user = req.user;
+    var admin = await DraftsRepo.getOwnerById(id);
+    if (!admin) throw new Error(`Can't get owner for draft with id ${id}`);
+    if (admin.id !== req.user.id) {
+      throw new Error('Not authorized to delete draft!');
+    }
 
     await DraftsRepo.deleteDraft(id);
     return null;
