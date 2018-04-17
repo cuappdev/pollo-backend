@@ -26,8 +26,6 @@ class PostSessionRouter extends AppDevRouter<Object> {
     if (!code) throw new Error('Code missing');
     if (isGroup === null || isGroup === undefined) isGroup = false;
 
-    console.log(isGroup);
-
     const session = await SessionsRepo.createSession(name, code, user, isGroup);
 
     return {

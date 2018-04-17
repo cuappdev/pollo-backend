@@ -161,11 +161,18 @@ const addUsersByIds = async (id: number, userIds: number[],
       .where('sessions.id = :sessionId')
       .setParameters({ sessionId: id })
       .getOne();
-    const users = await UsersRepo.getUsersFromIds(userIds);
-    if (users) {
+    if (session) {
       if (role === 'admin') {
-        session.admins = session.admins.concat(users);
+        const currAdminIds = session.admins.map(function (admin) {
+          return admin.id;
+        });
+        const admins = await UsersRepo.getUsersFromIds(userIds, currAdminIds);
+        session.admins = session.admins.concat(admins);
       } else {
+        const currUserIds = session.members.map(function (user) {
+          return user.id;
+        });
+        const users = await UsersRepo.getUsersFromIds(userIds, currUserIds);
         session.members = session.members.concat(users);
       }
     }
@@ -174,33 +181,6 @@ const addUsersByIds = async (id: number, userIds: number[],
     return session;
   } catch (e) {
     throw new Error('Problem adding users to session by groupIds!');
-  }
-};
-
-// Add admin/member to a session by Id
-const addUserBySessionId = async (id: number, user: User, role: ?string):
-  Promise<?Session> => {
-  try {
-    const session = await db().createQueryBuilder('sessions')
-      .leftJoinAndSelect('sessions.admins', 'admins')
-      .leftJoinAndSelect('sessions.members', 'members')
-      .leftJoinAndSelect('sessions.polls', 'polls')
-      .where('sessions.id = :sessionId')
-      .setParameters({ sessionId: id })
-      .getOne();
-
-    if (user) {
-      if (role === 'admin') {
-        session.admins = session.admins.concat(user);
-      } else {
-        session.members = session.members.concat(user);
-      }
-      await db().persist(session);
-    }
-
-    return session;
-  } catch (e) {
-    throw new Error(`Problem adding admin to session by id: ${id}`);
   }
 };
 
@@ -305,7 +285,6 @@ export default {
   getSessionId,
   updateSessionById,
   deleteSessionById,
-  addUserBySessionId,
   addUsersByGoogleIds,
   removeUserBySessionId,
   getUsersBySessionId,

@@ -10,12 +10,13 @@ class GetGroupsRouter extends AppDevRouter<Object> {
   }
 
   getPath (): string {
-    return '/groups/';
+    return '/groups/:role/';
   }
 
   async content (req: Request) {
-    var sessions = await UsersRepo.getSessionsById(req.user.id, 'member');
-    if (!sessions) throw new Error('Can\'t find sessions for user!');
+    const role = req.params.role;
+    var sessions = await UsersRepo.getSessionsById(req.user.id, role);
+    if (!sessions) throw new Error('Can\'t find groups for user!');
     return sessions
       .filter(Boolean)
       .filter(function (s) {

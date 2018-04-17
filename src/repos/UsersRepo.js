@@ -123,7 +123,7 @@ const deleteUserById = async (id: number) => {
   }
 };
 
-// Get sessions (one offs) by userId
+// Get sessions by userId
 const getSessionsById = async (id: number, role: ?string):
     Promise<Array<?Session>> => {
   try {
@@ -131,8 +131,6 @@ const getSessionsById = async (id: number, role: ?string):
       .leftJoinAndSelect('users.memberSessions', 'memberSessions')
       .leftJoinAndSelect('users.adminSessions', 'adminSessions')
       .where('users.id = :userId')
-      // .where('NOT "memberSessions.isGroup"')
-      // .where('NOT "adminSessions.isGroup"')
       .setParameters({ userId: id })
       .getOne();
     if (role === 'admin') {
@@ -147,30 +145,6 @@ const getSessionsById = async (id: number, role: ?string):
   }
 };
 
-// Get groups by userId
-const getGroupsById = async (id: number, role: ?string):
-    Promise<Array<?Session>> => {
-  try {
-    const user = await db().createQueryBuilder('users')
-      .leftJoinAndSelect('users.memberSessions', 'memberSessions')
-      .leftJoinAndSelect('users.adminSessions', 'adminSessions')
-      .where('users.id = :userId')
-      .where('"memberSessions.isGroup"')
-      .where('adminSessions.isGroup')
-      .setParameters({ userId: id })
-      .getOne();
-    if (role === 'admin') {
-      return user.adminSessions;
-    } else if (role === 'member') {
-      return user.memberSessions;
-    } else {
-      return user.memberSessions.concat(user.adminSessions);
-    }
-  } catch (e) {
-    throw new Error(`Problem getting member groups for user: ${id}`);
-  }
-};
-
 export default {
   getUsers,
   createUser,
@@ -181,6 +155,5 @@ export default {
   getUsersByGoogleIds,
   getUsersFromIds,
   deleteUserById,
-  getSessionsById,
-  getGroupsById
+  getSessionsById
 };
