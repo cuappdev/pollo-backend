@@ -65,10 +65,10 @@ const getSessionId = async (code: string) => {
       .where('sessions.code = :sessionCode')
       .setParameters({ sessionCode: code })
       .getOne();
-  if (!session) {
-    throw new Error('Could not find session associated with given code.');
+  if (session) {
+    return session.id;
   }
-  return session.id;
+  return null;
 };
 
 // Delete a session by Id
@@ -264,14 +264,17 @@ const getPollsBeforeDate = async (id: number, cursor: ?number):
   if (!cursor) cursor = (new Date()).getTime();
   try {
     const session = await db().createQueryBuilder('sessions')
-      .innerJoin('session.polls', 'polls')
-      .where('polls.createdAt <= :c')
-      .setParameters({ c: cursor })
+      .leftJoinAndSelect('sessions.polls', 'polls')
+      // .where('polls.createdAt <= :c')
+      // .setParameters({ c: cursor })
+      .where('sessions.id = :sessionId')
+      .setParameters({ sessionId: id })
       .orderBy('polls.createdAt', 'DESC')
       .getOne();
 
     return session.polls;
   } catch (e) {
+    console.log(e);
     throw new Error('Problem getting polls before date');
   }
 };

@@ -10,11 +10,11 @@ class GetSessionsRouter extends AppDevRouter<Object> {
   }
 
   getPath (): string {
-    return '/sessions/all/member/';
+    return '/sessions/all/admin/';
   }
 
   async content (req: Request) {
-    var sessions = await UsersRepo.getSessionsById(req.user.id, 'member');
+    var sessions = await UsersRepo.getSessionsById(req.user.id, 'admin');
     if (!sessions) throw new Error('Can\'t find sessions for user!');
     return sessions
       .filter(Boolean)

@@ -51,7 +51,8 @@ class StartSessionRouter extends AppDevRouter<APISession> {
       node: {
         id: session.id,
         name: session.name,
-        code: session.code
+        code: session.code,
+        isGroup: session.isGroup
       }
     };
   }
