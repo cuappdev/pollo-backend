@@ -99,12 +99,17 @@ Promise<?Array<User>> => {
 };
 
 // Get users from list of googleIds
-const getUsersByGoogleIds = async (googleIds: string[]):
+const getUsersByGoogleIds = async (googleIds: string[], filter: ?string[]):
   Promise<?Array<User>> => {
   try {
-    var ids = '(' + String(googleIds) + ')';
+    if (filter && filter.length > 0) {
+      googleIds = googleIds.filter(function (id) {
+        return filter && !filter.includes(id);
+      });
+    }
+    var ids = '{' + String(googleIds) + '}';
     const users = await db().createQueryBuilder('users')
-      .where('"users.googleId" IN ' + ids)
+      .where('users.googleId = ANY(\'' + ids + '\'::text[])')
       .getMany();
     return users;
   } catch (e) {

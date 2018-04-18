@@ -62,7 +62,7 @@ test('Remove Admin From Session', async () => {
 
 test('Add Member To Session', async () => {
   const members =
-    (await SessionsRepo.addUsersByIds(id, [user2.id], 'member')).members;
+    (await SessionsRepo.addUsersByGoogleIds(id, [user2.googleId], 'member')).members;
   expect(members.length).toEqual(1);
   expect(members[0].googleId).toBe(user2.googleId);
 });

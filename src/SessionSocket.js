@@ -91,7 +91,7 @@ export default class SessionSocket {
     console.log(msg);
   }
 
-  _onConnect (client: IOSocket): void {
+  _onConnect = async (client: IOSocket) => {
     const userType: ?string = client.handshake.query.userType || null;
     const googleId: ?string = client.handshake.query.googleId || null;
 
@@ -103,6 +103,9 @@ export default class SessionSocket {
       }
       this._setupAdminEvents(client);
       client.join('admins');
+      if (googleId) {
+        await SessionsRepo.addUsersByGoogleIds(this.session.id, [googleId], 'admin');
+      }
       break;
     case 'user':
       console.log(`User with id ${client.id} connected to socket`);
@@ -115,6 +118,10 @@ export default class SessionSocket {
       const currentPoll = this._currentPoll();
       if (currentPoll) {
         client.emit('user/poll/start', { poll: currentPoll });
+      }
+
+      if (googleId) {
+        await SessionsRepo.addUsersByGoogleIds(this.session.id, [googleId], 'user');
       }
       break;
     default:
@@ -145,8 +152,8 @@ export default class SessionSocket {
       };
       this.answerId++;
       const poll = this._currentPoll();
-      if (poll === null) {
-        console.log(`Client ${client.id} sanswer on no poll`);
+      if (poll === null || poll === undefined) {
+        console.log(`Client ${client.id} tried to answer with no current poll`);
         return;
       }
       if (poll.id !== answer.poll) {
@@ -200,7 +207,7 @@ export default class SessionSocket {
   _startPoll (poll: Poll) {
     // start new poll
     this.current.poll = poll.id;
-    if (!this.polls[`${poll.id}`]) {
+    if (this.polls[`${poll.id}`] !== null || this.polls[`${poll.id}`] !== undefined) {
       this.polls[`${poll.id}`] = {
         poll,
         answers: {}
@@ -289,10 +296,10 @@ export default class SessionSocket {
 
     client.on('disconnect', async () => {
       console.log(`Admin ${client.id} disconnected.`);
-      await SessionsRepo.addUsersByGoogleIds(this.session.id,
-        this.userGoogleIds, 'user');
-      await SessionsRepo.addUsersByGoogleIds(this.session.id,
-        this.adminGoogleIds, 'admin');
+      // await SessionsRepo.addUsersByGoogleIds(this.session.id,
+      //   this.userGoogleIds, 'user');
+      // await SessionsRepo.addUsersByGoogleIds(this.session.id,
+      //   this.adminGoogleIds, 'admin');
       if (this.nsp.connected.length === 0) {
         this.onClose();
       }

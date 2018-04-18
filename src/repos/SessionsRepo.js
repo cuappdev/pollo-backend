@@ -134,11 +134,18 @@ const addUsersByGoogleIds = async (id: number, googleIds: string[],
       .where('sessions.id = :sessionId')
       .setParameters({ sessionId: id })
       .getOne();
-    const users = await UsersRepo.getUsersByGoogleIds(googleIds);
-    if (users) {
+    if (session) {
       if (role === 'admin') {
+        const currAdminIds = session.admins.map(function (admin) {
+          return admin.googleId;
+        });
+        const users = await UsersRepo.getUsersByGoogleIds(googleIds, currAdminIds);
         session.admins = session.admins.concat(users);
       } else {
+        const currUserIds = session.members.map(function (user) {
+          return user.googleId;
+        });
+        const users = await UsersRepo.getUsersByGoogleIds(googleIds, currUserIds);
         session.members = session.members.concat(users);
       }
     }
@@ -146,7 +153,8 @@ const addUsersByGoogleIds = async (id: number, googleIds: string[],
     await db().persist(session);
     return session;
   } catch (e) {
-    throw new Error('Problem adding users to session by groupIds!');
+    console.log(e);
+    throw new Error('Problem adding users to session by google ids!');
   }
 };
 
