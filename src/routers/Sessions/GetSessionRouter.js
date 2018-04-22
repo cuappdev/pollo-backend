@@ -14,7 +14,8 @@ class GetSessionRouter extends AppDevNodeRouter<APISession> {
     return session && {
       id: session.id,
       name: session.name,
-      code: session.code
+      code: session.code,
+      isGroup: session.isGroup
     };
   }
 }

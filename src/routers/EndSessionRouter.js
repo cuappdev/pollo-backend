@@ -22,7 +22,11 @@ class EndSessionRouter extends AppDevRouter<Object> {
       throw new Error(`No session with id ${id} found.`);
     }
 
-    if (save === 'false' || save === '0') {
+    if (!(await SessionsRepo.isAdmin(id, req.user))) {
+      throw new Error('Not authorized to end session.');
+    }
+
+    if (!session.isGroup && (save === 'false' || save === '0')) {
       await SessionsRepo.deleteSessionById(id);
     }
 

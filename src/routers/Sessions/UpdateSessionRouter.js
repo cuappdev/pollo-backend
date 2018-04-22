@@ -23,19 +23,24 @@ class UpdateSessionRouter extends AppDevRouter<APISession> {
     if (!name) throw new Error('No fields specified to update.');
 
     var session = await SessionsRepo.getSessionById(sessionId);
-    if (!session) throw new Error(`Session with id ${sessionId} was not found!`);
+    if (!session) {
+      throw new Error(`Session with id ${sessionId} was not found!`);
+    }
 
     if (!await SessionsRepo.isAdmin(sessionId, user)) {
       throw new Error('You are not authorized to update this session!');
     }
 
     session = await SessionsRepo.updateSessionById(sessionId, name);
-    if (!session) throw new Error(`Session with id ${sessionId} was not found!`);
+    if (!session) {
+      throw new Error(`Session with id ${sessionId} was not found!`);
+    }
     return {
       node: {
         id: session.id,
         name: session.name,
-        code: session.code
+        code: session.code,
+        isGroup: session.isGroup
       }
     };
   }

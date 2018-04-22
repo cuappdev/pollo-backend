@@ -8,8 +8,6 @@ import {
 } from 'typeorm';
 import { Base } from './Base';
 import { Session } from './Session';
-import { Group } from './Group';
-
 @Entity('polls')
 export class Poll extends Base {
   @PrimaryGeneratedColumn()
@@ -22,11 +20,6 @@ export class Poll extends Base {
     onDelete: 'CASCADE'
   })
   session: ?Session = null;
-
-  @ManyToOne(type => Group, group => group.polls, {
-    onDelete: 'CASCADE'
-  })
-  group: ?Group = null;
 
   @Column('json')
   results: json = {};

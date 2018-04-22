@@ -1,7 +1,7 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
-import GroupsRepo from '../../repos/GroupsRepo';
+import SessionsRepo from '../../repos/SessionsRepo';
 import constants from '../../utils/constants';
 
 class GetGroupPollsRouter extends AppDevRouter<Object> {
@@ -10,16 +10,16 @@ class GetGroupPollsRouter extends AppDevRouter<Object> {
   }
 
   getPath (): string {
-    return '/groups/:id/polls/';
+    return '/sessions/:id/polls/date/';
   }
 
   async content (req: Request) {
     const id = req.params.id;
-    var polls = await GroupsRepo.getPollsById(id);
+    var polls = await SessionsRepo.getPollsBeforeDate(id);
     if (!polls) throw new Error(`Problem getting polls from group id: ${id}!`);
 
     // Show only shared polls for members
-    if (!await GroupsRepo.isAdmin(id, req.user)) {
+    if (!await SessionsRepo.isAdmin(id, req.user)) {
       polls = polls.filter(function (p) {
         return p && p.shared;
       });

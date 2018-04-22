@@ -2,7 +2,6 @@
 import AppDevRouter from '../utils/AppDevRouter';
 import constants from '../utils/constants';
 import SessionsRepo from '../repos/SessionsRepo';
-import GroupsRepo from '../repos/GroupsRepo';
 import {Request} from 'express';
 import type { APISession } from './APITypes';
 
@@ -18,36 +17,43 @@ class StartSessionRouter extends AppDevRouter<APISession> {
   async content (req: Request) {
     const id = req.body.id;
     const code = req.body.code;
-    const groupId = req.body.groupId;
     var name = req.body.name;
+    var isGroup = req.body.isGroup;
 
     if (!name) name = '';
-    var session = await SessionsRepo.getSessionById(id);
+    if (isGroup === null) isGroup = false;
 
     if (!(id || code)) {
       throw new Error('Session id, or code and device id required.');
     }
 
-    if (!id) {
-      if (!groupId) {
-        session = await SessionsRepo.createSession(name, code, req.user);
-      } else {
-        const group = await GroupsRepo.getGroupById(groupId);
-        session = await SessionsRepo.createSession(name, code, req.user, group);
+    var session = await SessionsRepo.getSessionById(id);
+
+    if (!session && code) {
+      const sessionId = await SessionsRepo.getSessionId(code);
+      if (sessionId) {
+        session = await SessionsRepo.getSessionById(sessionId);
       }
+    }
+
+    if (!id && !session) {
+      session = await SessionsRepo.createSession(name, code, req.user, isGroup);
     }
 
     if (!session) {
       throw new Error(`No session with id ${id} found.`);
     }
 
-    await req.app.sessionManager.startNewSession(session);
+    if (!req.app.sessionManager.isLive(code, id)) {
+      await req.app.sessionManager.startNewSession(session);
+    }
 
     return {
       node: {
         id: session.id,
         name: session.name,
-        code: session.code
+        code: session.code,
+        isGroup: session.isGroup
       }
     };
   }

@@ -7,7 +7,7 @@ import constants from '../../utils/constants';
 
 import type { APIPoll } from '../APITypes';
 
-class PostPollToSessionRouter extends AppDevRouter<Object> {
+class PostPollRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.POST);
   }
@@ -47,4 +47,4 @@ class PostPollToSessionRouter extends AppDevRouter<Object> {
   }
 }
 
-export default new PostPollToSessionRouter().router;
+export default new PostPollRouter().router;

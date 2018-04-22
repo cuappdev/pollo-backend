@@ -21,12 +21,7 @@ export type APISession = {|
   id: id,
   name: string,
   code: string,
-|}
-
-export type APIGroup = {|
-  id: id,
-  name: string,
-  code: string
+  isGroup: boolean
 |}
 
 export type APIPoll = {|

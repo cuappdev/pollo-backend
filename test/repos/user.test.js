@@ -41,6 +41,12 @@ test('Get Users', async () => {
   expect(user).toBeDefined();
 });
 
+test('Get Users by googleId', async () => {
+  const users = await UsersRepo.getUsersByGoogleIds([googleId]);
+  expect(users.length).toEqual(1);
+  expect(users[0].googleId).toBe(googleId);
+});
+
 test('Get Sessions', async () => {
   const user = await UsersRepo.getUserById(id);
   const code = await SessionsRepo.createCode();
