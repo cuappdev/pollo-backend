@@ -22,11 +22,12 @@ class StartSessionRouter extends AppDevRouter<APISession> {
 
     if (!name) name = '';
     if (isGroup === null) isGroup = false;
-    var session = await SessionsRepo.getSessionById(id);
 
     if (!(id || code)) {
       throw new Error('Session id, or code and device id required.');
     }
+
+    var session = await SessionsRepo.getSessionById(id);
 
     if (!session && code) {
       const sessionId = await SessionsRepo.getSessionId(code);

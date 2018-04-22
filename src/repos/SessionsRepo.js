@@ -153,7 +153,6 @@ const addUsersByGoogleIds = async (id: number, googleIds: string[],
     await db().persist(session);
     return session;
   } catch (e) {
-    console.log(e);
     throw new Error('Problem adding users to session by google ids!');
   }
 };
@@ -273,8 +272,6 @@ const getPollsBeforeDate = async (id: number, cursor: ?number):
   try {
     const session = await db().createQueryBuilder('sessions')
       .leftJoinAndSelect('sessions.polls', 'polls')
-      // .where('polls.createdAt <= :c')
-      // .setParameters({ c: cursor })
       .where('sessions.id = :sessionId')
       .setParameters({ sessionId: id })
       .orderBy('polls.createdAt', 'DESC')
@@ -282,7 +279,6 @@ const getPollsBeforeDate = async (id: number, cursor: ?number):
 
     return session.polls;
   } catch (e) {
-    console.log(e);
     throw new Error('Problem getting polls before date');
   }
 };
