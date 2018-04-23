@@ -5,6 +5,10 @@ import SessionsRepo from '../../../repos/SessionsRepo';
 import type { APIPoll } from '../APITypes';
 
 class GetPollRouter extends AppDevNodeRouter<APIPoll> {
+  constructor () {
+    super(false);
+  }
+
   getPath (): string {
     return '/polls/:id/';
   }

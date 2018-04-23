@@ -9,7 +9,7 @@ import type { APIPoll } from '../APITypes';
 
 class UpdatePollRouter extends AppDevRouter<Object> {
   constructor () {
-    super(constants.REQUEST_TYPES.PUT);
+    super(constants.REQUEST_TYPES.PUT, false);
   }
 
   getPath (): string {

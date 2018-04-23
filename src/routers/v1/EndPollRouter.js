@@ -6,7 +6,7 @@ import { Request } from 'express';
 
 class EndPollRouter extends AppDevRouter<Object> {
   constructor () {
-    super(constants.REQUEST_TYPES.POST);
+    super(constants.REQUEST_TYPES.POST, false);
   }
 
   getPath (): string {

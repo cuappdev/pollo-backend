@@ -6,7 +6,7 @@ import {Request} from 'express';
 
 class GenerateCodeRouter extends AppDevRouter<Object> {
   constructor () {
-    super(constants.REQUEST_TYPES.GET);
+    super(constants.REQUEST_TYPES.GET, false);
   }
 
   getPath (): string {

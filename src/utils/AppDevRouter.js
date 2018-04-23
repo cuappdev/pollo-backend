@@ -21,14 +21,20 @@ import lib from './lib';
 export default class AppDevRouter<T: Object> {
   router: Router;
   requestType: RequestType;
+  authenticated: boolean;
 
   getPath (): string {
     throw new Error('You must implement getPath() with a valid path!');
   }
 
-  constructor (type: RequestType) {
+  constructor (type: RequestType, auth: ?boolean) {
     this.router = new Router();
     this.requestType = type;
+    if (auth !== undefined && auth !== null) {
+      this.authenticated = auth;
+    } else {
+      this.authenticated = true;
+    }
 
     // Initialize this router
     this.init();
@@ -45,9 +51,8 @@ export default class AppDevRouter<T: Object> {
     } else if (path[path.length - 1] !== '/') {
       throw new Error('Path must end with a \'/\'!');
     }
-
     // Attach content to router
-    if (path.includes('v2')) {
+    if (this.authenticated) {
       switch (this.requestType) {
       case constants.REQUEST_TYPES.GET:
         this.router.get(path, lib.ensureAuthenticated, this.response);

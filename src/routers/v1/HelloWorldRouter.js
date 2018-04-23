@@ -5,7 +5,7 @@ import constants from '../../utils/constants';
 
 class HelloWorldRouter extends AppDevRouter<Object> {
   constructor () {
-    super(constants.REQUEST_TYPES.GET);
+    super(constants.REQUEST_TYPES.GET, false);
   }
 
   getPath (): string {
