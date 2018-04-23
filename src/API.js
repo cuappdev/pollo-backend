@@ -129,7 +129,8 @@ class API {
     // Connect all routers in ./routers
     const opts = { cwd: path.join(__dirname, 'routers') };
     globby.sync(['**/*Router.js'], opts).forEach(file => {
-      const router = require('./routers/' + file).default;
+      // All v2 routes
+      const router = require('./routers/v2/' + file).default;
 
       registered.push(...router.stack
         .filter(r => r.route)
