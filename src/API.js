@@ -126,9 +126,22 @@ class API {
   routes (): void {
     const registered = [];
 
-    // Connect all routers in ./routers
-    const opts = { cwd: path.join(__dirname, 'routers') };
+    // Connect all routers in ./routers/v1
+    const opts = { cwd: path.join(__dirname, 'routers/v1') };
     globby.sync(['**/*Router.js'], opts).forEach(file => {
+      // All v2 routes
+      const router = require('./routers/v1/' + file).default;
+
+      registered.push(...router.stack
+        .filter(r => r.route)
+        .map(r => `/api/v1${r.route.path}`));
+
+      this.express.use('/api/v1', router);
+    });
+
+    // Connect all routers in ./routers/v2
+    const opts2 = { cwd: path.join(__dirname, 'routers/v2') };
+    globby.sync(['**/*Router.js'], opts2).forEach(file => {
       // All v2 routes
       const router = require('./routers/v2/' + file).default;
 

@@ -47,19 +47,36 @@ export default class AppDevRouter<T: Object> {
     }
 
     // Attach content to router
-    switch (this.requestType) {
-    case constants.REQUEST_TYPES.GET:
-      this.router.get(path, lib.ensureAuthenticated, this.response);
-      break;
-    case constants.REQUEST_TYPES.POST:
-      this.router.post(path, lib.ensureAuthenticated, this.response);
-      break;
-    case constants.REQUEST_TYPES.DELETE:
-      this.router.delete(path, lib.ensureAuthenticated, this.response);
-      break;
-    case constants.REQUEST_TYPES.PUT:
-      this.router.put(path, lib.ensureAuthenticated, this.response);
-      break;
+    if (path.includes('v2')) {
+      switch (this.requestType) {
+      case constants.REQUEST_TYPES.GET:
+        this.router.get(path, lib.ensureAuthenticated, this.response);
+        break;
+      case constants.REQUEST_TYPES.POST:
+        this.router.post(path, lib.ensureAuthenticated, this.response);
+        break;
+      case constants.REQUEST_TYPES.DELETE:
+        this.router.delete(path, lib.ensureAuthenticated, this.response);
+        break;
+      case constants.REQUEST_TYPES.PUT:
+        this.router.put(path, lib.ensureAuthenticated, this.response);
+        break;
+      }
+    } else {
+      switch (this.requestType) {
+      case constants.REQUEST_TYPES.GET:
+        this.router.get(path, this.response);
+        break;
+      case constants.REQUEST_TYPES.POST:
+        this.router.post(path, this.response);
+        break;
+      case constants.REQUEST_TYPES.DELETE:
+        this.router.delete(path, this.response);
+        break;
+      case constants.REQUEST_TYPES.PUT:
+        this.router.put(path, this.response);
+        break;
+      }
     }
   }
 

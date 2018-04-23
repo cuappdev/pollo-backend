@@ -30,7 +30,7 @@ class StartPollRouter extends AppDevRouter<APIPoll> {
 
     var user = await UsersRepo.getUserByGoogleId(deviceId);
     if (!user) {
-      throw new Error('Error finding user!');
+      user = await UsersRepo.createDummyUser(deviceId);
     }
 
     if (!id) {

@@ -30,10 +30,6 @@ class PostPollRouter extends AppDevRouter<Object> {
       user = await UsersRepo.createDummyUser(deviceId);
     }
 
-    if (!user) {
-      throw new Error('Problem creating user!');
-    }
-
     const poll = await SessionsRepo.createSession(name, code, user, false);
 
     return {
