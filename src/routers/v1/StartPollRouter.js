@@ -28,12 +28,11 @@ class StartPollRouter extends AppDevRouter<APIPoll> {
       throw new Error('Poll id, or code and device id required.');
     }
 
-    var user = await UsersRepo.getUserByGoogleId(deviceId);
-    if (!user) {
-      user = await UsersRepo.createDummyUser(deviceId);
-    }
-
     if (!id) {
+      var user = await UsersRepo.getUserByGoogleId(deviceId);
+      if (!user) {
+        user = await UsersRepo.createDummyUser(deviceId);
+      }
       poll = await SessionsRepo.createSession(name, code, user, false);
     }
 

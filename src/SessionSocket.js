@@ -82,9 +82,10 @@ export default class SessionSocket {
     this.answerId = 0;
   }
 
+  // v1 message
   saveSession () {
     console.log('save this sessioning session on user side');
-    this.nsp.to('users').emit('user/session/save', this.session);
+    this.nsp.to('users').emit('user/poll/save', this.session);
   }
 
   _clientError (client: IOSocket, msg: string): void {
@@ -118,6 +119,7 @@ export default class SessionSocket {
       const currentPoll = this._currentPoll();
       if (currentPoll) {
         client.emit('user/poll/start', { poll: currentPoll });
+        client.emit('user/question/start', { question: currentPoll }); // v1
       }
 
       if (googleId) {
@@ -186,6 +188,55 @@ export default class SessionSocket {
       this.nsp.to('admins').emit('admin/poll/updateTally', this.current);
     });
 
+    // v1
+    client.on('server/question/tally', (answerObject: Object) => {
+      const answer: Answer = {
+        id: this.answerId,
+        googleId: answerObject.deviceId,
+        poll: answerObject.question,
+        choice: answerObject.choice,
+        text: answerObject.text
+      };
+      this.answerId++;
+      const question = this._currentPoll();
+      if (question === null || question === undefined) {
+        console.log(`Client ${client.id} sanswer on no question`);
+        return;
+      }
+      if (question.id !== answer.poll) {
+        console.log(`Poll ${answer.poll} is not the current poll`);
+        return;
+      }
+
+      let nextState = {...this.current};
+      const prev = nextState.answers[answer.googleId];
+      nextState.answers[answer.googleId] = answer.choice; // update/input user's response
+      if (prev) { // if truthy
+        // has selected something before
+        nextState.results[prev].count -= 1;
+        const poll = this._currentPoll();
+        if (poll && poll.type === 'FREE_RESPONSE') {
+          if (nextState.results[prev].count <= 0) {
+            delete nextState.results[prev];
+          }
+        }
+      }
+
+      let curTally = nextState.results[answer.choice];
+      if (curTally) { // if truthy
+        nextState.results[answer.choice].count += 1;
+      } else {
+        nextState.results[answer.choice] = {'text': answer.text, 'count': 1};
+      }
+
+      this.current = nextState;
+      this.nsp.to('admins').emit('admin/question/updateTally', {
+        answers: nextState.answers,
+        results: nextState.results,
+        question: nextState.poll
+      });
+    });
+
     client.on('disconnect', () => {
       console.log(`User ${client.id} disconnected.`);
       if (this.nsp.connected.length === 0) {
@@ -224,6 +275,7 @@ export default class SessionSocket {
     this.current.answers = {};
 
     this.nsp.to('users').emit('user/poll/start', { poll });
+    this.nsp.to('users').emit('user/question/start', { question: poll }); // v1
   }
 
   _endPoll = async () => {
@@ -233,7 +285,8 @@ export default class SessionSocket {
     }
     this.lastPoll = await PollsRepo.createPoll(poll.text,
       this.session, this.current.results, false);
-    this.nsp.to('users').emit('user/poll/end', {poll});
+    this.nsp.to('users').emit('user/poll/end', { poll });
+    this.nsp.to('users').emit('user/question/end', { question: poll }); // v1
   }
 
   /**
@@ -271,6 +324,22 @@ export default class SessionSocket {
       this._startPoll(poll);
     });
 
+    // v1
+    client.on('server/question/start', async (questionObject: Object) => {
+      const question: Poll = {
+        id: this.pollId,
+        text: questionObject.text,
+        type: questionObject.type,
+        options: questionObject.options
+      };
+      this.pollId++;
+      console.log('starting', question);
+      if (this.current.question !== -1) {
+        await this._endPoll();
+      }
+      this._startPoll(question);
+    });
+
     // share results
     client.on('server/poll/results', async () => {
       const poll = this._currentPoll();
@@ -288,8 +357,34 @@ export default class SessionSocket {
       this.nsp.to('users').emit('user/poll/results', current);
     });
 
+    // v1
+    client.on('server/question/results', async () => {
+      const question = this._currentPoll();
+      if (question === null) {
+        console.log(`Admin ${client.id} sharing results on no question`);
+        return;
+      }
+      console.log('sharing results');
+      if (this.lastPoll) {
+        await PollsRepo.updatePollById(this.lastPoll.id, null,
+          null, true);
+      }
+      const current = this.current;
+      this.nsp.to('users').emit('user/question/results', {
+        answers: current.answers,
+        results: current.results,
+        question: current.poll
+      });
+    });
+
     // End poll
     client.on('server/poll/end', () => {
+      console.log('ending quesiton');
+      this._endPoll();
+    });
+
+    // v1
+    client.on('server/question/end', () => {
       console.log('ending quesiton');
       this._endPoll();
     });
