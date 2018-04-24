@@ -14,7 +14,7 @@ const db = (): Repository<Session> => {
 var sessionCodes = {};
 
 // Create a session
-const createSession = async (name: string, code: string, user: User,
+const createSession = async (name: string, code: string, user: ?User,
   isGroup: boolean):
   Promise<Session> => {
   try {
@@ -24,7 +24,9 @@ const createSession = async (name: string, code: string, user: User,
     if (isGroup !== null && isGroup !== undefined) {
       session.isGroup = isGroup;
     }
-    session.admins = [user];
+    if (user) {
+      session.admins = [user];
+    }
 
     if (sessionCodes[code]) {
       throw new Error('Session code is already in use');
@@ -139,13 +141,15 @@ const addUsersByGoogleIds = async (id: number, googleIds: string[],
         const currAdminIds = session.admins.map(function (admin) {
           return admin.googleId;
         });
-        const users = await UsersRepo.getUsersByGoogleIds(googleIds, currAdminIds);
+        const users = await UsersRepo
+          .getUsersByGoogleIds(googleIds, currAdminIds);
         session.admins = session.admins.concat(users);
       } else {
         const currUserIds = session.members.map(function (user) {
           return user.googleId;
         });
-        const users = await UsersRepo.getUsersByGoogleIds(googleIds, currUserIds);
+        const users = await UsersRepo
+          .getUsersByGoogleIds(googleIds, currUserIds);
         session.members = session.members.concat(users);
       }
     }

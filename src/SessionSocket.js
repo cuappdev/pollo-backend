@@ -105,7 +105,8 @@ export default class SessionSocket {
       this._setupAdminEvents(client);
       client.join('admins');
       if (googleId) {
-        await SessionsRepo.addUsersByGoogleIds(this.session.id, [googleId], 'admin');
+        await SessionsRepo
+          .addUsersByGoogleIds(this.session.id, [googleId], 'admin');
       }
       break;
     case 'user':
@@ -123,7 +124,8 @@ export default class SessionSocket {
       }
 
       if (googleId) {
-        await SessionsRepo.addUsersByGoogleIds(this.session.id, [googleId], 'user');
+        await SessionsRepo
+          .addUsersByGoogleIds(this.session.id, [googleId], 'user');
       }
       break;
     default:
@@ -210,7 +212,8 @@ export default class SessionSocket {
 
       let nextState = {...this.current};
       const prev = nextState.answers[answer.googleId];
-      nextState.answers[answer.googleId] = answer.choice; // update/input user's response
+      // update/input user's response
+      nextState.answers[answer.googleId] = answer.choice;
       if (prev) { // if truthy
         // has selected something before
         nextState.results[prev].count -= 1;
@@ -258,7 +261,8 @@ export default class SessionSocket {
   _startPoll (poll: Poll) {
     // start new poll
     this.current.poll = poll.id;
-    if (this.polls[`${poll.id}`] !== null || this.polls[`${poll.id}`] !== undefined) {
+    if (this.polls[`${poll.id}`] !== null ||
+        this.polls[`${poll.id}`] !== undefined) {
       this.polls[`${poll.id}`] = {
         poll,
         answers: {}

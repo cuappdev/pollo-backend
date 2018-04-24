@@ -2,7 +2,6 @@
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/constants';
 import SessionsRepo from '../../repos/SessionsRepo';
-import UsersRepo from '../../repos/UsersRepo';
 import {Request} from 'express';
 import type { APIPoll } from './APITypes';
 
@@ -17,23 +16,19 @@ class StartPollRouter extends AppDevRouter<APIPoll> {
 
   async content (req: Request) {
     const id = req.body.id;
-    const deviceId = req.body.deviceId;
+    // const deviceId = req.body.deviceId;
     const code = req.body.code;
     var name = req.body.name;
 
     if (!name) name = '';
     var poll = await SessionsRepo.getSessionById(id);
 
-    if (!(id || (code && deviceId))) {
+    if (!(id || code)) {
       throw new Error('Poll id, or code and device id required.');
     }
 
     if (!id) {
-      var user = await UsersRepo.getUserByGoogleId(deviceId);
-      if (!user) {
-        user = await UsersRepo.createDummyUser(deviceId);
-      }
-      poll = await SessionsRepo.createSession(name, code, user, false);
+      poll = await SessionsRepo.createSession(name, code, null, false);
     }
 
     if (!poll) {
