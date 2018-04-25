@@ -130,9 +130,7 @@ const addUsersByGoogleIds = async (id: number, googleIds: string[],
         });
         const users = await UsersRepo
           .getUsersByGoogleIds(googleIds, currMemberIds);
-        console.log(users);
         session.members = session.members.concat(users);
-        console.log(session.members);
       }
     }
 
