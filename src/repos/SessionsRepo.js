@@ -167,7 +167,7 @@ const addUsersByIds = async (id: number, userIds: number[],
     await db().persist(session);
     return session;
   } catch (e) {
-    throw new Error('Problem adding users to session by groupIds!');
+    throw new Error('Problem adding users to session by ids!');
   }
 };
 
