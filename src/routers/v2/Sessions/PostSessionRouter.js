@@ -18,22 +18,19 @@ class PostSessionRouter extends AppDevRouter<Object> {
   async content (req: Request): Promise<{ node: APISession }> {
     var name = req.body.name;
     const code = req.body.code;
-    var isGroup = req.body.isGroup;
     const user = req.user;
 
     if (!name) name = '';
     if (!user) throw new Error('User missing');
     if (!code) throw new Error('Code missing');
-    if (isGroup === null || isGroup === undefined) isGroup = false;
 
-    const session = await SessionsRepo.createSession(name, code, user, isGroup);
+    const session = await SessionsRepo.createSession(name, code, user);
 
     return {
       node: {
         id: session.id,
         name: session.name,
-        code: session.code,
-        isGroup: session.isGroup
+        code: session.code
       }
     };
   }

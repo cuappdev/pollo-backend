@@ -20,8 +20,7 @@ export type EdgesResponse<T> = Response<AppDevEdgesResponse<T>>
 export type APISession = {|
   id: id,
   name: string,
-  code: string,
-  isGroup: boolean
+  code: string
 |}
 
 export type APIPoll = {|
