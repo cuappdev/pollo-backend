@@ -53,6 +53,11 @@ test('Update Draft', async () => {
   draft1 = newDraft;
 });
 
+test('Get Owner of Draft', async () => {
+  var user = await DraftsRepo.getOwnerById(draft1.id);
+  expect(user.id).toBe(user1.id);
+});
+
 test('Delete Draft', async () => {
   await DraftsRepo.deleteDraft(draft1.id);
   await DraftsRepo.deleteDraft(draft2.id);

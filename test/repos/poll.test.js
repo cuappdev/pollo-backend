@@ -58,15 +58,23 @@ test('Get Session from Poll', async () => {
   expect(p.id).toBe(session.id);
 });
 
+test('Get Polls from Session', async () => {
+  const poll =
+    await PollsRepo.createPoll('Another poll', session, {}, true);
+  const polls = await SessionsRepo.getPolls(session.id);
+  expect(polls.length).toBe(2);
+  expect(polls[1].id).toBe(poll.id);
+  expect(polls[0].id).toBe(id);
+})
+
 test('Delete Poll', async () => {
-  await SessionsRepo.deleteSessionById(session.id);
-  // await PollsRepo.deletePollById(id);
+  await PollsRepo.deletePollById(id);
   expect(await PollsRepo.getPollById(id)).not.toBeDefined();
 });
 
 // Teardown
 afterAll(async () => {
-  // await SessionsRepo.deleteSessionById(session.id);
+  await SessionsRepo.deleteSessionById(session.id);
   await UsersRepo.deleteUserById(user.id);
   console.log('Passed all poll tests');
 });

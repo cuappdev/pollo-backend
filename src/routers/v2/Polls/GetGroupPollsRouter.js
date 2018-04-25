@@ -15,7 +15,7 @@ class GetGroupPollsRouter extends AppDevRouter<Object> {
 
   async content (req: Request) {
     const id = req.params.id;
-    var polls = await SessionsRepo.getPollsBeforeDate(id);
+    var polls = await SessionsRepo.getPolls(id);
     if (!polls) throw new Error(`Problem getting polls from group id: ${id}!`);
 
     // Show only shared polls for members
