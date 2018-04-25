@@ -88,26 +88,6 @@ const deleteSessionById = async (id: number) => {
   }
 };
 
-// Delete code for a session
-const deleteCodeById = async (id: number): Promise<Session> => {
-  try {
-    const session = await db().findOneById(id);
-    if (session.code in sessionCodes) {
-      delete sessionCodes[session.code];
-    }
-    var field = {};
-    field.code = '';
-    await db().createQueryBuilder('sessions')
-      .where('sessions.id = :sessionId')
-      .setParameters({ sessionId: id })
-      .update(field)
-      .execute();
-    return await db().findOneById(id);
-  } catch (e) {
-    throw new Error(`Problem deleting code for session by id: ${id}`);
-  }
-};
-
 // Update a session by Id
 const updateSessionById = async (id: number, name: ?string):
   Promise<?Session> => {
@@ -145,12 +125,14 @@ const addUsersByGoogleIds = async (id: number, googleIds: string[],
           .getUsersByGoogleIds(googleIds, currAdminIds);
         session.admins = session.admins.concat(users);
       } else {
-        const currUserIds = session.members.map(function (user) {
+        const currMemberIds = session.members.map(function (user) {
           return user.googleId;
         });
         const users = await UsersRepo
-          .getUsersByGoogleIds(googleIds, currUserIds);
+          .getUsersByGoogleIds(googleIds, currMemberIds);
+        console.log(users);
         session.members = session.members.concat(users);
+        console.log(session.members);
       }
     }
 
@@ -180,11 +162,11 @@ const addUsersByIds = async (id: number, userIds: number[],
         const admins = await UsersRepo.getUsersFromIds(userIds, currAdminIds);
         session.admins = session.admins.concat(admins);
       } else {
-        const currUserIds = session.members.map(function (user) {
-          return user.id;
+        const currMemberIds = session.members.map(function (member) {
+          return member.id;
         });
-        const users = await UsersRepo.getUsersFromIds(userIds, currUserIds);
-        session.members = session.members.concat(users);
+        const members = await UsersRepo.getUsersFromIds(userIds, currMemberIds);
+        session.members = session.members.concat(members);
       }
     }
 
@@ -270,9 +252,8 @@ const getUsersBySessionId = async (id: number, role: ?string):
 };
 
 // Get polls before a specified date
-const getPollsBeforeDate = async (id: number, cursor: ?number):
+const getPolls = async (id: number):
   Promise<Array<?Poll>> => {
-  if (!cursor) cursor = (new Date()).getTime();
   try {
     const session = await db().createQueryBuilder('sessions')
       .leftJoinAndSelect('sessions.polls', 'polls')
@@ -291,7 +272,6 @@ export default {
   sessionCodes,
   createSession,
   createCode,
-  deleteCodeById,
   getSessionById,
   getSessionId,
   updateSessionById,
@@ -300,6 +280,6 @@ export default {
   removeUserBySessionId,
   getUsersBySessionId,
   isAdmin,
-  getPollsBeforeDate,
+  getPolls,
   addUsersByIds
 };

@@ -3,6 +3,7 @@
 *.env*
 *node_modules*
 *secret*
+*coverage*
 */public/js/*
 */public/images/*
 *.tern-project
