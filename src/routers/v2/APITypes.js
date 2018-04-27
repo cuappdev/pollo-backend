@@ -27,7 +27,8 @@ export type APISession = {|
 export type APIPoll = {|
   id: id,
   text: string,
-  results: Object
+  results: Object,
+  answer: ?string
 |}
 
 export type APIDraft = {|

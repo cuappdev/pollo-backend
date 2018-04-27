@@ -9,7 +9,7 @@ const db = (): Repository<Poll> => {
 
 // Create a poll
 const createPoll = async (text: string, session: ?Session, results: json,
-  canShare: boolean):
+  canShare: boolean, userAnswers: ?json):
   Promise <Poll> => {
   try {
     const poll = new Poll();
@@ -17,6 +17,9 @@ const createPoll = async (text: string, session: ?Session, results: json,
     poll.session = session;
     poll.results = results;
     poll.shared = canShare;
+    if (userAnswers) {
+      poll.userAnswers = userAnswers;
+    }
 
     await db().persist(poll);
     return poll;
@@ -47,13 +50,14 @@ const deletePollById = async (id: number) => {
 
 // Update a poll by id
 const updatePollById = async (id: number, text: ?string, results: ?json,
-  canShare: ?boolean):
+  canShare: ?boolean, userAnswers: ?json):
   Promise<?Poll> => {
   try {
     var field = {};
     if (text) field.text = text;
     if (results) field.results = results;
     if (canShare !== null) field.shared = canShare;
+    if (userAnswers) field.userAnswers = userAnswers;
 
     await db().createQueryBuilder('polls')
       .where('polls.id = :pollId')
