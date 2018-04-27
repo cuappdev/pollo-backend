@@ -39,8 +39,7 @@ class UpdateSessionRouter extends AppDevRouter<APISession> {
       node: {
         id: session.id,
         name: session.name,
-        code: session.code,
-        isGroup: session.isGroup
+        code: session.code
       }
     };
   }

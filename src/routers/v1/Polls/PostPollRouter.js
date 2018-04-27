@@ -30,7 +30,7 @@ class PostPollRouter extends AppDevRouter<Object> {
       user = await UsersRepo.createDummyUser(deviceId);
     }
 
-    const poll = await SessionsRepo.createSession(name, code, user, false);
+    const poll = await SessionsRepo.createSession(name, code, user);
 
     return {
       node: {

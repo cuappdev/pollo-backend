@@ -21,7 +21,7 @@ class PostAdminsRouter extends AppDevRouter<Object> {
     if (!adminIds) throw new Error('List of admin ids missing!');
 
     if (!await SessionsRepo.isAdmin(id, user)) {
-      throw new Error('You are not authorized to add admins to this group!');
+      throw new Error('You are not authorized to add admins to this session!');
     }
 
     await SessionsRepo.addUsersByIds(id, adminIds, 'admin');

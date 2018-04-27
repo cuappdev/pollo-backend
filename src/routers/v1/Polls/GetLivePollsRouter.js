@@ -20,9 +20,6 @@ class GetLivePollsRouter extends AppDevRouter<Object> {
     const polls = await req.app.sessionManager.liveSessions(codes);
     return polls
       .filter(Boolean)
-      .filter(function (s) {
-        return !s.isGroup;
-      })
       .map(poll => ({
         node: {
           id: poll.id,

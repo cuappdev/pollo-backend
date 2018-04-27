@@ -26,7 +26,7 @@ class EndSessionRouter extends AppDevRouter<Object> {
       throw new Error('Not authorized to end session.');
     }
 
-    if (!session.isGroup && (save === 'false' || save === '0')) {
+    if (save === 'false' || save === '0') {
       await SessionsRepo.deleteSessionById(id);
     }
 

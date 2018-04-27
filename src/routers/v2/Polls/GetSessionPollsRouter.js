@@ -4,7 +4,7 @@ import AppDevRouter from '../../../utils/AppDevRouter';
 import SessionsRepo from '../../../repos/SessionsRepo';
 import constants from '../../../utils/constants';
 
-class GetGroupPollsRouter extends AppDevRouter<Object> {
+class GetSessionPollsRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.GET);
   }
@@ -49,4 +49,4 @@ class GetGroupPollsRouter extends AppDevRouter<Object> {
   }
 }
 
-export default new GetGroupPollsRouter().router;
+export default new GetSessionPollsRouter().router;

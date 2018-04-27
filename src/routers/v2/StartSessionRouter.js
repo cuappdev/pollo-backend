@@ -18,10 +18,8 @@ class StartSessionRouter extends AppDevRouter<APISession> {
     const id = req.body.id;
     const code = req.body.code;
     var name = req.body.name;
-    var isGroup = req.body.isGroup;
 
     if (!name) name = '';
-    if (isGroup === null) isGroup = false;
 
     if (!(id || code)) {
       throw new Error('Session id, or code and device id required.');
@@ -37,7 +35,7 @@ class StartSessionRouter extends AppDevRouter<APISession> {
     }
 
     if (!id && !session) {
-      session = await SessionsRepo.createSession(name, code, req.user, isGroup);
+      session = await SessionsRepo.createSession(name, code, req.user);
     }
 
     if (!session) {
@@ -52,8 +50,7 @@ class StartSessionRouter extends AppDevRouter<APISession> {
       node: {
         id: session.id,
         name: session.name,
-        code: session.code,
-        isGroup: session.isGroup
+        code: session.code
       }
     };
   }

@@ -28,7 +28,7 @@ class StartPollRouter extends AppDevRouter<APIPoll> {
     }
 
     if (!id) {
-      poll = await SessionsRepo.createSession(name, code, null, false);
+      poll = await SessionsRepo.createSession(name, code, null);
     }
 
     if (!poll) {
