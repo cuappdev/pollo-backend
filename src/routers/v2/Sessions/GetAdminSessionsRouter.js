@@ -18,15 +18,11 @@ class GetSessionsRouter extends AppDevRouter<Object> {
     if (!sessions) throw new Error('Can\'t find sessions for user!');
     return sessions
       .filter(Boolean)
-      .filter(function (s) {
-        return !s.isGroup;
-      })
       .map(session => ({
         node: {
           id: session.id,
           name: session.name,
-          code: session.code,
-          isGroup: session.isGroup
+          code: session.code
         }
       }));
   }

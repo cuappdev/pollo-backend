@@ -21,7 +21,7 @@ class PostMembersRouter extends AppDevRouter<Object> {
     if (!memberIds) throw new Error('List of member ids missing!');
 
     if (!await SessionsRepo.isAdmin(id, user)) {
-      throw new Error('You are not authorized to add members to this group!');
+      throw new Error('You are not authorized to add members to this session!');
     }
 
     await SessionsRepo.addUsersByIds(id, memberIds, 'member');

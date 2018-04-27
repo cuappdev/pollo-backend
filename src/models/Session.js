@@ -22,9 +22,6 @@ export class Session extends Base {
   @Column('string')
   code: string = '';
 
-  @Column('boolean')
-  isGroup: boolean = false;
-
   @ManyToMany(type => User, user => user.adminSessions)
   @JoinTable()
   admins: ?User[] = [];

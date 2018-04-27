@@ -4,7 +4,7 @@ import AppDevRouter from '../../../utils/AppDevRouter';
 import SessionsRepo from '../../../repos/SessionsRepo';
 import constants from '../../../utils/constants';
 
-class GetGroupPollsRouter extends AppDevRouter<Object> {
+class GetSessionPollsRouter extends AppDevRouter<Object> {
   constructor () {
     super(constants.REQUEST_TYPES.GET);
   }
@@ -16,7 +16,7 @@ class GetGroupPollsRouter extends AppDevRouter<Object> {
   async content (req: Request) {
     const id = req.params.id;
     var polls = await SessionsRepo.getPolls(id);
-    if (!polls) throw new Error(`Problem getting polls from group id: ${id}!`);
+    if (!polls) throw new Error(`Problem getting polls from session id: ${id}!`);
 
     // Show only shared polls for members
     if (!await SessionsRepo.isAdmin(id, req.user)) {
@@ -48,4 +48,4 @@ class GetGroupPollsRouter extends AppDevRouter<Object> {
   }
 }
 
-export default new GetGroupPollsRouter().router;
+export default new GetSessionPollsRouter().router;

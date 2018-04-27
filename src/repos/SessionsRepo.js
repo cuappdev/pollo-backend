@@ -14,16 +14,12 @@ const db = (): Repository<Session> => {
 var sessionCodes = {};
 
 // Create a session
-const createSession = async (name: string, code: string, user: ?User,
-  isGroup: boolean):
+const createSession = async (name: string, code: string, user: ?User):
   Promise<Session> => {
   try {
     const session = new Session();
     session.name = name;
     session.code = code;
-    if (isGroup !== null && isGroup !== undefined) {
-      session.isGroup = isGroup;
-    }
     if (user) {
       session.admins = [user];
     }
@@ -171,7 +167,7 @@ const addUsersByIds = async (id: number, userIds: number[],
     await db().persist(session);
     return session;
   } catch (e) {
-    throw new Error('Problem adding users to session by groupIds!');
+    throw new Error('Problem adding users to session by ids!');
   }
 };
 
