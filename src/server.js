@@ -2,7 +2,7 @@
 import API from './API';
 import dbConnection from './db/DbConnection';
 import http from 'http';
-import PollManager from './PollManager';
+import SessionManager from './SessionManager';
 
 type Error = {
   errno?: number;
@@ -13,7 +13,7 @@ type Error = {
 
 const app: API = new API();
 const server: http.Server = http.createServer(app.express);
-app.express.pollManager = new PollManager(server);
+app.express.sessionManager = new SessionManager(server);
 const port: number = 3000;
 
 const onError = (error: Error): void => {

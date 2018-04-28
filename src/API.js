@@ -5,6 +5,11 @@ import express from 'express';
 import globby from 'globby';
 import path from 'path';
 import cors from 'cors';
+import passport from 'passport';
+import UsersRepo from './repos/UsersRepo';
+import UserSessionsRepo from './repos/UserSessionsRepo';
+import dotenv from 'dotenv';
+import lib from './utils/lib';
 
 class API {
   express: Express;
@@ -12,6 +17,7 @@ class API {
   constructor () {
     this.express = express();
     this.middleware();
+    this.auth();
     this.routes();
   }
 
@@ -42,19 +48,108 @@ class API {
     this.express.use(cors());
   }
 
+  auth (): void {
+    const GoogleStrategy = require('passport-google-oauth20').Strategy;
+
+    passport.serializeUser(function (user, done) {
+      done(null, user);
+    });
+
+    passport.deserializeUser(function (user, done) {
+      done(null, user);
+    });
+
+    dotenv.config();
+    passport.use(new GoogleStrategy({
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_REDIRECT_URI
+    },
+    async function (accessToken, refreshToken, profile, done) {
+      var user = await UsersRepo.getUserByGoogleId(profile.id);
+      if (!user) {
+        user = await UsersRepo.createUser(profile);
+      }
+      const session = await UserSessionsRepo
+        .createOrUpdateSession(user, accessToken, refreshToken);
+      const response = {
+        accessToken: session.sessionToken,
+        refreshToken: session.updateToken,
+        sessionExpiration: session.expiresAt,
+        isActive: session.isActive
+      };
+      return done(null, response);
+    }
+    ));
+
+    this.express.use(passport.initialize());
+    this.express.use(passport.session());
+
+    this.express.get('/auth/google',
+      passport.authenticate('google', { scope: ['profile', 'email'] }));
+    this.express.get('/auth/google/callback',
+      passport.authenticate('google', { failureRedirect: '/error' }),
+      function (req, res) {
+        const r = {success: true, data: req.user};
+        res.json(r);
+      });
+    this.express.post('/auth/refresh', lib.updateSession, function (req, res) {
+      const r = {success: true, data: req.session};
+      res.json(r);
+    });
+    this.express.get('/error',
+      (req, res) => res.send('Error authenticating!'));
+    this.express.post('/api/v2/auth/mobile', async function (req, res) {
+      const googleId = req.body.userId;
+      const first = req.body.givenName;
+      const last = req.body.familyName;
+      const email = req.body.email;
+
+      var user = await UsersRepo.getUserByGoogleId(googleId);
+      if (!user) {
+        user = await UsersRepo.createUserWithFields(googleId, first, last,
+          email);
+      }
+
+      const session = await UserSessionsRepo
+        .createOrUpdateSession(user, null, null);
+      const response = {
+        accessToken: session.sessionToken,
+        refreshToken: session.updateToken,
+        sessionExpiration: session.expiresAt,
+        isActive: session.isActive
+      };
+      res.json({success: true, data: response});
+    });
+  }
+
   routes (): void {
     const registered = [];
 
-    // Connect all routers in ./routers
-    const opts = { cwd: path.join(__dirname, 'routers') };
+    // Connect all routers in ./routers/v1
+    const opts = { cwd: path.join(__dirname, 'routers/v1') };
     globby.sync(['**/*Router.js'], opts).forEach(file => {
-      const router = require('./routers/' + file).default;
+      // All v2 routes
+      const router = require('./routers/v1/' + file).default;
 
       registered.push(...router.stack
         .filter(r => r.route)
         .map(r => `/api/v1${r.route.path}`));
 
       this.express.use('/api/v1', router);
+    });
+
+    // Connect all routers in ./routers/v2
+    const opts2 = { cwd: path.join(__dirname, 'routers/v2') };
+    globby.sync(['**/*Router.js'], opts2).forEach(file => {
+      // All v2 routes
+      const router = require('./routers/v2/' + file).default;
+
+      registered.push(...router.stack
+        .filter(r => r.route)
+        .map(r => `/api/v2${r.route.path}`));
+
+      this.express.use('/api/v2', router);
     });
 
     // Fallback prints all registered routes

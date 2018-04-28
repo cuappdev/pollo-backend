@@ -1,34 +1,38 @@
 var formurlencoded = require('form-urlencoded');
 
-const post = (path, body) => {
+const post = (path, body, token) => {
   return {
     method: 'POST',
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
-    uri: 'http://localhost:3000/api/v1' + path,
+    headers: { 'content-type': 'application/x-www-form-urlencoded',
+      'Authorization': 'Bearer ' + token},
+    uri: 'http://localhost:3000/api/v2' + path,
     body: formurlencoded(body)
   };
 };
 
-const put = (path, body) => {
+const put = (path, body, token) => {
   return {
     method: 'PUT',
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
-    uri: 'http://localhost:3000/api/v1' + path,
+    headers: { 'content-type': 'application/x-www-form-urlencoded',
+      'Authorization': 'Bearer ' + token },
+    uri: 'http://localhost:3000/api/v2' + path,
     body: formurlencoded(body)
   };
 };
 
-const get = (path) => {
+const get = (path, token) => {
   return {
     method: 'GET',
-    uri: 'http://localhost:3000/api/v1' + path
+    headers: { 'Authorization': 'Bearer ' + token },
+    uri: 'http://localhost:3000/api/v2' + path
   };
 };
 
-const del = (path) => {
+const del = (path, token) => {
   return {
     method: 'DELETE',
-    uri: 'http://localhost:3000/api/v1' + path
+    headers: { 'Authorization': 'Bearer ' + token },
+    uri: 'http://localhost:3000/api/v2' + path
   };
 };
 

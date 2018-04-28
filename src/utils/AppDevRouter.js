@@ -3,6 +3,7 @@
 // serving up JSON responses based on HTTP verb
 
 import type {RequestType} from './constants';
+import AppDevResponse from './AppDevResponse';
 
 import {
   Router,
@@ -12,16 +13,7 @@ import {
 } from 'express';
 
 import constants from './constants';
-
-class AppDevResponse<T> {
-  success: boolean;
-  data: T;
-
-  constructor (success: boolean, data: T) {
-    this.success = success;
-    this.data = data;
-  }
-}
+import lib from './lib';
 
 /**
  * T is the response type for AppDevRouter
@@ -29,14 +21,20 @@ class AppDevResponse<T> {
 export default class AppDevRouter<T: Object> {
   router: Router;
   requestType: RequestType;
+  authenticated: boolean;
 
   getPath (): string {
     throw new Error('You must implement getPath() with a valid path!');
   }
 
-  constructor (type: RequestType) {
+  constructor (type: RequestType, auth: ?boolean) {
     this.router = new Router();
     this.requestType = type;
+    if (auth !== undefined && auth !== null) {
+      this.authenticated = auth;
+    } else {
+      this.authenticated = true;
+    }
 
     // Initialize this router
     this.init();
@@ -53,21 +51,37 @@ export default class AppDevRouter<T: Object> {
     } else if (path[path.length - 1] !== '/') {
       throw new Error('Path must end with a \'/\'!');
     }
-
     // Attach content to router
-    switch (this.requestType) {
-    case constants.REQUEST_TYPES.GET:
-      this.router.get(path, this.response);
-      break;
-    case constants.REQUEST_TYPES.POST:
-      this.router.post(path, this.response);
-      break;
-    case constants.REQUEST_TYPES.DELETE:
-      this.router.delete(path, this.response);
-      break;
-    case constants.REQUEST_TYPES.PUT:
-      this.router.put(path, this.response);
-      break;
+    if (this.authenticated) {
+      switch (this.requestType) {
+      case constants.REQUEST_TYPES.GET:
+        this.router.get(path, lib.ensureAuthenticated, this.response);
+        break;
+      case constants.REQUEST_TYPES.POST:
+        this.router.post(path, lib.ensureAuthenticated, this.response);
+        break;
+      case constants.REQUEST_TYPES.DELETE:
+        this.router.delete(path, lib.ensureAuthenticated, this.response);
+        break;
+      case constants.REQUEST_TYPES.PUT:
+        this.router.put(path, lib.ensureAuthenticated, this.response);
+        break;
+      }
+    } else {
+      switch (this.requestType) {
+      case constants.REQUEST_TYPES.GET:
+        this.router.get(path, this.response);
+        break;
+      case constants.REQUEST_TYPES.POST:
+        this.router.post(path, this.response);
+        break;
+      case constants.REQUEST_TYPES.DELETE:
+        this.router.delete(path, this.response);
+        break;
+      case constants.REQUEST_TYPES.PUT:
+        this.router.put(path, this.response);
+        break;
+      }
     }
   }
 

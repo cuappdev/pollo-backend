@@ -3,25 +3,31 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToMany
+  ManyToOne,
+  json
 } from 'typeorm';
-import {Base} from './Base';
-import { Question } from './Question';
-
+import { Base } from './Base';
+import { Session } from './Session';
 @Entity('polls')
 export class Poll extends Base {
   @PrimaryGeneratedColumn()
   id: any = null;
 
   @Column('string')
-  name: string = '';
+  text: string = '';
 
-  @Column('string')
-  code: string = '';
+  @ManyToOne(type => Session, session => session.polls, {
+    onDelete: 'CASCADE'
+  })
+  session: ?Session = null;
 
-  @Column('string')
-  deviceId: string = '';
+  @Column('json')
+  results: json = {};
 
-  @OneToMany(type => Question, question => question.poll)
-  questions: ?Question[] = [];
+  // Google ids mapped to answer choice
+  @Column('json')
+  userAnswers: json = {};
+
+  @Column('boolean')
+  shared: boolean = true;
 }
