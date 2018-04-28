@@ -61,6 +61,7 @@ export default class SessionSocket {
   usersConnected: number;
 
   lastPoll = null;
+  lastState = {};
 
   // Google ids of every admin/user who has joined the session
   adminGoogleIds = [];
@@ -299,6 +300,7 @@ export default class SessionSocket {
     }
     this.lastPoll = await PollsRepo.createPoll(poll.text,
       this.session, this.current.results, false, this.current.answers);
+    this.lastState = this.current;
     this.nsp.to('users').emit('user/poll/end', { poll });
     this.nsp.to('users').emit('user/question/end', { question: poll }); // v1
     this.current.poll = -1;
@@ -357,34 +359,34 @@ export default class SessionSocket {
 
     // share results
     client.on('server/poll/results', async () => {
-      const poll = this._currentPoll();
-      if (poll === null) {
-        console.log(`Admin ${client.id} sharing results on no poll`);
-        return;
-      }
+      // const poll = this._currentPoll();
+      // if (poll === null) {
+      //   console.log(`Admin ${client.id} sharing results on no poll`);
+      //   return;
+      // }
       console.log('sharing results');
       // Update poll to 'shared'
       if (this.lastPoll) {
         await PollsRepo.updatePollById(this.lastPoll.id, null,
           null, true);
       }
-      const current = this.current;
+      const current = this.lastState;
       this.nsp.to('users').emit('user/poll/results', current);
     });
 
     // v1
     client.on('server/question/results', async () => {
-      const question = this._currentPoll();
-      if (question === null) {
-        console.log(`Admin ${client.id} sharing results on no question`);
-        return;
-      }
+      // const question = this._currentPoll();
+      // if (question === null) {
+      //   console.log(`Admin ${client.id} sharing results on no question`);
+      //   return;
+      // }
       console.log('sharing results');
       if (this.lastPoll) {
         await PollsRepo.updatePollById(this.lastPoll.id, null,
           null, true);
       }
-      const current = this.current;
+      const current = this.lastState;
       this.nsp.to('users').emit('user/question/results', {
         answers: current.answers,
         results: current.results,
