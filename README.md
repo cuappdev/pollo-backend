@@ -17,6 +17,9 @@ export DB_HOST=localhost
 export DB_USERNAME=FILL_IN
 export DB_PASSWORD=FILL_IN
 export DB_NAME=clicker
+export GOOGLE_CLIENT_ID=FILL_IN
+export GOOGLE_CLIENT_SECRET=FILL_IN
+export GOOGLE_REDIRECT_URI=FILL_IN
 ````
 Using [`autoenv`](https://github.com/kennethreitz/autoenv) to make an .env file with the above contents in the project directory is recommended.
 
