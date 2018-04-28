@@ -58,6 +58,7 @@ export default class SessionSocket {
   // Counter for generating poll/answer ids
   pollId: number;
   answerId: number;
+  usersConnected: number;
 
   lastPoll = null;
 
@@ -80,6 +81,7 @@ export default class SessionSocket {
     this.polls = {};
     this.pollId = 0;
     this.answerId = 0;
+    this.usersConnected = 0;
   }
 
   // v1 message
@@ -104,6 +106,7 @@ export default class SessionSocket {
       }
       this._setupAdminEvents(client);
       client.join('admins');
+      client.emit('user/count', { count: this.usersConnected });
       if (googleId) {
         await SessionsRepo
           .addUsersByGoogleIds(this.session.id, [googleId], 'admin');
@@ -116,6 +119,10 @@ export default class SessionSocket {
       }
       this._setupUserEvents(client);
       client.join('users');
+
+      this.usersConnected++;
+      this.nsp.to('users').emit('user/count', { count: this.usersConnected });
+      this.nsp.to('admins').emit('user/count', { count: this.usersConnected });
 
       const currentPoll = this._currentPoll();
       if (currentPoll) {
@@ -245,6 +252,9 @@ export default class SessionSocket {
       if (this.nsp.connected.length === 0) {
         this.onClose();
       }
+      this.usersConnected--;
+      this.nsp.to('users').emit('user/count', { count: this.usersConnected });
+      this.nsp.to('admins').emit('user/count', { count: this.usersConnected });
     });
   }
 
@@ -288,9 +298,10 @@ export default class SessionSocket {
       return;
     }
     this.lastPoll = await PollsRepo.createPoll(poll.text,
-      this.session, this.current.results, false);
+      this.session, this.current.results, false, this.current.answers);
     this.nsp.to('users').emit('user/poll/end', { poll });
     this.nsp.to('users').emit('user/question/end', { question: poll }); // v1
+    this.current.poll = -1;
   }
 
   /**
@@ -383,13 +394,13 @@ export default class SessionSocket {
 
     // End poll
     client.on('server/poll/end', () => {
-      console.log('ending quesiton');
+      console.log('ending question');
       this._endPoll();
     });
 
     // v1
     client.on('server/question/end', () => {
-      console.log('ending quesiton');
+      console.log('ending question');
       this._endPoll();
     });
 

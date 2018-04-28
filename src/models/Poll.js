@@ -24,6 +24,10 @@ export class Poll extends Base {
   @Column('json')
   results: json = {};
 
+  // Google ids mapped to answer choice
+  @Column('json')
+  userAnswers: json = {};
+
   @Column('boolean')
   shared: boolean = true;
 }

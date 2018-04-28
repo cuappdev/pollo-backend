@@ -16,9 +16,10 @@ class GetPollsRouter extends AppDevEdgeRouter<APIPoll> {
 
   async contentArray (req, pageInfo, error) {
     const id = req.params.id;
+    const isAdmin = await SessionsRepo.isAdmin(id, req.user);
     var polls;
 
-    if (await SessionsRepo.isAdmin(id, req.user)) {
+    if (isAdmin) {
       polls = await PollsRepo.getPollsFromSessionId(id);
     } else {
       polls = await PollsRepo.getSharedPollsFromSessionId(id);
@@ -31,7 +32,8 @@ class GetPollsRouter extends AppDevEdgeRouter<APIPoll> {
           node: {
             id: poll.id,
             text: poll.text,
-            results: poll.results
+            results: poll.results,
+            answer: isAdmin ? null : poll.userAnswers[req.user.googleId]
           },
           cursor: poll.createdAt.valueOf()
         };

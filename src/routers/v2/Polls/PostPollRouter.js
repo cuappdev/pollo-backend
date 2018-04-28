@@ -41,7 +41,8 @@ class PostPollRouter extends AppDevRouter<Object> {
       node: {
         id: poll.id,
         text: poll.text,
-        results: poll.results
+        results: poll.results,
+        answer: null
       }
     };
   }
