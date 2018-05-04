@@ -14,6 +14,7 @@ class PostMembersRouter extends AppDevRouter<Object> {
   }
 
   async content (req: Request) {
+    console.log(req);
     const id = req.params.id;
     const user = req.user;
     const memberIds = req.body.memberIds;
@@ -23,7 +24,9 @@ class PostMembersRouter extends AppDevRouter<Object> {
     if (!await SessionsRepo.isAdmin(id, user)) {
       throw new Error('You are not authorized to add members to this session!');
     }
-
+    console.log(memberIds);
+    console.log(memberIds[1]);
+    console.log(memberIds.length);
     await SessionsRepo.addUsersByIds(id, memberIds, 'member');
     return null;
   }

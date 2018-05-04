@@ -37,6 +37,51 @@ test('get single session', async () => {
   expect(sessionres).toMatchObject(getres);
 });
 
+test('get sessions for admin', async () => {
+  const getstr = await request(get(`/sessions/all/admin`, token));
+  const getres = JSON.parse(getstr);
+  expect(getres.success).toBeTruthy();
+  expect(sessionres.data).toMatchObject(getres.data[0]);
+});
+
+test('get admins for session', async () => {
+  const getstr = await request(get(`/sessions/${sessionres.data.node.id}/admins/`, token));
+  const getres = JSON.parse(getstr);
+  expect(getres.success).toBeTruthy();
+  const edges = getres.data.edges;
+  expect(edges.length).toBe(1);
+  expect(edges[0].node.id).toBe(userId);
+});
+
+test('get members for session', async () => {
+  const getstr = await request(get(`/sessions/${sessionres.data.node.id}/members/`, token));
+  const getres = JSON.parse(getstr);
+  expect(getres.success).toBeTruthy();
+  const edges = getres.data.edges;
+  expect(edges.length).toBe(0);
+});
+
+test('add/remove members from session', async () => {
+  const user = await UsersRepo.createDummyUser('dummy');
+  const body = {
+    memberIds: JSON.stringify([user.id])
+  };
+  console.log(body);
+  const getstr =
+    await request(post(`/sessions/${sessionres.data.node.id}/members/`, body, token));
+  const getres = JSON.parse(getstr);
+  console.log(getres);
+  expect(getres.success).toBeTruthy();
+  await UsersRepo.deleteUserById(user.id);
+});
+
+test('get sessions for admin', async () => {
+  const getstr = await request(get(`/sessions/all/admin/`, token));
+  const getres = JSON.parse(getstr);
+  expect(getres.success).toBeTruthy();
+  expect(getres.data[0]).toMatchObject(sessionres.data);
+});
+
 test('update session', async () => {
   const getstr =
     await request(put(`/sessions/${sessionres.data.node.id}`, opts2, token));
