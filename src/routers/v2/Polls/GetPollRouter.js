@@ -19,14 +19,12 @@ class GetPollRouter extends AppDevNodeRouter<APIPoll> {
     if (!session) throw new Error(`Session with id ${id} cannot be found`);
 
     const isAdmin = await SessionsRepo.isAdmin(session.id, req.user);
-    if (!poll.shared && !isAdmin) {
-      throw new Error('This poll is not shared with you');
-    }
 
     return poll && {
       id: poll.id,
       text: poll.text,
       results: poll.results,
+      shared: poll.shared,
       answer: isAdmin ? null : poll.userAnswers[req.user.googleId]
     };
   }
