@@ -22,7 +22,7 @@ beforeAll(async () => {
 
 test('get user', async () => {
   const getstr = await request(get(`/users/`, token));
-  const getres = JSON.parse(getstr);
+  const getres = getstr;
   expect(getres.success).toBeTruthy();
   expect(user.id).toBe(getres.data.id);
   expect(user.netId).toBe(getres.data.netId);

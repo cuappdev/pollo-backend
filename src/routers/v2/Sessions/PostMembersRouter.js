@@ -23,7 +23,6 @@ class PostMembersRouter extends AppDevRouter<Object> {
     if (!await SessionsRepo.isAdmin(id, user)) {
       throw new Error('You are not authorized to add members to this session!');
     }
-
     await SessionsRepo.addUsersByIds(id, memberIds, 'member');
     return null;
   }

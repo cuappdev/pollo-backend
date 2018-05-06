@@ -1,22 +1,20 @@
-var formurlencoded = require('form-urlencoded');
-
 const post = (path, body, token) => {
   return {
     method: 'POST',
-    headers: { 'content-type': 'application/x-www-form-urlencoded',
-      'Authorization': 'Bearer ' + token},
-    uri: 'http://localhost:3000/api/v2' + path,
-    body: formurlencoded(body)
+    headers: { 'Authorization': 'Bearer ' + token },
+    url: 'http://localhost:3000/api/v2' + path,
+    body: body,
+    json: true
   };
 };
 
 const put = (path, body, token) => {
   return {
     method: 'PUT',
-    headers: { 'content-type': 'application/x-www-form-urlencoded',
-      'Authorization': 'Bearer ' + token },
+    headers: { 'Authorization': 'Bearer ' + token },
     uri: 'http://localhost:3000/api/v2' + path,
-    body: formurlencoded(body)
+    body: body,
+    json: true
   };
 };
 
@@ -24,7 +22,8 @@ const get = (path, token) => {
   return {
     method: 'GET',
     headers: { 'Authorization': 'Bearer ' + token },
-    uri: 'http://localhost:3000/api/v2' + path
+    uri: 'http://localhost:3000/api/v2' + path,
+    json: true
   };
 };
 
@@ -32,7 +31,8 @@ const del = (path, token) => {
   return {
     method: 'DELETE',
     headers: { 'Authorization': 'Bearer ' + token },
-    uri: 'http://localhost:3000/api/v2' + path
+    uri: 'http://localhost:3000/api/v2' + path,
+    json: true
   };
 };
 

@@ -6,6 +6,7 @@ var id;
 var code;
 var user;
 var user2;
+var user3;
 var poll;
 var poll2;
 
@@ -109,7 +110,7 @@ test('Add Members To Session By Id', async () => {
   expect(members.length).toEqual(1);
   expect(members[0].googleId).toBe(user2.googleId);
 
-  const user3 = await UsersRepo.createDummyUser('sessiontest3');
+  user3 = await UsersRepo.createDummyUser('sessiontest3');
   members =
     (await SessionsRepo.addUsersByIds(id, [user3.id], 'member')).members;
   expect(members.length).toEqual(2);
@@ -129,5 +130,6 @@ test('Delete Session', async () => {
 afterAll(async () => {
   await UsersRepo.deleteUserById(user.id);
   await UsersRepo.deleteUserById(user2.id);
+  await UsersRepo.deleteUserById(user3.id);
   console.log('Passed all session tests');
 });

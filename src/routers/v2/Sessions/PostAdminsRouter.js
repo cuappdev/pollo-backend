@@ -16,7 +16,7 @@ class PostAdminsRouter extends AppDevRouter<Object> {
   async content (req: Request) {
     const id = req.params.id;
     const user = req.user;
-    const adminIds = req.body.memberIds;
+    const adminIds = req.body.adminIds;
 
     if (!adminIds) throw new Error('List of admin ids missing!');
 
