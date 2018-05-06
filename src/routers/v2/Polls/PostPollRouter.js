@@ -25,7 +25,9 @@ class PostPollRouter extends AppDevRouter<Object> {
 
     if (!text) text = '';
     if (!results) results = {};
+    console.log(shared);
     if (shared === null) shared = false;
+    console.log(shared);
 
     const session = await SessionsRepo.getSessionById(sessionId);
     if (!session) throw new Error(`Couldn't find session with id ${sessionId}`);
@@ -42,6 +44,7 @@ class PostPollRouter extends AppDevRouter<Object> {
         id: poll.id,
         text: poll.text,
         results: poll.results,
+        shared: poll.shared,
         answer: null
       }
     };

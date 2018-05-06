@@ -27,6 +27,7 @@ export type APIPoll = {|
   id: id,
   text: string,
   results: Object,
+  shared: boolean,
   answer: ?string
 |}
 

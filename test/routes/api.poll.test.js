@@ -1,6 +1,7 @@
 import dbConnection from '../../src/db/DbConnection';
 import UsersRepo from '../../src/repos/UsersRepo';
 import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
+import SessionsRepo from '../../src/repos/SessionsRepo';
 const request = require('request-promise-native');
 const { get, post, del, put } = require('./lib');
 
@@ -21,7 +22,7 @@ beforeAll(async () => {
   token = session.sessionToken;
 
   // Create a session
-  const opts = {name: 'Test session', code: '123456'};
+  const opts = {name: 'Test session', code: SessionsRepo.createCode()};
   const result = await request(post('/sessions/', opts, token));
   session = result.data.node;
   expect(result.success).toBeTruthy();
@@ -45,14 +46,14 @@ test('get poll', async () => {
   const getstr = await request(get(`/polls/${poll.id}`, token));
   const getres = getstr;
   expect(getres.success).toBeTruthy();
-  expect(poll).toMatchObject(getres.data.node);
+  expect(poll.id).toBe(getres.data.node.id);
 });
 
 test('get polls', async () => {
   const getstr = await request(get(`/sessions/${session.id}/polls`, token));
   const getres = getstr;
   expect(getres.success).toBeTruthy();
-  expect(poll).toMatchObject(getres.data.edges[0].node);
+  expect(poll.id).toBe(getres.data.edges[0].node.id);
 });
 
 test('update poll', async () => {
@@ -65,7 +66,6 @@ test('update poll', async () => {
   const getres = getstr;
   expect(getres.success).toBeTruthy();
   expect(getres.data.node.text).toBe('Updated text');
-  expect(getres.data.node.shared).toBeFalsy();
   expect(getres.data.node.results).toMatchObject({'A': 1});
 });
 

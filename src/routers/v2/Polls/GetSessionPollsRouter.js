@@ -18,12 +18,6 @@ class GetSessionPollsRouter extends AppDevRouter<Object> {
     var polls = await SessionsRepo.getPolls(id);
     if (!polls) throw new Error(`Problem getting polls from group id: ${id}!`);
     const isAdmin = await SessionsRepo.isAdmin(id, req.user);
-    // Show only shared polls for members
-    if (!isAdmin) {
-      polls = polls.filter(function (p) {
-        return p && p.shared;
-      });
-    }
 
     // Date mapped to list of polls
     const pollsByDate = {};
@@ -36,6 +30,7 @@ class GetSessionPollsRouter extends AppDevRouter<Object> {
           id: poll.id,
           text: poll.text,
           results: poll.results,
+          shared: poll.shared,
           answer: isAdmin ? null : poll.userAnswers[req.user.googleId]
         };
         if (pollsByDate[date]) {
