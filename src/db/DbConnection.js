@@ -9,6 +9,7 @@ import dotenv from 'dotenv';
 import {Base} from '../models/Base';
 import {Session} from '../models/Session';
 import {Poll} from '../models/Poll';
+import {Question} from '../models/Question';
 import {Draft} from '../models/Draft';
 import {User} from '../models/User';
 import {UserSession} from '../models/UserSession';
@@ -29,6 +30,7 @@ const entities = [
   Base,
   Session,
   Poll,
+  Question,
   Draft,
   User,
   UserSession

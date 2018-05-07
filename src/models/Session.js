@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Base } from './Base';
 import { Poll } from './Poll';
+import { Question } from './Question';
 import { User } from './User';
 
 @Entity('sessions')
@@ -30,6 +31,11 @@ export class Session extends Base {
     cascadeRemove: true
   })
   polls: ?Poll[] = [];
+
+  @OneToMany(type => Question, question => question.session, {
+    cascadeRemove: true
+  })
+  questions: ?Question[] = [];
 
   @ManyToMany(type => User, user => user.memberSessions)
   @JoinTable()

@@ -3,6 +3,7 @@ import { getConnectionManager, Repository } from 'typeorm';
 import { Session } from '../models/Session';
 import { User } from '../models/User';
 import { Poll } from '../models/Poll';
+import { Question } from '../models/Question';
 import appDevUtils from '../utils/appDevUtils';
 import UsersRepo from './UsersRepo';
 
@@ -109,6 +110,7 @@ const addUsersByGoogleIds = async (id: number, googleIds: string[],
       .leftJoinAndSelect('sessions.admins', 'admins')
       .leftJoinAndSelect('sessions.members', 'members')
       .leftJoinAndSelect('sessions.polls', 'polls')
+      .leftJoinAndSelect('sessions.questions', 'questions')
       .where('sessions.id = :sessionId')
       .setParameters({ sessionId: id })
       .getOne();
@@ -145,6 +147,7 @@ const addUsersByIds = async (id: number, userIds: number[],
       .leftJoinAndSelect('sessions.admins', 'admins')
       .leftJoinAndSelect('sessions.members', 'members')
       .leftJoinAndSelect('sessions.polls', 'polls')
+      .leftJoinAndSelect('sessions.questions', 'questions')
       .where('sessions.id = :sessionId')
       .setParameters({ sessionId: id })
       .getOne();
@@ -179,6 +182,7 @@ const removeUserBySessionId = async (id: number, user: User, role: ?string):
       .leftJoinAndSelect('sessions.admins', 'admins')
       .leftJoinAndSelect('sessions.members', 'members')
       .leftJoinAndSelect('sessions.polls', 'polls')
+      .leftJoinAndSelect('sessions.questions', 'questions')
       .where('sessions.id = :sessionId')
       .setParameters({ sessionId: id })
       .getOne();
@@ -223,6 +227,28 @@ const isAdmin = async (id: number, user: User):
   }
 };
 
+// Return true if user is an member of a session by id
+const isMember = async (id: number, user: User):
+  Promise<?boolean> => {
+  try {
+    const session = await db().createQueryBuilder('sessions')
+      .leftJoinAndSelect('sessions.members', 'members')
+      .where('sessions.id = :sessionId')
+      .setParameters({ sessionId: id })
+      .getOne();
+
+    const members = session.members;
+    for (var i in members) {
+      if (members[i].googleId === user.googleId) {
+        return true;
+      }
+    }
+    return false;
+  } catch (e) {
+    throw new Error(`Problem verifying member status for session ${id}`);
+  }
+};
+
 // Get admins/members from a session id
 const getUsersBySessionId = async (id: number, role: ?string):
   Promise<Array<?User>> => {
@@ -245,7 +271,7 @@ const getUsersBySessionId = async (id: number, role: ?string):
   }
 };
 
-// Get polls before a specified date
+// Get polls from a session
 const getPolls = async (id: number):
   Promise<Array<?Poll>> => {
   try {
@@ -258,7 +284,23 @@ const getPolls = async (id: number):
 
     return session.polls;
   } catch (e) {
-    throw new Error('Problem getting polls before date');
+    throw new Error('Problem getting polls');
+  }
+};
+
+// Get questions from a session
+const getQuestions = async (id: number): Promise<Array<?Question>> => {
+  try {
+    const session = await db().createQueryBuilder('sessions')
+      .leftJoinAndSelect('sessions.questions', 'questions')
+      .where('sessions.id = :sessionId')
+      .setParameters({ sessionId: id })
+      .orderBy('questions.createdAt', 'DESC')
+      .getOne();
+
+    return session.questions;
+  } catch (e) {
+    throw new Error('Problem getting questions');
   }
 };
 
@@ -274,6 +316,8 @@ export default {
   removeUserBySessionId,
   getUsersBySessionId,
   isAdmin,
+  isMember,
   getPolls,
+  getQuestions,
   addUsersByIds
 };

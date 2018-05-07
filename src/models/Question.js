@@ -8,9 +8,10 @@ import {
 } from 'typeorm';
 import { Base } from './Base';
 import { Session } from './Session';
+import { User } from './User';
 
-@Entity('polls')
-export class Poll extends Base {
+@Entity('questions')
+export class Question extends Base {
   @PrimaryGeneratedColumn()
   id: any = null;
 
@@ -22,13 +23,6 @@ export class Poll extends Base {
   })
   session: ?Session = null;
 
-  @Column('json')
-  results: json = {};
-
-  // Google ids mapped to answer choice
-  @Column('json')
-  userAnswers: json = {};
-
-  @Column('boolean')
-  shared: boolean = true;
+  @ManyToOne(type => User, user => user.questions)
+  user: ?User = null;
 }
