@@ -22,8 +22,8 @@ class DeleteQuestionRouter extends AppDevRouter<Object> {
     if (!session) {
       throw new Error(`Couldn't find session with question ${questionId}`);
     }
-    if (!await SessionsRepo.isAdmin(session.id, user) ||
-          QuestionsRepo.isOwnerById(questionId, user)) {
+    if (!await SessionsRepo.isAdmin(session.id, user) &&
+          !await QuestionsRepo.isOwnerById(questionId, user)) {
       throw new Error('You are not authorized to delete this question!');
     }
     await QuestionsRepo.deleteQuestionById(questionId);

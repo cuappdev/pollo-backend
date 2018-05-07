@@ -19,7 +19,7 @@ const createQuestion = async (text: string, session: ?Session):
     await db().persist(question);
     return question;
   } catch (e) {
-    throw new Error('Problem creating poll!');
+    throw new Error('Problem creating question!');
   }
 };
 
@@ -44,7 +44,7 @@ const deleteQuestionById = async (id: number) => {
 };
 
 // Update a question by id
-const updateQuestionById = async (id: number, text: ?string):
+const updateQuestionById = async (id: number, text: string):
   Promise<?Question> => {
   try {
     var field = {};
@@ -89,7 +89,7 @@ const getSessionFromQuestionId = async (id: number) : Promise<?Session> => {
 };
 
 // Returns true iff the user owns a question by id
-const isOwnerById = async (id: number, user: ?User) : Promise<?boolean> => {
+const isOwnerById = async (id: number, user: User) : Promise<?boolean> => {
   try {
     const question = await db().createQueryBuilder('questions')
       .leftJoinAndSelect('questions.user', 'user')
@@ -98,7 +98,7 @@ const isOwnerById = async (id: number, user: ?User) : Promise<?boolean> => {
 
     return user && question.user.id === user.id;
   } catch (e) {
-    throw new Error(`Could not very ownership of question with id: ${id}`);
+    throw new Error(`Could not verify ownership of question with id: ${id}`);
   }
 };
 

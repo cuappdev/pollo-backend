@@ -215,13 +215,9 @@ const isAdmin = async (id: number, user: User):
       .setParameters({ sessionId: id })
       .getOne();
 
-    const admins = session.admins;
-    for (var i in admins) {
-      if (admins[i].googleId === user.googleId) {
-        return true;
-      }
-    }
-    return false;
+    return session.admins.find(function(x) {
+      return x.googleId === user.googleId
+    });
   } catch (e) {
     throw new Error(`Problem verifying admin status for session ${id}`);
   }
@@ -237,13 +233,9 @@ const isMember = async (id: number, user: User):
       .setParameters({ sessionId: id })
       .getOne();
 
-    const members = session.members;
-    for (var i in members) {
-      if (members[i].googleId === user.googleId) {
-        return true;
-      }
-    }
-    return false;
+      return session.members.find(function(x) {
+        return x.googleId === user.googleId
+      });
   } catch (e) {
     throw new Error(`Problem verifying member status for session ${id}`);
   }
