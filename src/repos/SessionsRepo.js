@@ -275,7 +275,6 @@ const getPolls = async (id: number):
       .setParameters({ sessionId: id })
       .orderBy('polls.createdAt', 'DESC')
       .getOne();
-
     return session.polls;
   } catch (e) {
     throw new Error('Problem getting polls');
