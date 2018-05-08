@@ -37,6 +37,11 @@ export type APIDraft = {|
   options: string[]
 |}
 
+export type APIQuestion = {|
+  id: id,
+  text: string
+|}
+
 export type APIUser = {|
   id: id,
   name: string,

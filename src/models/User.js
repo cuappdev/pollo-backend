@@ -9,6 +9,7 @@ import {
 import { Draft } from './Draft';
 import { Base } from './Base';
 import { Session } from './Session';
+import { Question } from './Question';
 import appDevUtils from '../utils/appDevUtils';
 
 @Entity('users')
@@ -36,6 +37,9 @@ export class User extends Base {
 
   @ManyToMany(type => Session, session => session.members)
   memberSessions: ?Session[] = [];
+
+  @OneToMany(type => Question, question => question.user)
+  questions: ?Question[] = [];
 
   @OneToMany(type => Draft, draft => draft.user)
   drafts: ?Draft[] = [];

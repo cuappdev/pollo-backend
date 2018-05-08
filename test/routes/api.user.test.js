@@ -2,7 +2,7 @@ import dbConnection from '../../src/db/DbConnection';
 import UsersRepo from '../../src/repos/UsersRepo';
 import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
 const request = require('request-promise-native');
-const { get, post, del, put } = require('./lib');
+const { get } = require('./lib');
 
 // Users
 // Must be running server to test
@@ -21,7 +21,7 @@ beforeAll(async () => {
 });
 
 test('get user', async () => {
-  const getstr = await request(get(`/users/`, token));
+  const getstr = await request(get('/users/', token));
   const getres = getstr;
   expect(getres.success).toBeTruthy();
   expect(user.id).toBe(getres.data.id);

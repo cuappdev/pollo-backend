@@ -16,7 +16,7 @@ class GetSessionPollsRouter extends AppDevRouter<Object> {
   async content (req: Request) {
     const id = req.params.id;
     var polls = await SessionsRepo.getPolls(id);
-    if (!polls) throw new Error(`Problem getting polls from group id: ${id}!`);
+    if (!polls) throw new Error(`Problem getting polls from session id: ${id}!`);
     const isAdmin = await SessionsRepo.isAdmin(id, req.user);
 
     // Date mapped to list of polls

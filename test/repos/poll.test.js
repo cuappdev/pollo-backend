@@ -65,7 +65,7 @@ test('Get Polls from Session', async () => {
   expect(polls.length).toBe(2);
   expect(polls[1].id).toBe(poll.id);
   expect(polls[0].id).toBe(id);
-})
+});
 
 test('Delete Poll', async () => {
   await PollsRepo.deletePollById(id);
