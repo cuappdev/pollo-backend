@@ -47,7 +47,7 @@ test('Get drafts (Unauthorized)', async () => {
 test('Update a draft', async () => {
   const body = {
     text: 'Test draft updated'
-  }
+  };
   const getstr = await request(put(`/drafts/${draft1.id}`, body, userToken));
   const getres = getstr;
   const node = getres.data.node;

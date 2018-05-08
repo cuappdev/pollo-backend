@@ -3,8 +3,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
-  json
+  ManyToOne
 } from 'typeorm';
 import { Base } from './Base';
 import { Session } from './Session';

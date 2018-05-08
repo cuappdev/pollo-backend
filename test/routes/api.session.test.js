@@ -51,7 +51,7 @@ test('add admins to session', async () => {
   userId = user.id;
   const body = {
     adminIds: [userId]
-  }
+  };
   const getstr = await request(post(`/sessions/${sessionres.data.node.id}/admins/`, body, adminToken));
   const getres = getstr;
   expect(getres.success).toBeTruthy();
@@ -70,7 +70,7 @@ test('get admins for session', async () => {
 test('remove admin from session', async () => {
   const body = {
     adminIds: [userId]
-  }
+  };
   const getstr = await request(put(`/sessions/${sessionres.data.node.id}/admins/`, body, adminToken));
   const getres = getstr;
   expect(getres.success).toBeTruthy();
@@ -91,7 +91,7 @@ test('add members to session', async () => {
 });
 
 test('get sessions as member', async () => {
-  const getstr = await request(get(`/sessions/all/member/`, userToken));
+  const getstr = await request(get('/sessions/all/member/', userToken));
   const getres = getstr;
   expect(getres.success).toBeTruthy();
   expect(sessionres.data).toMatchObject(getres.data[0]);

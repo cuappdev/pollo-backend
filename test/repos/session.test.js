@@ -7,8 +7,6 @@ var code;
 var user;
 var user2;
 var user3;
-var poll;
-var poll2;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {

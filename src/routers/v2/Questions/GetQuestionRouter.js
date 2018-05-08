@@ -1,7 +1,6 @@
 // @flow
 import AppDevNodeRouter from '../../../utils/AppDevNodeRouter';
 import QuestionsRepo from '../../../repos/QuestionsRepo';
-import SessionsRepo from '../../../repos/SessionsRepo';
 import { Request } from 'express';
 
 import type { APIQuestion } from '../APITypes';

@@ -3,7 +3,6 @@ import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import QuestionsRepo from '../../../repos/QuestionsRepo';
 import constants from '../../../utils/constants';
-import SessionsRepo from '../../../repos/SessionsRepo';
 
 import type { APIQuestion } from '../APITypes';
 
