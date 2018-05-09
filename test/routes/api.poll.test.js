@@ -42,14 +42,14 @@ test('create poll with invalid token', async () => {
   expect(result.success).toBeFalsy();
 });
 
-test('get poll', async () => {
+test('get poll by id', async () => {
   const getstr = await request(get(`/polls/${poll.id}`, token));
   const getres = getstr;
   expect(getres.success).toBeTruthy();
   expect(poll.id).toBe(getres.data.node.id);
 });
 
-test('get polls', async () => {
+test('get polls by session', async () => {
   const getstr = await request(get(`/sessions/${session.id}/polls`, token));
   const getres = getstr;
   expect(getres.success).toBeTruthy();
