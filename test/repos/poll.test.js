@@ -14,7 +14,8 @@ beforeAll(async () => {
     process.exit();
   });
   user = await UsersRepo.createDummyUser('1234');
-  session = await SessionsRepo.createSession('Session', SessionsRepo.createCode(), user);
+  session =
+    await SessionsRepo.createSession('Session', SessionsRepo.createCode(), user);
 });
 
 test('Create Poll', async () => {
