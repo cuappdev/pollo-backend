@@ -30,7 +30,7 @@ class PostQuestionRouter extends AppDevRouter<Object> {
       throw new Error('You are not authorized to post a poll!');
     }
 
-    const poll = await QuestionsRepo.createQuestion(text, session);
+    const poll = await QuestionsRepo.createQuestion(text, session, user);
 
     return {
       node: {

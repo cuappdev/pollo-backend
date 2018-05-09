@@ -9,12 +9,13 @@ const db = (): Repository<Question> => {
 };
 
 // Create a question
-const createQuestion = async (text: string, session: ?Session):
+const createQuestion = async (text: string, session: Session, user: User):
   Promise<Question> => {
   try {
     const question = new Question();
     question.text = text;
     question.session = session;
+    question.user = user;
 
     await db().persist(question);
     return question;
@@ -66,6 +67,7 @@ const getQuestionsFromSessionId = async (id: number):
   Promise<Array<?Question>> => {
   try {
     const questions = await db().createQueryBuilder('questions')
+      .leftJoinAndSelect('questions.user', 'user')
       .innerJoin('questions.session', 'session', 'session.id = :sessionId')
       .setParameters({ sessionId: id })
       .getMany();
