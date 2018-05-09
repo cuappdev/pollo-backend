@@ -194,6 +194,40 @@ export default class SessionSocket {
       }
     });
 
+    client.on('server/poll/upvote', (answerObject: Object) => {
+      const answer: Answer = {
+        id: this.answerId,
+        googleId: answerObject.googleId,
+        poll: answerObject.poll,
+        choice: answerObject.choice,
+        text: answerObject.text
+      };
+      this.answerId++;
+      const poll = this._currentPoll();
+      if (poll === null || poll === undefined) {
+        console.log(`Client ${client.id} tried to answer with no active poll`);
+        return;
+      }
+      if (poll.id !== answer.poll) {
+        console.log(`Poll ${answer.poll} is not the current poll`);
+        return;
+      }
+
+      let nextState = {...this.current};
+      let curTally = nextState.results[answer.choice];
+      if (curTally) { // if truthy
+        nextState.results[answer.choice].count += 1;
+      } else {
+        nextState.results[answer.choice] = {'text': answer.text, 'count': 1};
+      }
+
+      this.current = nextState;
+      this.nsp.to('admins').emit('admin/poll/updateTally', this.current);
+      if (poll.shared) {
+        this.nsp.to('users').emit('user/poll/results', this.current);
+      }
+    });
+
     // v1
     client.on('server/question/tally', (answerObject: Object) => {
       const answer: Answer = {
