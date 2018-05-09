@@ -91,5 +91,4 @@ afterAll(async () => {
   await UsersRepo.deleteUserById(member.id);
   await UserSessionsRepo.deleteSession(session.id);
   console.log('Passed all question route tests');
-
 });

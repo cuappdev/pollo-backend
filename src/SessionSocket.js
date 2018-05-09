@@ -17,7 +17,8 @@ type Poll = {
   id: number,
   text: string,
   type: string,
-  options: ?string[]
+  options: ?string[],
+  shared: boolean
 }
 
 type Answer = {
@@ -196,6 +197,9 @@ export default class SessionSocket {
 
       this.current = nextState;
       this.nsp.to('admins').emit('admin/poll/updateTally', this.current);
+      if (poll.shared) {
+        this.nsp.to('users').emit('user/poll/results', this.current);
+      }
     });
 
     // v1
@@ -299,7 +303,7 @@ export default class SessionSocket {
       return;
     }
     this.lastPoll = await PollsRepo.createPoll(poll.text,
-      this.session, this.current.results, false, this.current.answers);
+      this.session, this.current.results, poll.shared, this.current.answers);
     this.lastState = this.current;
     this.nsp.to('users').emit('user/poll/end', { poll });
     this.nsp.to('users').emit('user/question/end', { question: poll }); // v1
@@ -331,7 +335,8 @@ export default class SessionSocket {
         id: this.pollId,
         text: pollObject.text,
         type: pollObject.type,
-        options: pollObject.options
+        options: pollObject.options,
+        shared: pollObject.shared
       };
       this.pollId++;
       console.log('starting', poll);
@@ -347,7 +352,8 @@ export default class SessionSocket {
         id: this.pollId,
         text: questionObject.text,
         type: questionObject.type,
-        options: questionObject.options
+        options: questionObject.options,
+        shared: false
       };
       this.pollId++;
       console.log('starting', question);
