@@ -31,6 +31,7 @@ class GetSessionPollsRouter extends AppDevRouter<Object> {
           text: poll.text,
           results: poll.results,
           shared: poll.shared,
+          type: poll.type,
           answer: isAdmin ? null : poll.userAnswers[req.user.googleId]
         };
         if (pollsByDate[date]) {

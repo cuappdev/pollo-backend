@@ -25,6 +25,7 @@ class GetPollRouter extends AppDevNodeRouter<APIPoll> {
       text: poll.text,
       results: poll.results,
       shared: poll.shared,
+      type: poll.type,
       answer: isAdmin ? null : poll.userAnswers[req.user.googleId]
     };
   }

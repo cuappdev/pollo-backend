@@ -332,8 +332,8 @@ export default class SessionSocket {
     if (!poll) {
       return;
     }
-    this.lastPoll = await PollsRepo.createPoll(poll.text,
-      this.session, this.current.results, poll.shared, this.current.answers);
+    this.lastPoll = await PollsRepo.createPoll(poll.text, this.session,
+      this.current.results, poll.shared, poll.type, this.current.answers);
     this.lastState = this.current;
     this.nsp.to('users').emit('user/poll/end', { poll });
     this.nsp.to('users').emit('user/question/end', { question: poll }); // v1

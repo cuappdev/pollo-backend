@@ -9,7 +9,7 @@ const db = (): Repository<Poll> => {
 
 // Create a poll
 const createPoll = async (text: string, session: ?Session, results: json,
-  canShare: boolean, userAnswers: ?json):
+  canShare: boolean, type: string, userAnswers: ?json):
   Promise <Poll> => {
   try {
     const poll = new Poll();
@@ -17,6 +17,7 @@ const createPoll = async (text: string, session: ?Session, results: json,
     poll.session = session;
     poll.results = results;
     poll.shared = canShare;
+    poll.type = type;
     if (userAnswers) {
       poll.userAnswers = userAnswers;
     }
