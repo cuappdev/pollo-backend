@@ -21,11 +21,15 @@ class PostPollRouter extends AppDevRouter<Object> {
     var text = req.body.text;
     var results = req.body.results;
     var shared = req.body.shared;
+    const type = req.body.type;
     var user = req.user;
 
     if (!text) text = '';
     if (!results) results = {};
     if (shared === null) shared = false;
+    if (type !== 'FREE_RESPONSE' && type !== 'MULTIPLE_CHOICE') {
+      throw new Error('Valid poll type not found');
+    }
 
     const session = await SessionsRepo.getSessionById(sessionId);
     if (!session) throw new Error(`Couldn't find session with id ${sessionId}`);
@@ -35,7 +39,7 @@ class PostPollRouter extends AppDevRouter<Object> {
     }
 
     const poll =
-      await PollsRepo.createPoll(text, session, results, shared);
+      await PollsRepo.createPoll(text, session, results, shared, type);
 
     return {
       node: {
@@ -43,6 +47,7 @@ class PostPollRouter extends AppDevRouter<Object> {
         text: poll.text,
         results: poll.results,
         shared: poll.shared,
+        type: poll.type,
         answer: null
       }
     };

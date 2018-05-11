@@ -17,7 +17,8 @@ type Poll = {
   id: number,
   text: string,
   type: string,
-  options: ?string[]
+  options: ?string[],
+  shared: boolean
 }
 
 type Answer = {
@@ -63,7 +64,8 @@ export default class SessionSocket {
   lastPoll = null;
   lastState = {};
 
-  // Google ids of every admin/user who has joined the session
+  // Google ids of admin/user to add to the session
+  // List of users saved to session when a user exits socket (same for admins)
   adminGoogleIds = [];
   userGoogleIds = [];
 
@@ -102,20 +104,16 @@ export default class SessionSocket {
     switch (userType) {
     case 'admin':
       console.log(`Admin with id ${client.id} connected to socket`);
-      if (googleId && !this.adminGoogleIds.includes(googleId)) {
+      if (googleId) {
         this.adminGoogleIds.push(googleId);
       }
       this._setupAdminEvents(client);
       client.join('admins');
       client.emit('user/count', { count: this.usersConnected });
-      if (googleId) {
-        await SessionsRepo
-          .addUsersByGoogleIds(this.session.id, [googleId], 'admin');
-      }
       break;
     case 'user':
       console.log(`User with id ${client.id} connected to socket`);
-      if (googleId && !this.userGoogleIds.includes(googleId)) {
+      if (googleId) {
         this.userGoogleIds.push(googleId);
       }
       this._setupUserEvents(client);
@@ -129,11 +127,6 @@ export default class SessionSocket {
       if (currentPoll) {
         client.emit('user/poll/start', { poll: currentPoll });
         client.emit('user/question/start', { question: currentPoll }); // v1
-      }
-
-      if (googleId) {
-        await SessionsRepo
-          .addUsersByGoogleIds(this.session.id, [googleId], 'user');
       }
       break;
     default:
@@ -165,7 +158,7 @@ export default class SessionSocket {
       this.answerId++;
       const poll = this._currentPoll();
       if (poll === null || poll === undefined) {
-        console.log(`Client ${client.id} tried to answer with no current poll`);
+        console.log(`Client ${client.id} tried to answer with no active poll`);
         return;
       }
       if (poll.id !== answer.poll) {
@@ -196,6 +189,43 @@ export default class SessionSocket {
 
       this.current = nextState;
       this.nsp.to('admins').emit('admin/poll/updateTally', this.current);
+      if (poll.shared) {
+        this.nsp.to('users').emit('user/poll/results', this.current);
+      }
+    });
+
+    client.on('server/poll/upvote', (answerObject: Object) => {
+      const answer: Answer = {
+        id: this.answerId,
+        googleId: answerObject.googleId,
+        poll: answerObject.poll,
+        choice: answerObject.choice,
+        text: answerObject.text
+      };
+      this.answerId++;
+      const poll = this._currentPoll();
+      if (poll === null || poll === undefined) {
+        console.log(`Client ${client.id} tried to answer with no active poll`);
+        return;
+      }
+      if (poll.id !== answer.poll) {
+        console.log(`Poll ${answer.poll} is not the current poll`);
+        return;
+      }
+
+      let nextState = {...this.current};
+      let curTally = nextState.results[answer.choice];
+      if (curTally) { // if truthy
+        nextState.results[answer.choice].count += 1;
+      } else {
+        nextState.results[answer.choice] = {'text': answer.text, 'count': 1};
+      }
+
+      this.current = nextState;
+      this.nsp.to('admins').emit('admin/poll/updateTally', this.current);
+      if (poll.shared) {
+        this.nsp.to('users').emit('user/poll/results', this.current);
+      }
     });
 
     // v1
@@ -248,8 +278,12 @@ export default class SessionSocket {
       });
     });
 
-    client.on('disconnect', () => {
+    client.on('disconnect', async () => {
       console.log(`User ${client.id} disconnected.`);
+      await SessionsRepo.addUsersByGoogleIds(this.session.id,
+        this.userGoogleIds, 'user');
+      this.userGoogleIds = [];
+
       if (this.nsp.connected.length === 0) {
         this.onClose();
       }
@@ -298,8 +332,8 @@ export default class SessionSocket {
     if (!poll) {
       return;
     }
-    this.lastPoll = await PollsRepo.createPoll(poll.text,
-      this.session, this.current.results, false, this.current.answers);
+    this.lastPoll = await PollsRepo.createPoll(poll.text, this.session,
+      this.current.results, poll.shared, poll.type, this.current.answers);
     this.lastState = this.current;
     this.nsp.to('users').emit('user/poll/end', { poll });
     this.nsp.to('users').emit('user/question/end', { question: poll }); // v1
@@ -331,7 +365,8 @@ export default class SessionSocket {
         id: this.pollId,
         text: pollObject.text,
         type: pollObject.type,
-        options: pollObject.options
+        options: pollObject.options,
+        shared: pollObject.shared
       };
       this.pollId++;
       console.log('starting', poll);
@@ -347,7 +382,8 @@ export default class SessionSocket {
         id: this.pollId,
         text: questionObject.text,
         type: questionObject.type,
-        options: questionObject.options
+        options: questionObject.options,
+        shared: false
       };
       this.pollId++;
       console.log('starting', question);
@@ -359,11 +395,6 @@ export default class SessionSocket {
 
     // share results
     client.on('server/poll/results', async () => {
-      // const poll = this._currentPoll();
-      // if (poll === null) {
-      //   console.log(`Admin ${client.id} sharing results on no poll`);
-      //   return;
-      // }
       console.log('sharing results');
       // Update poll to 'shared'
       if (this.lastPoll) {
@@ -376,11 +407,6 @@ export default class SessionSocket {
 
     // v1
     client.on('server/question/results', async () => {
-      // const question = this._currentPoll();
-      // if (question === null) {
-      //   console.log(`Admin ${client.id} sharing results on no question`);
-      //   return;
-      // }
       console.log('sharing results');
       if (this.lastPoll) {
         await PollsRepo.updatePollById(this.lastPoll.id, null,
@@ -408,10 +434,10 @@ export default class SessionSocket {
 
     client.on('disconnect', async () => {
       console.log(`Admin ${client.id} disconnected.`);
-      // await SessionsRepo.addUsersByGoogleIds(this.session.id,
-      //   this.userGoogleIds, 'user');
-      // await SessionsRepo.addUsersByGoogleIds(this.session.id,
-      //   this.adminGoogleIds, 'admin');
+      await SessionsRepo.addUsersByGoogleIds(this.session.id,
+        this.adminGoogleIds, 'admin');
+      this.adminGoogleIds = [];
+
       if (this.nsp.connected.length === 0) {
         this.onClose();
       }

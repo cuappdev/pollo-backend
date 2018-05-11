@@ -45,6 +45,7 @@ class UpdatePollRouter extends AppDevRouter<Object> {
         text: poll.text,
         results: poll.results,
         shared: poll.shared,
+        type: poll.type,
         answer: null
       }
     };

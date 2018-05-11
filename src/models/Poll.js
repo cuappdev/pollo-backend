@@ -17,6 +17,9 @@ export class Poll extends Base {
   @Column('string')
   text: string = '';
 
+  @Column('string')
+  type: string = ''; // Either MULTIPLE_CHOICE OR FREE_RESPONSE 
+
   @ManyToOne(type => Session, session => session.polls, {
     onDelete: 'CASCADE'
   })

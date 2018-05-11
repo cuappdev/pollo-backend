@@ -29,7 +29,7 @@ beforeAll(async () => {
 });
 
 test('create poll', async () => {
-  const opts = {text: 'Poll text', results: {}, shared: true};
+  const opts = {text: 'Poll text', shared: true, type: 'MULTIPLE_CHOICE'};
   const result = await request(post(`/sessions/${session.id}/polls`, opts, token));
   poll = result.data.node;
   expect(result.success).toBeTruthy();
