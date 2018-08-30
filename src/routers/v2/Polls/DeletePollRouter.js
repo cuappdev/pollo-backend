@@ -6,17 +6,17 @@ import constants from '../../../utils/constants';
 import SessionsRepo from '../../../repos/SessionsRepo';
 
 class DeletePollRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.DELETE);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/polls/:id/';
   }
 
-  async content (req: Request) {
+  async content(req: Request) {
     const pollId = req.params.id;
-    const user = req.user;
+    const { user } = req;
 
     const session = await PollsRepo.getSessionFromPollId(pollId);
     if (!session) {

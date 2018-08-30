@@ -1,7 +1,7 @@
 // @flow
+import http from 'http';
 import API from './API';
 import dbConnection from './db/DbConnection';
-import http from 'http';
 import SessionManager from './SessionManager';
 
 type Error = {
@@ -22,24 +22,26 @@ const onError = (error: Error): void => {
   case 'EACCES':
     console.error(`${port} requires elevated privileges`);
     process.exit(1);
+    break;
   case 'EADDRINUSE':
     console.error(`${port} is already in use`);
     process.exit(1);
+    break;
   default:
     throw error;
   }
 };
 
 const onListening = (): void => {
-  let addr: Object = server.address();
+  const addr: Object = server.address();
   console.log(`Listening on ${addr.port} (${process.env.NODE_ENV || 'development'})`);
 };
 
 // Bootstrap everything
-dbConnection().then(_ => {
+dbConnection().then((_) => {
   server.on('error', onError);
   server.on('listening', onListening);
   server.listen(port);
-}).catch(err => {
+}).catch((err) => {
   console.log(err);
 });

@@ -1,18 +1,16 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
-import { Session } from '../models/Session';
-import { User } from '../models/User';
-import { Poll } from '../models/Poll';
-import { Question } from '../models/Question';
+import Poll from '../models/Poll';
+import Question from '../models/Question';
+import Session from '../models/Session';
+import User from '../models/User';
 import appDevUtils from '../utils/appDevUtils';
 import UsersRepo from './UsersRepo';
 
-const db = (): Repository<Session> => {
-  return getConnectionManager().get().getRepository(Session);
-};
+const db = (): Repository<Session> => getConnectionManager().get().getRepository(Session);
 
 // Contains all session codes used mapped to session id
-var sessionCodes = {};
+const sessionCodes = {};
 
 // Create a session
 const createSession = async (name: string, code: string, user: ?User):
@@ -40,7 +38,7 @@ const createSession = async (name: string, code: string, user: ?User):
 
 // Generate unique session code
 const createCode = (): string => {
-  var code = appDevUtils.randomCode(6);
+  let code = appDevUtils.randomCode(6);
   while (sessionCodes[code]) {
     code = appDevUtils.randomCode(6);
   }
@@ -59,11 +57,10 @@ const getSessionById = async (id: number): Promise<?Session> => {
 
 // Get a session id from session code
 const getSessionId = async (code: string) => {
-  var session =
-    await db().createQueryBuilder('sessions')
-      .where('sessions.code = :sessionCode')
-      .setParameters({ sessionCode: code })
-      .getOne();
+  const session = await db().createQueryBuilder('sessions')
+    .where('sessions.code = :sessionCode')
+    .setParameters({ sessionCode: code })
+    .getOne();
   if (session) {
     return session.id;
   }
@@ -89,7 +86,7 @@ const deleteSessionById = async (id: number) => {
 const updateSessionById = async (id: number, name: ?string):
   Promise<?Session> => {
   try {
-    var field = {};
+    const field = {};
     if (name) field.name = name;
     await db().createQueryBuilder('sessions')
       .where('sessions.id = :sessionId')
@@ -116,16 +113,12 @@ const addUsersByGoogleIds = async (id: number, googleIds: string[],
       .getOne();
     if (session) {
       if (role === 'admin') {
-        const currAdminIds = session.admins.map(function (admin) {
-          return admin.googleId;
-        });
+        const currAdminIds = session.admins.map(admin => admin.googleId);
         const users = await UsersRepo
           .getUsersByGoogleIds(googleIds, currAdminIds);
         session.admins = session.admins.concat(users);
       } else {
-        const currMemberIds = session.members.map(function (user) {
-          return user.googleId;
-        });
+        const currMemberIds = session.members.map(user => user.googleId);
         const users = await UsersRepo
           .getUsersByGoogleIds(googleIds, currMemberIds);
         session.members = session.members.concat(users);
@@ -153,15 +146,11 @@ const addUsersByIds = async (id: number, userIds: number[],
       .getOne();
     if (session) {
       if (role === 'admin') {
-        const currAdminIds = session.admins.map(function (admin) {
-          return admin.id;
-        });
+        const currAdminIds = session.admins.map(admin => admin.id);
         const admins = await UsersRepo.getUsersFromIds(userIds, currAdminIds);
         session.admins = session.admins.concat(admins);
       } else {
-        const currMemberIds = session.members.map(function (member) {
-          return member.id;
-        });
+        const currMemberIds = session.members.map(member => member.id);
         const members = await UsersRepo.getUsersFromIds(userIds, currMemberIds);
         session.members = session.members.concat(members);
       }
@@ -188,13 +177,9 @@ const removeUserBySessionId = async (id: number, user: User, role: ?string):
       .getOne();
     if (user) {
       if (role === 'admin') {
-        session.admins = session.admins.filter(function (admin) {
-          return (admin.googleId !== user.googleId);
-        });
+        session.admins = session.admins.filter(admin => (admin.googleId !== user.googleId));
       } else {
-        session.members = session.members.filter(function (member) {
-          return (member.googleId !== user.googleId);
-        });
+        session.members = session.members.filter(member => (member.googleId !== user.googleId));
       }
       await db().persist(session);
     }
@@ -215,9 +200,7 @@ const isAdmin = async (id: number, user: User):
       .setParameters({ sessionId: id })
       .getOne();
 
-    const admin = session.admins.find(function (x) {
-      return x.googleId === user.googleId;
-    });
+    const admin = session.admins.find(x => x.googleId === user.googleId);
     return admin !== undefined;
   } catch (e) {
     throw new Error(`Problem verifying admin status for session ${id}`);
@@ -234,9 +217,7 @@ const isMember = async (id: number, user: User):
       .setParameters({ sessionId: id })
       .getOne();
 
-    const member = session.members.find(function (x) {
-      return x.googleId === user.googleId;
-    });
+    const member = session.members.find(x => x.googleId === user.googleId);
     return member !== undefined;
   } catch (e) {
     throw new Error(`Problem verifying member status for session ${id}`);
@@ -255,11 +236,10 @@ const getUsersBySessionId = async (id: number, role: ?string):
       .getOne();
     if (role === 'admin') {
       return session.admins;
-    } else if (role === 'member') {
+    } if (role === 'member') {
       return session.members;
-    } else {
-      return session.admins.concat(session.members);
     }
+    return session.admins.concat(session.members);
   } catch (e) {
     throw new Error(`Problem getting admins for session with id: ${id}!`);
   }

@@ -8,21 +8,19 @@ import constants from '../../../utils/constants';
 import type { APIPoll } from '../APITypes';
 
 class PostPollRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.POST);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/sessions/:id/polls/';
   }
 
-  async content (req: Request): Promise<{ node: APIPoll }> {
+  async content(req: Request): Promise<{ node: APIPoll }> {
     const sessionId = req.params.id;
-    var text = req.body.text;
-    var results = req.body.results;
-    var shared = req.body.shared;
-    const type = req.body.type;
-    var user = req.user;
+    let { text, results, shared } = req.body;
+    const { type } = req.body;
+    const { user } = req;
 
     if (!text) text = '';
     if (!results) results = {};
@@ -38,8 +36,7 @@ class PostPollRouter extends AppDevRouter<Object> {
       throw new Error('You are not authorized to post a poll!');
     }
 
-    const poll =
-      await PollsRepo.createPoll(text, session, results, shared, type);
+    const poll = await PollsRepo.createPoll(text, session, results, shared, type);
 
     return {
       node: {

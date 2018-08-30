@@ -1,19 +1,18 @@
 // @flow
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  OneToMany,
+  Entity,
+  JoinTable,
   ManyToMany,
-  JoinTable
+  OneToMany,
+  PrimaryGeneratedColumn
 } from 'typeorm';
-import { Base } from './Base';
-import { Poll } from './Poll';
-import { Question } from './Question';
-import { User } from './User';
+import Base from './Base';
+import Poll from './Poll';
+import Question from './Question';
+import User from './User';
 
-@Entity('sessions')
-export class Session extends Base {
+export default @Entity('sessions') class Session extends Base {
   @PrimaryGeneratedColumn()
   id: any = null;
 

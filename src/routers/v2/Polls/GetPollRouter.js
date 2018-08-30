@@ -1,17 +1,17 @@
 // @flow
+import { Request } from 'express';
 import AppDevNodeRouter from '../../../utils/AppDevNodeRouter';
 import PollsRepo from '../../../repos/PollsRepo';
 import SessionsRepo from '../../../repos/SessionsRepo';
-import { Request } from 'express';
 
 import type { APIPoll } from '../APITypes';
 
 class GetPollRouter extends AppDevNodeRouter<APIPoll> {
-  getPath (): string {
+  getPath(): string {
     return '/polls/:id/';
   }
 
-  async fetchWithId (id: number, req: Request) {
+  async fetchWithId(id: number, req: Request) {
     const poll = await PollsRepo.getPollById(id);
     if (!poll) throw new Error(`Poll with id ${id} cannot be found`);
 

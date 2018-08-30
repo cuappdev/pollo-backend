@@ -7,18 +7,17 @@ import constants from '../../../utils/constants';
 import type { APIDraft } from '../APITypes';
 
 class UpdateDraftRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.PUT);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/drafts/:id/';
   }
 
-  async content (req: Request): Promise<{ node: APIDraft }> {
+  async content(req: Request): Promise<{ node: APIDraft }> {
     const draftId = req.params.id;
-    var text = req.body.text;
-    var options = req.body.options;
+    const { text, options } = req.body;
     const admin = await DraftsRepo.getOwnerById(draftId);
     if (!admin) throw new Error(`Draft with id ${draftId} was not found!`);
 

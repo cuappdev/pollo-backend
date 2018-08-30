@@ -5,17 +5,17 @@ import constants from '../../../utils/constants';
 import SessionsRepo from '../../../repos/SessionsRepo';
 
 class DeleteAdminsRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.PUT);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/sessions/:id/admins/';
   }
 
-  async content (req: Request) {
+  async content(req: Request) {
     const sessionId = req.params.id;
-    const user = req.user;
+    const { user } = req;
     const adminIds = JSON.parse(req.body.adminIds);
 
     if (!adminIds) throw new Error('List of admin ids missing!');

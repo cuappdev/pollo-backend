@@ -7,20 +7,19 @@ import constants from '../../../utils/constants';
 import type { APIPoll } from '../APITypes';
 
 class UpdatePollRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.PUT, false);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/polls/:id/';
   }
 
-  async content (req: Request): Promise<{ node: APIPoll }> {
-    const name = req.body.name;
+  async content(req: Request): Promise<{ node: APIPoll }> {
+    const { name, deviceId } = req.body;
     const pollId = req.params.id;
-    const deviceId = req.body.deviceId;
 
-    var poll = await SessionsRepo.getSessionById(pollId);
+    let poll = await SessionsRepo.getSessionById(pollId);
     if (!poll) throw new Error(`Poll with id ${pollId} was not found!`);
 
     const users = await SessionsRepo.getUsersBySessionId(pollId, 'admin');

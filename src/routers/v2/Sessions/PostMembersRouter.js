@@ -5,18 +5,18 @@ import SessionsRepo from '../../../repos/SessionsRepo';
 import constants from '../../../utils/constants';
 
 class PostMembersRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.POST);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/sessions/:id/members/';
   }
 
-  async content (req: Request) {
-    const id = req.params.id;
-    const user = req.user;
-    const memberIds = req.body.memberIds;
+  async content(req: Request) {
+    const { id } = req.params;
+    const { user } = req;
+    const { memberIds } = req.body;
 
     if (!memberIds) throw new Error('List of member ids missing!');
 

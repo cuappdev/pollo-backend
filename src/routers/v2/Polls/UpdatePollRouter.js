@@ -8,20 +8,18 @@ import SessionsRepo from '../../../repos/SessionsRepo';
 import type { APIPoll } from '../APITypes';
 
 class UpdatePollRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.PUT);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/polls/:id/';
   }
 
-  async content (req: Request): Promise<{ node: APIPoll }> {
+  async content(req: Request): Promise<{ node: APIPoll }> {
     const pollId = req.params.id;
-    var text = req.body.text;
-    var results = req.body.results;
-    var shared = req.body.shared;
-    var user = req.user;
+    const { text, results, shared } = req.body;
+    const { user } = req;
 
     if (!results && !text && shared === null) {
       throw new Error('No fields specified to update.');

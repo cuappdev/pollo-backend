@@ -1,19 +1,18 @@
 // @flow
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
+  Entity,
   ManyToMany,
-  OneToMany
+  OneToMany,
+  PrimaryGeneratedColumn
 } from 'typeorm';
-import { Draft } from './Draft';
-import { Base } from './Base';
-import { Session } from './Session';
-import { Question } from './Question';
+import Base from './Base';
+import Draft from './Draft';
+import Question from './Question';
+import Session from './Session';
 import appDevUtils from '../utils/appDevUtils';
 
-@Entity('users')
-export class User extends Base {
+export default @Entity('users') class User extends Base {
   @PrimaryGeneratedColumn()
   id: any = null;
 
@@ -44,7 +43,7 @@ export class User extends Base {
   @OneToMany(type => Draft, draft => draft.user)
   drafts: ?Draft[] = [];
 
-  static dummy (id: string): User {
+  static dummy(id: string): User {
     const user = new User();
     user.googleId = id;
     user.firstName = '';
@@ -54,7 +53,7 @@ export class User extends Base {
     return user;
   }
 
-  static fromGoogleCreds (creds: Object): User {
+  static fromGoogleCreds(creds: Object): User {
     const user = new User();
     user.googleId = creds.id;
     user.firstName = creds.name.givenName;

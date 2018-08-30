@@ -25,11 +25,11 @@ export type AppDevEdgesResponse<T> = {
 type ErrorCollector = Error => void
 
 class AppDevEdgeRouter<T> extends AppDevRouter<AppDevEdgesResponse<T>> {
-  defaultCount () {
+  static defaultCount() {
     return 10;
   }
 
-  async contentArray (
+  async contentArray(
     req: Request,
     pageInfo: PageInfo,
     error: ErrorCollector
@@ -37,14 +37,14 @@ class AppDevEdgeRouter<T> extends AppDevRouter<AppDevEdgesResponse<T>> {
     throw new Error(`Didn't implement contentArray for ${this.getPath()}`);
   }
 
-  async content (req: Request) {
+  async content(req: Request) {
     const pageInfo = {
-      count: req.query.count || this.defaultCount(),
+      count: req.query.count || AppDevEdgeRouter.defaultCount(),
       cursor: req.query.cursor || undefined
     };
 
     const errors = [];
-    const onerror = err => { errors.push(err); };
+    const onerror = (err) => { errors.push(err); };
 
     const edges = await this.contentArray(req, pageInfo, onerror);
     const response: AppDevEdgesResponse<T> = {

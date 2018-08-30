@@ -5,11 +5,11 @@ import SessionsRepo from '../../../repos/SessionsRepo';
 import type { APISession } from '../APITypes';
 
 class GetSessionRouter extends AppDevNodeRouter<APISession> {
-  getPath (): string {
+  getPath(): string {
     return '/sessions/:id/';
   }
 
-  async fetchWithId (id: number) {
+  async fetchWithId(id: number) {
     const session = await SessionsRepo.getSessionById(id);
     return session && {
       id: session.id,

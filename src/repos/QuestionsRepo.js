@@ -1,12 +1,10 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
-import { Session } from '../models/Session';
-import { Question } from '../models/Question';
-import { User } from '../models/User';
+import Session from '../models/Session';
+import User from '../models/User';
+import Question from '../models/Question';
 
-const db = (): Repository<Question> => {
-  return getConnectionManager().get().getRepository(Question);
-};
+const db = (): Repository<Question> => getConnectionManager().get().getRepository(Question);
 
 // Create a question
 const createQuestion = async (text: string, session: Session, user: User):
@@ -48,7 +46,7 @@ const deleteQuestionById = async (id: number) => {
 const updateQuestionById = async (id: number, text: string):
   Promise<?Question> => {
   try {
-    var field = {};
+    const field = {};
     if (text) field.text = text;
 
     await db().createQueryBuilder('questions')
@@ -82,7 +80,7 @@ const getSessionFromQuestionId = async (id: number) : Promise<?Session> => {
   try {
     const question = await db().createQueryBuilder('questions')
       .leftJoinAndSelect('questions.session', 'session')
-      .where('questions.id = :questionId', {questionId: id})
+      .where('questions.id = :questionId', { questionId: id })
       .getOne();
     return question.session;
   } catch (e) {
@@ -95,7 +93,7 @@ const isOwnerById = async (id: number, user: User) : Promise<?boolean> => {
   try {
     const question = await db().createQueryBuilder('questions')
       .leftJoinAndSelect('questions.user', 'user')
-      .where('questions.id = :questionId', {questionId: id})
+      .where('questions.id = :questionId', { questionId: id })
       .getOne();
 
     return user && question.user.id === user.id;

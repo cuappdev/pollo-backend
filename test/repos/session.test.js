@@ -2,15 +2,15 @@ import SessionsRepo from '../../src/repos/SessionsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
 
-var id;
-var code;
-var user;
-var user2;
-var user3;
+let id;
+let code;
+let user;
+let user2;
+let user3;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
-  await dbConnection().catch(function (e) {
+  await dbConnection().catch((e) => {
     console.log('Error connecting to database');
     process.exit();
   });
@@ -20,12 +20,11 @@ test('Create Session', async () => {
   code = SessionsRepo.createCode();
   user = await UsersRepo.createDummyUser('sessiontest1');
 
-  const session =
-    await SessionsRepo.createSession('Session', code, user, false);
+  const session = await SessionsRepo.createSession('Session', code, user, false);
   expect(session.name).toBe('Session');
   expect(session.code).toBe(code);
   expect(session.admins[0].googleId).toBe(user.googleId);
-  id = session.id;
+  ({ id } = session);
 });
 
 test('Get Session By Id', async () => {
@@ -35,8 +34,8 @@ test('Get Session By Id', async () => {
 });
 
 test('Get Session By Code', async () => {
-  const _id = await SessionsRepo.getSessionId(code);
-  expect(_id).toBe(id);
+  const id2 = await SessionsRepo.getSessionId(code);
+  expect(id2).toBe(id);
 });
 
 test('Update Session', async () => {
@@ -52,35 +51,32 @@ test('Get Admins From Session', async () => {
 
 test('Add Admin To Session By Id', async () => {
   user2 = await UsersRepo.createDummyUser('sessiontest2');
-  const admins =
-    (await SessionsRepo.addUsersByIds(id, [user2.id], 'admin')).admins;
+  const { admins } = (await SessionsRepo.addUsersByIds(id, [user2.id], 'admin'));
   expect(admins.length).toEqual(2);
   expect(admins[1].googleId).toBe(user2.googleId);
 });
 
 test('Remove Admin From Session', async () => {
   const session = await SessionsRepo.removeUserBySessionId(id, user2, 'admin');
-  const admins = session.admins;
+  const { admins } = session;
   expect(admins.length).toEqual(1);
   expect(admins[0].googleId).toBe(user.googleId);
-  id = session.id;
+  ({ id } = session);
   expect(await SessionsRepo.isAdmin(id, user2)).toBe(false);
   expect(await SessionsRepo.isAdmin(id, user)).toBe(true);
 });
 
 test('Add Admin To Session By GoogleId', async () => {
-  const admins =
-    (await SessionsRepo.addUsersByGoogleIds(id, [user2.googleId], 'admin')).admins;
+  const { admins } = (await SessionsRepo.addUsersByGoogleIds(id, [user2.googleId], 'admin'));
   expect(admins.length).toEqual(2);
   expect(admins[1].googleId).toBe(user2.googleId);
 
   const session = await SessionsRepo.removeUserBySessionId(id, user2, 'admin');
-  id = session.id;
+  ({ id } = session);
 });
 
 test('Add Member To Session By GoogleId', async () => {
-  const members =
-    (await SessionsRepo.addUsersByGoogleIds(id, [user2.googleId], 'member')).members;
+  const { members } = (await SessionsRepo.addUsersByGoogleIds(id, [user2.googleId], 'member'));
   expect(members.length).toEqual(1);
   expect(members[0].googleId).toBe(user2.googleId);
 });
@@ -100,26 +96,23 @@ test('Get Members And Admins Of Session', async () => {
 
 test('Remove Member From Session', async () => {
   const session = await SessionsRepo.removeUserBySessionId(id, user2, 'member');
-  const members = session.members;
-  expect(members.length).toEqual(0);
-  id = session.id;
+  expect(session.members.length).toEqual(0);
+  ({ id } = session);
 });
 
 test('Add Members To Session By Id', async () => {
-  var members =
-    (await SessionsRepo.addUsersByIds(id, [user2.id], 'member')).members;
+  let { members } = (await SessionsRepo.addUsersByIds(id, [user2.id], 'member'));
   expect(members.length).toEqual(1);
   expect(members[0].googleId).toBe(user2.googleId);
 
   user3 = await UsersRepo.createDummyUser('sessiontest3');
-  members =
-    (await SessionsRepo.addUsersByIds(id, [user3.id], 'member')).members;
+  ({ members } = await SessionsRepo.addUsersByIds(id, [user3.id], 'member'));
   expect(members.length).toEqual(2);
   expect(members[1].googleId).toBe(user3.googleId);
 
-  var session = await SessionsRepo.removeUserBySessionId(id, user2, 'member');
+  let session = await SessionsRepo.removeUserBySessionId(id, user2, 'member');
   session = await SessionsRepo.removeUserBySessionId(id, user3, 'member');
-  id = session.id;
+  ({ id } = session);
 });
 
 test('Delete Session', async () => {

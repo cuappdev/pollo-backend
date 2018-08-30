@@ -1,21 +1,21 @@
 // @flow
+import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/constants';
 import SessionsRepo from '../../repos/SessionsRepo';
-import { Request } from 'express';
 
 class EndPollRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.POST, false);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/polls/:id/end/';
   }
 
-  async content (req: Request) {
-    const id = req.params.id;
-    const save = req.body.save;
+  async content(req: Request) {
+    const { id } = req.params;
+    const { save } = req.body;
 
     const poll = await SessionsRepo.getSessionById(id);
     if (!poll) {

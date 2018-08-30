@@ -1,11 +1,9 @@
 // @flow
-import { getConnectionManager, Repository, json } from 'typeorm';
-import { Session } from '../models/Session';
-import { Poll } from '../models/Poll';
+import { getConnectionManager, json, Repository } from 'typeorm';
+import Poll from '../models/Poll';
+import Session from '../models/Session';
 
-const db = (): Repository<Poll> => {
-  return getConnectionManager().get().getRepository(Poll);
-};
+const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Poll);
 
 // Create a poll
 const createPoll = async (text: string, session: ?Session, results: json,
@@ -54,7 +52,7 @@ const updatePollById = async (id: number, text: ?string, results: ?json,
   canShare: ?boolean, userAnswers: ?json):
   Promise<?Poll> => {
   try {
-    var field = {};
+    const field = {};
     if (text) field.text = text;
     if (results) field.results = results;
     if (canShare !== null) field.shared = canShare;
@@ -105,7 +103,7 @@ const getSessionFromPollId = async (id: number) : Promise<?Session> => {
   try {
     const poll = await db().createQueryBuilder('polls')
       .leftJoinAndSelect('polls.session', 'session')
-      .where('polls.id = :pollId', {pollId: id})
+      .where('polls.id = :pollId', { pollId: id })
       .getOne();
     return poll.session;
   } catch (e) {

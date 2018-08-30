@@ -5,15 +5,15 @@ import SessionsRepo from '../../../repos/SessionsRepo';
 import type { APIPoll } from '../APITypes';
 
 class GetPollRouter extends AppDevNodeRouter<APIPoll> {
-  constructor () {
+  constructor() {
     super(false);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/polls/:id/';
   }
 
-  async fetchWithId (id: number) {
+  async fetchWithId(id: number) {
     const poll = await SessionsRepo.getSessionById(id);
     return poll && {
       id: poll.id,

@@ -1,11 +1,9 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
-import { User } from '../models/User';
-import { Draft } from '../models/Draft';
+import Draft from '../models/Draft';
+import User from '../models/User';
 
-const db = (): Repository<Draft> => {
-  return getConnectionManager().get().getRepository(Draft);
-};
+const db = (): Repository<Draft> => getConnectionManager().get().getRepository(Draft);
 
 // Create a draft
 const createDraft = async (text: string, options: string[], user: User):
@@ -54,7 +52,7 @@ const getDraftsByUser = async (id: number): Promise<Array<?Draft>> => {
 const updateDraft = async (id: number, text: ?string, options: ?string[]):
   Promise<?Draft> => {
   try {
-    var field = {};
+    const field = {};
     if (text) field.text = text;
     if (options) field.options = options;
 

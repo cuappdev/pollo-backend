@@ -1,6 +1,6 @@
 // @flow
-import { Session } from './models/Session';
 import SocketIO from 'socket.io';
+import Session from './models/Session';
 import PollsRepo from './repos/PollsRepo';
 import SessionsRepo from './repos/SessionsRepo';
 
@@ -40,8 +40,11 @@ type CurrentState = {
  */
 export default class SessionSocket {
   session: Session
+
   nsp: SocketIO.Namespace
+
   onClose: void => void
+
   closing: boolean = false
 
   /**
@@ -58,15 +61,19 @@ export default class SessionSocket {
 
   // Counter for generating poll/answer ids
   pollId: number;
+
   answerId: number;
+
   usersConnected: number;
 
   lastPoll = null;
+
   lastState = {};
 
   // Google ids of admin/user to add to the session
   // List of users saved to session when a user exits socket (same for admins)
   adminGoogleIds = [];
+
   userGoogleIds = [];
 
   current: CurrentState = {
@@ -75,7 +82,7 @@ export default class SessionSocket {
     answers: {}
   }
 
-  constructor ({ session, nsp, onClose }: SessionSocketConfig) {
+  constructor({ session, nsp, onClose }: SessionSocketConfig) {
     this.session = session;
     this.nsp = nsp;
     this.nsp.on('connect', this._onConnect.bind(this));
@@ -88,12 +95,12 @@ export default class SessionSocket {
   }
 
   // v1 message
-  saveSession () {
+  saveSession() {
     console.log('save this sessioning session on user side');
     this.nsp.to('users').emit('user/poll/save', this.session);
   }
 
-  _clientError (client: IOSocket, msg: string): void {
+  _clientError(client: IOSocket, msg: string): void {
     console.log(msg);
   }
 
@@ -119,7 +126,7 @@ export default class SessionSocket {
       this._setupUserEvents(client);
       client.join('users');
 
-      this.usersConnected++;
+      this.usersConnected += 1;
       this.nsp.to('users').emit('user/count', { count: this.usersConnected });
       this.nsp.to('admins').emit('user/count', { count: this.usersConnected });
 
@@ -138,7 +145,7 @@ export default class SessionSocket {
     }
   }
 
-  /** ***************************** User Side *************************** **/
+  /** ***************************** User Side *************************** * */
   // i.e. the server hears 'server/poll/respond
   /**
    * Events:
@@ -146,7 +153,7 @@ export default class SessionSocket {
    * : User wants to update its answer to a poll
    * - Record the answer in volatile memory
    */
-  _setupUserEvents (client: IOSocket): void {
+  _setupUserEvents(client: IOSocket): void {
     client.on('server/poll/tally', (answerObject: Object) => {
       const answer: Answer = {
         id: this.answerId,
@@ -155,7 +162,7 @@ export default class SessionSocket {
         choice: answerObject.choice,
         text: answerObject.text
       };
-      this.answerId++;
+      this.answerId += 1;
       const poll = this._currentPoll();
       if (poll === null || poll === undefined) {
         console.log(`Client ${client.id} tried to answer with no active poll`);
@@ -166,7 +173,7 @@ export default class SessionSocket {
         return;
       }
 
-      let nextState = {...this.current};
+      const nextState = { ...this.current };
       const prev = nextState.answers[answer.googleId];
       nextState.answers[answer.googleId] = answer.choice; // update/add response
       if (prev) { // if truthy
@@ -180,11 +187,11 @@ export default class SessionSocket {
         }
       }
 
-      let curTally = nextState.results[answer.choice];
+      const curTally = nextState.results[answer.choice];
       if (curTally) { // if truthy
         nextState.results[answer.choice].count += 1;
       } else {
-        nextState.results[answer.choice] = {'text': answer.text, 'count': 1};
+        nextState.results[answer.choice] = { text: answer.text, count: 1 };
       }
 
       this.current = nextState;
@@ -213,12 +220,12 @@ export default class SessionSocket {
         return;
       }
 
-      let nextState = {...this.current};
-      let curTally = nextState.results[answer.choice];
+      const nextState = { ...this.current };
+      const curTally = nextState.results[answer.choice];
       if (curTally) { // if truthy
         nextState.results[answer.choice].count += 1;
       } else {
-        nextState.results[answer.choice] = {'text': answer.text, 'count': 1};
+        nextState.results[answer.choice] = { text: answer.text, count: 1 };
       }
 
       this.current = nextState;
@@ -240,7 +247,7 @@ export default class SessionSocket {
       this.answerId++;
       const question = this._currentPoll();
       if (question === null || question === undefined) {
-        console.log(`Client ${client.id} sanswer on no question`);
+        console.log(`Client ${client.id} answered on no question`);
         return;
       }
       if (question.id !== answer.poll) {
@@ -248,7 +255,7 @@ export default class SessionSocket {
         return;
       }
 
-      let nextState = {...this.current};
+      const nextState = { ...this.current };
       const prev = nextState.answers[answer.googleId];
       // update/input user's response
       nextState.answers[answer.googleId] = answer.choice;
@@ -263,11 +270,11 @@ export default class SessionSocket {
         }
       }
 
-      let curTally = nextState.results[answer.choice];
+      const curTally = nextState.results[answer.choice];
       if (curTally) { // if truthy
         nextState.results[answer.choice].count += 1;
       } else {
-        nextState.results[answer.choice] = {'text': answer.text, 'count': 1};
+        nextState.results[answer.choice] = { text: answer.text, count: 1 };
       }
 
       this.current = nextState;
@@ -293,31 +300,29 @@ export default class SessionSocket {
     });
   }
 
-  /** *************************** Admin Side *************************** **/
+  /** *************************** Admin Side *************************** * */
 
-  _currentPoll (): Poll | null {
+  _currentPoll(): Poll | null {
     if (this.current.poll === -1) {
       return null;
-    } else {
-      return this.polls[`${this.current.poll}`].poll;
     }
+    return this.polls[`${this.current.poll}`].poll;
   }
 
-  _startPoll (poll: Poll) {
+  _startPoll(poll: Poll) {
     // start new poll
     this.current.poll = poll.id;
-    if (this.polls[`${poll.id}`] !== null ||
-        this.polls[`${poll.id}`] !== undefined) {
+    if (this.polls[`${poll.id}`] !== null
+        || this.polls[`${poll.id}`] !== undefined) {
       this.polls[`${poll.id}`] = {
         poll,
         answers: {}
       };
     }
-    var results = {};
+    const results = {};
     if (poll.options) {
-      for (var i = 0; i < poll.options.length; i++) {
-        results[String.fromCharCode(65 + i)] =
-          {'text': poll.options[i], 'count': 0};
+      for (let i = 0; i < poll.options.length; i++) {
+        results[String.fromCharCode(65 + i)] = { text: poll.options[i], count: 0 };
       }
     }
     this.current.results = results;
@@ -351,7 +356,7 @@ export default class SessionSocket {
    * - Persists recieved polls
    * - Notifies clients quesiton is now closed
    */
-  _setupAdminEvents (client: Object): void {
+  _setupAdminEvents(client: Object): void {
     const address = client.handshake.address;
 
     if (!address) {
@@ -368,7 +373,7 @@ export default class SessionSocket {
         options: pollObject.options,
         shared: pollObject.shared
       };
-      this.pollId++;
+      this.pollId += 1;
       console.log('starting', poll);
       if (this.current.poll !== -1) {
         await this._endPoll();
@@ -385,7 +390,7 @@ export default class SessionSocket {
         options: questionObject.options,
         shared: false
       };
-      this.pollId++;
+      this.pollId += 1;
       console.log('starting', question);
       if (this.current.question !== -1) {
         await this._endPoll();

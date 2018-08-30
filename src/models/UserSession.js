@@ -1,18 +1,16 @@
 // @flow
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
+  Entity,
+  JoinColumn,
   OneToOne,
-  JoinColumn
+  PrimaryGeneratedColumn
 } from 'typeorm';
-import {Base} from './Base';
-import {User} from './User';
-
 import crypto from 'crypto';
+import Base from './Base';
+import User from './User';
 
-@Entity('usersessions')
-export class UserSession extends Base {
+export default @Entity('usersessions') class UserSession extends Base {
   @PrimaryGeneratedColumn()
   id: any = null;
 
@@ -32,7 +30,7 @@ export class UserSession extends Base {
   @JoinColumn()
   user: ?User = null;
 
-  static fromUser (user: User, accessToken: ?string, refreshToken: ?string):
+  static fromUser(user: User, accessToken: ?string, refreshToken: ?string):
     UserSession {
     const session = new UserSession();
     session.user = user;
@@ -40,7 +38,7 @@ export class UserSession extends Base {
     return session;
   }
 
-  update (accessToken: ?string, updateToken: ?string): UserSession {
+  update(accessToken: ?string, updateToken: ?string): UserSession {
     if (accessToken) {
       this.sessionToken = accessToken;
     } else {
@@ -57,12 +55,12 @@ export class UserSession extends Base {
     return this;
   }
 
-  activate (): UserSession {
+  activate(): UserSession {
     this.isActive = true;
     return this;
   }
 
-  logOut (): UserSession {
+  logOut(): UserSession {
     this.isActive = false;
     return this;
   }

@@ -1,27 +1,25 @@
 // @flow
+import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/constants';
 import SessionsRepo from '../../repos/SessionsRepo';
-import {Request} from 'express';
 import type { APIPoll } from './APITypes';
 
 class StartPollRouter extends AppDevRouter<APIPoll> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.POST, false);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/start/poll/';
   }
 
-  async content (req: Request) {
-    const id = req.body.id;
-    // const deviceId = req.body.deviceId;
-    const code = req.body.code;
-    var name = req.body.name;
+  async content(req: Request) {
+    const { id, code } = req.body;
+    let { name } = req.body;
 
     if (!name) name = '';
-    var poll = await SessionsRepo.getSessionById(id);
+    let poll = await SessionsRepo.getSessionById(id);
 
     if (!(id || code)) {
       throw new Error('Poll id, or code and device id required.');

@@ -2,15 +2,15 @@
 // A REST-API Router parent that handles boilerplate for
 // serving up JSON responses based on HTTP verb
 
-import type {RequestType} from './constants';
-import AppDevResponse from './AppDevResponse';
-
 import {
   Router,
   Request,
   Response,
   NextFunction
 } from 'express';
+import type { RequestType } from './constants';
+import AppDevResponse from './AppDevResponse';
+
 
 import constants from './constants';
 import lib from './lib';
@@ -20,14 +20,16 @@ import lib from './lib';
  */
 export default class AppDevRouter<T: Object> {
   router: Router;
+
   requestType: RequestType;
+
   authenticated: boolean;
 
-  getPath (): string {
+  getPath(): string {
     throw new Error('You must implement getPath() with a valid path!');
   }
 
-  constructor (type: RequestType, auth: ?boolean) {
+  constructor(type: RequestType, auth: ?boolean) {
     this.router = new Router();
     this.requestType = type;
     if (auth !== undefined && auth !== null) {
@@ -40,7 +42,7 @@ export default class AppDevRouter<T: Object> {
     this.init();
   }
 
-  init () {
+  init() {
     const path = this.getPath();
 
     // Error handle path
@@ -66,6 +68,8 @@ export default class AppDevRouter<T: Object> {
       case constants.REQUEST_TYPES.PUT:
         this.router.put(path, lib.ensureAuthenticated, this.response);
         break;
+      default:
+        break;
       }
     } else {
       switch (this.requestType) {
@@ -81,6 +85,8 @@ export default class AppDevRouter<T: Object> {
       case constants.REQUEST_TYPES.PUT:
         this.router.put(path, this.response);
         break;
+      default:
+        break;
       }
     }
   }
@@ -94,12 +100,12 @@ export default class AppDevRouter<T: Object> {
         throw new Error('You must implement content()!');
       } else {
         console.error(e);
-        res.json(new AppDevResponse(false, {errors: [e.message]}));
+        res.json(new AppDevResponse(false, { errors: [e.message] }));
       }
     }
   }
 
-  async content (req: Request): Promise<any> {
+  async content(req: Request): Promise<any> {
     throw new Error(1);
   }
 }

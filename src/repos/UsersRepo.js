@@ -1,13 +1,11 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
-import { User } from '../models/User';
-import { Session } from '../models/Session';
-import UserSessionsRepo from '../repos/UserSessionsRepo';
+import Session from '../models/Session';
+import User from '../models/User';
+import UserSessionsRepo from './UserSessionsRepo';
 import appDevUtils from '../utils/appDevUtils';
 
-const db = (): Repository<User> => {
-  return getConnectionManager().get().getRepository(User);
-};
+const db = (): Repository<User> => getConnectionManager().get().getRepository(User);
 
 // Create a user without fields
 const createDummyUser = async (id: string): Promise<User> => {
@@ -60,7 +58,7 @@ const getUserById = async (id: number): Promise<?User> => {
 const getUserByGoogleId = async (googleId: string): Promise<?User> => {
   try {
     const user = await db().createQueryBuilder('users')
-      .where('users.googleId = :googleId', { googleId: googleId })
+      .where('users.googleId = :googleId', { googleId })
       .getOne();
     return user;
   } catch (e) {
@@ -83,11 +81,11 @@ const getUsers = async (): Promise<Array<?User>> => {
 const getUsersFromIds = async (userIds: number[], filter: ?number[]):
 Promise<?Array<User>> => {
   try {
-    var ids = '(' + String(userIds) + ')';
-    var query = 'users.id IN ' + ids;
+    const ids = `(${String(userIds)})`;
+    let query = `users.id IN ${ids}`;
     if (filter && filter.length > 0) {
-      var f = '(' + String(filter) + ')';
-      query += ' AND users.id not IN ' + f;
+      const f = `(${String(filter)})`;
+      query += ` AND users.id not IN ${f}`;
     }
     const users = await db().createQueryBuilder('users')
       .where(query)
@@ -102,14 +100,13 @@ Promise<?Array<User>> => {
 const getUsersByGoogleIds = async (googleIds: string[], filter: ?string[]):
   Promise<?Array<User>> => {
   try {
+    let validIds = googleIds;
     if (filter && filter.length > 0) {
-      googleIds = googleIds.filter(function (id) {
-        return filter && !filter.includes(id);
-      });
+      validIds = googleIds.filter(id => filter && !filter.includes(id));
     }
-    var ids = '{' + String(googleIds) + '}';
+    const ids = `{${String(validIds)}}`;
     const users = await db().createQueryBuilder('users')
-      .where('users.googleId = ANY(\'' + ids + '\'::text[])')
+      .where(`users.googleId = ANY('${ids}'::text[])`)
       .getMany();
     return users;
   } catch (e) {
@@ -140,11 +137,10 @@ const getSessionsById = async (id: number, role: ?string):
       .getOne();
     if (role === 'admin') {
       return user.adminSessions;
-    } else if (role === 'member') {
+    } if (role === 'member') {
       return user.memberSessions;
-    } else {
-      return user.memberSessions.concat(user.adminSessions);
     }
+    return user.memberSessions.concat(user.adminSessions);
   } catch (e) {
     throw new Error(`Problem getting member sessions for user: ${id}`);
   }

@@ -5,29 +5,27 @@ import constants from '../../../utils/constants';
 import type { APIQuestion } from '../APITypes';
 
 class GetQuestionsRouter extends AppDevEdgeRouter<APIQuestion> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.GET);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/sessions/:id/questions/';
   }
 
-  async contentArray (req, pageInfo, error) {
-    const id = req.params.id;
-    var questions = await QuestionsRepo.getQuestionsFromSessionId(id);
+  async contentArray(req, pageInfo, error) {
+    const { id } = req.params;
+    const questions = await QuestionsRepo.getQuestionsFromSessionId(id);
 
     return questions
       .filter(Boolean)
-      .map(function (question) {
-        return {
-          node: {
-            id: question.id,
-            text: question.text
-          },
-          cursor: question.createdAt.valueOf()
-        };
-      });
+      .map(question => ({
+        node: {
+          id: question.id,
+          text: question.text
+        },
+        cursor: question.createdAt.valueOf()
+      }));
   }
 }
 

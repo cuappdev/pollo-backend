@@ -4,16 +4,16 @@ import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/constants';
 
 class GetLivePollsRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.POST, false);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/polls/live/';
   }
 
-  async content (req: Request) {
-    const codes = req.body.codes;
+  async content(req: Request) {
+    const { codes } = req.body;
 
     if (!codes) throw new Error('Poll codes are missing!');
 
