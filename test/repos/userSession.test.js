@@ -3,12 +3,12 @@ import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
 
 const googleId = 'usertest1';
-var user;
-var sessionId;
+let user;
+let sessionId;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
-  await dbConnection().catch(function (e) {
+  await dbConnection().catch((e) => {
     console.log('Error connecting to database');
     process.exit();
   });
@@ -17,8 +17,7 @@ beforeAll(async () => {
 });
 
 test('Create Session', async () => {
-  const session =
-    await UserSessionsRepo.createOrUpdateSession(user, 'access', 'refresh');
+  const session = await UserSessionsRepo.createOrUpdateSession(user, 'access', 'refresh');
   sessionId = session.id;
   expect(session.isActive).toBeTruthy();
   expect(session.sessionToken).toBe('access');

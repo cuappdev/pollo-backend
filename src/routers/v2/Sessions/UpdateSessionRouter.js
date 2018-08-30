@@ -7,22 +7,22 @@ import constants from '../../../utils/constants';
 import type { APISession } from '../APITypes';
 
 class UpdateSessionRouter extends AppDevRouter<APISession> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.PUT);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/sessions/:id/';
   }
 
-  async content (req: Request): Promise<{ node: APISession }> {
-    const name = req.body.name;
+  async content(req: Request): Promise<{ node: APISession }> {
+    const { name } = req.body;
     const sessionId = req.params.id;
-    const user = req.user;
+    const { user } = req;
 
     if (!name) throw new Error('No fields specified to update.');
 
-    var session = await SessionsRepo.getSessionById(sessionId);
+    let session = await SessionsRepo.getSessionById(sessionId);
     if (!session) {
       throw new Error(`Session with id ${sessionId} was not found!`);
     }

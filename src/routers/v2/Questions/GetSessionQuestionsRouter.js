@@ -5,26 +5,26 @@ import SessionsRepo from '../../../repos/SessionsRepo';
 import constants from '../../../utils/constants';
 
 class GetSessionQuestionsRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.GET);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/sessions/:id/questions/date/';
   }
 
-  async content (req: Request) {
-    const id = req.params.id;
-    var questions = await SessionsRepo.getQuestions(id);
+  async content(req: Request) {
+    const { id } = req.params;
+    const questions = await SessionsRepo.getQuestions(id);
     if (!questions) {
       throw new Error(`Problem getting questions from session id: ${id}!`);
     }
     // Date mapped to list of questions
     const questionsByDate = {};
-    for (var i = 0; i < questions.length; i++) {
+    for (let i = 0; i < questions.length; i += 1) {
       const question = questions[i];
       if (question) {
-        var date = (new Date(1000 * question.createdAt)).toLocaleString();
+        let date = (new Date(1000 * question.createdAt)).toLocaleString();
         date = date.substring(0, date.indexOf(','));
         const q = {
           id: question.id,

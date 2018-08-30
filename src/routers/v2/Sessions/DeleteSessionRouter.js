@@ -5,17 +5,17 @@ import SessionsRepo from '../../../repos/SessionsRepo';
 import constants from '../../../utils/constants';
 
 class DeleteSessionRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.DELETE);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/sessions/:id/';
   }
 
-  async content (req: Request) {
+  async content(req: Request) {
     const sessionId = req.params.id;
-    const user = req.user;
+    const { user } = req;
 
     const session = await SessionsRepo.getSessionById(sessionId);
     if (!session) throw new Error(`Session with id ${sessionId} not found!`);

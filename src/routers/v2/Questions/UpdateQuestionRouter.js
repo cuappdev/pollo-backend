@@ -7,18 +7,18 @@ import constants from '../../../utils/constants';
 import type { APIQuestion } from '../APITypes';
 
 class UpdateQuestionRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.PUT);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/questions/:id/';
   }
 
-  async content (req: Request): Promise<{ node: APIQuestion }> {
+  async content(req: Request): Promise<{ node: APIQuestion }> {
     const questionId = req.params.id;
-    var text = req.body.text;
-    var user = req.user;
+    const { text } = req.body;
+    const { user } = req;
 
     if (!text) {
       throw new Error('No fields specified to update.');

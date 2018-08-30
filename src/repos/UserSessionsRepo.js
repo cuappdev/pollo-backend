@@ -1,11 +1,9 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
-import { UserSession } from '../models/UserSession';
-import { User } from '../models/User';
+import User from '../models/User';
+import UserSession from '../models/UserSession';
 
-const db = (): Repository<UserSession> => {
-  return getConnectionManager().get().getRepository(UserSession);
-};
+const db = (): Repository<UserSession> => getConnectionManager().get().getRepository(UserSession);
 
 // Create or update session
 const createOrUpdateSession = async (
@@ -16,14 +14,14 @@ const createOrUpdateSession = async (
     .innerJoinAndSelect('usersessions.user', 'users')
     .getOne();
 
-  var session;
+  let session;
   if (optionalSession) {
     session = await
-      db().persist(optionalSession.update(accessToken, refreshToken));
+    db().persist(optionalSession.update(accessToken, refreshToken));
     return session;
   }
   session = await
-    db().persist(UserSession.fromUser(user, accessToken, refreshToken));
+  db().persist(UserSession.fromUser(user, accessToken, refreshToken));
   return session;
 };
 
@@ -32,7 +30,7 @@ const getUserFromToken = async (accessToken: string): Promise<?User> => {
   const session = await db().createQueryBuilder('usersessions')
     .leftJoinAndSelect('usersessions.user', 'user')
     .where('usersessions.sessionToken = :accessToken',
-      {accessToken: accessToken})
+      { accessToken })
     .getOne();
   if (!session) return null;
   return session.user;
@@ -40,9 +38,9 @@ const getUserFromToken = async (accessToken: string): Promise<?User> => {
 
 // Update session from refresh token
 const updateSession = async (refreshToken: string): Promise<?Object> => {
-  var session = await db().createQueryBuilder('usersessions')
+  let session = await db().createQueryBuilder('usersessions')
     .leftJoinAndSelect('usersessions.user', 'user')
-    .where('usersessions.updateToken = :token', {token: refreshToken})
+    .where('usersessions.updateToken = :token', { token: refreshToken })
     .getOne();
   if (!session) return null;
   session = session.update();
@@ -59,11 +57,11 @@ const updateSession = async (refreshToken: string): Promise<?Object> => {
 const verifySession = async (accessToken: string): Promise<boolean> => {
   const session = await db().createQueryBuilder('usersessions')
     .where('usersessions.sessionToken = :accessToken',
-      {accessToken: accessToken})
+      { accessToken })
     .getOne();
   if (!session) return false;
-  return session.isActive &&
-    session.expiresAt > Math.floor(new Date().getTime() / 1000);
+  return session.isActive
+    && session.expiresAt > Math.floor(new Date().getTime() / 1000);
 };
 
 // Delete session
@@ -80,7 +78,7 @@ const deleteSessionFromUserId = async (userId: number) => {
   try {
     const session = await db().createQueryBuilder('usersessions')
       .innerJoin('usersessions.user', 'user', 'user.id = :userId')
-      .setParameters({ userId: userId })
+      .setParameters({ userId })
       .getOne();
     if (session) db().remove(session);
   } catch (e) {

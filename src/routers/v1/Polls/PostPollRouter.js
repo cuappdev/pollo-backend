@@ -8,24 +8,23 @@ import constants from '../../../utils/constants';
 import type { APIPoll } from '../APITypes';
 
 class PostPollRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.POST, false);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/polls/';
   }
 
-  async content (req: Request): Promise<{ node: APIPoll }> {
-    var name = req.body.name;
-    const code = req.body.code;
-    const deviceId = req.body.deviceId;
+  async content(req: Request): Promise<{ node: APIPoll }> {
+    let { name } = req.body;
+    const { code, deviceId } = req.body;
 
     if (!name) name = '';
     if (!code) throw new Error('Code missing');
     if (!deviceId) throw new Error('Device id missing');
 
-    var user = await UsersRepo.getUserByGoogleId(deviceId);
+    let user = await UsersRepo.getUserByGoogleId(deviceId);
     if (!user) {
       user = await UsersRepo.createDummyUser(deviceId);
     }

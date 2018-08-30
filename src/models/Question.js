@@ -1,16 +1,15 @@
 // @flow
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  ManyToOne
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn
 } from 'typeorm';
-import { Base } from './Base';
-import { Session } from './Session';
-import { User } from './User';
+import Base from './Base';
+import Session from './Session';
+import User from './User';
 
-@Entity('questions')
-export class Question extends Base {
+export default @Entity('questions') class Question extends Base {
   @PrimaryGeneratedColumn()
   id: any = null;
 

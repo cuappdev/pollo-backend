@@ -1,21 +1,20 @@
 // @flow
+import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/constants';
 import SessionsRepo from '../../repos/SessionsRepo';
-import { Request } from 'express';
 
 class EndSessionRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.POST);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/sessions/:id/end/';
   }
 
-  async content (req: Request) {
-    const id = req.params.id;
-    const save = req.body.save;
+  async content(req: Request) {
+    const { id, save } = req.params;
 
     const session = await SessionsRepo.getSessionById(id);
     if (!session) {

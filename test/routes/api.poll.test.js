@@ -2,17 +2,23 @@ import dbConnection from '../../src/db/DbConnection';
 import UsersRepo from '../../src/repos/UsersRepo';
 import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
 import SessionsRepo from '../../src/repos/SessionsRepo';
+
 const request = require('request-promise-native');
-const { get, post, del, put } = require('./lib');
+const {
+  get, post, del, put
+} = require('./lib');
 
 // Polls
 // Must be running server to test
 
 const googleId = 'usertest';
-var session, poll, userId, token;
+let session;
+let poll;
+let userId;
+let token;
 
 beforeAll(async () => {
-  await dbConnection().catch(function (e) {
+  await dbConnection().catch((e) => {
     console.log('Error connecting to database');
     process.exit();
   });
@@ -22,23 +28,22 @@ beforeAll(async () => {
   token = session.sessionToken;
 
   // Create a session
-  const opts = {name: 'Test session', code: SessionsRepo.createCode()};
+  const opts = { name: 'Test session', code: SessionsRepo.createCode() };
   const result = await request(post('/sessions/', opts, token));
   session = result.data.node;
   expect(result.success).toBeTruthy();
 });
 
 test('create poll', async () => {
-  const opts = {text: 'Poll text', shared: true, type: 'MULTIPLE_CHOICE'};
+  const opts = { text: 'Poll text', shared: true, type: 'MULTIPLE_CHOICE' };
   const result = await request(post(`/sessions/${session.id}/polls`, opts, token));
   poll = result.data.node;
   expect(result.success).toBeTruthy();
 });
 
 test('create poll with invalid token', async () => {
-  const opts = {text: 'Poll text', results: {}, shared: true};
-  const result =
-    await request(post(`/sessions/${session.id}/polls`, opts, 'invalid'));
+  const opts = { text: 'Poll text', results: {}, shared: true };
+  const result = await request(post(`/sessions/${session.id}/polls`, opts, 'invalid'));
   expect(result.success).toBeFalsy();
 });
 
@@ -59,23 +64,22 @@ test('get polls by session', async () => {
 test('update poll', async () => {
   const opts = {
     text: 'Updated text',
-    results: {'A': 1},
+    results: { A: 1 },
     shared: false
   };
   const getstr = await request(put(`/polls/${poll.id}`, opts, token));
   const getres = getstr;
   expect(getres.success).toBeTruthy();
   expect(getres.data.node.text).toBe('Updated text');
-  expect(getres.data.node.results).toMatchObject({'A': 1});
+  expect(getres.data.node.results).toMatchObject({ A: 1 });
 });
 
 test('update poll with invalid token', async () => {
   const opts = {
     text: 'Updated text',
-    results: {'A': 1}
+    results: { A: 1 }
   };
-  const getstr =
-    await request(put(`/polls/${poll.id}`, opts, 'invalid'));
+  const getstr = await request(put(`/polls/${poll.id}`, opts, 'invalid'));
   const getres = getstr;
   expect(getres.success).toBeFalsy();
 });
@@ -91,8 +95,7 @@ test('delete poll', async () => {
 });
 
 afterAll(async () => {
-  const result =
-    await request(del(`/sessions/${session.id}`, token));
+  const result = await request(del(`/sessions/${session.id}`, token));
   expect(result.success).toBeTruthy();
   await UsersRepo.deleteUserById(userId);
   await UserSessionsRepo.deleteSession(session.id);

@@ -3,13 +3,13 @@ import PollsRepo from '../../src/repos/PollsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
 
-var session;
-var id;
-var user;
+let session;
+let id;
+let user;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
-  await dbConnection().catch(function (e) {
+  await dbConnection().catch((e) => {
     console.log('Error connecting to database');
     process.exit();
   });
@@ -19,13 +19,12 @@ beforeAll(async () => {
 });
 
 test('Create Poll', async () => {
-  const poll =
-    await PollsRepo.createPoll('Poll', session, {}, true, 'MULTIPLE_CHOICE');
+  const poll = await PollsRepo.createPoll('Poll', session, {}, true, 'MULTIPLE_CHOICE');
   expect(poll.text).toBe('Poll');
   expect(poll.session.id).toBe(session.id);
   expect(poll.results).toEqual({});
   expect(poll.type).toBe('MULTIPLE_CHOICE');
-  id = poll.id;
+  ({ id } = poll);
 });
 
 test('Get Poll', async () => {
@@ -37,16 +36,14 @@ test('Get Poll', async () => {
 
 test('Get Polls from Session', async () => {
   const polls = await PollsRepo.getPollsFromSessionId(session.id);
-  const sharedPolls =
-    await PollsRepo.getSharedPollsFromSessionId(session.id);
+  const sharedPolls = await PollsRepo.getSharedPollsFromSessionId(session.id);
   expect(polls.length).toEqual(1);
   expect(polls[0].text).toBe('Poll');
   expect(polls).toEqual(sharedPolls);
 });
 
 test('Update Poll', async () => {
-  const poll =
-    await PollsRepo.updatePollById(id, 'New Poll', null, false);
+  const poll = await PollsRepo.updatePollById(id, 'New Poll', null, false);
   expect(poll.text).toBe('New Poll');
   expect(poll.canShare).toBeFalsy();
 });

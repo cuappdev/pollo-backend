@@ -1,16 +1,15 @@
 // @flow
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
+  Entity,
+  json,
   ManyToOne,
-  json
+  PrimaryGeneratedColumn
 } from 'typeorm';
-import { Base } from './Base';
-import { Session } from './Session';
+import Base from './Base';
+import Session from './Session';
 
-@Entity('polls')
-export class Poll extends Base {
+export default @Entity('polls') class Poll extends Base {
   @PrimaryGeneratedColumn()
   id: any = null;
 
@@ -18,7 +17,7 @@ export class Poll extends Base {
   text: string = '';
 
   @Column('string')
-  type: string = ''; // Either MULTIPLE_CHOICE OR FREE_RESPONSE 
+  type: string = ''; // Either MULTIPLE_CHOICE OR FREE_RESPONSE
 
   @ManyToOne(type => Session, session => session.polls, {
     onDelete: 'CASCADE'

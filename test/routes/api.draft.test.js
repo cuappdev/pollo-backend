@@ -1,13 +1,19 @@
 import dbConnection from '../../src/db/DbConnection';
 import UsersRepo from '../../src/repos/UsersRepo';
 import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
-const request = require('request-promise-native');
-const { get, post, del, put } = require('./lib');
 
-var draft1, draft2, userId, userToken;
+const request = require('request-promise-native');
+const {
+  get, post, del, put
+} = require('./lib');
+
+let draft1;
+let draft2;
+let userId;
+let userToken;
 
 beforeAll(async () => {
-  await dbConnection().catch(function (e) {
+  await dbConnection().catch((e) => {
     console.log('Error connecting to database');
     process.exit();
   });
@@ -32,7 +38,7 @@ test('Create a draft', async () => {
 test('Get drafts (Authorized)', async () => {
   const getstr = await request(get('/drafts/', userToken));
   const getres = getstr;
-  const edges = getres.data.edges;
+  const { edges } = getres.data;
   expect(getres.success).toBeTruthy();
   expect(edges.length).toBe(1);
   expect(edges[0].node).toMatchObject(draft1);
@@ -50,7 +56,7 @@ test('Update a draft', async () => {
   };
   const getstr = await request(put(`/drafts/${draft1.id}`, body, userToken));
   const getres = getstr;
-  const node = getres.data.node;
+  const { node } = getres.data;
   expect(getres.success).toBeTruthy();
   expect(node.text).toBe(body.text);
   expect(node.options).toMatchObject(draft1.options);
@@ -73,7 +79,7 @@ test('Create another draft', async () => {
 test('Get updated list of drafts (Authorized)', async () => {
   const getstr = await request(get('/drafts/', userToken));
   const getres = getstr;
-  const edges = getres.data.edges;
+  const { edges } = getres.data;
   expect(getres.success).toBeTruthy();
   expect(edges.length).toBe(2);
   expect(edges[0].node).toMatchObject(draft1);
@@ -81,7 +87,7 @@ test('Get updated list of drafts (Authorized)', async () => {
 });
 
 test('Delete draft', async () => {
-  var result = await request(del(`/drafts/${draft1.id}`, userToken));
+  let result = await request(del(`/drafts/${draft1.id}`, userToken));
   expect(result.success).toBeTruthy();
   result = await request(del(`/drafts/${draft2.id}`, userToken));
   expect(result.success).toBeTruthy();

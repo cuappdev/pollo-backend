@@ -1,19 +1,19 @@
 // @flow
+import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import SessionsRepo from '../../repos/SessionsRepo';
 import constants from '../../utils/constants';
-import {Request} from 'express';
 
 class GenerateCodeRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.GET, false);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/generate/code/';
   }
 
-  async content (req: Request) {
+  async content(req: Request) {
     return {
       code: SessionsRepo.createCode()
     };

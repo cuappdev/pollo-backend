@@ -7,18 +7,17 @@ import constants from '../../../utils/constants';
 import type { APIDraft } from '../APITypes';
 
 class PostDraftRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.POST);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/drafts/';
   }
 
-  async content (req: Request): Promise<{ node: APIDraft }> {
-    var text = req.body.text;
-    var options = req.body.options;
-    var user = req.user;
+  async content(req: Request): Promise<{ node: APIDraft }> {
+    let { text, options } = req.body;
+    const { user } = req;
 
     if (!text) text = '';
     if (!options) options = [];

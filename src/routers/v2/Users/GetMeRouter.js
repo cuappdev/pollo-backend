@@ -5,18 +5,18 @@ import constants from '../../../utils/constants';
 import type { APIUser } from '../APITypes';
 
 class GetMeRouter extends AppDevRouter<APIUser> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.GET);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/users/';
   }
 
-  async content (req: Request) {
+  async content(req: Request) {
     return req.user && {
       id: req.user.id,
-      name: req.user.firstName + ' ' + req.user.lastName,
+      name: `${req.user.firstName} ${req.user.lastName}`,
       netId: req.user.netId
     };
   }

@@ -3,12 +3,13 @@ import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
 import appDevUtils from '../../src/utils/appDevUtils';
 
-var id, session;
+let id;
+let session;
 const googleId = appDevUtils.randomCode(6);
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
-  await dbConnection().catch(function (e) {
+  await dbConnection().catch((e) => {
     console.log('Error connecting to database');
     process.exit();
   });
@@ -18,7 +19,7 @@ test('Create User', async () => {
   const user = await UsersRepo.createDummyUser(googleId);
   expect(user.googleId).toBe(googleId);
   expect(user.netId).toBe('');
-  id = user.id;
+  ({ id } = user);
 });
 
 test('Get User by Id', async () => {
@@ -35,9 +36,7 @@ test('Get User by googleId', async () => {
 
 test('Get Users', async () => {
   const users = await UsersRepo.getUsers();
-  const user = users.find(function (u) {
-    return u.id === id;
-  });
+  const user = users.find(u => u.id === id);
   expect(user).toBeDefined();
 });
 

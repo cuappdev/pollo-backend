@@ -3,25 +3,23 @@ import QuestionsRepo from '../../src/repos/QuestionsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
 
-var session;
-var question1;
-var question2;
-var user;
+let session;
+let question1;
+let question2;
+let user;
 
 beforeAll(async () => {
-  await dbConnection().catch(function (e) {
+  await dbConnection().catch((e) => {
     console.log('Error connecting to database');
     process.exit();
   });
   user = await UsersRepo.createDummyUser('googleId');
-  session =
-    await SessionsRepo.createSession('Session', SessionsRepo.createCode(), user);
+  session = await SessionsRepo.createSession('Session', SessionsRepo.createCode(), user);
 });
 
 test('Create Question', async () => {
   const text = 'Why do we have to test shit? (PG-13)';
-  question1 =
-    await QuestionsRepo.createQuestion(text, session, user);
+  question1 = await QuestionsRepo.createQuestion(text, session, user);
   expect(question1.text).toBe(text);
   expect(question1.session.id).toBe(session.id);
   expect(question1.user.id).toBe(user.id);
@@ -34,7 +32,7 @@ test('Get Question', async () => {
 });
 
 test('Update Question', async () => {
-  var text = 'Why do we have to test stuff? (PG)';
+  const text = 'Why do we have to test stuff? (PG)';
   const question = await QuestionsRepo.updateQuestionById(question1.id, text);
   expect(question1.id).toBe(question.id);
   expect(question1.text).not.toBe(question.text);
@@ -58,7 +56,7 @@ test('Create A New Question', async () => {
 });
 
 test('Get Session From Both Questions', async () => {
-  var temp = await QuestionsRepo.getSessionFromQuestionId(question1.id);
+  let temp = await QuestionsRepo.getSessionFromQuestionId(question1.id);
   expect(temp.id).toBe(session.id);
   temp = await QuestionsRepo.getSessionFromQuestionId(question2.id);
   expect(temp.id).toBe(session.id);

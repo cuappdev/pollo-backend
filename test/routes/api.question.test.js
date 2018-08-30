@@ -2,24 +2,30 @@ import dbConnection from '../../src/db/DbConnection';
 import UsersRepo from '../../src/repos/UsersRepo';
 import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
 import SessionsRepo from '../../src/repos/SessionsRepo';
-const request = require('request-promise-native');
-const {get, post, del, put} = require('./lib');
 
-var session, question, admin, member, adminToken, memberToken;
+const request = require('request-promise-native');
+const {
+  get, post, del, put
+} = require('./lib');
+
+let session;
+let question;
+let admin;
+let member;
+let adminToken;
+let memberToken;
 
 beforeAll(async () => {
-  await dbConnection().catch(function (e) {
+  await dbConnection().catch((e) => {
     console.log('Error connecting to database');
     process.exit();
   });
   member = await UsersRepo.createDummyUser('member');
   admin = await UsersRepo.createDummyUser('admin');
-  adminToken =
-    (await UserSessionsRepo.createOrUpdateSession(admin, null, null)).sessionToken;
-  memberToken =
-    (await UserSessionsRepo.createOrUpdateSession(member, null, null)).sessionToken;
+  adminToken = (await UserSessionsRepo.createOrUpdateSession(admin, null, null)).sessionToken;
+  memberToken = (await UserSessionsRepo.createOrUpdateSession(member, null, null)).sessionToken;
 
-  const opts = {name: 'Test session', code: SessionsRepo.createCode()};
+  const opts = { name: 'Test session', code: SessionsRepo.createCode() };
   const result = await request(post('/sessions/', opts, adminToken));
   session = result.data.node;
   expect(result.success).toBeTruthy();
@@ -84,8 +90,7 @@ test('delete question', async () => {
 });
 
 afterAll(async () => {
-  const result =
-    await request(del(`/sessions/${session.id}`, adminToken));
+  const result = await request(del(`/sessions/${session.id}`, adminToken));
   expect(result.success).toBeTruthy();
   await UsersRepo.deleteUserById(admin.id);
   await UsersRepo.deleteUserById(member.id);

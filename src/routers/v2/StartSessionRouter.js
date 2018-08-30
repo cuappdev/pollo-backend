@@ -1,23 +1,22 @@
 // @flow
+import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/constants';
 import SessionsRepo from '../../repos/SessionsRepo';
-import {Request} from 'express';
 import type { APISession } from './APITypes';
 
 class StartSessionRouter extends AppDevRouter<APISession> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.POST);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/start/session/';
   }
 
-  async content (req: Request) {
-    const id = req.body.id;
-    const code = req.body.code;
-    var name = req.body.name;
+  async content(req: Request) {
+    const { id, code } = req.body;
+    let { name } = req.body;
 
     if (!name) name = '';
 
@@ -25,7 +24,7 @@ class StartSessionRouter extends AppDevRouter<APISession> {
       throw new Error('Session id, or code and device id required.');
     }
 
-    var session = await SessionsRepo.getSessionById(id);
+    let session = await SessionsRepo.getSessionById(id);
 
     if (!session && code) {
       const sessionId = await SessionsRepo.getSessionId(code);

@@ -1,6 +1,7 @@
 import dbConnection from '../../src/db/DbConnection';
 import UsersRepo from '../../src/repos/UsersRepo';
 import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
+
 const request = require('request-promise-native');
 const { get } = require('./lib');
 
@@ -8,10 +9,12 @@ const { get } = require('./lib');
 // Must be running server to test
 
 const googleId = 'usertest';
-var session, user, token;
+let session;
+let user;
+let token;
 
 beforeAll(async () => {
-  await dbConnection().catch(function (e) {
+  await dbConnection().catch((e) => {
     console.log('Error connecting to database');
     process.exit();
   });

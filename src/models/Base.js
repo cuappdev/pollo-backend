@@ -1,8 +1,9 @@
 // @flow
-import { AbstractEntity, Column, BeforeInsert, BeforeUpdate } from 'typeorm';
+import {
+  AbstractEntity, BeforeInsert, BeforeUpdate, Column
+} from 'typeorm';
 
-@AbstractEntity()
-export class Base {
+export default @AbstractEntity() class Base {
   @Column('bigint')
   createdAt: number = -1;
 
@@ -10,12 +11,14 @@ export class Base {
   updatedAt: number = -1;
 
   @BeforeInsert()
-  setTimestamps () : void {
-    this.createdAt = this.updatedAt = Math.floor(new Date().getTime() / 1000);
+  setTimestamps() : void {
+    const time = Math.floor(new Date().getTime() / 1000);
+    this.createdAt = time;
+    this.updatedAt = time;
   }
 
   @BeforeUpdate()
-  updateTimestamps () : void {
+  updateTimestamps() : void {
     this.updatedAt = Math.floor(new Date().getTime() / 1000);
   }
 }

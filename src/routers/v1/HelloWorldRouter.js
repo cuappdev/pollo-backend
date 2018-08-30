@@ -4,15 +4,15 @@ import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/constants';
 
 class HelloWorldRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.GET, false);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/hello/';
   }
 
-  async content (req: Request) {
+  async content(req: Request) {
     return { message: 'Hello, world!' };
   }
 }

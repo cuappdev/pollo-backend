@@ -1,16 +1,16 @@
 // @flow
+import { Request } from 'express';
 import AppDevNodeRouter from '../../../utils/AppDevNodeRouter';
 import QuestionsRepo from '../../../repos/QuestionsRepo';
-import { Request } from 'express';
 
 import type { APIQuestion } from '../APITypes';
 
 class GetQuestionRouter extends AppDevNodeRouter<APIQuestion> {
-  getPath (): string {
+  getPath(): string {
     return '/questions/:id/';
   }
 
-  async fetchWithId (id: number, req: Request) {
+  async fetchWithId(id: number, req: Request) {
     const question = await QuestionsRepo.getQuestionById(id);
     if (!question) throw new Error(`Question with id ${id} cannot be found`);
 

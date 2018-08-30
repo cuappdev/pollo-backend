@@ -5,17 +5,17 @@ import constants from '../../../utils/constants';
 import SessionsRepo from '../../../repos/SessionsRepo';
 
 class DeleteMembersRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.PUT);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/sessions/:id/members/';
   }
 
-  async content (req: Request) {
+  async content(req: Request) {
     const sessionId = req.params.id;
-    const user = req.user;
+    const { user } = req;
     const memberIds = JSON.parse(req.body.memberIds);
 
     if (!memberIds) throw new Error('List of member ids missing!');

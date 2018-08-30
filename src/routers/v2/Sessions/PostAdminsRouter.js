@@ -5,18 +5,18 @@ import SessionsRepo from '../../../repos/SessionsRepo';
 import constants from '../../../utils/constants';
 
 class PostAdminsRouter extends AppDevRouter<Object> {
-  constructor () {
+  constructor() {
     super(constants.REQUEST_TYPES.POST);
   }
 
-  getPath (): string {
+  getPath(): string {
     return '/sessions/:id/admins/';
   }
 
-  async content (req: Request) {
-    const id = req.params.id;
-    const user = req.user;
-    const adminIds = req.body.adminIds;
+  async content(req: Request) {
+    const { id } = req.params;
+    const { user } = req;
+    const { adminIds } = req.body;
 
     if (!adminIds) throw new Error('List of admin ids missing!');
 
