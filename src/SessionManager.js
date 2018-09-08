@@ -28,8 +28,8 @@ class SessionManager {
 
   endSession(session: Session, save: bool): void {
     const index = this.sessionSockets.findIndex((x) => {
-      if (!x || !x.session) return false;
-      return (x.session.id === session.id);
+      const sessionUndefined = !x || !x.session;
+      return sessionUndefined ? false : x.session.id === session.id;
     });
 
     if (index !== -1) {
@@ -56,22 +56,18 @@ class SessionManager {
   liveSessions(sessionCodes: Array<string>): Array<Session> {
     return this.sessionSockets
       .filter((x) => {
-        if (x && x.session) {
-          return sessionCodes.includes(x.session.code);
-        }
-        return false;
+        const isSession = x && x.session;
+        return isSession ? sessionCodes.includes(x.session.code) : false;
       })
       .map((l : SessionSocket) => l.session);
   }
 
   isLive(sessionCode: ?string, id: ?number): bool {
     const socket = this.sessionSockets.find((x) => {
-      if (x && x.session) {
-        return x.session.code === sessionCode || x.session.id === id;
-      }
-      return false;
+      const isSession = x && x.session;
+      return isSession ? x.session.code === sessionCode || x.session.id === id : false;
     });
-    return (socket !== undefined);
+    return socket !== undefined;
   }
 }
 

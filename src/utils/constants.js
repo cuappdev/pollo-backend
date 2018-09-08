@@ -19,7 +19,13 @@ const QUESTION_TYPES = {
   RANKING: 'RANKING'
 };
 
+const USER_TYPES = {
+  ADMIN: 'admin',
+  MEMBER: 'member'
+};
+
 export default {
   REQUEST_TYPES,
-  QUESTION_TYPES
+  QUESTION_TYPES,
+  USER_TYPES
 };

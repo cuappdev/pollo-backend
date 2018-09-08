@@ -25,8 +25,7 @@ const createQuestion = async (text: string, session: Session, user: User):
 // Get a question by id
 const getQuestionById = async (id: number): Promise<?Question> => {
   try {
-    const question = await db().findOneById(id);
-    return question;
+    return await db().findOneById(id);
   } catch (e) {
     throw new Error(`Problem getting question by id: ${id}`);
   }

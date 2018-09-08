@@ -21,22 +21,19 @@ class GetSessionQuestionsRouter extends AppDevRouter<Object> {
     }
     // Date mapped to list of questions
     const questionsByDate = {};
-    for (let i = 0; i < questions.length; i += 1) {
-      const question = questions[i];
-      if (question) {
-        let date = (new Date(1000 * question.createdAt)).toLocaleString();
-        date = date.substring(0, date.indexOf(','));
-        const q = {
-          id: question.id,
-          text: question.text
-        };
-        if (questionsByDate[date]) {
-          questionsByDate[date].push(q);
-        } else {
-          questionsByDate[date] = [q];
-        }
+    questions.filter(Boolean).forEach((question) => {
+      let date = (new Date(1000 * question.createdAt)).toLocaleString();
+      date = date.substring(0, date.indexOf(','));
+      const q = {
+        id: question.id,
+        text: question.text
+      };
+      if (questionsByDate[date]) {
+        questionsByDate[date].push(q);
+      } else {
+        questionsByDate[date] = [q];
       }
-    }
+    });
     return questionsByDate;
   }
 }

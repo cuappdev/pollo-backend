@@ -3,6 +3,7 @@ import SocketIO from 'socket.io';
 import Session from './models/Session';
 import PollsRepo from './repos/PollsRepo';
 import SessionsRepo from './repos/SessionsRepo';
+import constants from './utils/constants';
 
 export type SessionSocketConfig = {
   session: Session,
@@ -180,7 +181,7 @@ export default class SessionSocket {
         // has selected something before
         nextState.results[prev].count -= 1;
         const poll = this._currentPoll();
-        if (poll && poll.type === 'FREE_RESPONSE') {
+        if (poll && poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
           if (nextState.results[prev].count <= 0) {
             delete nextState.results[prev];
           }
@@ -244,7 +245,7 @@ export default class SessionSocket {
         choice: answerObject.choice,
         text: answerObject.text
       };
-      this.answerId++;
+      this.answerId += 1;
       const question = this._currentPoll();
       if (question === null || question === undefined) {
         console.log(`Client ${client.id} answered on no question`);
@@ -263,7 +264,7 @@ export default class SessionSocket {
         // has selected something before
         nextState.results[prev].count -= 1;
         const poll = this._currentPoll();
-        if (poll && poll.type === 'FREE_RESPONSE') {
+        if (poll && poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
           if (nextState.results[prev].count <= 0) {
             delete nextState.results[prev];
           }
@@ -294,7 +295,7 @@ export default class SessionSocket {
       if (this.nsp.connected.length === 0) {
         this.onClose();
       }
-      this.usersConnected--;
+      this.usersConnected -= 1;
       this.nsp.to('users').emit('user/count', { count: this.usersConnected });
       this.nsp.to('admins').emit('user/count', { count: this.usersConnected });
     });
@@ -321,7 +322,7 @@ export default class SessionSocket {
     }
     const results = {};
     if (poll.options) {
-      for (let i = 0; i < poll.options.length; i++) {
+      for (let i = 0; i < poll.options.length; i += 1) {
         results[String.fromCharCode(65 + i)] = { text: poll.options[i], count: 0 };
       }
     }
@@ -357,7 +358,7 @@ export default class SessionSocket {
    * - Notifies clients quesiton is now closed
    */
   _setupAdminEvents(client: Object): void {
-    const address = client.handshake.address;
+    const { address } = client.handshake;
 
     if (!address) {
       this._clientError(client, 'No client address.');

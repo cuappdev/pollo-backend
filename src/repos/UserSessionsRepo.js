@@ -32,8 +32,7 @@ const getUserFromToken = async (accessToken: string): Promise<?User> => {
     .where('usersessions.sessionToken = :accessToken',
       { accessToken })
     .getOne();
-  if (!session) return null;
-  return session.user;
+  return session ? session.user : null;
 };
 
 // Update session from refresh token

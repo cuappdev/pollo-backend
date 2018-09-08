@@ -4,6 +4,7 @@ import Session from '../models/Session';
 import User from '../models/User';
 import UserSessionsRepo from './UserSessionsRepo';
 import appDevUtils from '../utils/appDevUtils';
+import constants from '../utils/constants';
 
 const db = (): Repository<User> => getConnectionManager().get().getRepository(User);
 
@@ -47,8 +48,7 @@ const createUserWithFields = async (googleId: string, firstName: string,
 // Get a user by Id
 const getUserById = async (id: number): Promise<?User> => {
   try {
-    const user = await db().findOneById(id);
-    return user;
+    return await db().findOneById(id);
   } catch (e) {
     throw new Error(`Problem getting user by id: ${id}!`);
   }
@@ -135,9 +135,9 @@ const getSessionsById = async (id: number, role: ?string):
       .where('users.id = :userId')
       .setParameters({ userId: id })
       .getOne();
-    if (role === 'admin') {
+    if (role === constants.USER_TYPES.ADMIN) {
       return user.adminSessions;
-    } if (role === 'member') {
+    } if (role === constants.USER_TYPES.MEMBER) {
       return user.memberSessions;
     }
     return user.memberSessions.concat(user.adminSessions);

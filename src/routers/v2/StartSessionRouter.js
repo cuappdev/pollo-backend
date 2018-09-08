@@ -21,7 +21,7 @@ class StartSessionRouter extends AppDevRouter<APISession> {
     if (!name) name = '';
 
     if (!(id || code)) {
-      throw new Error('Session id, or code and device id required.');
+      throw new Error('Session id, or code required.');
     }
 
     let session = await SessionsRepo.getSessionById(id);

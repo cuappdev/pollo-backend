@@ -20,9 +20,7 @@ class UpdateQuestionRouter extends AppDevRouter<Object> {
     const { text } = req.body;
     const { user } = req;
 
-    if (!text) {
-      throw new Error('No fields specified to update.');
-    }
+    if (!text) throw new Error('No fields specified to update.');
 
     const session = await QuestionsRepo.getSessionFromQuestionId(questionId);
     if (!session) throw new Error(`Question with id ${questionId} has no session!`);

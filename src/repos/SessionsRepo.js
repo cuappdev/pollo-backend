@@ -5,6 +5,7 @@ import Question from '../models/Question';
 import Session from '../models/Session';
 import User from '../models/User';
 import appDevUtils from '../utils/appDevUtils';
+import constants from '../utils/constants';
 import UsersRepo from './UsersRepo';
 
 const db = (): Repository<Session> => getConnectionManager().get().getRepository(Session);
@@ -19,9 +20,7 @@ const createSession = async (name: string, code: string, user: ?User):
     const session = new Session();
     session.name = name;
     session.code = code;
-    if (user) {
-      session.admins = [user];
-    }
+    session.admins = user ? [user] : [];
 
     if (sessionCodes[code]) {
       throw new Error('Session code is already in use');
@@ -38,18 +37,18 @@ const createSession = async (name: string, code: string, user: ?User):
 
 // Generate unique session code
 const createCode = (): string => {
-  let code = appDevUtils.randomCode(6);
-  while (sessionCodes[code]) {
+  let code;
+  do {
     code = appDevUtils.randomCode(6);
-  }
+  } while (sessionCodes[code]);
+
   return code;
 };
 
 // Get a session by Id
 const getSessionById = async (id: number): Promise<?Session> => {
   try {
-    const session = await db().findOneById(id);
-    return session;
+    return await db().findOneById(id);
   } catch (e) {
     throw new Error(`Problem getting session by id: ${id}!`);
   }
@@ -61,21 +60,15 @@ const getSessionId = async (code: string) => {
     .where('sessions.code = :sessionCode')
     .setParameters({ sessionCode: code })
     .getOne();
-  if (session) {
-    return session.id;
-  }
-  return null;
+  return session ? session.id : null;
 };
 
 // Delete a session by Id
 const deleteSessionById = async (id: number) => {
   try {
     const session = await db().findOneById(id);
-    if (session.code in sessionCodes) {
-      delete sessionCodes[session.code];
-    }
-    // Cascading does work???
-    // await PollsRepo.deletePollsForSession(id);
+    delete sessionCodes[session.code];
+
     await db().remove(session);
   } catch (e) {
     throw new Error(`Problem deleting session by id: ${id}!`);
@@ -112,7 +105,7 @@ const addUsersByGoogleIds = async (id: number, googleIds: string[],
       .setParameters({ sessionId: id })
       .getOne();
     if (session) {
-      if (role === 'admin') {
+      if (role === constants.USER_TYPES.ADMIN) {
         const currAdminIds = session.admins.map(admin => admin.googleId);
         const users = await UsersRepo
           .getUsersByGoogleIds(googleIds, currAdminIds);
@@ -145,7 +138,7 @@ const addUsersByIds = async (id: number, userIds: number[],
       .setParameters({ sessionId: id })
       .getOne();
     if (session) {
-      if (role === 'admin') {
+      if (role === constants.USER_TYPES.ADMIN) {
         const currAdminIds = session.admins.map(admin => admin.id);
         const admins = await UsersRepo.getUsersFromIds(userIds, currAdminIds);
         session.admins = session.admins.concat(admins);
@@ -176,7 +169,7 @@ const removeUserBySessionId = async (id: number, user: User, role: ?string):
       .setParameters({ sessionId: id })
       .getOne();
     if (user) {
-      if (role === 'admin') {
+      if (role === constants.USER_TYPES.ADMIN) {
         session.admins = session.admins.filter(admin => (admin.googleId !== user.googleId));
       } else {
         session.members = session.members.filter(member => (member.googleId !== user.googleId));
@@ -234,9 +227,9 @@ const getUsersBySessionId = async (id: number, role: ?string):
       .where('sessions.id = :sessionId')
       .setParameters({ sessionId: id })
       .getOne();
-    if (role === 'admin') {
+    if (role === constants.USER_TYPES.ADMIN) {
       return session.admins;
-    } if (role === 'member') {
+    } if (role === constants.USER_TYPES.MEMBER) {
       return session.members;
     }
     return session.admins.concat(session.members);

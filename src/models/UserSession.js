@@ -39,16 +39,9 @@ export default @Entity('usersessions') class UserSession extends Base {
   }
 
   update(accessToken: ?string, updateToken: ?string): UserSession {
-    if (accessToken) {
-      this.sessionToken = accessToken;
-    } else {
-      this.sessionToken = crypto.randomBytes(64).toString('hex');
-    }
-    if (updateToken) {
-      this.updateToken = updateToken;
-    } else {
-      this.updateToken = crypto.randomBytes(64).toString('hex');
-    }
+    this.sessionToken = accessToken || crypto.randomBytes(64).toString('hex');
+    this.updateToken = updateToken || crypto.randomBytes(64).toString('hex');
+
     // Session length is 1 day
     this.expiresAt = Math.floor(new Date().getTime() / 1000) + 60 * 60 * 24;
     this.activate();

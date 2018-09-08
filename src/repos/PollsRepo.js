@@ -16,9 +16,7 @@ const createPoll = async (text: string, session: ?Session, results: json,
     poll.results = results;
     poll.shared = canShare;
     poll.type = type;
-    if (userAnswers) {
-      poll.userAnswers = userAnswers;
-    }
+    poll.userAnswers = userAnswers || {};
 
     await db().persist(poll);
     return poll;
@@ -30,8 +28,7 @@ const createPoll = async (text: string, session: ?Session, results: json,
 // Get a poll by id
 const getPollById = async (id: number): Promise<?Poll> => {
   try {
-    const poll = await db().findOneById(id);
-    return poll;
+    return await db().findOneById(id);
   } catch (e) {
     throw new Error(`Problem getting poll by id: ${id}!`);
   }
