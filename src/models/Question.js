@@ -1,9 +1,9 @@
 // @flow
 import {
-  Column,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn
+    Column,
+    Entity,
+    ManyToOne,
+    PrimaryGeneratedColumn,
 } from 'typeorm';
 import Base from './Base';
 import Session from './Session';
@@ -17,7 +17,7 @@ export default @Entity('questions') class Question extends Base {
   text: string = '';
 
   @ManyToOne(type => Session, session => session.polls, {
-    onDelete: 'CASCADE'
+      onDelete: 'CASCADE',
   })
   session: ?Session = null;
 

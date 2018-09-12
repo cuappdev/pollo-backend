@@ -4,7 +4,7 @@ export default class AppDevResponse<T> {
   data: T;
 
   constructor(success: boolean, data: T) {
-    this.success = success;
-    this.data = data;
+      this.success = success;
+      this.data = data;
   }
 }

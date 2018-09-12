@@ -25,43 +25,43 @@ export type AppDevEdgesResponse<T> = {
 type ErrorCollector = Error => void
 
 class AppDevEdgeRouter<T> extends AppDevRouter<AppDevEdgesResponse<T>> {
-  static defaultCount() {
-    return 10;
-  }
-
-  async contentArray(
-    req: Request,
-    pageInfo: PageInfo,
-    error: ErrorCollector
-  ): Promise<Array<AppDevEdge<T>>> {
-    throw new Error(`Didn't implement contentArray for ${this.getPath()}`);
-  }
-
-  async content(req: Request) {
-    const pageInfo = {
-      count: req.query.count || AppDevEdgeRouter.defaultCount(),
-      cursor: req.query.cursor || undefined
-    };
-
-    const errors = [];
-    const onerror = (err) => { errors.push(err); };
-
-    const edges = await this.contentArray(req, pageInfo, onerror);
-    const response: AppDevEdgesResponse<T> = {
-      edges,
-      pageInfo: {
-        count: edges.length
-      }
-    };
-
-    if (errors.length) {
-      response.errors = errors.map(err => ({
-        message: err.message
-      }));
+    static defaultCount() {
+        return 10;
     }
 
-    return response;
-  }
+    async contentArray(
+        req: Request,
+        pageInfo: PageInfo,
+        error: ErrorCollector,
+    ): Promise<Array<AppDevEdge<T>>> {
+        throw new Error(`Didn't implement contentArray for ${this.getPath()}`);
+    }
+
+    async content(req: Request) {
+        const pageInfo = {
+            count: req.query.count || AppDevEdgeRouter.defaultCount(),
+            cursor: req.query.cursor || undefined,
+        };
+
+        const errors = [];
+        const onerror = (err) => { errors.push(err); };
+
+        const edges = await this.contentArray(req, pageInfo, onerror);
+        const response: AppDevEdgesResponse<T> = {
+            edges,
+            pageInfo: {
+                count: edges.length,
+            },
+        };
+
+        if (errors.length) {
+            response.errors = errors.map(err => ({
+                message: err.message,
+            }));
+        }
+
+        return response;
+    }
 }
 
 export default AppDevEdgeRouter;
