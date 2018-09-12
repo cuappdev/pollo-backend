@@ -263,7 +263,6 @@ const getQuestions = async (id: number): Promise<Array<?Question>> => {
       .setParameters({ sessionId: id })
       .orderBy('questions.createdAt', 'DESC')
       .getOne();
-
     return session.questions;
   } catch (e) {
     throw new Error('Problem getting questions');

@@ -110,7 +110,7 @@ export default class SessionSocket {
     const googleId: ?string = client.handshake.query.googleId || null;
 
     switch (userType) {
-    case 'admin':
+    case 'admin': {
       console.log(`Admin with id ${client.id} connected to socket`);
       if (googleId) {
         this.adminGoogleIds.push(googleId);
@@ -119,7 +119,9 @@ export default class SessionSocket {
       client.join('admins');
       client.emit('user/count', { count: this.usersConnected });
       break;
-    case 'user':
+    }
+    case 'member':
+    case 'user': {
       console.log(`User with id ${client.id} connected to socket`);
       if (googleId) {
         this.userGoogleIds.push(googleId);
@@ -137,12 +139,14 @@ export default class SessionSocket {
         client.emit('user/question/start', { question: currentPoll }); // v1
       }
       break;
-    default:
+    }
+    default: {
       if (!userType) {
         this._clientError(client, 'Invalid user connected: no userType.');
       } else {
         this._clientError(client, `Invalid userType ${userType} connected.`);
       }
+    }
     }
   }
 
@@ -180,7 +184,6 @@ export default class SessionSocket {
       if (prev) { // if truthy
         // has selected something before
         nextState.results[prev].count -= 1;
-        const poll = this._currentPoll();
         if (poll && poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
           if (nextState.results[prev].count <= 0) {
             delete nextState.results[prev];
@@ -210,7 +213,7 @@ export default class SessionSocket {
         choice: answerObject.choice,
         text: answerObject.text
       };
-      this.answerId++;
+      this.answerId += 1;
       const poll = this._currentPoll();
       if (poll === null || poll === undefined) {
         console.log(`Client ${client.id} tried to answer with no active poll`);
@@ -223,7 +226,7 @@ export default class SessionSocket {
 
       const nextState = { ...this.current };
       const curTally = nextState.results[answer.choice];
-      if (curTally) { // if truthy
+      if (curTally) {
         nextState.results[answer.choice].count += 1;
       } else {
         nextState.results[answer.choice] = { text: answer.text, count: 1 };
@@ -341,6 +344,14 @@ export default class SessionSocket {
     this.lastPoll = await PollsRepo.createPoll(poll.text, this.session,
       this.current.results, poll.shared, poll.type, this.current.answers);
     this.lastState = this.current;
+    const pollNode = {
+      id: this.lastPoll.id,
+      text: poll.text,
+      type: poll.type,
+      options: poll.options,
+      shared: poll.shared
+    };
+    this.nsp.to('admins').emit('admin/poll/ended', { poll: pollNode });
     this.nsp.to('users').emit('user/poll/end', { poll });
     this.nsp.to('users').emit('user/question/end', { question: poll }); // v1
     this.current.poll = -1;

@@ -25,7 +25,7 @@ export default @Entity('polls') class Poll extends Base {
   session: ?Session = null;
 
   @Column('json')
-  results: json = {};
+  results: json = {}; // Ex. {'A': {'text': 'blue', 'count': 0}}
 
   // Google ids mapped to answer choice
   @Column('json')
