@@ -7,33 +7,33 @@ import constants from '../../../utils/constants';
 import type { APISession } from '../APITypes';
 
 class PostSessionRouter extends AppDevRouter<Object> {
-  constructor() {
-    super(constants.REQUEST_TYPES.POST);
-  }
+    constructor() {
+        super(constants.REQUEST_TYPES.POST);
+    }
 
-  getPath(): string {
-    return '/sessions/';
-  }
+    getPath(): string {
+        return '/sessions/';
+    }
 
-  async content(req: Request): Promise<{ node: APISession }> {
-    let { name } = req.body;
-    const { code } = req.body;
-    const { user } = req;
+    async content(req: Request): Promise<{ node: APISession }> {
+        let { name } = req.body;
+        const { code } = req.body;
+        const { user } = req;
 
-    if (!name) name = '';
-    if (!user) throw new Error('User missing');
-    if (!code) throw new Error('Code missing');
+        if (!name) name = '';
+        if (!user) throw new Error('User missing');
+        if (!code) throw new Error('Code missing');
 
-    const session = await SessionsRepo.createSession(name, code, user);
+        const session = await SessionsRepo.createSession(name, code, user);
 
-    return {
-      node: {
-        id: session.id,
-        name: session.name,
-        code: session.code
-      }
-    };
-  }
+        return {
+            node: {
+                id: session.id,
+                name: session.name,
+                code: session.code,
+            },
+        };
+    }
 }
 
 export default new PostSessionRouter().router;

@@ -6,53 +6,53 @@ import SessionsRepo from '../../repos/SessionsRepo';
 import type { APISession } from './APITypes';
 
 class StartSessionRouter extends AppDevRouter<APISession> {
-  constructor() {
-    super(constants.REQUEST_TYPES.POST);
-  }
-
-  getPath(): string {
-    return '/start/session/';
-  }
-
-  async content(req: Request) {
-    const { id, code } = req.body;
-    let { name } = req.body;
-
-    if (!name) name = '';
-
-    if (!(id || code)) {
-      throw new Error('Session id, or code and device id required.');
+    constructor() {
+        super(constants.REQUEST_TYPES.POST);
     }
 
-    let session = await SessionsRepo.getSessionById(id);
-
-    if (!session && code) {
-      const sessionId = await SessionsRepo.getSessionId(code);
-      if (sessionId) {
-        session = await SessionsRepo.getSessionById(sessionId);
-      }
+    getPath(): string {
+        return '/start/session/';
     }
 
-    if (!id && !session) {
-      session = await SessionsRepo.createSession(name, code, req.user);
-    }
+    async content(req: Request) {
+        const { id, code } = req.body;
+        let { name } = req.body;
 
-    if (!session) {
-      throw new Error(`No session with id ${id} found.`);
-    }
+        if (!name) name = '';
 
-    if (!req.app.sessionManager.isLive(code, id)) {
-      await req.app.sessionManager.startNewSession(session);
-    }
+        if (!(id || code)) {
+            throw new Error('Session id, or code required.');
+        }
 
-    return {
-      node: {
-        id: session.id,
-        name: session.name,
-        code: session.code
-      }
-    };
-  }
+        let session = await SessionsRepo.getSessionById(id);
+
+        if (!session && code) {
+            const sessionId = await SessionsRepo.getSessionId(code);
+            if (sessionId) {
+                session = await SessionsRepo.getSessionById(sessionId);
+            }
+        }
+
+        if (!id && !session) {
+            session = await SessionsRepo.createSession(name, code, req.user);
+        }
+
+        if (!session) {
+            throw new Error(`No session with id ${id} found.`);
+        }
+
+        if (!req.app.sessionManager.isLive(code, id)) {
+            await req.app.sessionManager.startNewSession(session);
+        }
+
+        return {
+            node: {
+                id: session.id,
+                name: session.name,
+                code: session.code,
+            },
+        };
+    }
 }
 
 export default new StartSessionRouter().router;

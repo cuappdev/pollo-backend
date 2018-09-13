@@ -12,66 +12,62 @@ class SessionManager {
   io: SocketIO.Server
 
   constructor(server: SocketIO.Server) {
-    this.io = SocketIO(server);
+      this.io = SocketIO(server);
   }
 
   async startNewSession(session: Session) {
-    const nsp = this.io.of(`/${session.id}`);
-    this.sessionSockets.push(new SessionSocket({
-      session,
-      nsp,
-      onClose: () => {
-        this.endSession(session, true);
-      }
-    }));
+      const nsp = this.io.of(`/${session.id}`);
+      this.sessionSockets.push(new SessionSocket({
+          session,
+          nsp,
+          onClose: () => {
+              this.endSession(session, true);
+          },
+      }));
   }
 
   endSession(session: Session, save: bool): void {
-    const index = this.sessionSockets.findIndex((x) => {
-      if (!x || !x.session) return false;
-      return (x.session.id === session.id);
-    });
-
-    if (index !== -1) {
-      const socket = this.sessionSockets[index];
-
-      if (socket.closing) return;
-      socket.closing = true;
-
-      if (save) {
-        socket.saveSession();
-      }
-
-      const connectedSockets = Object.keys(socket.nsp.connected);
-      connectedSockets.forEach((id) => {
-        socket.nsp.connected[id].disconnect();
+      const index = this.sessionSockets.findIndex((x) => {
+          const sessionUndefined = !x || !x.session;
+          return sessionUndefined ? false : x.session.id === session.id;
       });
-      socket.nsp.removeAllListeners();
 
-      this.sessionSockets.splice(index, 1);
-      delete this.io.nsps[`/${session.id}`];
-    }
+      if (index !== -1) {
+          const socket = this.sessionSockets[index];
+
+          if (socket.closing) return;
+          socket.closing = true;
+
+          if (save) {
+              socket.saveSession();
+          }
+
+          const connectedSockets = Object.keys(socket.nsp.connected);
+          connectedSockets.forEach((id) => {
+              socket.nsp.connected[id].disconnect();
+          });
+          socket.nsp.removeAllListeners();
+
+          this.sessionSockets.splice(index, 1);
+          delete this.io.nsps[`/${session.id}`];
+      }
   }
 
   liveSessions(sessionCodes: Array<string>): Array<Session> {
-    return this.sessionSockets
-      .filter((x) => {
-        if (x && x.session) {
-          return sessionCodes.includes(x.session.code);
-        }
-        return false;
-      })
-      .map((l : SessionSocket) => l.session);
+      return this.sessionSockets
+          .filter((x) => {
+              const isSession = x && x.session;
+              return isSession ? sessionCodes.includes(x.session.code) : false;
+          })
+          .map((l : SessionSocket) => l.session);
   }
 
   isLive(sessionCode: ?string, id: ?number): bool {
-    const socket = this.sessionSockets.find((x) => {
-      if (x && x.session) {
-        return x.session.code === sessionCode || x.session.id === id;
-      }
-      return false;
-    });
-    return (socket !== undefined);
+      const socket = this.sessionSockets.find((x) => {
+          const isSession = x && x.session;
+          return isSession ? x.session.code === sessionCode || x.session.id === id : false;
+      });
+      return socket !== undefined;
   }
 }
 

@@ -1,11 +1,11 @@
 // @flow
 import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  OneToMany,
-  PrimaryGeneratedColumn
+    Column,
+    Entity,
+    JoinTable,
+    ManyToMany,
+    OneToMany,
+    PrimaryGeneratedColumn,
 } from 'typeorm';
 import Base from './Base';
 import Poll from './Poll';
@@ -27,12 +27,12 @@ export default @Entity('sessions') class Session extends Base {
   admins: ?User[] = [];
 
   @OneToMany(type => Poll, poll => poll.session, {
-    cascadeRemove: true
+      cascadeRemove: true,
   })
   polls: ?Poll[] = [];
 
   @OneToMany(type => Question, question => question.session, {
-    cascadeRemove: true
+      cascadeRemove: true,
   })
   questions: ?Question[] = [];
 
