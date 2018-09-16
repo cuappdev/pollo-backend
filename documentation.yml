@@ -1,0 +1,29 @@
+toc:
+  - name: Models
+    description: |
+      Classes representing tables in the database.
+    children:
+      - Base
+      - Draft
+      - Poll
+      - Question
+      - Session
+      - User
+      - UserSession
+  - name: Drafts Repo
+    children:
+      - createDraft
+      - getDraft
+      - getDraftsByUser
+      - updateDraft
+      - deleteDraft
+      - getOwnerById
+  - name: Polls Repo
+    children:
+      - createPoll
+      - deletePollById
+      - getPollById
+      - updatePollById
+      - getPollsFromSessionId
+      - getSessionFromPollId
+      - getSharedPollsFromSessionId

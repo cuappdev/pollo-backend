@@ -8,7 +8,8 @@
     "prod": "webpack -p && node build/bundle.js",
     "test": "jest --forceExit -i",
     "flow": "node_modules/.bin/flow",
-    "flow-stop": "node_modules/.bin/flow stop"
+    "flow-stop": "node_modules/.bin/flow stop",
+    "docs": "documentation build --config documentation.yml src/** -f html -o docs && open docs/index.html"
   },
   "author": "Cornell AppDev",
   "license": "ISC",

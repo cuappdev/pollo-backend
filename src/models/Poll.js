@@ -9,28 +9,46 @@ import {
 import Base from './Base';
 import Session from './Session';
 
-export default @Entity('polls') class Poll extends Base {
+@Entity('polls')
+/**
+ * Poll class represents a single question
+ * @extends {Base}
+ */
+class Poll extends Base {
   @PrimaryGeneratedColumn()
+  /** Unique identifier */
   id: any = null;
 
   @Column('string')
+  /** Text of question */
   text: string = '';
 
   @Column('string')
-  type: string = ''; // Either MULTIPLE_CHOICE OR FREE_RESPONSE
+  /** Type of question either MULTIPLE_CHOICE or FREE_RESPONSE */
+  type: string = '';
 
   @ManyToOne(type => Session, session => session.polls, {
       onDelete: 'CASCADE',
   })
+  /** Session the poll belongs to */
   session: ?Session = null;
 
   @Column('json')
-  results: json = {}; // Ex. {'A': {'text': 'blue', 'count': 0}}
+  /**
+   * Result of the poll
+   * @example
+   * let results_mc = {'A': {'text': 'blue', 'count': 0}}
+   * let results_fr = {'blue': {'text': 'blue', 'count': 0}}
+   */
+  results: json = {};
 
-  // Google ids mapped to answer choice
   @Column('json')
+  /** Google id of users mapped to their answer (key in results) */
   userAnswers: json = {};
 
   @Column('boolean')
+  /** If the results of the poll is shared to all users */
   shared: boolean = true;
 }
+
+export default Poll;
