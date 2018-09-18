@@ -1,14 +1,14 @@
-# Clicker Backend [![Build Status](https://travis-ci.org/cuappdev/clicker-backend.svg?branch=master)](https://travis-ci.org/cuappdev/clicker-backend)
+# Pollo Backend [![Build Status](https://travis-ci.org/cuappdev/pollo-backend.svg?branch=master)](https://travis-ci.org/cuappdev/pollo-backend)
 
 ### Setting up database:
 Make sure `PostgreSQL` is installed. After installation, start `PostgreSQL` and run the command
 ````
-CREATE DATABASE clicker;
+CREATE DATABASE pollo;
 ````
 If you get a database error, upon running `npm start` and you already have the database created try
 ````
-DROP DATABASE clicker;
-CREATE DATABASE clicker;
+DROP DATABASE pollo;
+CREATE DATABASE pollo;
 ````
 
 ### Required variables:
@@ -16,7 +16,7 @@ CREATE DATABASE clicker;
 export DB_HOST=localhost
 export DB_USERNAME=FILL_IN
 export DB_PASSWORD=FILL_IN
-export DB_NAME=clicker
+export DB_NAME=pollo
 export GOOGLE_CLIENT_ID=FILL_IN
 export GOOGLE_CLIENT_SECRET=FILL_IN
 export GOOGLE_REDIRECT_URI=FILL_IN
