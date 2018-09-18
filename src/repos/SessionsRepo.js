@@ -10,10 +10,17 @@ import UsersRepo from './UsersRepo';
 
 const db = (): Repository<Session> => getConnectionManager().get().getRepository(Session);
 
-// Contains all session codes used mapped to session id
+/** Contains all session codes used mapped to session id */
 const sessionCodes = {};
 
-// Create a session
+/**
+ * Creates a session and saves it to the db
+ * @function
+ * @param {string} name - Name of session
+ * @param {string} code - Unique code used to join session
+ * @param {?User} user - Admin of session
+ * @return {Session} Created session
+ */
 const createSession = async (name: string, code: string, user: ?User):
   Promise<Session> => {
     try {
@@ -35,7 +42,11 @@ const createSession = async (name: string, code: string, user: ?User):
     }
 };
 
-// Generate unique session code
+/**
+ * Generates a unique session code
+ * @function
+ * @return {string} Unique code
+ */
 const createCode = (): string => {
     let code;
     do {
@@ -45,7 +56,12 @@ const createCode = (): string => {
     return code;
 };
 
-// Get a session by Id
+/**
+ * Get a session by id
+ * @function
+ * @param {number} id - Id of session to fetch
+ * @return {?Session} Session with specified id
+ */
 const getSessionById = async (id: number): Promise<?Session> => {
     try {
         return await db().findOneById(id);
@@ -54,7 +70,12 @@ const getSessionById = async (id: number): Promise<?Session> => {
     }
 };
 
-// Get a session id from session code
+/**
+ * Get a session id by the session's unique code
+ * @function
+ * @param {string} code - Unique code of session to fetch
+ * @return {?number} Id of session with given code
+ */
 const getSessionId = async (code: string) => {
     const session = await db().createQueryBuilder('sessions')
         .where('sessions.code = :sessionCode')
@@ -63,7 +84,11 @@ const getSessionId = async (code: string) => {
     return session ? session.id : null;
 };
 
-// Delete a session by Id
+/**
+ * Delete a session
+ * @function
+ * @param {number} id - Id of session to delete
+ */
 const deleteSessionById = async (id: number) => {
     try {
         const session = await db().findOneById(id);
@@ -75,7 +100,13 @@ const deleteSessionById = async (id: number) => {
     }
 };
 
-// Update a session by Id
+/**
+ * Update a session
+ * @function
+ * @param {number} id - Id of session to update
+ * @param {?string} name - New name of session
+ * @return {?Session} Updated session
+ */
 const updateSessionById = async (id: number, name: ?string):
   Promise<?Session> => {
     try {
@@ -92,7 +123,14 @@ const updateSessionById = async (id: number, name: ?string):
     }
 };
 
-// Add a list of admins/member googleIds to a session by googleId
+/**
+ * Add users (admins or members) to a session
+ * @function
+ * @param {number} id - Id of session to add users
+ * @param {string[]} googleIds - List of user's google ids to add
+ * @role {?string} role - Specifies whether to add the users as members or admins
+ * @return {?Session} Session that users were added to
+ */
 const addUsersByGoogleIds = async (id: number, googleIds: string[],
     role: ?string): Promise<?Session> => {
     try {
@@ -125,7 +163,14 @@ const addUsersByGoogleIds = async (id: number, googleIds: string[],
     }
 };
 
-// Add a list of admins/member ids to a session
+/**
+ * Add users (admins or members) to a session
+ * @function
+ * @param {number} id - Id of session to add users
+ * @param {number[]} userIds - List of user ids to add
+ * @role {?string} role - Specifies whether to add the users as members or admins
+ * @return {?Session} Session that users were added to
+ */
 const addUsersByIds = async (id: number, userIds: number[],
     role: ?string): Promise<?Session> => {
     try {
@@ -156,7 +201,14 @@ const addUsersByIds = async (id: number, userIds: number[],
     }
 };
 
-// Remove admin/member of a session by Id
+/**
+ * Remove user from session
+ * @function
+ * @param {number} id - Id of session to remove user from
+ * @param {User} user - User to remove from session
+ * @param {?string} role - Role to remove user from
+ * @return {?Session} Session without specified user
+ */
 const removeUserBySessionId = async (id: number, user: User, role: ?string):
   Promise<?Session> => {
     try {
@@ -183,7 +235,13 @@ const removeUserBySessionId = async (id: number, user: User, role: ?string):
     }
 };
 
-// Return true if user is an admin of a session by id
+/**
+ * Checks if user is an admin of given session
+ * @function
+ * @param {number} id - Id of session to check admins
+ * @param {User} user - User that we want to check if they're an admin
+ * @return {?boolean} Whether the given user is an admin of the given session
+ */
 const isAdmin = async (id: number, user: User):
   Promise<?boolean> => {
     try {
@@ -200,7 +258,13 @@ const isAdmin = async (id: number, user: User):
     }
 };
 
-// Return true if user is an member of a session by id
+/**
+ * Checks if user is a member of given session
+ * @function
+ * @param {number} id - Id of session to check members
+ * @param {User} user - User that we want to check if they're a member
+ * @return {?boolean} Whether the given user is a member of the given session
+ */
 const isMember = async (id: number, user: User):
   Promise<?boolean> => {
     try {
@@ -217,7 +281,13 @@ const isMember = async (id: number, user: User):
     }
 };
 
-// Get admins/members from a session id
+/**
+ * Get users from a session
+ * @function
+ * @param {number} id - Id of session to get users
+ * @param {?string} role - Specifies if we only want users of a certain role
+ * @return {User[]} List of specified user from session
+ */
 const getUsersBySessionId = async (id: number, role: ?string):
   Promise<Array<?User>> => {
     try {
@@ -238,7 +308,12 @@ const getUsersBySessionId = async (id: number, role: ?string):
     }
 };
 
-// Get polls from a session
+/**
+ * Gets polls from a session sorted by creation date desc.
+ * @function
+ * @param {number} id - Id of session to fetch polls from
+ * @return {Poll[]} List of polls from session
+ */
 const getPolls = async (id: number):
   Promise<Array<?Poll>> => {
     try {
@@ -254,7 +329,12 @@ const getPolls = async (id: number):
     }
 };
 
-// Get questions from a session
+/**
+ * Get questions from a session sorted by creation date desc.
+ * @function
+ * @param {number} id - Id of session to fetch questions from
+ * @return {Question[]} List of questions rom session
+ */
 const getQuestions = async (id: number): Promise<Array<?Question>> => {
     try {
         const session = await db().createQueryBuilder('sessions')

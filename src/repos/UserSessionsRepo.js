@@ -5,7 +5,14 @@ import UserSession from '../models/UserSession';
 
 const db = (): Repository<UserSession> => getConnectionManager().get().getRepository(UserSession);
 
-// Create or update session
+/**
+ * Create or update session for a user
+ * @function
+ * @param {User} user - User to either create or update a sessionn for
+ * @param {?string} accessToken - Access token to be used for the session
+ * @param {?string} refreshToken - Refresh token to be used for the session
+ * @return {UserSession} New or updated session
+ */
 const createOrUpdateSession = async (
     user: User, accessToken: ?string, refreshToken: ?string,
 ): Promise<UserSession> => {
@@ -25,7 +32,12 @@ const createOrUpdateSession = async (
     return session;
 };
 
-// Get user from access token
+/**
+ * Get user from access token
+ * @function
+ * @param {string} accessToken - Access token that we want to find the owner
+ * @return {?User} User that is associated with the access token
+ */
 const getUserFromToken = async (accessToken: string): Promise<?User> => {
     const session = await db().createQueryBuilder('usersessions')
         .leftJoinAndSelect('usersessions.user', 'user')
@@ -35,7 +47,12 @@ const getUserFromToken = async (accessToken: string): Promise<?User> => {
     return session ? session.user : null;
 };
 
-// Update session from refresh token
+/**
+ * Update a session
+ * @function
+ * @param {string} refreshToken - Refresh token associated with session to update
+ * @return {Object} Object containing the session info serialized
+ */
 const updateSession = async (refreshToken: string): Promise<?Object> => {
     let session = await db().createQueryBuilder('usersessions')
         .leftJoinAndSelect('usersessions.user', 'user')
@@ -52,7 +69,12 @@ const updateSession = async (refreshToken: string): Promise<?Object> => {
     };
 };
 
-// Make sure access token is related to active, valid session
+/**
+ * Verify that a session if valid and active
+ * @function
+ * @param {string} accessToken - Access token associated with session to check
+ * @return {boolean} Whether or not the session is valid and active
+ */
 const verifySession = async (accessToken: string): Promise<boolean> => {
     const session = await db().createQueryBuilder('usersessions')
         .where('usersessions.sessionToken = :accessToken',
@@ -63,7 +85,11 @@ const verifySession = async (accessToken: string): Promise<boolean> => {
     && session.expiresAt > Math.floor(new Date().getTime() / 1000);
 };
 
-// Delete session
+/**
+ * Delete a session
+ * @function
+ * @param {number} id - Id of session to delete
+ */
 const deleteSession = async (id: number) => {
     try {
         const session = await db().findOneById(id);
@@ -73,6 +99,11 @@ const deleteSession = async (id: number) => {
     }
 };
 
+/**
+ * Delete the session for a user
+ * @function
+ * @param {number} userId - Id of use to delete the session for
+ */
 const deleteSessionFromUserId = async (userId: number) => {
     try {
         const session = await db().createQueryBuilder('usersessions')

@@ -8,7 +8,12 @@ import constants from '../utils/constants';
 
 const db = (): Repository<User> => getConnectionManager().get().getRepository(User);
 
-// Create a user without fields
+/**
+ * Creates a dummy user and saves it to the db (Testing purposes)
+ * @function
+ * @param {string} id - Google id to create user with
+ * @return {User} New dummy user
+ */
 const createDummyUser = async (id: string): Promise<User> => {
     try {
         const user = await db().persist(User.dummy(id));
@@ -18,7 +23,12 @@ const createDummyUser = async (id: string): Promise<User> => {
     }
 };
 
-// Create a user from google creds
+/**
+ * Creates a user using google credentials
+ * @function
+ * @param {Object} fields - Object containing user info returned by google
+ * @return {User} New user created using given credentials
+ */
 const createUser = async (fields: Object): Promise<User> => {
     try {
         const user = await db().persist(User.fromGoogleCreds(fields));
@@ -28,6 +38,15 @@ const createUser = async (fields: Object): Promise<User> => {
     }
 };
 
+/**
+ * Creates a user
+ * @function
+ * @param {string} googleId - Google id of user
+ * @param {string} firstName - First name of user
+ * @param {string} lastName - Last name of user
+ * @param {string} email - Email of user
+ * @return {User} New user created using given params
+ */
 const createUserWithFields = async (googleId: string, firstName: string,
     lastName: string, email: string): Promise<User> => {
     try {
@@ -45,7 +64,12 @@ const createUserWithFields = async (googleId: string, firstName: string,
     }
 };
 
-// Get a user by Id
+/**
+ * Get a user by id
+ * @function
+ * @param {number} id - Id of user to fetch
+ * @return {?User} User with given id
+ */
 const getUserById = async (id: number): Promise<?User> => {
     try {
         return await db().findOneById(id);
@@ -54,7 +78,12 @@ const getUserById = async (id: number): Promise<?User> => {
     }
 };
 
-// Get a user by googleId (a.k.a. unique key of their Google account)
+/**
+ * Get a user by google id
+ * @function
+ * @param {string} googleId - Google id of user to fetch
+ * @return {?User} User with given google id
+ */
 const getUserByGoogleId = async (googleId: string): Promise<?User> => {
     try {
         const user = await db().createQueryBuilder('users')
@@ -66,7 +95,11 @@ const getUserByGoogleId = async (googleId: string): Promise<?User> => {
     }
 };
 
-// Get users
+/**
+ * Get all users
+ * @function
+ * @return {User[]} List of all users
+ */
 const getUsers = async (): Promise<Array<?User>> => {
     try {
         const users = await db().createQueryBuilder('users')
@@ -77,7 +110,13 @@ const getUsers = async (): Promise<Array<?User>> => {
     }
 };
 
-// Get users from list of ids but filters out users with ids in filter
+/**
+ * Gets all users from list of ids but also filters out using another list of ids
+ * @function
+ * @param {number[]} userIds - List of ids to fetch users from
+ * @param {?number[]} filter - List of ids to filter out
+ * @return {User[]} List of users resulting from given params
+ */
 const getUsersFromIds = async (userIds: number[], filter: ?number[]):
 Promise<?Array<User>> => {
     try {
@@ -96,7 +135,14 @@ Promise<?Array<User>> => {
     }
 };
 
-// Get users from list of googleIds
+/**
+ * Gets all users from list of google ids but also filters out using another
+ * list of google ids
+ * @function
+ * @param {number[]} googleIds - List of google ids to fetch users from
+ * @param {?number[]} filter - List of ids to filter out
+ * @return {User[]} List of users resulting from given params
+ */
 const getUsersByGoogleIds = async (googleIds: string[], filter: ?string[]):
   Promise<?Array<User>> => {
     try {
@@ -114,7 +160,11 @@ const getUsersByGoogleIds = async (googleIds: string[], filter: ?string[]):
     }
 };
 
-// Delete a user by Id
+/**
+ * Delete a user
+ * @function
+ * @param {number} id - Id of user to delete
+ */
 const deleteUserById = async (id: number) => {
     try {
         const user = await db().findOneById(id);
@@ -125,7 +175,14 @@ const deleteUserById = async (id: number) => {
     }
 };
 
-// Get sessions by userId
+/**
+ * Gets all sessions that a user is in
+ * @function
+ * @param {number} id - Id of user to fetch sessions for
+ * @param {?string} role - Specifies role which we want to fetch sessions for
+ * Ex. If role is admin, we fetch all sessions the user is an admin of.
+ * @return {Session[]} List of session for given user
+ */
 const getSessionsById = async (id: number, role: ?string):
     Promise<Array<?Session>> => {
     try {

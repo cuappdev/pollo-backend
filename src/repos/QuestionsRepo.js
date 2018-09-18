@@ -6,7 +6,14 @@ import Question from '../models/Question';
 
 const db = (): Repository<Question> => getConnectionManager().get().getRepository(Question);
 
-// Create a question
+/**
+ * Create question and save it to the db
+ * @function
+ * @param {string} text - Text of question
+ * @param {Session} session - Session that question belongs to
+ * @param {User} user - User that asked the question
+ * @return {Question} New question created
+ */
 const createQuestion = async (text: string, session: Session, user: User):
   Promise<Question> => {
     try {
@@ -22,7 +29,12 @@ const createQuestion = async (text: string, session: Session, user: User):
     }
 };
 
-// Get a question by id
+/**
+ * Get a question by id
+ * @function
+ * @param {number} id - Id of question to fetch
+ * @return {?Question} Question with specified id
+ */
 const getQuestionById = async (id: number): Promise<?Question> => {
     try {
         return await db().findOneById(id);
@@ -31,7 +43,11 @@ const getQuestionById = async (id: number): Promise<?Question> => {
     }
 };
 
-// Delete a question
+/**
+ * Delete a question
+ * @function
+ * @param {number} id - Id of question to delete
+ */
 const deleteQuestionById = async (id: number) => {
     try {
         const question = await db().findOneById(id);
@@ -41,7 +57,13 @@ const deleteQuestionById = async (id: number) => {
     }
 };
 
-// Update a question by id
+/**
+ * Update a question
+ * @function
+ * @param {number} id - Id of question to update
+ * @param {string} text - New text of question
+ * @return {?Question} Updated question
+ */
 const updateQuestionById = async (id: number, text: string):
   Promise<?Question> => {
     try {
@@ -59,7 +81,12 @@ const updateQuestionById = async (id: number, text: string):
     }
 };
 
-// Get all questions from a session id
+/**
+ * Get all questions for a session
+ * @function
+ * @param {number} id - Id of session we want to get questions for
+ * @reutrn {Question[]} List of questions from specified session
+ */
 const getQuestionsFromSessionId = async (id: number):
   Promise<Array<?Question>> => {
     try {
@@ -74,7 +101,12 @@ const getQuestionsFromSessionId = async (id: number):
     }
 };
 
-// Get a session from a question
+/**
+ * Get session that question belongs to
+ * @function
+ * @param {number} id - Id of question we want to get the session for
+ * @return {?Session} Session that the question belongs to
+ */
 const getSessionFromQuestionId = async (id: number) : Promise<?Session> => {
     try {
         const question = await db().createQueryBuilder('questions')
@@ -87,7 +119,13 @@ const getSessionFromQuestionId = async (id: number) : Promise<?Session> => {
     }
 };
 
-// Returns true iff the user owns a question by id
+/**
+ * Returns if user is the owner of a question
+ * @function
+ * @param {number} id - Id of question we want to check the owner of
+ * @param {User} user - User that we want to check if they are the owner
+ * @return {boolean} Whether the given user is the owner of the question
+ */
 const isOwnerById = async (id: number, user: User) : Promise<?boolean> => {
     try {
         const question = await db().createQueryBuilder('questions')

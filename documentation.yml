@@ -27,3 +27,49 @@ toc:
       - getPollsFromSessionId
       - getSessionFromPollId
       - getSharedPollsFromSessionId
+  - name: Questions Repo
+    children:
+        - createQuestion
+        - deleteQuestionById
+        - getQuestionById
+        - updateQuestionById
+        - getQuestionsFromSessionId
+        - getSessionFromQuestionId
+        - isOwnerById
+  - name: Sessions Repo
+    children:
+      - sessionCodes
+      - createSession
+      - createCode
+      - getSessionById
+      - getSessionId
+      - updateSessionById
+      - deleteSessionById
+      - addUsersByGoogleIds
+      - removeUserBySessionId
+      - getUsersBySessionId
+      - isAdmin
+      - isMember
+      - getPolls
+      - getQuestions
+      - addUsersByIds
+  - name: Users Repo
+    children:
+      - getUsers
+      - createUser
+      - createUserWithFields
+      - createDummyUser
+      - getUserById
+      - getUserByGoogleId
+      - getUsersByGoogleIds
+      - getUsersFromIds
+      - deleteUserById
+      - getSessionsById
+  - name: User Sessions Repo
+    children:
+      - createOrUpdateSession
+      - getUserFromToken
+      - updateSession
+      - verifySession
+      - deleteSession
+      - deleteSessionFromUserId
