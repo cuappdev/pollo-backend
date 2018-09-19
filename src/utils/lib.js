@@ -7,7 +7,12 @@ import {
 import AppDevResponse from './AppDevResponse';
 import UserSessionsRepo from '../repos/UserSessionsRepo';
 
-/** Removes element from array on predicate */
+/** Removes element from array on predicate
+* @function
+* @param {Array<T>} arr - Array to remove elements
+* @param {(param: T, num: number) => boolean} pred - Predicate to determine which elements
+* to remove
+*/
 function remove <T>(arr: Array<T>, pred: (param: T, num: number) => boolean) {
     for (let i = arr.length - 1; i > -1; i -= 1) {
         if (pred(arr[i], i)) {
@@ -16,7 +21,13 @@ function remove <T>(arr: Array<T>, pred: (param: T, num: number) => boolean) {
     }
 }
 
-// Checks authentication header for token
+/**
+ * Makes sure all requests are authenticated
+ * @function
+ * @param {Request} req - Request object to check
+ * @param {Response} res - Response object
+ * @param {NextFunction} next - Next function
+ */
 async function ensureAuthenticated(req: Request, res: Response,
     next: NextFunction) {
     const header = req.get('Authorization');
@@ -43,7 +54,13 @@ async function ensureAuthenticated(req: Request, res: Response,
     return next();
 }
 
-// Checks for refresh token, and updates session accordingly
+/**
+ * Updates session
+ * @function
+ * @param {Request} req - Request object
+ * @param {Response} res - Response object
+ * @param {NextFunction} next - Next function
+ */
 async function updateSession(req: Request, res: Response, next: NextFunction) {
     const header = req.get('Authorization');
     if (!header) {

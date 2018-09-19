@@ -5,7 +5,17 @@ import Session from '../models/Session';
 
 const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Poll);
 
-// Create a poll
+/**
+ * Create a poll and saves it to the db
+ * @function
+ * @param {string} text - Text of poll
+ * @param {Session} [session] - Session that the poll belongs to
+ * @param {json} results - Results of poll
+ * @param {boolean} canShare - Whether the results of the poll are shared
+ * @param {string} type - Type of poll, see Poll class for more info
+ * @param {json} [userAnswers] - Json mapping users to their answers
+ * @return {Poll} New poll created
+ */
 const createPoll = async (text: string, session: ?Session, results: json,
     canShare: boolean, type: string, userAnswers: ?json):
   Promise <Poll> => {
@@ -25,7 +35,12 @@ const createPoll = async (text: string, session: ?Session, results: json,
     }
 };
 
-// Get a poll by id
+/**
+ * Get a poll by id
+ * @function
+ * @param {number} id - id of the poll we want
+ * @return {?Poll} Poll with corresponding id
+ */
 const getPollById = async (id: number): Promise<?Poll> => {
     try {
         return await db().findOneById(id);
@@ -34,7 +49,11 @@ const getPollById = async (id: number): Promise<?Poll> => {
     }
 };
 
-// Delete a poll
+/**
+ * Delete a poll
+ * @function
+ * @param {number} id - id of the poll to delete
+ */
 const deletePollById = async (id: number) => {
     try {
         const poll = await db().findOneById(id);
@@ -44,7 +63,16 @@ const deletePollById = async (id: number) => {
     }
 };
 
-// Update a poll by id
+/**
+ * Update a poll
+ * @function
+ * @param {number} id - id of the poll to update
+ * @param {string} [text] - new text for poll
+ * @param {json} [results] - new results for poll
+ * @param {boolean} [canShare] - new shared option for poll
+ * @param {json} [userAnswers] - new json of user answers
+ * @return {?Poll} Updated poll
+ */
 const updatePollById = async (id: number, text: ?string, results: ?json,
     canShare: ?boolean, userAnswers: ?json):
   Promise<?Poll> => {
@@ -66,36 +94,49 @@ const updatePollById = async (id: number, text: ?string, results: ?json,
     }
 };
 
-// Get all polls from a session id
+/**
+ * Get all polls of a session
+ * @function
+ * @param {number} id - id of session we want to fetch polls of
+ * @return {Poll[]} List of polls from specified session
+ */
 const getPollsFromSessionId = async (id: number):
   Promise<Array<?Poll>> => {
     try {
-        const polls = await db().createQueryBuilder('polls')
+        return await db().createQueryBuilder('polls')
             .innerJoin('polls.session', 'session', 'session.id = :sessionId')
             .setParameters({ sessionId: id })
             .getMany();
-        return polls;
     } catch (e) {
         throw new Error(`Problem getting polls for session with id: ${id}!`);
     }
 };
 
-// Get shared polls from a session id
+/**
+ * Get all shared polls of a session
+ * @function
+ * @param {number} id - id of session we want to fetch polls of
+ * @return {Poll[]} List of shared polls from specified session
+ */
 const getSharedPollsFromSessionId = async (id: number):
   Promise<Array<?Poll>> => {
     try {
-        const polls = await db().createQueryBuilder('polls')
+        return await db().createQueryBuilder('polls')
             .innerJoin('polls.session', 'session', 'session.id = :sessionId')
             .where('polls.shared')
             .setParameters({ sessionId: id })
             .getMany();
-        return polls;
     } catch (e) {
         throw new Error(`Problem getting polls for session with id: ${id}!`);
     }
 };
 
-// Get a session from poll
+/**
+ * Get session that a poll belongs to
+ * @function
+ * @param {number} id - id of poll we want to find the session for
+ * @return {?Session} Session that the poll belongs to
+ */
 const getSessionFromPollId = async (id: number) : Promise<?Session> => {
     try {
         const poll = await db().createQueryBuilder('polls')

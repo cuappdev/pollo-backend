@@ -1,0 +1,99 @@
+toc:
+  - name: Models
+    description: |
+      Classes representing tables in the database.
+    children:
+      - Base
+      - Draft
+      - Poll
+      - Question
+      - Session
+      - User
+      - UserSession
+  - name: Drafts Repo
+    children:
+      - createDraft
+      - getDraft
+      - getDraftsByUser
+      - updateDraft
+      - deleteDraft
+      - getOwnerById
+  - name: Polls Repo
+    children:
+      - createPoll
+      - deletePollById
+      - getPollById
+      - updatePollById
+      - getPollsFromSessionId
+      - getSessionFromPollId
+      - getSharedPollsFromSessionId
+  - name: Questions Repo
+    children:
+        - createQuestion
+        - deleteQuestionById
+        - getQuestionById
+        - updateQuestionById
+        - getQuestionsFromSessionId
+        - getSessionFromQuestionId
+        - isOwnerById
+  - name: Sessions Repo
+    children:
+      - sessionCodes
+      - createSession
+      - createCode
+      - getSessionById
+      - getSessionId
+      - updateSessionById
+      - deleteSessionById
+      - addUsersByGoogleIds
+      - removeUserBySessionId
+      - getUsersBySessionId
+      - isAdmin
+      - isMember
+      - getPolls
+      - getQuestions
+      - addUsersByIds
+  - name: Users Repo
+    children:
+      - getUsers
+      - createUser
+      - createUserWithFields
+      - createDummyUser
+      - getUserById
+      - getUserByGoogleId
+      - getUsersByGoogleIds
+      - getUsersFromIds
+      - deleteUserById
+      - getSessionsById
+  - name: User Sessions Repo
+    children:
+      - createOrUpdateSession
+      - getUserFromToken
+      - updateSession
+      - verifySession
+      - deleteSession
+      - deleteSessionFromUserId
+  - SessionSocket
+  - name: Session Socket Types
+    children:
+        - SocketPoll
+        - Answer
+        - SessionSocketConfig
+        - CurrentState
+  - SessionManager
+  - name: Utility Functions
+    children:
+        - netIdFromEmail
+        - randomCode
+  - name: Constants
+    children:
+        - REQUEST_TYPES
+        - QUESTION_TYPES
+        - USER_TYPES
+        - RequestType
+        - QuestionType
+  - name: Library Functions
+    children:
+        - remove
+        - ensureAuthenticated
+        - updateSession

@@ -3,7 +3,7 @@
 import type { AppDevEdgesResponse } from '../../utils/AppDevEdgeRouter';
 import type { AppDevNodeResponse } from '../../utils/AppDevNodeRouter';
 
-/** *********************** GENERAL RESPONSE TYPES *********************** * */
+// *********************** GENERAL RESPONSE TYPES ***********************
 
 export type id = string
 
@@ -16,7 +16,7 @@ export type Response<T> = {
 export type NodeResponse<T> = Response<AppDevNodeResponse<T>>
 export type EdgesResponse<T> = Response<AppDevEdgesResponse<T>>
 
-/** ************************ CLICKER OBJECT TYPES ************************ * */
+// ************************ POLLO OBJECT TYPES ************************
 export type APISession = {|
   id: id,
   name: string,

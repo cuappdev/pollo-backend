@@ -5,7 +5,14 @@ import User from '../models/User';
 
 const db = (): Repository<Draft> => getConnectionManager().get().getRepository(Draft);
 
-// Create a draft
+/**
+* Creates a draft and saves it to the db
+* @function
+* @param {string} text - Text of question
+* @param {string[]} options - Options of question
+* @param {User} user - User that wants to create draft
+* @return {Draft} new created draft
+*/
 const createDraft = async (text: string, options: string[], user: User):
   Promise<Draft> => {
     try {
@@ -21,34 +28,49 @@ const createDraft = async (text: string, options: string[], user: User):
     }
 };
 
-// Get draft by id
+/**
+* Gets draft by id
+* @function
+* @param {number} id - Id of draft we want to fetch
+* @return {Draft} Draft with given id
+*/
 const getDraft = async (id: number): Promise<Draft> => {
     try {
-        const draft = await db().createQueryBuilder('drafts')
+        return await db().createQueryBuilder('drafts')
             .leftJoinAndSelect('drafts.user', 'users')
             .where('drafts.id = :draftId')
             .setParameters({ draftId: id })
             .getOne();
-        return draft;
     } catch (e) {
         throw new Error(`Problem getting draft with id: ${id}`);
     }
 };
 
-// Get drafts by user id
+/**
+* Gets draft by user id
+* @function
+* @param {number} id - Id of user we want to fetch drafts for
+* @return {Draft[]} Drafts belonging to the user specified
+*/
 const getDraftsByUser = async (id: number): Promise<Array<?Draft>> => {
     try {
-        const drafts = await db().createQueryBuilder('drafts')
+        return await db().createQueryBuilder('drafts')
             .innerJoinAndSelect('drafts.user', 'user', 'user.id = :userId')
             .setParameters({ userId: id })
             .getMany();
-        return drafts;
     } catch (e) {
         throw new Error(`Problem getting drafts for user with id: ${id}`);
     }
 };
 
-// Update draft by id
+/**
+* Updates draft
+* @function
+* @param {number} id - Id of draft to update
+* @param {string} [text] - New text of draft
+* @param {string[]} [options] - New options of draft
+* @return {?Draft} Updated draft
+*/
 const updateDraft = async (id: number, text: ?string, options: ?string[]):
   Promise<?Draft> => {
     try {
@@ -67,7 +89,11 @@ const updateDraft = async (id: number, text: ?string, options: ?string[]):
     }
 };
 
-// Delete draft by id
+/**
+* Deletes draft
+* @function
+* @param {number} id - Id of draft to delete
+*/
 const deleteDraft = async (id: number) => {
     try {
         const draft = await db().findOneById(id);
@@ -77,7 +103,12 @@ const deleteDraft = async (id: number) => {
     }
 };
 
-// Get owner of draft by id
+/**
+* Get owner of a draft
+* @function
+* @param {number} id - Id of draft to get owner of
+* @return {?User} owner of draft
+*/
 const getOwnerById = async (id: number): Promise<?User> => {
     try {
         const draft = await db().createQueryBuilder('drafts')

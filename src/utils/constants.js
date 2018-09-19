@@ -1,7 +1,13 @@
 // flow
 
+/** Custom type for http request types */
 export type RequestType = 'POST' | 'GET' | 'DELETE' | 'PUT';
 
+/**
+ * Constants for request types
+ * @constant
+ * @enum {string}
+ */
 const REQUEST_TYPES = {
     POST: 'POST',
     GET: 'GET',
@@ -9,9 +15,15 @@ const REQUEST_TYPES = {
     PUT: 'PUT',
 };
 
+/** Custom type for question types */
 export type QuestionType = 'MULTIPLE_CHOICE' | 'FREE_RESPONSE' |
   'MULTIPLE_ANSWER' | 'RANKING'
 
+/**
+* Constants for question types
+* @constant
+* @enum {string}
+*/
 const QUESTION_TYPES = {
     MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',
     FREE_RESPONSE: 'FREE_RESPONSE',
@@ -19,6 +31,11 @@ const QUESTION_TYPES = {
     RANKING: 'RANKING',
 };
 
+/**
+* Constants for user types
+* @constant
+* @enum {string}
+*/
 const USER_TYPES = {
     ADMIN: 'admin',
     MEMBER: 'member',

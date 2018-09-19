@@ -5,6 +5,7 @@ import PollsRepo from './repos/PollsRepo';
 import SessionsRepo from './repos/SessionsRepo';
 import constants from './utils/constants';
 
+/** Configuration for each SessionSocket */
 export type SessionSocketConfig = {
   session: Session,
   nsp: SocketIO.Namespace,
@@ -14,6 +15,9 @@ export type SessionSocketConfig = {
 type id = number;
 type IOSocket = Object;
 
+/** Poll object used in SessionSockets
+ * @name SocketPoll
+ */
 type Poll = {
   id: number,
   text: string,
@@ -22,6 +26,7 @@ type Poll = {
   shared: boolean
 }
 
+/** Answer object used in SessionSockets */
 type Answer = {
   id: id,
   googleId: string,
@@ -30,6 +35,14 @@ type Answer = {
   text: string
 }
 
+/** Keeps track of current state of a Session Socket
+ * @example
+ * let currentState = {
+ *   poll: 1,
+ *   results: {'A': {'text': 'blue', 'count': 2}},
+ *   answers: {'1': 'A', '2': 'A'}
+ * }
+ */
 type CurrentState = {
   poll: number,
   results: {}, // {'A': {'text': 'blue', 'count': 1}}
@@ -38,15 +51,21 @@ type CurrentState = {
 
 /**
  * Represents a single running session
+ * @param {SessionSocketConfig} config - Configuration for session socket
+ * @param {Session} config.session - Session to make active
+ * @param {SocketIO.Namespace} config.nsp - Socket Namespace
+ * @param {function} config.onClose - Function called when socket closes
  */
 export default class SessionSocket {
-  session: Session
+  /** Session that is running */
+  session: Session;
 
-  nsp: SocketIO.Namespace
+  /** Namespace of socket */
+  nsp: SocketIO.Namespace;
 
-  onClose: void => void
+  onClose: void => void;
 
-  closing: boolean = false
+  closing: boolean = false;
 
   /**
    * Stores all polls/answers for the session.
@@ -65,10 +84,13 @@ export default class SessionSocket {
 
   answerId: number;
 
+  // Number of users connected
   usersConnected: number;
 
+  // Previous poll
   lastPoll = null;
 
+  // Previous state
   lastState = {};
 
   // Google ids of admin/user to add to the session
@@ -77,6 +99,7 @@ export default class SessionSocket {
 
   userGoogleIds = [];
 
+  /** Current state of the socket */
   current: CurrentState = {
       poll: -1, // id of current poll object
       results: {},
@@ -105,6 +128,11 @@ export default class SessionSocket {
       console.log(msg);
   }
 
+  /**
+   * Handles response and setup when a user connects
+   * @function
+   * @param {IOSocket} client - The client object upon connection
+   */
   _onConnect = async (client: IOSocket) => {
       const userType: ?string = client.handshake.query.userType || null;
       const googleId: ?string = client.handshake.query.googleId || null;
@@ -150,13 +178,20 @@ export default class SessionSocket {
       }
   }
 
-  /** ***************************** User Side *************************** * */
+  // ***************************** User Side ***************************
   // i.e. the server hears 'server/poll/respond
   /**
-   * Events:
-   * /poll/respond
-   * : User wants to update its answer to a poll
-   * - Record the answer in volatile memory
+   * Sets up user events on the member side.
+   * User Events:
+   * 'server/poll/tally', (answerObject: Object) (Answer without id field)
+   *  - Client answers current poll
+   *  - Adds their answer to results and remove their old answer if exists
+   *
+   * 'server/poll/upvote', (answerObject: Object) (Answer without id field)
+   *  - Client upvotes an answer
+   *  - Increases count of answer upvoted
+   * @function
+   * @param {IOSocket} client - Client's socket object
    */
   _setupUserEvents(client: IOSocket): void {
       client.on('server/poll/tally', (answerObject: Object) => {
@@ -304,8 +339,13 @@ export default class SessionSocket {
       });
   }
 
-  /** *************************** Admin Side *************************** * */
+  // *************************** Admin Side ***************************
 
+  /**
+   * Gives current poll
+   * @function
+   * @return {?SocketPoll} Socket poll object
+   */
   _currentPoll(): Poll | null {
       if (this.current.poll === -1) {
           return null;
@@ -313,6 +353,10 @@ export default class SessionSocket {
       return this.polls[`${this.current.poll}`].poll;
   }
 
+  /**
+   * Starts poll on the socket
+   * @param {SocketPoll} poll - Poll object to start
+   */
   _startPoll(poll: Poll) {
       // start new poll
       this.current.poll = poll.id;
@@ -336,6 +380,10 @@ export default class SessionSocket {
       this.nsp.to('users').emit('user/question/start', { question: poll }); // v1
   }
 
+  /**
+   * Ends current poll
+   * @function
+   */
   _endPoll = async () => {
       const poll = this._currentPoll();
       if (!poll) {
@@ -358,15 +406,20 @@ export default class SessionSocket {
   }
 
   /**
-   * Events:
-   * /poll/start (quesiton: Poll)
-   * : Admin wants to start a poll
+   * Setups up events for users on admin side
+   * Admin events:
+   * 'server/poll/start' (pollObject: Object) (Poll object without id field)
+   * - Admin wants to start a poll
    * - Creates cache to store answers
    * - Notifies clients new poll has started
-   * /poll/end (void)
-   * : Admin wants to close a poll
+   *
+   * 'server/poll/end' (void)
+   * - Admin wants to close a poll
    * - Persists recieved polls
    * - Notifies clients quesiton is now closed
+   *
+   * 'server/poll/results' (void)
+   * - Shares poll results with members
    */
   _setupAdminEvents(client: Object): void {
       const { address } = client.handshake;

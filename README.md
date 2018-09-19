@@ -35,3 +35,8 @@ Run the following commands in separate windows (server must be running to test r
 npm start
 npm test
 ````
+
+### To generate and open docs:
+````bash
+npm run docs
+````
