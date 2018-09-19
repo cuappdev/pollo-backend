@@ -16,8 +16,7 @@ const db = (): Repository<User> => getConnectionManager().get().getRepository(Us
  */
 const createDummyUser = async (id: string): Promise<User> => {
     try {
-        const user = await db().persist(User.dummy(id));
-        return user;
+        return await db().persist(User.dummy(id));
     } catch (e) {
         throw new Error('Problem creating user!');
     }
@@ -31,8 +30,7 @@ const createDummyUser = async (id: string): Promise<User> => {
  */
 const createUser = async (fields: Object): Promise<User> => {
     try {
-        const user = await db().persist(User.fromGoogleCreds(fields));
-        return user;
+        return await db().persist(User.fromGoogleCreds(fields));
     } catch (e) {
         throw new Error('Problem creating user!');
     }
@@ -86,10 +84,9 @@ const getUserById = async (id: number): Promise<?User> => {
  */
 const getUserByGoogleId = async (googleId: string): Promise<?User> => {
     try {
-        const user = await db().createQueryBuilder('users')
+        return await db().createQueryBuilder('users')
             .where('users.googleId = :googleId', { googleId })
             .getOne();
-        return user;
     } catch (e) {
         throw new Error('Problem getting user by google ID!');
     }
@@ -102,9 +99,8 @@ const getUserByGoogleId = async (googleId: string): Promise<?User> => {
  */
 const getUsers = async (): Promise<Array<?User>> => {
     try {
-        const users = await db().createQueryBuilder('users')
+        return await db().createQueryBuilder('users')
             .getMany();
-        return users;
     } catch (e) {
         throw new Error('Problem getting users!');
     }
@@ -126,10 +122,9 @@ Promise<?Array<User>> => {
             const f = `(${String(filter)})`;
             query += ` AND users.id not IN ${f}`;
         }
-        const users = await db().createQueryBuilder('users')
+        return await db().createQueryBuilder('users')
             .where(query)
             .getMany();
-        return users;
     } catch (e) {
         throw new Error('Problem getting users from ids!');
     }
@@ -151,10 +146,9 @@ const getUsersByGoogleIds = async (googleIds: string[], filter: ?string[]):
             validIds = googleIds.filter(id => filter && !filter.includes(id));
         }
         const ids = `{${String(validIds)}}`;
-        const users = await db().createQueryBuilder('users')
+        return await db().createQueryBuilder('users')
             .where(`users.googleId = ANY('${ids}'::text[])`)
             .getMany();
-        return users;
     } catch (e) {
         throw new Error('Problem getting users from googleIds!');
     }

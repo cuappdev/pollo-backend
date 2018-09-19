@@ -90,12 +90,11 @@ const updateQuestionById = async (id: number, text: string):
 const getQuestionsFromSessionId = async (id: number):
   Promise<Array<?Question>> => {
     try {
-        const questions = await db().createQueryBuilder('questions')
+        return await db().createQueryBuilder('questions')
             .leftJoinAndSelect('questions.user', 'user')
             .innerJoin('questions.session', 'session', 'session.id = :sessionId')
             .setParameters({ sessionId: id })
             .getMany();
-        return questions;
     } catch (e) {
         throw new Error(`Problem getting questions for session with id: ${id}`);
     }

@@ -18,7 +18,7 @@ const sessionCodes = {};
  * @function
  * @param {string} name - Name of session
  * @param {string} code - Unique code used to join session
- * @param {?User} user - Admin of session
+ * @param {User} [user] - Admin of session
  * @return {Session} Created session
  */
 const createSession = async (name: string, code: string, user: ?User):
@@ -104,7 +104,7 @@ const deleteSessionById = async (id: number) => {
  * Update a session
  * @function
  * @param {number} id - Id of session to update
- * @param {?string} name - New name of session
+ * @param {string} [name] - New name of session
  * @return {?Session} Updated session
  */
 const updateSessionById = async (id: number, name: ?string):
@@ -128,7 +128,7 @@ const updateSessionById = async (id: number, name: ?string):
  * @function
  * @param {number} id - Id of session to add users
  * @param {string[]} googleIds - List of user's google ids to add
- * @role {?string} role - Specifies whether to add the users as members or admins
+ * @param {string} [role] - Specifies whether to add the users as members or admins
  * @return {?Session} Session that users were added to
  */
 const addUsersByGoogleIds = async (id: number, googleIds: string[],
@@ -168,7 +168,7 @@ const addUsersByGoogleIds = async (id: number, googleIds: string[],
  * @function
  * @param {number} id - Id of session to add users
  * @param {number[]} userIds - List of user ids to add
- * @role {?string} role - Specifies whether to add the users as members or admins
+ * @param {string} [role] - Specifies whether to add the users as members or admins
  * @return {?Session} Session that users were added to
  */
 const addUsersByIds = async (id: number, userIds: number[],
@@ -206,7 +206,7 @@ const addUsersByIds = async (id: number, userIds: number[],
  * @function
  * @param {number} id - Id of session to remove user from
  * @param {User} user - User to remove from session
- * @param {?string} role - Role to remove user from
+ * @param {string} [role] - Role to remove user from
  * @return {?Session} Session without specified user
  */
 const removeUserBySessionId = async (id: number, user: User, role: ?string):
@@ -285,7 +285,7 @@ const isMember = async (id: number, user: User):
  * Get users from a session
  * @function
  * @param {number} id - Id of session to get users
- * @param {?string} role - Specifies if we only want users of a certain role
+ * @param {string} [role] - Specifies if we only want users of a certain role
  * @return {User[]} List of specified user from session
  */
 const getUsersBySessionId = async (id: number, role: ?string):

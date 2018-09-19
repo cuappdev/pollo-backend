@@ -73,3 +73,27 @@ toc:
       - verifySession
       - deleteSession
       - deleteSessionFromUserId
+  - SessionSocket
+  - name: Session Socket Types
+    children:
+        - SocketPoll
+        - Answer
+        - SessionSocketConfig
+        - CurrentState
+  - SessionManager
+  - name: Utility Functions
+    children:
+        - netIdFromEmail
+        - randomCode
+  - name: Constants
+    children:
+        - REQUEST_TYPES
+        - QUESTION_TYPES
+        - USER_TYPES
+        - RequestType
+        - QuestionType
+  - name: Library Functions
+    children:
+        - remove
+        - ensureAuthenticated
+        - updateSession

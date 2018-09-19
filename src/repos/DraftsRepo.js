@@ -36,12 +36,11 @@ const createDraft = async (text: string, options: string[], user: User):
 */
 const getDraft = async (id: number): Promise<Draft> => {
     try {
-        const draft = await db().createQueryBuilder('drafts')
+        return await db().createQueryBuilder('drafts')
             .leftJoinAndSelect('drafts.user', 'users')
             .where('drafts.id = :draftId')
             .setParameters({ draftId: id })
             .getOne();
-        return draft;
     } catch (e) {
         throw new Error(`Problem getting draft with id: ${id}`);
     }
@@ -55,11 +54,10 @@ const getDraft = async (id: number): Promise<Draft> => {
 */
 const getDraftsByUser = async (id: number): Promise<Array<?Draft>> => {
     try {
-        const drafts = await db().createQueryBuilder('drafts')
+        return await db().createQueryBuilder('drafts')
             .innerJoinAndSelect('drafts.user', 'user', 'user.id = :userId')
             .setParameters({ userId: id })
             .getMany();
-        return drafts;
     } catch (e) {
         throw new Error(`Problem getting drafts for user with id: ${id}`);
     }

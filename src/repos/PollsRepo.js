@@ -67,7 +67,7 @@ const deletePollById = async (id: number) => {
  * Update a poll
  * @function
  * @param {number} id - id of the poll to update
- * @param {text} [string] - new text for poll
+ * @param {string} [text] - new text for poll
  * @param {json} [results] - new results for poll
  * @param {boolean} [canShare] - new shared option for poll
  * @param {json} [userAnswers] - new json of user answers
@@ -103,11 +103,10 @@ const updatePollById = async (id: number, text: ?string, results: ?json,
 const getPollsFromSessionId = async (id: number):
   Promise<Array<?Poll>> => {
     try {
-        const polls = await db().createQueryBuilder('polls')
+        return await db().createQueryBuilder('polls')
             .innerJoin('polls.session', 'session', 'session.id = :sessionId')
             .setParameters({ sessionId: id })
             .getMany();
-        return polls;
     } catch (e) {
         throw new Error(`Problem getting polls for session with id: ${id}!`);
     }
@@ -122,12 +121,11 @@ const getPollsFromSessionId = async (id: number):
 const getSharedPollsFromSessionId = async (id: number):
   Promise<Array<?Poll>> => {
     try {
-        const polls = await db().createQueryBuilder('polls')
+        return await db().createQueryBuilder('polls')
             .innerJoin('polls.session', 'session', 'session.id = :sessionId')
             .where('polls.shared')
             .setParameters({ sessionId: id })
             .getMany();
-        return polls;
     } catch (e) {
         throw new Error(`Problem getting polls for session with id: ${id}!`);
     }
