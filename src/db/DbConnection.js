@@ -50,14 +50,5 @@ const connectionOptions: ConnectionOptions = {
     },
 };
 
-const dbConnection = (): Promise<any> => createConnection(connectionOptions).then(async (connection) => {
-    // run all migrations
-    // await connection.runMigrations();
-
-    // and undo previous migration
-    // await connection.undoLastMigration();
-
-    // console.log('Done. We run two migrations then reverted them.');
-});
-
+const dbConnection = (): Promise<any> => createConnection(connectionOptions);
 export default dbConnection;

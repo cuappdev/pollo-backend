@@ -42,7 +42,7 @@ module.exports = {
         "radix": ["error", "as-needed"],
 
         // allow long lines
-        "max-len": ["error", { "code": 200 }],
+        "max-len": ["error", { "code": 100 }],
 
         // allow unary operator
         "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],

@@ -60,7 +60,8 @@ test('add admins to session', async () => {
     const body = {
         adminIds: [userId],
     };
-    const getstr = await request(post(`/sessions/${sessionres.data.node.id}/admins/`, body, adminToken));
+    const getstr = await request(post(`/sessions/${sessionres.data.node.id}/admins/`, body,
+        adminToken));
     const getres = getstr;
     expect(getres.success).toBeTruthy();
 });
@@ -79,7 +80,8 @@ test('remove admin from session', async () => {
     const body = {
         adminIds: [userId],
     };
-    const getstr = await request(put(`/sessions/${sessionres.data.node.id}/admins/`, body, adminToken));
+    const getstr = await request(put(`/sessions/${sessionres.data.node.id}/admins/`, body,
+        adminToken));
     const getres = getstr;
     expect(getres.success).toBeTruthy();
     UsersRepo.deleteUserById(userId);
@@ -92,7 +94,8 @@ test('add members to session', async () => {
     const body = {
         memberIds: [userId],
     };
-    const getstr = await request(post(`/sessions/${sessionres.data.node.id}/members/`, body, adminToken));
+    const getstr = await request(post(`/sessions/${sessionres.data.node.id}/members/`, body,
+        adminToken));
     const getres = getstr;
     expect(getres.success).toBeTruthy();
 });
@@ -117,7 +120,8 @@ test('remove member from session', async () => {
     const body = {
         memberIds: [userId],
     };
-    const getstr = await request(put(`/sessions/${sessionres.data.node.id}/members`, body, adminToken));
+    const getstr = await request(put(`/sessions/${sessionres.data.node.id}/members`, body,
+        adminToken));
     const getres = getstr;
     expect(getres.success).toBeTruthy();
     await UsersRepo.deleteUserById(userId);
