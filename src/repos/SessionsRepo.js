@@ -251,7 +251,7 @@ const isAdmin = async (id: number, user: User):
             .where('sessions.id = :sessionId')
             .setParameters({ sessionId: id })
             .getOne();
-
+        var x = 0;
         const admin = session.admins.find(x => x.googleId === user.googleId);
         return admin !== undefined;
     } catch (e) {
@@ -342,9 +342,9 @@ const getQuestions = async (id: number): Promise<Array<?Question>> => {
             .leftJoinAndSelect('sessions.questions', 'questions')
             .where('sessions.id = :sessionId')
             .setParameters({ sessionId: id })
-            .orderBy('questions.createdAt', 'DESC')
+            .orderBy('questions.createdAt' , 'DESC')
             .getOne();
-        return session.questions;
+        return session.questions
     } catch (e) {
         throw new Error('Problem getting questions');
     }
