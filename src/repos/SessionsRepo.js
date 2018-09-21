@@ -222,9 +222,10 @@ const removeUserBySessionId = async (id: number, user: User, role: ?string):
             .getOne();
         if (user) {
             if (role === constants.USER_TYPES.ADMIN) {
-                session.admins = session.admins.filter(admin => (admin.googleId !== user.googleId));
+                session.admins = session.admins.filter(admin => admin.googleId !== user.googleId);
             } else {
-                session.members = session.members.filter(member => (member.googleId !== user.googleId));
+                session.members = session.members
+                    .filter(member => member.googleId !== user.googleId);
             }
             await db().persist(session);
         }
