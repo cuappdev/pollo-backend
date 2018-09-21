@@ -1,11 +1,10 @@
-module.exports = {
+{
     "extends": "airbnb",
     "parser": "babel-eslint",
     "plugins": ["jest"],
     "env": {
         "jest/globals": true
     },
-    "extends": "airbnb",
     "rules": {
         // for babel-eslint
         "strict": 0,
@@ -68,5 +67,5 @@ module.exports = {
         "no-param-reassign": [2, { "props": false }],
 
         "import/no-dynamic-require": 0
-    }
-};
+      }
+}
