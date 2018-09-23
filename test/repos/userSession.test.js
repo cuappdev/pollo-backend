@@ -19,7 +19,7 @@ beforeAll(async () => {
 test('Create Session', async () => {
     const session = await UserSessionsRepo.createOrUpdateSession(user, 'access', 'refresh');
     sessionId = session.id;
-    expect(session.isActive).toBeTruthy();
+    expect(session.isActive).toBe(true);
     expect(session.sessionToken).toBe('access');
     expect(session.updateToken).toBe('refresh');
 });
@@ -33,16 +33,16 @@ test('Get User From Token', async () => {
 
 test('Verify session', async () => {
     const valid = await UserSessionsRepo.verifySession('access');
-    expect(valid).toBeTruthy();
+    expect(valid).toBe(true);
     const invalid = await UserSessionsRepo.verifySession('invalid');
-    expect(invalid).toBeFalsy();
+    expect(invalid).toBe(false);
 });
 
 test('Update session', async () => {
     const nullObj = await UserSessionsRepo.updateSession('invalid');
     expect(nullObj).toBeNull();
     const obj = await UserSessionsRepo.updateSession('refresh');
-    expect(obj.isActive).toBeTruthy();
+    expect(obj.isActive).toBe(true);
 });
 
 // Teardown

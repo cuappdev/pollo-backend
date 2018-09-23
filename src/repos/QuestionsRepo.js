@@ -68,13 +68,15 @@ const updateQuestionById = async (id: number, text: string):
   Promise<?Question> => {
     try {
         const field = {};
-        if (text) field.text = text;
+        if (text !== undefined && text !== null) {
+            field.text = text;
+            await db().createQueryBuilder('questions')
+                .where('questions.id = :questionId')
+                .setParameters({ questionId: id })
+                .update(field)
+                .execute();
+        }
 
-        await db().createQueryBuilder('questions')
-            .where('questions.id = :questionId')
-            .setParameters({ questionId: id })
-            .update(field)
-            .execute();
         return await db().findOneById(id);
     } catch (e) {
         throw new Error(`Problem updating question by id: ${id}`);

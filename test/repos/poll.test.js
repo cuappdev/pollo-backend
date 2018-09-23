@@ -45,7 +45,7 @@ test('Get Polls from Session', async () => {
 test('Update Poll', async () => {
     const poll = await PollsRepo.updatePollById(id, 'New Poll', null, false);
     expect(poll.text).toBe('New Poll');
-    expect(poll.canShare).toBeFalsy();
+    expect(poll.shared).toBe(false);
 });
 
 test('Get Shared Polls from Session', async () => {
@@ -62,7 +62,7 @@ test('Get Polls from Session', async () => {
     const poll = await PollsRepo
         .createPoll('Another poll', session, {}, true, 'FREE_RESPONSE');
     const polls = await SessionsRepo.getPolls(session.id);
-    expect(polls.length > 1).toBeTruthy();
+    expect(polls.length > 1).toBe(true);
     expect(polls[1].id).toBe(poll.id);
     expect(polls[0].id).toBe(id);
 });

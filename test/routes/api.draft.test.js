@@ -31,7 +31,7 @@ test('Create a draft', async () => {
     const getstr = await request(post('/drafts/', body, userToken));
     const getres = getstr;
     draft1 = getres.data.node;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     expect(draft1).toMatchObject(body);
 });
 
@@ -39,7 +39,7 @@ test('Get drafts (Authorized)', async () => {
     const getstr = await request(get('/drafts/', userToken));
     const getres = getstr;
     const { edges } = getres.data;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     expect(edges.length).toBe(1);
     expect(edges[0].node).toMatchObject(draft1);
 });
@@ -47,7 +47,7 @@ test('Get drafts (Authorized)', async () => {
 test('Get drafts (Unauthorized)', async () => {
     const getstr = await request(get('/drafts/', 'blah'));
     const getres = getstr;
-    expect(getres.success).toBeFalsy();
+    expect(getres.success).toBe(false);
 });
 
 test('Update a draft', async () => {
@@ -57,7 +57,7 @@ test('Update a draft', async () => {
     const getstr = await request(put(`/drafts/${draft1.id}`, body, userToken));
     const getres = getstr;
     const { node } = getres.data;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     expect(node.text).toBe(body.text);
     expect(node.options).toMatchObject(draft1.options);
     expect(node.id).toBe(draft1.id);
@@ -72,7 +72,7 @@ test('Create another draft', async () => {
     const getstr = await request(post('/drafts/', body, userToken));
     const getres = getstr;
     draft2 = getres.data.node;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     expect(draft2).toMatchObject(body);
 });
 
@@ -80,7 +80,7 @@ test('Get updated list of drafts (Authorized)', async () => {
     const getstr = await request(get('/drafts/', userToken));
     const getres = getstr;
     const { edges } = getres.data;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     expect(edges.length).toBe(2);
     expect(edges[0].node).toMatchObject(draft1);
     expect(edges[1].node).toMatchObject(draft2);
@@ -88,9 +88,9 @@ test('Get updated list of drafts (Authorized)', async () => {
 
 test('Delete draft', async () => {
     let result = await request(del(`/drafts/${draft1.id}`, userToken));
-    expect(result.success).toBeTruthy();
+    expect(result.success).toBe(true);
     result = await request(del(`/drafts/${draft2.id}`, userToken));
-    expect(result.success).toBeTruthy();
+    expect(result.success).toBe(true);
 });
 
 afterAll(async () => {

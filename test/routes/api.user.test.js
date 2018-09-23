@@ -26,7 +26,7 @@ beforeAll(async () => {
 test('get user', async () => {
     const getstr = await request(get('/users/', token));
     const getres = getstr;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     expect(user.id).toBe(getres.data.id);
     expect(user.netId).toBe(getres.data.netId);
 });

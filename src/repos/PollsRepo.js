@@ -77,18 +77,19 @@ const updatePollById = async (id: number, text: ?string, results: ?json,
     canShare: ?boolean, userAnswers: ?json):
   Promise<?Poll> => {
     try {
-        const field = {};
-        if (text) field.text = text;
-        if (results) field.results = results;
-        if (canShare !== null) field.shared = canShare;
-        if (userAnswers) field.userAnswers = userAnswers;
-
-        await db().createQueryBuilder('polls')
+        const poll = await db().createQueryBuilder('polls')
+            .leftJoinAndSelect('polls.session', 'session')
             .where('polls.id = :pollId')
             .setParameters({ pollId: id })
-            .update(field)
-            .execute();
-        return await db().findOneById(id);
+            .getOne();
+
+        if (text !== undefined && text !== null) poll.text = text;
+        if (results) poll.results = results;
+        if (canShare !== null && canShare !== undefined) poll.shared = canShare;
+        if (userAnswers) poll.userAnswers = userAnswers;
+
+        await db().persist(poll);
+        return poll;
     } catch (e) {
         throw new Error(`Problem updating poll by id: ${id}!`);
     }

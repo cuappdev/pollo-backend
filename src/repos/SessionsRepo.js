@@ -104,19 +104,22 @@ const deleteSessionById = async (id: number) => {
  * Update a session
  * @function
  * @param {number} id - Id of session to update
- * @param {string} [name] - New name of session
+ * @param {string} name - New name of session
  * @return {?Session} Updated session
  */
-const updateSessionById = async (id: number, name: ?string):
+const updateSessionById = async (id: number, name: string):
   Promise<?Session> => {
     try {
         const field = {};
-        if (name) field.name = name;
-        await db().createQueryBuilder('sessions')
-            .where('sessions.id = :sessionId')
-            .setParameters({ sessionId: id })
-            .update(field)
-            .execute();
+        if (name !== undefined && name !== null) {
+            field.name = name;
+            await db().createQueryBuilder('sessions')
+                .where('sessions.id = :sessionId')
+                .setParameters({ sessionId: id })
+                .update(field)
+                .execute();
+        }
+        
         return await db().findOneById(id);
     } catch (e) {
         throw new Error(`Problem updating session by id: ${id}!`);

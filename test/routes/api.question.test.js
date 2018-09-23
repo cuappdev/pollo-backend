@@ -28,7 +28,7 @@ beforeAll(async () => {
     const opts = { name: 'Test session', code: SessionsRepo.createCode() };
     const result = await request(post('/sessions/', opts, adminToken));
     session = result.data.node;
-    expect(result.success).toBeTruthy();
+    expect(result.success).toBe(true);
 
     await SessionsRepo.addUsersByGoogleIds(session.id, ['member'], 'member');
 });
@@ -39,7 +39,7 @@ test('create question', async () => {
     };
     const result = await request(post(`/sessions/${session.id}/questions`, opts, memberToken));
     question = result.data.node;
-    expect(result.success).toBeTruthy();
+    expect(result.success).toBe(true);
 });
 
 test('create question with invalid token', async () => {
@@ -47,20 +47,20 @@ test('create question with invalid token', async () => {
         text: 'Why do we have to test shit? (PG-13)',
     };
     const result = await request(post(`/sessions/${session.id}/questions`, opts, adminToken));
-    expect(result.success).toBeFalsy();
+    expect(result.success).toBe(false);
 });
 
 test('get question by id', async () => {
     const getstr = await request(get(`/questions/${question.id}`, memberToken));
     const getres = getstr;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     expect(question.id).toBe(getres.data.node.id);
 });
 
 test('get questions by session', async () => {
     const getstr = await request(get(`/sessions/${session.id}/questions`, adminToken));
     const getres = getstr;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     expect(question.id).toBe(getres.data.edges[0].node.id);
 });
 
@@ -70,7 +70,7 @@ test('update question', async () => {
     };
     const getstr = await request(put(`/questions/${question.id}`, opts, memberToken));
     const getres = getstr;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     expect(getres.data.node.text).toBe('Why do we have to test stuff? (PG)');
     expect(getres.data.node.id).toBe(question.id);
 });
@@ -81,17 +81,17 @@ test('update question with invalid token', async () => {
     };
     const getstr = await request(put(`/questions/${question.id}`, opts, adminToken));
     const getres = getstr;
-    expect(getres.success).toBeFalsy();
+    expect(getres.success).toBe(false);
 });
 
 test('delete question', async () => {
     const result = await request(del(`/questions/${question.id}`, memberToken));
-    expect(result.success).toBeTruthy();
+    expect(result.success).toBe(true);
 });
 
 afterAll(async () => {
     const result = await request(del(`/sessions/${session.id}`, adminToken));
-    expect(result.success).toBeTruthy();
+    expect(result.success).toBe(true);
     await UsersRepo.deleteUserById(admin.id);
     await UsersRepo.deleteUserById(member.id);
     await UserSessionsRepo.deleteSession(session.id);

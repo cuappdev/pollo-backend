@@ -15,7 +15,7 @@ class StartSessionRouter extends AppDevRouter<APISession> {
     }
 
     async content(req: Request) {
-        const { id, code } = req.body;
+        const { id, code, create } = req.body;
         let { name } = req.body;
 
         if (!name) name = '';
@@ -24,21 +24,28 @@ class StartSessionRouter extends AppDevRouter<APISession> {
             throw new Error('Session id, or code required.');
         }
 
-        let session = await SessionsRepo.getSessionById(id);
+        let session;
 
-        if (!session && code) {
+        if (id && !create) {
+            session = await SessionsRepo.getSessionById(id);
+        }
+
+        if (code && !create) {
             const sessionId = await SessionsRepo.getSessionId(code);
+
             if (sessionId) {
                 session = await SessionsRepo.getSessionById(sessionId);
             }
         }
 
-        if (!id && !session) {
-            session = await SessionsRepo.createSession(name, code, req.user);
-        }
-
         if (!session) {
-            throw new Error(`No session with id ${id} found.`);
+            if (create) {
+                session = await SessionsRepo.createSession(name, code, req.user);
+            } else if (id) {
+                throw new Error(`No session with id ${id} found.`);
+            } else {
+                throw new Error(`No session with code ${code} found.`);
+            }
         }
 
         if (!req.app.sessionManager.isLive(code, id)) {
