@@ -64,9 +64,9 @@ test('Get Session From Both Questions', async () => {
 
 test('Verify Ownership', async () => {
     const tempUser = await UsersRepo.createDummyUser('wastemon');
-    expect(await QuestionsRepo.isOwnerById(question1.id, user)).toBeTruthy();
-    expect(await QuestionsRepo.isOwnerById(question2.id, user)).toBeTruthy();
-    expect(await QuestionsRepo.isOwnerById(question1.id, tempUser)).toBeFalsy();
+    expect(await QuestionsRepo.isOwnerById(question1.id, user)).toBe(true);
+    expect(await QuestionsRepo.isOwnerById(question2.id, user)).toBe(true);
+    expect(await QuestionsRepo.isOwnerById(question1.id, tempUser)).toBe(false);
     await UsersRepo.deleteUserById(tempUser.id);
 });
 

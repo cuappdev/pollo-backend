@@ -66,6 +66,8 @@
         // allow reassignment of param properties
         "no-param-reassign": [2, { "props": false }],
 
-        "import/no-dynamic-require": 0
+        "import/no-dynamic-require": 0,
+
+        "import/extensions": "never"
       }
 }

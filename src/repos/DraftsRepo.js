@@ -74,16 +74,17 @@ const getDraftsByUser = async (id: number): Promise<Array<?Draft>> => {
 const updateDraft = async (id: number, text: ?string, options: ?string[]):
   Promise<?Draft> => {
     try {
-        const field = {};
-        if (text) field.text = text;
-        if (options) field.options = options;
-
-        await db().createQueryBuilder('drafts')
+        const draft = await db().createQueryBuilder('drafts')
+            .leftJoinAndSelect('drafts.user', 'user')
             .where('drafts.id = :draftId')
             .setParameters({ draftId: id })
-            .update(field)
-            .execute();
-        return await db().findOneById(id);
+            .getOne();
+
+        if (options) draft.options = options;
+        if (text !== undefined && text !== null) draft.text = text;
+
+        await db().persist(draft);
+        return draft;
     } catch (e) {
         throw new Error(`Problem updating draft with id: ${id}`);
     }

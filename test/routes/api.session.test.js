@@ -37,20 +37,20 @@ test('create session', async () => {
     const option = post('/sessions/', opts, adminToken);
     const result = await request(option);
     sessionres = result;
-    expect(sessionres.success).toBeTruthy();
+    expect(sessionres.success).toBe(true);
 });
 
 test('get single session', async () => {
     const getstr = await request(get(`/sessions/${sessionres.data.node.id}`, adminToken));
     const getres = getstr;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     expect(sessionres).toMatchObject(getres);
 });
 
 test('get sessions for admin', async () => {
     const getstr = await request(get('/sessions/all/admin', adminToken));
     const getres = getstr;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     expect(sessionres.data).toMatchObject(getres.data[0]);
 });
 
@@ -63,13 +63,13 @@ test('add admins to session', async () => {
     const getstr = await request(post(`/sessions/${sessionres.data.node.id}/admins/`, body,
         adminToken));
     const getres = getstr;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
 });
 
 test('get admins for session', async () => {
     const getstr = await request(get(`/sessions/${sessionres.data.node.id}/admins/`, adminToken));
     const getres = getstr;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     const { edges } = getres.data;
     expect(edges.length).toBe(2);
     expect(edges[0].node.id).toBe(adminId);
@@ -83,7 +83,7 @@ test('remove admin from session', async () => {
     const getstr = await request(put(`/sessions/${sessionres.data.node.id}/admins/`, body,
         adminToken));
     const getres = getstr;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     UsersRepo.deleteUserById(userId);
 });
 
@@ -97,20 +97,20 @@ test('add members to session', async () => {
     const getstr = await request(post(`/sessions/${sessionres.data.node.id}/members/`, body,
         adminToken));
     const getres = getstr;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
 });
 
 test('get sessions as member', async () => {
     const getstr = await request(get('/sessions/all/member/', userToken));
     const getres = getstr;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     expect(sessionres.data).toMatchObject(getres.data[0]);
 });
 
 test('get members of session', async () => {
     const getstr = await request(get(`/sessions/${sessionres.data.node.id}/members/`, adminToken));
     const getres = getstr;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     const { edges } = getres.data;
     expect(edges.length).toBe(1);
     expect(edges[0].node.id).toBe(userId);
@@ -123,38 +123,38 @@ test('remove member from session', async () => {
     const getstr = await request(put(`/sessions/${sessionres.data.node.id}/members`, body,
         adminToken));
     const getres = getstr;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     await UsersRepo.deleteUserById(userId);
 });
 
 test('get sessions for admin', async () => {
     const getstr = await request(get('/sessions/all/admin/', adminToken));
     const getres = getstr;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     expect(getres.data[0]).toMatchObject(sessionres.data);
 });
 
 test('update session', async () => {
     const getstr = await request(put(`/sessions/${sessionres.data.node.id}`, opts2, adminToken));
     const getres = getstr;
-    expect(getres.success).toBeTruthy();
+    expect(getres.success).toBe(true);
     expect(getres.data.node.name).toBe('New session');
 });
 
 test('update session with invalid adminToken', async () => {
     const getstr = await request(put(`/sessions/${sessionres.data.node.id}`, opts2, 'invalid'));
     const getres = getstr;
-    expect(getres.success).toBeFalsy();
+    expect(getres.success).toBe(false);
 });
 
 test('delete session with invalid adminToken', async () => {
     const result = await request(del(`/sessions/${sessionres.data.node.id}`, 'invalid'));
-    expect(result.success).toBeFalsy();
+    expect(result.success).toBe(false);
 });
 
 test('delete session', async () => {
     const result = await request(del(`/sessions/${sessionres.data.node.id}`, adminToken));
-    expect(result.success).toBeTruthy();
+    expect(result.success).toBe(true);
 });
 
 afterAll(async () => {

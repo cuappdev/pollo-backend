@@ -15,35 +15,17 @@ class StartSessionRouter extends AppDevRouter<APISession> {
     }
 
     async content(req: Request) {
-        const { id, code } = req.body;
+        const { code } = req.body;
         let { name } = req.body;
 
         if (!name) name = '';
 
-        if (!(id || code)) {
-            throw new Error('Session id, or code required.');
+        if (!code) {
+            throw new Error('Code required.');
         }
 
-        let session = await SessionsRepo.getSessionById(id);
-
-        if (!session && code) {
-            const sessionId = await SessionsRepo.getSessionId(code);
-            if (sessionId) {
-                session = await SessionsRepo.getSessionById(sessionId);
-            }
-        }
-
-        if (!id && !session) {
-            session = await SessionsRepo.createSession(name, code, req.user);
-        }
-
-        if (!session) {
-            throw new Error(`No session with id ${id} found.`);
-        }
-
-        if (!req.app.sessionManager.isLive(code, id)) {
-            await req.app.sessionManager.startNewSession(session);
-        }
+        const session = await SessionsRepo.createSession(name, code, req.user);
+        await req.app.sessionManager.startNewSession(session);
 
         return {
             node: {

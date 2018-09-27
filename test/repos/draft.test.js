@@ -46,9 +46,9 @@ test('Get Drafts from User', async () => {
 });
 
 test('Update Draft', async () => {
-    const newDraft = await DraftsRepo.updateDraft(draft1.id, 'New Question', undefined);
+    const newDraft = await DraftsRepo.updateDraft(draft1.id, 'New Question', ['hi']);
     expect(newDraft.text).toBe('New Question');
-    expect(newDraft.options).toEqual(draft1.options);
+    expect(newDraft.options).toEqual(['hi']);
     expect(newDraft.id).toBe(draft1.id);
     draft1 = newDraft;
 });
