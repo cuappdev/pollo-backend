@@ -3,8 +3,8 @@ import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
 
 const googleId = 'usertest1';
-let user;
 let sessionId;
+let user;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
@@ -24,21 +24,21 @@ test('Create Session', async () => {
     expect(session.updateToken).toBe('refresh');
 });
 
-test('Get User From Token', async () => {
+test('Get User from Token', async () => {
     user = await UserSessionsRepo.getUserFromToken('access');
     expect(user.googleId).toEqual(googleId);
     const nullUser = await UserSessionsRepo.getUserFromToken('invalid');
     expect(nullUser).toBeNull();
 });
 
-test('Verify session', async () => {
+test('Verify Session', async () => {
     const valid = await UserSessionsRepo.verifySession('access');
     expect(valid).toBe(true);
     const invalid = await UserSessionsRepo.verifySession('invalid');
     expect(invalid).toBe(false);
 });
 
-test('Update session', async () => {
+test('Update Session', async () => {
     const nullObj = await UserSessionsRepo.updateSession('invalid');
     expect(nullObj).toBeNull();
     const obj = await UserSessionsRepo.updateSession('refresh');
