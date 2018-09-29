@@ -119,7 +119,7 @@ const updateSessionById = async (id: number, name: string):
                 .update(field)
                 .execute();
         }
-        
+
         return await db().findOneById(id);
     } catch (e) {
         throw new Error(`Problem updating session by id: ${id}!`);
@@ -322,23 +322,14 @@ const getUsersBySessionId = async (id: number, role: ?string):
 const getPolls = async (id: number, sharedOnly: boolean):
   Promise<Array<?Poll>> => {
     try {
-        if (sharedOnly) {
-            const session = await db().createQueryBuilder('sessions')
-                .leftJoinAndSelect('sessions.polls', 'polls')
-                .where('sessions.id = :sessionId')
-                .andWhere('polls.shared = :shared', { shared: true })
-                .setParameters({ sessionId: id })
-                .orderBy('polls.createdAt', 'DESC')
-                .getOne();
-            return session.polls;
-        }
         const session = await db().createQueryBuilder('sessions')
             .leftJoinAndSelect('sessions.polls', 'polls')
             .where('sessions.id = :sessionId')
             .setParameters({ sessionId: id })
             .orderBy('polls.createdAt', 'DESC')
             .getOne();
-        return session.polls;
+
+        return sharedOnly === true ? session.polls.filter(poll => poll.shared) : session.polls;
     } catch (e) {
         throw new Error('Problem getting polls');
     }
