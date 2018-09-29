@@ -22,8 +22,9 @@ class GetSessionPollsRouter extends AppDevRouter<Object> {
         // Date mapped to list of polls
         const pollsByDate = {};
         polls.filter(Boolean).forEach((poll) => {
-            const date = (new Date(1000 * poll.createdAt))
+            let date = (new Date(1000 * poll.createdAt))
                 .toLocaleString('en-GB', { timeZone: 'UTC' });
+            date = date.substring(0, date.indexOf(','));
             const p = {
                 id: poll.id,
                 text: poll.text,
