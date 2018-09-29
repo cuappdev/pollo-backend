@@ -96,43 +96,6 @@ const updatePollById = async (id: number, text: ?string, results: ?json,
 };
 
 /**
- * Get all polls of a session
- * @function
- * @param {number} id - id of session we want to fetch polls of
- * @return {Poll[]} List of polls from specified session
- */
-const getPollsFromSessionId = async (id: number):
-  Promise<Array<?Poll>> => {
-    try {
-        return await db().createQueryBuilder('polls')
-            .innerJoin('polls.session', 'session', 'session.id = :sessionId')
-            .setParameters({ sessionId: id })
-            .getMany();
-    } catch (e) {
-        throw new Error(`Problem getting polls for session with id: ${id}!`);
-    }
-};
-
-/**
- * Get all shared polls of a session
- * @function
- * @param {number} id - id of session we want to fetch polls of
- * @return {Poll[]} List of shared polls from specified session
- */
-const getSharedPollsFromSessionId = async (id: number):
-  Promise<Array<?Poll>> => {
-    try {
-        return await db().createQueryBuilder('polls')
-            .innerJoin('polls.session', 'session', 'session.id = :sessionId')
-            .where('polls.shared')
-            .setParameters({ sessionId: id })
-            .getMany();
-    } catch (e) {
-        throw new Error(`Problem getting polls for session with id: ${id}!`);
-    }
-};
-
-/**
  * Get session that a poll belongs to
  * @function
  * @param {number} id - id of poll we want to find the session for
@@ -155,7 +118,5 @@ export default {
     deletePollById,
     getPollById,
     updatePollById,
-    getPollsFromSessionId,
     getSessionFromPollId,
-    getSharedPollsFromSessionId,
 };

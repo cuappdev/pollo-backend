@@ -10,14 +10,14 @@ class GetSessionPollsRouter extends AppDevRouter<Object> {
     }
 
     getPath(): string {
-        return '/sessions/:id/polls/date/';
+        return '/sessions/:id/polls/';
     }
 
     async content(req: Request) {
         const { id } = req.params;
-        const polls = await SessionsRepo.getPolls(id);
-        if (!polls) throw new Error(`Problem getting polls from session id: ${id}!`);
         const isAdmin = await SessionsRepo.isAdmin(id, req.user);
+        const polls = await SessionsRepo.getPolls(id, !isAdmin);
+        if (!polls) throw new Error(`Problem getting polls from session id: ${id}!`);
 
         // Date mapped to list of polls
         const pollsByDate = {};

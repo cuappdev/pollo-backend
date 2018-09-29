@@ -84,25 +84,6 @@ const updateQuestionById = async (id: number, text: string):
 };
 
 /**
- * Get all questions for a session
- * @function
- * @param {number} id - Id of session we want to get questions for
- * @reutrn {Question[]} List of questions from specified session
- */
-const getQuestionsFromSessionId = async (id: number):
-  Promise<Array<?Question>> => {
-    try {
-        return await db().createQueryBuilder('questions')
-            .leftJoinAndSelect('questions.user', 'user')
-            .innerJoin('questions.session', 'session', 'session.id = :sessionId')
-            .setParameters({ sessionId: id })
-            .getMany();
-    } catch (e) {
-        throw new Error(`Problem getting questions for session with id: ${id}`);
-    }
-};
-
-/**
  * Get session that question belongs to
  * @function
  * @param {number} id - Id of question we want to get the session for
@@ -145,7 +126,6 @@ export default {
     deleteQuestionById,
     getQuestionById,
     updateQuestionById,
-    getQuestionsFromSessionId,
     getSessionFromQuestionId,
     isOwnerById,
 };
