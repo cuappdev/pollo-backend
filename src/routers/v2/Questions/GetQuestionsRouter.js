@@ -1,6 +1,6 @@
 // @flow
 import AppDevEdgeRouter from '../../../utils/AppDevEdgeRouter';
-import QuestionsRepo from '../../../repos/QuestionsRepo';
+import SessionsRepo from '../../../repos/SessionsRepo';
 import constants from '../../../utils/constants';
 import type { APIQuestion } from '../APITypes';
 
@@ -15,7 +15,7 @@ class GetQuestionsRouter extends AppDevEdgeRouter<APIQuestion> {
 
     async contentArray(req, pageInfo, error) {
         const { id } = req.params;
-        const questions = await QuestionsRepo.getQuestionsFromSessionId(id);
+        const questions = await SessionsRepo.getQuestions(id);
 
         return questions
             .filter(Boolean)

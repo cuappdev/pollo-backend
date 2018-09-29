@@ -34,23 +34,10 @@ test('Get Poll', async () => {
     expect(poll.type).toBe('MULTIPLE_CHOICE');
 });
 
-test('Get Polls from Session', async () => {
-    const polls = await PollsRepo.getPollsFromSessionId(session.id);
-    const sharedPolls = await PollsRepo.getSharedPollsFromSessionId(session.id);
-    expect(polls.length).toEqual(1);
-    expect(polls[0].text).toBe('Poll');
-    expect(polls).toEqual(sharedPolls);
-});
-
 test('Update Poll', async () => {
     const poll = await PollsRepo.updatePollById(id, 'New Poll', null, false);
     expect(poll.text).toBe('New Poll');
     expect(poll.shared).toBe(false);
-});
-
-test('Get Shared Polls from Session', async () => {
-    const polls = await PollsRepo.getSharedPollsFromSessionId(session.id);
-    expect(polls.length).toEqual(0);
 });
 
 test('Get Session from Poll', async () => {
@@ -61,7 +48,7 @@ test('Get Session from Poll', async () => {
 test('Get Polls from Session', async () => {
     const poll = await PollsRepo
         .createPoll('Another poll', session, {}, true, 'FREE_RESPONSE');
-    const polls = await SessionsRepo.getPolls(session.id);
+    const polls = await SessionsRepo.getPolls(session.id, false);
     expect(polls.length > 1).toBe(true);
     expect(polls[1].id).toBe(poll.id);
     expect(polls[0].id).toBe(id);

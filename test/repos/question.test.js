@@ -39,14 +39,6 @@ test('Update Question', async () => {
     question1.text = question.text;
 });
 
-test('Get Questions From Session', async () => {
-    const questions = await QuestionsRepo.getQuestionsFromSessionId(session.id);
-    expect(questions.length).toBe(1);
-    expect(questions[0].id).toBe(question1.id);
-    expect(questions[0].text).toBe(question1.text);
-    expect(questions[0].user.id).toBe(question1.user.id);
-});
-
 test('Create A New Question', async () => {
     const text = 'Why is testing so annoying?';
     question2 = await QuestionsRepo.createQuestion(text, session, user);

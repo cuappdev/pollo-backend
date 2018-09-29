@@ -316,11 +316,22 @@ const getUsersBySessionId = async (id: number, role: ?string):
  * Gets polls from a session sorted by creation date desc.
  * @function
  * @param {number} id - Id of session to fetch polls from
+ * @param {boolean} sharedOnly - Specifies if we only want shared polls or all polls
  * @return {Poll[]} List of polls from session
  */
-const getPolls = async (id: number):
+const getPolls = async (id: number, sharedOnly: boolean):
   Promise<Array<?Poll>> => {
     try {
+        if (sharedOnly) {
+            const session = await db().createQueryBuilder('sessions')
+                .leftJoinAndSelect('sessions.polls', 'polls')
+                .where('sessions.id = :sessionId')
+                .andWhere('polls.shared = :shared', { shared: true })
+                .setParameters({ sessionId: id })
+                .orderBy('polls.createdAt', 'DESC')
+                .getOne();
+            return session.polls;
+        }
         const session = await db().createQueryBuilder('sessions')
             .leftJoinAndSelect('sessions.polls', 'polls')
             .where('sessions.id = :sessionId')
