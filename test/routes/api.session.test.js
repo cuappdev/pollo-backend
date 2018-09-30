@@ -116,6 +116,27 @@ test('get members of session', async () => {
     expect(edges[0].node.id).toBe(userId);
 });
 
+test('leave session', async () => {
+    await request(del(`/sessions/${sessionres.data.node.id}/members/`, userToken),
+        (error, res, body) => {
+            expect(body.success).toBe(true);
+        });
+
+    await request(get(`/sessions/${sessionres.data.node.id}/members/`, adminToken),
+        (error, res, body) => {
+            expect(body.success).toBe(true);
+            expect(body.data.edges.length).toBe(0);
+        });
+
+    const postBody = {
+        memberIds: [userId],
+    };
+    await request(post(`/sessions/${sessionres.data.node.id}/members/`, postBody, adminToken),
+        (error, res, body) => {
+            expect(body.success).toBe(true);
+        });
+});
+
 test('remove member from session', async () => {
     const body = {
         memberIds: [userId],
