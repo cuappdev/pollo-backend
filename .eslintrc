@@ -68,6 +68,8 @@
 
         "import/no-dynamic-require": 0,
 
-        "import/extensions": "never"
+        "import/extensions": "never",
+
+        "function-paren-newline": ["error", "consistent"]
       }
 }
