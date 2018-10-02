@@ -146,6 +146,11 @@ export default class SessionSocket {
               this._setupAdminEvents(client);
               client.join('admins');
               client.emit('user/count', { count: this.usersConnected });
+
+              const currentPoll = this._currentPoll();
+              if (currentPoll) {
+                  client.emit('admin/poll/start', { poll: currentPoll });
+              }
               break;
           }
           case 'member':
