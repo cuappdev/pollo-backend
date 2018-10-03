@@ -240,7 +240,7 @@ export default class SessionSocket {
 
           this.current = nextState;
           this.nsp.to('admins').emit('admin/poll/updateTally', this.current);
-          if (poll.shared) {
+          if (poll.shared || poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
               this.nsp.to('users').emit('user/poll/results', this.current);
           }
       });
@@ -274,7 +274,7 @@ export default class SessionSocket {
 
           this.current = nextState;
           this.nsp.to('admins').emit('admin/poll/updateTally', this.current);
-          if (poll.shared) {
+          if (poll.shared || poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
               this.nsp.to('users').emit('user/poll/results', this.current);
           }
       });

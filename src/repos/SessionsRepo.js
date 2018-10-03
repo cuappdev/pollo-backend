@@ -355,6 +355,28 @@ const getQuestions = async (id: number): Promise<Array<?Question>> => {
     }
 };
 
+/**
+ * Get time of latest activity of a session
+ * @function
+ * @param {number} id - Id of session to get latest activity
+ * @return {number} Time stamp of when the session was last updated
+ */
+const latestActivityBySessionId = async (id: number): number => {
+    try {
+        const session = await getSessionById(id);
+        const polls = await getPolls(id, false);
+
+        if (polls.length === 0) {
+            return session.updatedAt;
+        }
+        
+        const lastPoll = polls[polls.length - 1];
+        return session.updatedAt > lastPoll.updatedAt ? session.updatedAt : lastPoll.updatedAt;
+    } catch (e) {
+        throw new Error('Problem getting latest activity');
+    }
+};
+
 export default {
     sessionCodes,
     createSession,
@@ -371,4 +393,5 @@ export default {
     getPolls,
     getQuestions,
     addUsersByIds,
+    latestActivityBySessionId,
 };
