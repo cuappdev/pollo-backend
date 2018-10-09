@@ -361,17 +361,18 @@ const getQuestions = async (id: number): Promise<Array<?Question>> => {
  * @param {number} id - Id of session to get latest activity
  * @return {number} Time stamp of when the session was last updated
  */
-const latestActivityBySessionId = async (id: number): number => {
+const latestActivityBySessionId = async (id: number): Promise<?number> => {
     try {
-        const session = await getSessionById(id);
-        const polls = await getPolls(id, false);
+        const session = await db().findOneById(id);
+        if (!session) throw new Error(`Can't find session with id ${id}!`);
 
-        if (polls.length === 0) {
-            return session.updatedAt;
-        }
-        
-        const lastPoll = polls[polls.length - 1];
-        return session.updatedAt > lastPoll.updatedAt ? session.updatedAt : lastPoll.updatedAt;
+        return await getPolls(id, false).then((p: Array<?Poll>) => {
+            const lastPoll = p.slice(-1).pop();
+            if (p.length === 0 || !lastPoll) {
+                return session.updatedAt;
+            }
+            return session.updatedAt > lastPoll.updatedAt ? session.updatedAt : lastPoll.updatedAt;
+        });
     } catch (e) {
         throw new Error('Problem getting latest activity');
     }
