@@ -1,7 +1,7 @@
 // @flow
 import AppDevEdgeRouter from '../../../utils/AppDevEdgeRouter';
 import SessionsRepo from '../../../repos/SessionsRepo';
-import constants from '../../../utils/constants';
+import constants from '../../../utils/Constants';
 import type { APIQuestion } from '../APITypes';
 
 class GetQuestionsRouter extends AppDevEdgeRouter<APIQuestion> {

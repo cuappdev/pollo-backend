@@ -2,7 +2,7 @@
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import PollsRepo from '../../../repos/PollsRepo';
-import constants from '../../../utils/constants';
+import constants from '../../../utils/Constants';
 import SessionsRepo from '../../../repos/SessionsRepo';
 
 import type { APIPoll } from '../APITypes';

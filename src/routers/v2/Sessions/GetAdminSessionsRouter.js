@@ -1,7 +1,8 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
-import constants from '../../../utils/constants';
+import constants from '../../../utils/Constants';
+import SessionsRepo from '../../../repos/SessionsRepo';
 import UsersRepo from '../../../repos/UsersRepo';
 
 class GetSessionsRouter extends AppDevRouter<Object> {
@@ -16,15 +17,17 @@ class GetSessionsRouter extends AppDevRouter<Object> {
     async content(req: Request) {
         const sessions = await UsersRepo.getSessionsById(req.user.id, 'admin');
         if (!sessions) throw new Error('Can\'t find sessions for user!');
-        return sessions
+        const nodes = await sessions
             .filter(Boolean)
-            .map(session => ({
+            .map(async session => ({
                 node: {
                     id: session.id,
                     name: session.name,
                     code: session.code,
+                    updatedAt: await SessionsRepo.latestActivityBySessionId(session.id),
                 },
             }));
+        return Promise.all(nodes).then(n => n);
     }
 }
 

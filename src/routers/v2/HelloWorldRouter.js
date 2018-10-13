@@ -1,6 +1,6 @@
 // @flow
 import AppDevRouter from '../../utils/AppDevRouter';
-import constants from '../../utils/constants';
+import constants from '../../utils/Constants';
 
 class HelloWorldRouter extends AppDevRouter<Object> {
     constructor() {

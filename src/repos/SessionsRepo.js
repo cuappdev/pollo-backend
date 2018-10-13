@@ -4,8 +4,8 @@ import Poll from '../models/Poll';
 import Question from '../models/Question';
 import Session from '../models/Session';
 import User from '../models/User';
-import appDevUtils from '../utils/appDevUtils';
-import constants from '../utils/constants';
+import appDevUtils from '../utils/AppDevUtils';
+import constants from '../utils/Constants';
 import UsersRepo from './UsersRepo';
 
 const db = (): Repository<Session> => getConnectionManager().get().getRepository(Session);
@@ -355,6 +355,29 @@ const getQuestions = async (id: number): Promise<Array<?Question>> => {
     }
 };
 
+/**
+ * Get time of latest activity of a session
+ * @function
+ * @param {number} id - Id of session to get latest activity
+ * @return {number} Time stamp of when the session was last updated
+ */
+const latestActivityBySessionId = async (id: number): Promise<?number> => {
+    try {
+        const session = await db().findOneById(id);
+        if (!session) throw new Error(`Can't find session with id ${id}!`);
+
+        return await getPolls(id, false).then((p: Array<?Poll>) => {
+            const lastPoll = p.slice(-1).pop();
+            if (p.length === 0 || !lastPoll) {
+                return session.updatedAt;
+            }
+            return session.updatedAt > lastPoll.updatedAt ? session.updatedAt : lastPoll.updatedAt;
+        });
+    } catch (e) {
+        throw new Error('Problem getting latest activity');
+    }
+};
+
 export default {
     sessionCodes,
     createSession,
@@ -371,4 +394,5 @@ export default {
     getPolls,
     getQuestions,
     addUsersByIds,
+    latestActivityBySessionId,
 };

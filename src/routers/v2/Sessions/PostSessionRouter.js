@@ -2,7 +2,7 @@
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import SessionsRepo from '../../../repos/SessionsRepo';
-import constants from '../../../utils/constants';
+import constants from '../../../utils/Constants';
 
 import type { APISession } from '../APITypes';
 

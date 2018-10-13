@@ -3,8 +3,8 @@ import { getConnectionManager, Repository } from 'typeorm';
 import Session from '../models/Session';
 import User from '../models/User';
 import UserSessionsRepo from './UserSessionsRepo';
-import appDevUtils from '../utils/appDevUtils';
-import constants from '../utils/constants';
+import appDevUtils from '../utils/AppDevUtils';
+import constants from '../utils/Constants';
 
 const db = (): Repository<User> => getConnectionManager().get().getRepository(User);
 

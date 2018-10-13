@@ -4,7 +4,7 @@
 export type RequestType = 'POST' | 'GET' | 'DELETE' | 'PUT';
 
 /**
- * Constants for request types
+ * constants for request types
  * @constant
  * @enum {string}
  */
@@ -20,7 +20,7 @@ export type QuestionType = 'MULTIPLE_CHOICE' | 'FREE_RESPONSE' |
   'MULTIPLE_ANSWER' | 'RANKING'
 
 /**
-* Constants for question types
+* constants for question types
 * @constant
 * @enum {string}
 */
@@ -32,7 +32,7 @@ const QUESTION_TYPES = {
 };
 
 /**
-* Constants for user types
+* constants for user types
 * @constant
 * @enum {string}
 */

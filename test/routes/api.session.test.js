@@ -51,7 +51,10 @@ test('get sessions for admin', async () => {
     const getstr = await request(get('/sessions/all/admin', adminToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
-    expect(sessionres.data).toMatchObject(getres.data[0]);
+    const node = getres.data[0];
+    expect(sessionres.data.id).toBe(node.id);
+    expect(sessionres.data.name).toBe(node.name);
+    expect(sessionres.data.code).toBe(node.code);
 });
 
 test('add admins to session', async () => {
@@ -104,7 +107,10 @@ test('get sessions as member', async () => {
     const getstr = await request(get('/sessions/all/member/', userToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
-    expect(sessionres.data).toMatchObject(getres.data[0]);
+    const node = getres.data[0];
+    expect(sessionres.data.id).toBe(node.id);
+    expect(sessionres.data.name).toBe(node.name);
+    expect(sessionres.data.code).toBe(node.code);
 });
 
 test('get members of session', async () => {
@@ -152,7 +158,10 @@ test('get sessions for admin', async () => {
     const getstr = await request(get('/sessions/all/admin/', adminToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
-    expect(getres.data[0]).toMatchObject(sessionres.data);
+    const node = getres.data[0];
+    expect(sessionres.data.id).toBe(node.id);
+    expect(sessionres.data.name).toBe(node.name);
+    expect(sessionres.data.code).toBe(node.code);
 });
 
 test('update session', async () => {

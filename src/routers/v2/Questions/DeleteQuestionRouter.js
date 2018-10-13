@@ -3,7 +3,7 @@ import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import QuestionsRepo from '../../../repos/QuestionsRepo';
 import SessionsRepo from '../../../repos/SessionsRepo';
-import constants from '../../../utils/constants';
+import constants from '../../../utils/Constants';
 
 class DeleteQuestionRouter extends AppDevRouter<Object> {
     constructor() {

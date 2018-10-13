@@ -24,16 +24,13 @@ toc:
       - deletePollById
       - getPollById
       - updatePollById
-      - getPollsFromSessionId
       - getSessionFromPollId
-      - getSharedPollsFromSessionId
   - name: Questions Repo
     children:
         - createQuestion
         - deleteQuestionById
         - getQuestionById
         - updateQuestionById
-        - getQuestionsFromSessionId
         - getSessionFromQuestionId
         - isOwnerById
   - name: Sessions Repo
@@ -53,6 +50,7 @@ toc:
       - getPolls
       - getQuestions
       - addUsersByIds
+      - latestActivityBySessionId
   - name: Users Repo
     children:
       - getUsers
