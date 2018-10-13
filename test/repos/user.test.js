@@ -1,12 +1,12 @@
 import SessionsRepo from '../../src/repos/SessionsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
-import appDevUtils from '../../src/utils/appDevUtils';
+import AppDevUtils from '../../src/utils/AppDevUtils';
 
 let id;
 let id2;
-const googleId = appDevUtils.randomCode(6);
-const googleId2 = appDevUtils.randomCode(6);
+const googleId = AppDevUtils.randomCode(6);
+const googleId2 = AppDevUtils.randomCode(6);
 let session;
 let session2;
 

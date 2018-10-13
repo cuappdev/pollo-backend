@@ -3,7 +3,7 @@ import SocketIO from 'socket.io';
 import Session from './models/Session';
 import PollsRepo from './repos/PollsRepo';
 import SessionsRepo from './repos/SessionsRepo';
-import constants from './utils/constants';
+import constants from './utils/Constants';
 
 /** Configuration for each SessionSocket */
 export type SessionSocketConfig = {
@@ -462,7 +462,7 @@ export default class SessionSocket {
           };
           this.pollId += 1;
           console.log('starting', question);
-          if (this.current.question !== -1) {
+          if (this.current.poll !== -1) {
               await this._endPoll();
           }
           this._startPoll(question);

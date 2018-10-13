@@ -8,7 +8,7 @@ import globby from 'globby';
 import path from 'path';
 import passport from 'passport';
 import googlePassport from 'passport-google-oauth20';
-import lib from './utils/lib';
+import lib from './utils/Lib';
 import UsersRepo from './repos/UsersRepo';
 import UserSessionsRepo from './repos/UserSessionsRepo';
 

@@ -2,7 +2,7 @@
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import DraftsRepo from '../../../repos/DraftsRepo';
-import constants from '../../../utils/constants';
+import constants from '../../../utils/Constants';
 
 import type { APIDraft } from '../APITypes';
 

@@ -1,7 +1,7 @@
 // @flow
 import AppDevRouter from '../../utils/AppDevRouter';
 import SessionsRepo from '../../repos/SessionsRepo';
-import constants from '../../utils/constants';
+import constants from '../../utils/Constants';
 
 class GenerateCodeRouter extends AppDevRouter<Object> {
     constructor() {

@@ -10,7 +10,7 @@ import Base from './Base';
 import Draft from './Draft';
 import Question from './Question';
 import Session from './Session';
-import appDevUtils from '../utils/appDevUtils';
+import appDevUtils from '../utils/AppDevUtils';
 
 @Entity('users')
 /**

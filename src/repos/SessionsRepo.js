@@ -4,8 +4,8 @@ import Poll from '../models/Poll';
 import Question from '../models/Question';
 import Session from '../models/Session';
 import User from '../models/User';
-import appDevUtils from '../utils/appDevUtils';
-import constants from '../utils/constants';
+import appDevUtils from '../utils/AppDevUtils';
+import constants from '../utils/Constants';
 import UsersRepo from './UsersRepo';
 
 const db = (): Repository<Session> => getConnectionManager().get().getRepository(Session);
