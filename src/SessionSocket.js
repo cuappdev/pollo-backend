@@ -45,8 +45,9 @@ type Answer = {
  */
 type CurrentState = {
   poll: number,
-  results: {}, // {'A': {'text': 'blue', 'count': 1}}
-  answers: {} // id = client id, answer = current choice
+  results: {}, // MC: {'A': {'text': 'blue', 'count': 1}}, FR: {1: {'text': 'blue', 'count': 1}}
+  answers: {}, // id = client id to answer choice for MC and array of answer ids for FR
+  upvotes: {} // id = client id to array of answer ids
 }
 
 /**
@@ -104,6 +105,7 @@ export default class SessionSocket {
       poll: -1, // id of current poll object
       results: {},
       answers: {},
+      upvotes: {},
   }
 
   constructor({ session, nsp, onClose }: SessionSocketConfig) {
@@ -220,22 +222,28 @@ export default class SessionSocket {
 
           const nextState = { ...this.current };
           const prev = nextState.answers[answer.googleId];
-          nextState.answers[answer.googleId] = answer.choice; // update/add response
-          if (prev) { // if truthy
-              // has selected something before
-              nextState.results[prev].count -= 1;
-              if (poll && poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
-                  if (nextState.results[prev].count <= 0) {
-                      delete nextState.results[prev];
-                  }
+
+          if (poll.type === constants.QUESTION_TYPES.MULTIPLE_CHOICE) {
+              nextState.answers[answer.googleId] = answer.choice; // update/add response
+              if (prev) { // if truthy
+                  // has selected something before
+                  nextState.results[prev].count -= 1;
               }
+          } else if (prev) {
+              // User submitted another FR answer
+              nextState.answers[answer.googleId].push(answer.id);
+          } else {
+              // User submitted first FR answer
+              nextState.answers[answer.googleId] = [answer.id];
           }
 
-          const curTally = nextState.results[answer.choice];
-          if (curTally) { // if truthy
-              nextState.results[answer.choice].count += 1;
+          const key = poll.type === constants.QUESTION_TYPES.MULTIPLE_CHOICE
+              ? answer.choice : answer.id;
+
+          if (nextState.results[key]) { // if truthy
+              nextState.results[key].count += 1;
           } else {
-              nextState.results[answer.choice] = { text: answer.text, count: 1 };
+              nextState.results[key] = { text: answer.text, count: 1 };
           }
 
           this.current = nextState;
@@ -245,33 +253,22 @@ export default class SessionSocket {
           }
       });
 
-      client.on('server/poll/upvote', (answerObject: Object) => {
-          const answer: Answer = {
-              id: this.answerId,
-              googleId: answerObject.googleId,
-              poll: answerObject.poll,
-              choice: answerObject.choice,
-              text: answerObject.text,
-          };
-          this.answerId += 1;
+      client.on('server/poll/upvote', (answerId: id) => {
           const poll = this._currentPoll();
           if (poll === null || poll === undefined) {
               console.log(`Client ${client.id} tried to answer with no active poll`);
               return;
           }
-          if (poll.id !== answer.poll) {
-              console.log(`Poll ${answer.poll} is not the current poll`);
-              return;
-          }
-
           const nextState = { ...this.current };
-          const curTally = nextState.results[answer.choice];
+          const curTally = nextState.results[answerId];
           if (curTally) {
-              nextState.results[answer.choice].count += 1;
-          } else {
-              nextState.results[answer.choice] = { text: answer.text, count: 1 };
+              nextState.results[answerId].count += 1;
+              if (nextState.upvotes[client.id]) {
+                  nextState.upvotes[client.id].push(answerId);
+              } else {
+                  nextState.upvotes[client.id] = [answerId];
+              }
           }
-
           this.current = nextState;
           this.nsp.to('admins').emit('admin/poll/updateTally', this.current);
           if (poll.shared || poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
@@ -380,6 +377,7 @@ export default class SessionSocket {
       }
       this.current.results = results;
       this.current.answers = {};
+      this.current.upvotes = {};
 
       this.nsp.to('users').emit('user/poll/start', { poll });
       this.nsp.to('users').emit('user/question/start', { question: poll }); // v1
