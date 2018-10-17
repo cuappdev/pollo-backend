@@ -145,7 +145,7 @@ export default class SessionSocket {
               }
               this._setupAdminEvents(client);
               client.join('admins');
-              client.emit('user/count', { count: this.usersConnected });
+              this.nsp.to('admins').emit('user/count', { count: this.usersConnected });
 
               const currentPoll = this._currentPoll();
               if (currentPoll) {
@@ -336,6 +336,7 @@ export default class SessionSocket {
           this.userGoogleIds = [];
 
           if (this.nsp.connected.length === 0) {
+              await this._endPoll();
               this.onClose();
           }
           this.usersConnected -= 1;
@@ -496,15 +497,15 @@ export default class SessionSocket {
       });
 
       // End poll
-      client.on('server/poll/end', () => {
+      client.on('server/poll/end', async () => {
           console.log('ending question');
-          this._endPoll();
+          await this._endPoll();
       });
 
       // v1
-      client.on('server/question/end', () => {
+      client.on('server/question/end', async () => {
           console.log('ending question');
-          this._endPoll();
+          await this._endPoll();
       });
 
       client.on('disconnect', async () => {
@@ -514,6 +515,7 @@ export default class SessionSocket {
           this.adminGoogleIds = [];
 
           if (this.nsp.connected.length === 0) {
+              await this._endPoll();
               this.onClose();
           }
       });
