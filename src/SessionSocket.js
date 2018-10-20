@@ -46,8 +46,8 @@ type Answer = {
 type CurrentState = {
   poll: number,
   results: {}, // MC: {'A': {'text': 'blue', 'count': 1}}, FR: {1: {'text': 'blue', 'count': 1}}
-  answers: {}, // id = client id to answer choice for MC and array of answer ids for FR
-  upvotes: {} // id = client id to array of answer ids
+  answers: {}, // id = google id to answer choice for MC and array of answer ids for FR
+  upvotes: {} // id = google id to array of answer ids
 }
 
 /**
@@ -152,6 +152,7 @@ export default class SessionSocket {
               const currentPoll = this._currentPoll();
               if (currentPoll) {
                   client.emit('admin/poll/start', { poll: currentPoll });
+                  client.emit('admin/poll/updateTally/live', this.current);
               }
               break;
           }
@@ -171,7 +172,8 @@ export default class SessionSocket {
               const currentPoll = this._currentPoll();
               if (currentPoll) {
                   client.emit('user/poll/start', { poll: currentPoll });
-                  client.emit('user/question/start', { question: currentPoll }); // v1
+                  client.emit('user/question/start', { question: currentPoll }); //     v1
+                  client.emit('user/poll/results/live', this.current);
               }
               break;
           }
@@ -225,22 +227,19 @@ export default class SessionSocket {
 
           if (poll.type === constants.QUESTION_TYPES.MULTIPLE_CHOICE) {
               nextState.answers[answer.googleId] = answer.choice; // update/add response
-              if (prev) { // if truthy
-                  // has selected something before
+              if (prev) { // User selected something before
                   nextState.results[prev].count -= 1;
               }
-          } else if (prev) {
-              // User submitted another FR answer
+          } else if (prev) { // User submitted another FR answer
               nextState.answers[answer.googleId].push(answer.id);
-          } else {
-              // User submitted first FR answer
+          } else { // User submitted first FR answer
               nextState.answers[answer.googleId] = [answer.id];
           }
 
           const key = poll.type === constants.QUESTION_TYPES.MULTIPLE_CHOICE
               ? answer.choice : answer.id;
 
-          if (nextState.results[key]) { // if truthy
+          if (nextState.results[key]) { // if answer already in results
               nextState.results[key].count += 1;
           } else {
               nextState.results[key] = { text: answer.text, count: 1 };
@@ -253,20 +252,21 @@ export default class SessionSocket {
           }
       });
 
-      client.on('server/poll/upvote', (answerId: id) => {
+      client.on('server/poll/upvote', (upvoteObject: Object) => {
+          const { answerId, googleId } = upvoteObject;
           const poll = this._currentPoll();
           if (poll === null || poll === undefined) {
-              console.log(`Client ${client.id} tried to answer with no active poll`);
+              console.log(`Client with googleId ${googleId} tried to answer with no active poll`);
               return;
           }
           const nextState = { ...this.current };
           const curTally = nextState.results[answerId];
           if (curTally) {
               nextState.results[answerId].count += 1;
-              if (nextState.upvotes[client.id]) {
-                  nextState.upvotes[client.id].push(answerId);
+              if (nextState.upvotes[googleId]) {
+                  nextState.upvotes[googleId].push(answerId);
               } else {
-                  nextState.upvotes[client.id] = [answerId];
+                  nextState.upvotes[googleId] = [answerId];
               }
           }
           this.current = nextState;

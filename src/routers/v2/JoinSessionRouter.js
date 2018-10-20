@@ -35,11 +35,6 @@ class JoinSessionRouter extends AppDevRouter<APISession> {
             throw new Error(`No session with id ${id} found.`);
         }
 
-        const userSessions = await UsersRepo.getSessionsById(req.user.id, 'admin');
-        if (userSessions.filter(Boolean).find(s => session && s.id === session.id)) {
-            throw new Error('Cannot join session you are an admin of');
-        }
-
         if (!req.app.sessionManager.isLive(code, id)) {
             await req.app.sessionManager.startNewSession(session);
         }
