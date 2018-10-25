@@ -1,0 +1,6 @@
+#!/bin/bash
+echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+docker build -t pollo --no-cache .
+docker tag $(docker images -q pollo) cornellappdev/pollo:"$TRAVIS_COMMIT"
+docker push cornellappdev/pollo:"$TRAVIS_COMMIT"
+
