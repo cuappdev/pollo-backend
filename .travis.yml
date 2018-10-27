@@ -19,7 +19,7 @@ deploy:
     provider: script
     script: bash docker_push
     on:
-        branch: deploy
+        branch: release 
 script:
     - npm run start &
     - sleep 10; npm run test
