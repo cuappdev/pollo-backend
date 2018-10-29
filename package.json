@@ -55,6 +55,7 @@
     "eslint-plugin-standard": "^3.1.0",
     "express": "^4.15.3",
     "globby": "^6.1.0",
+    "google-auth-library": "^2.0.0",
     "mysql": "^2.13.0",
     "passport": "^0.4.0",
     "passport-google-oauth20": "^1.0.0",
