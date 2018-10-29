@@ -8,6 +8,7 @@ import globby from 'globby';
 import path from 'path';
 import passport from 'passport';
 import googlePassport from 'passport-google-oauth20';
+import { OAuth2Client } from 'google-auth-library';
 import lib from './utils/Lib';
 import UsersRepo from './repos/UsersRepo';
 import UserSessionsRepo from './repos/UserSessionsRepo';
@@ -31,6 +32,7 @@ class API {
 
   auth(): void {
       const GoogleStrategy = googlePassport.Strategy;
+      const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
       passport.serializeUser((user, done) => {
           done(null, user);
@@ -80,26 +82,38 @@ class API {
       this.express.get('/error',
           (req, res) => res.send('Error authenticating!'));
       this.express.post('/api/v2/auth/mobile', async (req, res) => {
-          const googleId = req.body.userId;
-          const first = req.body.givenName;
-          const last = req.body.familyName;
-          const { email } = req.body;
+          client.verifyIdToken({
+              idToken: req.body.idToken,
+              aud: process.env.GOOGLE_CLIENT_ID, // audience
+          })
+              .then(login => sendResponse(login))
+              .catch((error) => {
+                  res.redirect('/error');
+              });
 
-          let user = await UsersRepo.getUserByGoogleId(googleId);
-          if (!user) {
-              user = await UsersRepo.createUserWithFields(googleId, first, last,
-                  email);
+          async function sendResponse(login) {
+              const payload = login.getPayload();
+              const googleId = payload.sub;
+              const first = payload.given_name;
+              const last = payload.family_name;
+              const { email } = payload;
+
+              let user = await UsersRepo.getUserByGoogleId(googleId);
+              if (!user) {
+                  user = await UsersRepo.createUserWithFields(googleId, first, last,
+                      email);
+              }
+
+              const session = await UserSessionsRepo
+                  .createOrUpdateSession(user, null, null);
+              const response = {
+                  accessToken: session.sessionToken,
+                  refreshToken: session.updateToken,
+                  sessionExpiration: session.expiresAt,
+                  isActive: session.isActive,
+              };
+              res.json({ success: true, data: response });
           }
-
-          const session = await UserSessionsRepo
-              .createOrUpdateSession(user, null, null);
-          const response = {
-              accessToken: session.sessionToken,
-              refreshToken: session.updateToken,
-              sessionExpiration: session.expiresAt,
-              isActive: session.isActive,
-          };
-          res.json({ success: true, data: response });
       });
   }
 
