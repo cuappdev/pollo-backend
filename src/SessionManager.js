@@ -94,7 +94,7 @@ class SessionManager {
           const isSession = x && x.session;
           return isSession ? x.session.code === sessionCode || x.session.id === id : false;
       });
-      return socket !== undefined;
+      return socket !== undefined ? socket.isLive : false;
   }
 }
 

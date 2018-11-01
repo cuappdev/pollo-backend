@@ -108,6 +108,13 @@ export default class SessionSocket {
       upvotes: {},
   }
 
+  /**
+   * Indicate whether session is live or not
+   * Becomes live when a poll is started
+   * Becomes inactive when no admin is connected to socket && no live poll
+   */
+  isLive = false
+
   constructor({ session, nsp, onClose }: SessionSocketConfig) {
       this.session = session;
       this.nsp = nsp;
@@ -379,6 +386,7 @@ export default class SessionSocket {
       this.current.results = results;
       this.current.answers = {};
       this.current.upvotes = {};
+      this.isLive = true;
 
       this.nsp.to('users').emit('user/poll/start', { poll });
       this.nsp.to('users').emit('user/question/start', { question: poll }); // v1
@@ -511,6 +519,8 @@ export default class SessionSocket {
           await SessionsRepo.addUsersByGoogleIds(this.session.id,
               this.adminGoogleIds, 'admin');
           this.adminGoogleIds = [];
+
+          if (this.current.poll === -1) this.isLive = false;
 
           if (this.nsp.connected.length === 0) {
               await this._endPoll();
