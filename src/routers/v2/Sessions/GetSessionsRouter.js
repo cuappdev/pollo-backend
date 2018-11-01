@@ -25,6 +25,7 @@ class GetSessionsRouter extends AppDevRouter<Object> {
                     name: session.name,
                     code: session.code,
                     updatedAt: await SessionsRepo.latestActivityBySessionId(session.id),
+                    isLive: await req.app.sessionManager.isLive(session.code),
                 },
             }));
         return Promise.all(nodes).then(n => n);
