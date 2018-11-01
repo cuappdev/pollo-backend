@@ -34,7 +34,7 @@ class JoinSessionRouter extends AppDevRouter<APISession> {
             throw new Error(`No session with id ${id} found.`);
         }
 
-        if (!req.app.sessionManager.isLive(code, id)) {
+        if (req.app.sessionManager.findSocket(code, id) === undefined) {
             await req.app.sessionManager.startNewSession(session);
         }
 

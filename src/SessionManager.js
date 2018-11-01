@@ -83,17 +83,28 @@ class SessionManager {
   }
 
   /**
+   * Find the session's socket
+   * @function
+   * @param {string} [sessionCode] - Code of session to find
+   * @param {number} [id] - ID of sesssion to find
+   * @return {socket} Socket of the session
+   */
+  findSocket(sessionCode: ?string, id: ?number): SocketIO.socket {
+      return this.sessionSockets.find((x) => {
+          if (x && x.session) return x.session.code === sessionCode || x.session.id === id;
+          return false;
+      });
+  }
+
+  /**
    * Determines if a session is live
    * @function
    * @param {string} [sessionCode] - Code of session to check
-   * @param {number} [id] - Id of sesssion to check
+   * @param {number} [id] - ID of sesssion to check
    * @return {boolean} Whether the session is live
    */
   isLive(sessionCode: ?string, id: ?number): boolean {
-      const socket = this.sessionSockets.find((x) => {
-          const isSession = x && x.session;
-          return isSession ? x.session.code === sessionCode || x.session.id === id : false;
-      });
+      const socket = this.findSocket(sessionCode, id);
       return socket !== undefined ? socket.isLive : false;
   }
 }
