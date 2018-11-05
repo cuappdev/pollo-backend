@@ -1,6 +1,7 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
+import LogUtils from '../../../utils/LogUtils';
 import SessionsRepo from '../../../repos/SessionsRepo';
 import constants from '../../../utils/Constants';
 
@@ -20,20 +21,20 @@ class UpdateSessionRouter extends AppDevRouter<APISession> {
         const sessionId = req.params.id;
         const { user } = req;
 
-        if (!name) throw new Error('No fields specified to update.');
+        if (!name) throw LogUtils.logError('No fields specified to update.');
 
         let session = await SessionsRepo.getSessionById(sessionId);
         if (!session) {
-            throw new Error(`Session with id ${sessionId} was not found!`);
+            throw LogUtils.logError(`Session with id ${sessionId} was not found!`);
         }
 
         if (!await SessionsRepo.isAdmin(sessionId, user)) {
-            throw new Error('You are not authorized to update this session!');
+            throw LogUtils.logError('You are not authorized to update this session!');
         }
 
         session = await SessionsRepo.updateSessionById(sessionId, name);
         if (!session) {
-            throw new Error(`Session with id ${sessionId} was not found!`);
+            throw LogUtils.logError(`Session with id ${sessionId} was not found!`);
         }
         return {
             node: {

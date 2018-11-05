@@ -2,6 +2,7 @@
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/Constants';
+import LogUtils from '../../utils/LogUtils';
 import SessionsRepo from '../../repos/SessionsRepo';
 
 class EndSessionRouter extends AppDevRouter<Object> {
@@ -18,11 +19,11 @@ class EndSessionRouter extends AppDevRouter<Object> {
 
         const session = await SessionsRepo.getSessionById(id);
         if (!session) {
-            throw new Error(`No session with id ${id} found.`);
+            throw LogUtils.logError(`No session with id ${id} found.`);
         }
 
         if (!(await SessionsRepo.isAdmin(id, req.user))) {
-            throw new Error('Not authorized to end session.');
+            throw LogUtils.logError('Not authorized to end session.');
         }
 
         if (save === 'false' || save === '0') {

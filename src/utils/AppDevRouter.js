@@ -13,6 +13,7 @@ import AppDevResponse from './AppDevResponse';
 
 import constants from './Constants';
 import lib from './Lib';
+import LogUtils from './LogUtils';
 
 /**
  * T is the response type for AppDevRouter
@@ -25,7 +26,7 @@ export default class AppDevRouter<T: Object> {
   authenticated: boolean;
 
   getPath(): string {
-      throw new Error('You must implement getPath() with a valid path!');
+      throw LogUtils.logError('You must implement getPath() with a valid path!');
   }
 
   constructor(type: RequestType, auth: ?boolean) {
@@ -46,11 +47,11 @@ export default class AppDevRouter<T: Object> {
 
       // Error handle path
       if (path.length < 2) {
-          throw new Error('Invalid path!');
+          throw LogUtils.logError('Invalid path!');
       } else if (path[0] !== '/') {
-          throw new Error('Path must start with a \'/\'!');
+          throw LogUtils.logError('Path must start with a \'/\'!');
       } else if (path[path.length - 1] !== '/') {
-          throw new Error('Path must end with a \'/\'!');
+          throw LogUtils.logError('Path must end with a \'/\'!');
       }
       // Attach content to router
       if (this.authenticated) {
@@ -96,7 +97,7 @@ export default class AppDevRouter<T: Object> {
           res.json(new AppDevResponse(true, content));
       } catch (e) {
           if (e.message === 1) {
-              throw new Error('You must implement content()!');
+              throw LogUtils.logError('You must implement content()!');
           } else {
               console.error(e);
               res.json(new AppDevResponse(false, { errors: [e.message] }));

@@ -1,6 +1,7 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
+import LogUtils from '../../../utils/LogUtils';
 import SessionsRepo from '../../../repos/SessionsRepo';
 import constants from '../../../utils/Constants';
 
@@ -18,10 +19,10 @@ class DeleteSessionRouter extends AppDevRouter<Object> {
         const { user } = req;
 
         const session = await SessionsRepo.getSessionById(sessionId);
-        if (!session) throw new Error(`Session with id ${sessionId} not found!`);
+        if (!session) throw LogUtils.logError(`Session with id ${sessionId} not found!`);
 
         if (!await SessionsRepo.isAdmin(sessionId, user)) {
-            throw new Error('You are not authorized to delete this session!');
+            throw LogUtils.logError('You are not authorized to delete this session!');
         }
 
         await SessionsRepo.deleteSessionById(sessionId);
