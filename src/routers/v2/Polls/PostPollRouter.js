@@ -1,6 +1,7 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
+import LogUtils from '../../../utils/LogUtils';
 import PollsRepo from '../../../repos/PollsRepo';
 import SessionsRepo from '../../../repos/SessionsRepo';
 import constants from '../../../utils/Constants';
@@ -26,14 +27,14 @@ class PostPollRouter extends AppDevRouter<Object> {
         if (!results) results = {};
         if (shared === null) shared = false;
         if (type !== 'FREE_RESPONSE' && type !== 'MULTIPLE_CHOICE') {
-            throw new Error('Valid poll type not found');
+            throw LogUtils.logError('Valid poll type not found');
         }
 
         const session = await SessionsRepo.getSessionById(sessionId);
-        if (!session) throw new Error(`Couldn't find session with id ${sessionId}`);
+        if (!session) throw LogUtils.logError(`Couldn't find session with id ${sessionId}`);
 
         if (!await SessionsRepo.isAdmin(sessionId, user)) {
-            throw new Error('You are not authorized to post a poll!');
+            throw LogUtils.logError('You are not authorized to post a poll!');
         }
 
         const poll = await PollsRepo.createPoll(text, session, results, shared, type);

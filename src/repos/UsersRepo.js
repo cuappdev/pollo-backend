@@ -1,5 +1,6 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
+import LogUtils from '../utils/LogUtils';
 import Session from '../models/Session';
 import User from '../models/User';
 import UserSessionsRepo from './UserSessionsRepo';
@@ -18,7 +19,7 @@ const createDummyUser = async (id: string): Promise<User> => {
     try {
         return await db().persist(User.dummy(id));
     } catch (e) {
-        throw new Error('Problem creating user!');
+        throw LogUtils.logError('Problem creating user!');
     }
 };
 
@@ -32,7 +33,7 @@ const createUser = async (fields: Object): Promise<User> => {
     try {
         return await db().persist(User.fromGoogleCreds(fields));
     } catch (e) {
-        throw new Error('Problem creating user!');
+        throw LogUtils.logError('Problem creating user!');
     }
 };
 
@@ -58,7 +59,7 @@ const createUserWithFields = async (googleId: string, firstName: string,
         await db().persist(user);
         return user;
     } catch (e) {
-        throw new Error('Problem creating user!');
+        throw LogUtils.logError('Problem creating user!');
     }
 };
 
@@ -72,7 +73,7 @@ const getUserById = async (id: number): Promise<?User> => {
     try {
         return await db().findOneById(id);
     } catch (e) {
-        throw new Error(`Problem getting user by id: ${id}!`);
+        throw LogUtils.logError(`Problem getting user by id: ${id}!`);
     }
 };
 
@@ -88,7 +89,7 @@ const getUserByGoogleId = async (googleId: string): Promise<?User> => {
             .where('users.googleId = :googleId', { googleId })
             .getOne();
     } catch (e) {
-        throw new Error('Problem getting user by google ID!');
+        throw LogUtils.logError('Problem getting user by google ID!');
     }
 };
 
@@ -102,7 +103,7 @@ const getUsers = async (): Promise<Array<?User>> => {
         return await db().createQueryBuilder('users')
             .getMany();
     } catch (e) {
-        throw new Error('Problem getting users!');
+        throw LogUtils.logError('Problem getting users!');
     }
 };
 
@@ -126,7 +127,7 @@ Promise<?Array<User>> => {
             .where(query)
             .getMany();
     } catch (e) {
-        throw new Error('Problem getting users from ids!');
+        throw LogUtils.logError('Problem getting users from ids!');
     }
 };
 
@@ -150,7 +151,7 @@ const getUsersByGoogleIds = async (googleIds: string[], filter: ?string[]):
             .where(`users.googleId = ANY('${ids}'::text[])`)
             .getMany();
     } catch (e) {
-        throw new Error('Problem getting users from googleIds!');
+        throw LogUtils.logError('Problem getting users from googleIds!');
     }
 };
 
@@ -165,7 +166,7 @@ const deleteUserById = async (id: number) => {
         await UserSessionsRepo.deleteSessionFromUserId(id);
         await db().remove(user);
     } catch (e) {
-        throw new Error(`Problem deleting user by id: ${id}!`);
+        throw LogUtils.logError(`Problem deleting user by id: ${id}!`);
     }
 };
 
@@ -193,7 +194,7 @@ const getSessionsById = async (id: number, role: ?string):
         }
         return user.memberSessions.concat(user.adminSessions);
     } catch (e) {
-        throw new Error(`Problem getting member sessions for user: ${id}`);
+        throw LogUtils.logError(`Problem getting member sessions for user: ${id}`);
     }
 };
 

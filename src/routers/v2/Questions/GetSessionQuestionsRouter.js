@@ -1,6 +1,7 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
+import LogUtils from '../../../utils/LogUtils';
 import SessionsRepo from '../../../repos/SessionsRepo';
 import constants from '../../../utils/Constants';
 
@@ -17,7 +18,7 @@ class GetSessionQuestionsRouter extends AppDevRouter<Object> {
         const { id } = req.params;
         const questions = await SessionsRepo.getQuestions(id);
         if (!questions) {
-            throw new Error(`Problem getting questions from session id: ${id}!`);
+            throw LogUtils.logError(`Problem getting questions from session id: ${id}!`);
         }
         // Date mapped to list of questions
         const questionsByDate = {};

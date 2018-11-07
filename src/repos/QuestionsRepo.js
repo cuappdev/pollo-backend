@@ -3,6 +3,7 @@ import { getConnectionManager, Repository } from 'typeorm';
 import Session from '../models/Session';
 import User from '../models/User';
 import Question from '../models/Question';
+import LogUtils from '../utils/LogUtils';
 
 const db = (): Repository<Question> => getConnectionManager().get().getRepository(Question);
 
@@ -25,7 +26,7 @@ const createQuestion = async (text: string, session: Session, user: User):
         await db().persist(question);
         return question;
     } catch (e) {
-        throw new Error('Problem creating question!');
+        throw LogUtils.logError('Problem creating question!');
     }
 };
 
@@ -39,7 +40,7 @@ const getQuestionById = async (id: number): Promise<?Question> => {
     try {
         return await db().findOneById(id);
     } catch (e) {
-        throw new Error(`Problem getting question by id: ${id}`);
+        throw LogUtils.logError(`Problem getting question by id: ${id}`);
     }
 };
 
@@ -53,7 +54,7 @@ const deleteQuestionById = async (id: number) => {
         const question = await db().findOneById(id);
         await db().remove(question);
     } catch (e) {
-        throw new Error(`Problem deleting question with id: ${id}`);
+        throw LogUtils.logError(`Problem deleting question with id: ${id}`);
     }
 };
 
@@ -79,7 +80,7 @@ const updateQuestionById = async (id: number, text: string):
 
         return await db().findOneById(id);
     } catch (e) {
-        throw new Error(`Problem updating question by id: ${id}`);
+        throw LogUtils.logError(`Problem updating question by id: ${id}`);
     }
 };
 
@@ -97,7 +98,7 @@ const getSessionFromQuestionId = async (id: number) : Promise<?Session> => {
             .getOne();
         return question.session;
     } catch (e) {
-        throw new Error(`Problem getting session from question with id: ${id}`);
+        throw LogUtils.logError(`Problem getting session from question with id: ${id}`);
     }
 };
 
@@ -117,7 +118,7 @@ const isOwnerById = async (id: number, user: User) : Promise<?boolean> => {
 
         return user && question.user.id === user.id;
     } catch (e) {
-        throw new Error(`Could not verify ownership of question with id: ${id}`);
+        throw LogUtils.logError(`Could not verify ownership of question with id: ${id}`);
     }
 };
 

@@ -1,6 +1,7 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
+import LogUtils from '../../../utils/LogUtils';
 import QuestionsRepo from '../../../repos/QuestionsRepo';
 import SessionsRepo from '../../../repos/SessionsRepo';
 import constants from '../../../utils/Constants';
@@ -20,11 +21,11 @@ class DeleteQuestionRouter extends AppDevRouter<Object> {
 
         const session = await QuestionsRepo.getSessionFromQuestionId(questionId);
         if (!session) {
-            throw new Error(`Couldn't find session with question ${questionId}`);
+            throw LogUtils.logError(`Couldn't find session with question ${questionId}`);
         }
         if (!await SessionsRepo.isAdmin(session.id, user)
           && !await QuestionsRepo.isOwnerById(questionId, user)) {
-            throw new Error('You are not authorized to delete this question!');
+            throw LogUtils.logError('You are not authorized to delete this question!');
         }
         await QuestionsRepo.deleteQuestionById(questionId);
         return null;

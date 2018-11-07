@@ -1,6 +1,7 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
 import Draft from '../models/Draft';
+import LogUtils from '../utils/LogUtils';
 import User from '../models/User';
 
 const db = (): Repository<Draft> => getConnectionManager().get().getRepository(Draft);
@@ -24,7 +25,7 @@ const createDraft = async (text: string, options: string[], user: User):
         await db().persist(draft);
         return draft;
     } catch (e) {
-        throw new Error('Problem creating draft!');
+        throw LogUtils.logError('Problem creating draft!');
     }
 };
 
@@ -42,7 +43,7 @@ const getDraft = async (id: number): Promise<Draft> => {
             .setParameters({ draftId: id })
             .getOne();
     } catch (e) {
-        throw new Error(`Problem getting draft with id: ${id}`);
+        throw LogUtils.logError(`Problem getting draft with id: ${id}`);
     }
 };
 
@@ -59,7 +60,7 @@ const getDraftsByUser = async (id: number): Promise<Array<?Draft>> => {
             .setParameters({ userId: id })
             .getMany();
     } catch (e) {
-        throw new Error(`Problem getting drafts for user with id: ${id}`);
+        throw LogUtils.logError(`Problem getting drafts for user with id: ${id}`);
     }
 };
 
@@ -86,7 +87,7 @@ const updateDraft = async (id: number, text: ?string, options: ?string[]):
         await db().persist(draft);
         return draft;
     } catch (e) {
-        throw new Error(`Problem updating draft with id: ${id}`);
+        throw LogUtils.logError(`Problem updating draft with id: ${id}`);
     }
 };
 
@@ -100,7 +101,7 @@ const deleteDraft = async (id: number) => {
         const draft = await db().findOneById(id);
         await db().remove(draft);
     } catch (e) {
-        throw new Error(`Problem deleting draft with id: ${id}`);
+        throw LogUtils.logError(`Problem deleting draft with id: ${id}`);
     }
 };
 
@@ -120,7 +121,7 @@ const getOwnerById = async (id: number): Promise<?User> => {
 
         return draft.user;
     } catch (e) {
-        throw new Error(`Problem getting owner of draft with id: ${id}`);
+        throw LogUtils.logError(`Problem getting owner of draft with id: ${id}`);
     }
 };
 
