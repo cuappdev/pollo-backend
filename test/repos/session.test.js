@@ -180,8 +180,8 @@ test('Get Polls from Session', async () => {
     let polls = await SessionsRepo.getPolls(id);
     expect(polls.length).toEqual(0);
 
-    const poll = await PollsRepo.createPoll('Poll', session, {}, true, 'MULTIPLE_CHOICE');
-    const poll2 = await PollsRepo.createPoll('', session, {}, false, 'FREE_RESPONSE', {});
+    const poll = await PollsRepo.createPoll('Poll', session, {}, true, 'MULTIPLE_CHOICE', '');
+    const poll2 = await PollsRepo.createPoll('', session, {}, false, 'FREE_RESPONSE', '', {});
     polls = await SessionsRepo.getPolls(id, true);
     expect(polls.length).toEqual(1);
     expect(polls[0].id).toBe(poll.id);

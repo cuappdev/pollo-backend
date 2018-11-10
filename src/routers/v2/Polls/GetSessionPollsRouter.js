@@ -33,6 +33,7 @@ class GetSessionPollsRouter extends AppDevRouter<Object> {
                 shared: poll.shared,
                 type: poll.type,
                 answer: isAdmin ? null : poll.userAnswers[req.user.googleId],
+                correctAnswer: poll.correctAnswer,
             };
             if (pollsByDate[date]) {
                 pollsByDate[date].push(p);

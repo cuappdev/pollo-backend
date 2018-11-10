@@ -23,7 +23,8 @@ type Poll = {
   text: string,
   type: string,
   options: ?string[],
-  shared: boolean
+  shared: boolean,
+  correctAnswer: string,
 }
 
 /** Answer object used in SessionSockets */
@@ -402,7 +403,8 @@ export default class SessionSocket {
           return;
       }
       this.lastPoll = await PollsRepo.createPoll(poll.text, this.session,
-          this.current.results, poll.shared, poll.type, this.current.answers);
+          this.current.results, poll.shared, poll.type, poll.correctAnswer,
+          this.current.answers);
       this.lastState = this.current;
       const pollNode = {
           id: this.lastPoll.id,
@@ -410,6 +412,7 @@ export default class SessionSocket {
           type: poll.type,
           options: poll.options,
           shared: poll.shared,
+          correctAnswer: poll.correctAnswer,
       };
       this.nsp.to('admins').emit('admin/poll/ended', { poll: pollNode });
       this.nsp.to('users').emit('user/poll/end', { poll });
@@ -449,6 +452,7 @@ export default class SessionSocket {
               type: pollObject.type,
               options: pollObject.options,
               shared: pollObject.shared,
+              correctAnswer: pollObject.correctAnswer,
           };
           this.pollId += 1;
           console.log('starting', poll);
@@ -466,6 +470,7 @@ export default class SessionSocket {
               type: questionObject.type,
               options: questionObject.options,
               shared: false,
+              correctAnswer: questionObject.correctAnswer,
           };
           this.pollId += 1;
           console.log('starting', question);

@@ -23,22 +23,25 @@ beforeAll(async () => {
 });
 
 test('Create Poll', async () => {
-    const poll = await PollsRepo.createPoll('Poll', session, {}, true, 'MULTIPLE_CHOICE');
+    const poll = await PollsRepo
+        .createPoll('Poll', session, {}, true, 'MULTIPLE_CHOICE', 'A');
     expect(poll.text).toBe('Poll');
     expect(poll.session.id).toBe(session.id);
     expect(poll.results).toEqual({});
     expect(poll.shared).toBe(true);
     expect(poll.type).toBe('MULTIPLE_CHOICE');
     expect(poll.userAnswers).toEqual({});
+    expect(poll.correctAnswer).toBe('A');
     ({ id } = poll);
 
-    const poll2 = await PollsRepo.createPoll('', session, {}, false, 'FREE_RESPONSE', {});
+    const poll2 = await PollsRepo.createPoll('', session, {}, false, 'FREE_RESPONSE', '', {});
     expect(poll2.text).toBe('');
     expect(poll2.session.id).toBe(session.id);
     expect(poll2.results).toEqual({});
     expect(poll2.shared).toBe(false);
     expect(poll2.type).toBe('FREE_RESPONSE');
     expect(poll2.userAnswers).toEqual({});
+    expect(poll2.correctAnswer).toBe('');
     id2 = poll2.id;
 });
 
@@ -70,8 +73,8 @@ test('Get Session from Poll', async () => {
 });
 
 test('Get Polls from Session', async () => {
-    const poll = await PollsRepo
-        .createPoll('Another poll', session, {}, true, 'FREE_RESPONSE');
+    await PollsRepo
+        .createPoll('Another poll', session, {}, true, 'FREE_RESPONSE', '');
     let polls = await SessionsRepo.getPolls(session.id, false);
     expect(polls.length).toBe(3);
     polls = await SessionsRepo.getPolls(session.id, true);

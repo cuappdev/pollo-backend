@@ -14,11 +14,12 @@ const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Po
  * @param {json} results - Results of poll
  * @param {boolean} canShare - Whether the results of the poll are shared
  * @param {string} type - Type of poll, see Poll class for more info
+ * @param {string} correctAnswer - Correct answer choice for MC
  * @param {json} [userAnswers] - Json mapping users to their answers
  * @return {Poll} New poll created
  */
 const createPoll = async (text: string, session: ?Session, results: json,
-    canShare: boolean, type: string, userAnswers: ?json):
+    canShare: boolean, type: string, correctAnswer: string, userAnswers: ?json):
   Promise <Poll> => {
     try {
         const poll = new Poll();
@@ -27,6 +28,7 @@ const createPoll = async (text: string, session: ?Session, results: json,
         poll.results = results;
         poll.shared = canShare;
         poll.type = type;
+        poll.correctAnswer = correctAnswer;
         poll.userAnswers = userAnswers || {};
 
         await db().persist(poll);

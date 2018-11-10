@@ -20,7 +20,7 @@ class PostPollRouter extends AppDevRouter<Object> {
     async content(req: Request): Promise<{ node: APIPoll }> {
         const sessionId = req.params.id;
         let { text, results, shared } = req.body;
-        const { type } = req.body;
+        const { type, correctAnswer } = req.body;
         const { user } = req;
 
         if (!text) text = '';
@@ -37,7 +37,8 @@ class PostPollRouter extends AppDevRouter<Object> {
             throw LogUtils.logError('You are not authorized to post a poll!');
         }
 
-        const poll = await PollsRepo.createPoll(text, session, results, shared, type);
+        const poll = await PollsRepo
+            .createPoll(text, session, results, shared, type, correctAnswer);
 
         return {
             node: {
@@ -47,6 +48,7 @@ class PostPollRouter extends AppDevRouter<Object> {
                 shared: poll.shared,
                 type: poll.type,
                 answer: null,
+                correctAnswer: poll.correctAnswer,
             },
         };
     }
