@@ -49,6 +49,15 @@ class Poll extends Base {
   @Column('boolean')
   /** If the results of the poll is shared to all users */
   shared: boolean = true;
+
+  @Column('string')
+  /**
+   * Correct answer choice for MC.
+   * Empty string if FR or no correct answer chosen for MC.
+   * @example
+   * let correctAnswer = 'A'
+  */
+  correctAnswer: string = '';
 }
 
 export default Poll;
