@@ -3,16 +3,16 @@ import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/Constants';
 import LogUtils from '../../utils/LogUtils';
-import SessionsRepo from '../../repos/SessionsRepo';
-import type { APISession } from './APITypes';
+import GroupsRepo from '../../repos/GroupsRepo';
+import type { APIGroup } from './APITypes';
 
-class StartSessionRouter extends AppDevRouter<APISession> {
+class StartGroupRouter extends AppDevRouter<APIGroup> {
     constructor() {
         super(constants.REQUEST_TYPES.POST);
     }
 
     getPath(): string {
-        return '/start/session/';
+        return '/start/group/';
     }
 
     async content(req: Request) {
@@ -25,17 +25,17 @@ class StartSessionRouter extends AppDevRouter<APISession> {
             throw LogUtils.logError('Code required.');
         }
 
-        const session = await SessionsRepo.createSession(name, code, req.user);
-        await req.app.sessionManager.startNewSession(session);
+        const group = await GroupsRepo.createGroup(name, code, req.user);
+        await req.app.groupManager.startNewGroup(group);
 
         return {
             node: {
-                id: session.id,
-                name: session.name,
-                code: session.code,
+                id: group.id,
+                name: group.name,
+                code: group.code,
             },
         };
     }
 }
 
-export default new StartSessionRouter().router;
+export default new StartGroupRouter().router;

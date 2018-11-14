@@ -2,7 +2,7 @@
 import { getConnectionManager, json, Repository } from 'typeorm';
 import LogUtils from '../utils/LogUtils';
 import Poll from '../models/Poll';
-import Session from '../models/Session';
+import Group from '../models/Group';
 
 const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Poll);
 
@@ -10,7 +10,7 @@ const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Po
  * Create a poll and saves it to the db
  * @function
  * @param {string} text - Text of poll
- * @param {Session} [session] - Session that the poll belongs to
+ * @param {Group} [group] - Group that the poll belongs to
  * @param {json} results - Results of poll
  * @param {boolean} canShare - Whether the results of the poll are shared
  * @param {string} type - Type of poll, see Poll class for more info
@@ -18,13 +18,13 @@ const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Po
  * @param {json} [userAnswers] - Json mapping users to their answers
  * @return {Poll} New poll created
  */
-const createPoll = async (text: string, session: ?Session, results: json,
+const createPoll = async (text: string, group: ?Group, results: json,
     canShare: boolean, type: string, correctAnswer: string, userAnswers: ?json):
   Promise <Poll> => {
     try {
         const poll = new Poll();
         poll.text = text;
-        poll.session = session;
+        poll.group = group;
         poll.results = results;
         poll.shared = canShare;
         poll.type = type;
@@ -81,7 +81,7 @@ const updatePollById = async (id: number, text: ?string, results: ?json,
   Promise<?Poll> => {
     try {
         const poll = await db().createQueryBuilder('polls')
-            .leftJoinAndSelect('polls.session', 'session')
+            .leftJoinAndSelect('polls.group', 'group')
             .where('polls.id = :pollId')
             .setParameters({ pollId: id })
             .getOne();
@@ -99,20 +99,20 @@ const updatePollById = async (id: number, text: ?string, results: ?json,
 };
 
 /**
- * Get session that a poll belongs to
+ * Get group that a poll belongs to
  * @function
- * @param {number} id - id of poll we want to find the session for
- * @return {?Session} Session that the poll belongs to
+ * @param {number} id - id of poll we want to find the group for
+ * @return {?Group} Group that the poll belongs to
  */
-const getSessionFromPollId = async (id: number) : Promise<?Session> => {
+const getGroupFromPollId = async (id: number) : Promise<?Group> => {
     try {
         const poll = await db().createQueryBuilder('polls')
-            .leftJoinAndSelect('polls.session', 'session')
+            .leftJoinAndSelect('polls.group', 'group')
             .where('polls.id = :pollId', { pollId: id })
             .getOne();
-        return poll.session;
+        return poll.group;
     } catch (e) {
-        throw LogUtils.logError(`Problem getting session from quesiton with id: ${id}!`);
+        throw LogUtils.logError(`Problem getting group from quesiton with id: ${id}!`);
     }
 };
 
@@ -121,5 +121,5 @@ export default {
     deletePollById,
     getPollById,
     updatePollById,
-    getSessionFromPollId,
+    getGroupFromPollId,
 };

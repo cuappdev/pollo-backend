@@ -2,7 +2,7 @@
 import http from 'http';
 import API from './API';
 import dbConnection from './db/DbConnection';
-import SessionManager from './SessionManager';
+import GroupManager from './GroupManager';
 
 type Error = {
   errno?: number;
@@ -13,7 +13,7 @@ type Error = {
 
 const app: API = new API();
 const server: http.Server = http.createServer(app.express);
-app.express.sessionManager = new SessionManager(server);
+app.express.groupManager = new GroupManager(server);
 const port: number = 3000;
 
 const onError = (error: Error): void => {

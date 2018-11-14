@@ -3,7 +3,7 @@ import { Request } from 'express';
 import AppDevNodeRouter from '../../../utils/AppDevNodeRouter';
 import LogUtils from '../../../utils/LogUtils';
 import PollsRepo from '../../../repos/PollsRepo';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import GroupsRepo from '../../../repos/GroupsRepo';
 
 import type { APIPoll } from '../APITypes';
 
@@ -16,10 +16,10 @@ class GetPollRouter extends AppDevNodeRouter<APIPoll> {
         const poll = await PollsRepo.getPollById(id);
         if (!poll) throw LogUtils.logError(`Poll with id ${id} cannot be found`);
 
-        const session = await PollsRepo.getSessionFromPollId(poll.id);
-        if (!session) throw LogUtils.logError(`Session with id ${id} cannot be found`);
+        const group = await PollsRepo.getGroupFromPollId(poll.id);
+        if (!group) throw LogUtils.logError(`Group with id ${id} cannot be found`);
 
-        const isAdmin = await SessionsRepo.isAdmin(session.id, req.user);
+        const isAdmin = await GroupsRepo.isAdmin(group.id, req.user);
 
         return poll && {
             id: poll.id,

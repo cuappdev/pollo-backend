@@ -1,7 +1,7 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import GroupsRepo from '../../../repos/GroupsRepo';
 import UsersRepo from '../../../repos/UsersRepo';
 import constants from '../../../utils/Constants';
 
@@ -29,7 +29,7 @@ class PostPollRouter extends AppDevRouter<Object> {
             user = await UsersRepo.createDummyUser(deviceId);
         }
 
-        const poll = await SessionsRepo.createSession(name, code, user);
+        const poll = await GroupsRepo.createGroup(name, code, user);
 
         return {
             node: {

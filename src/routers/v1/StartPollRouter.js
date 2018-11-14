@@ -2,7 +2,7 @@
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/Constants';
-import SessionsRepo from '../../repos/SessionsRepo';
+import GroupsRepo from '../../repos/GroupsRepo';
 import type { APIPoll } from './APITypes';
 
 class StartPollRouter extends AppDevRouter<APIPoll> {
@@ -19,21 +19,21 @@ class StartPollRouter extends AppDevRouter<APIPoll> {
         let { name } = req.body;
 
         if (!name) name = '';
-        let poll = await SessionsRepo.getSessionById(id);
+        let poll = await GroupsRepo.getGroupById(id);
 
         if (!(id || code)) {
             throw new Error('Poll id, or code and device id required.');
         }
 
         if (!id) {
-            poll = await SessionsRepo.createSession(name, code, null);
+            poll = await GroupsRepo.createGroup(name, code, null);
         }
 
         if (!poll) {
             throw new Error(`No poll with id ${id} found.`);
         }
 
-        await req.app.sessionManager.startNewSession(poll);
+        await req.app.groupManager.startNewGroup(poll);
 
         return {
             node: {

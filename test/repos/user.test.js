@@ -1,4 +1,4 @@
-import SessionsRepo from '../../src/repos/SessionsRepo';
+import GroupsRepo from '../../src/repos/GroupsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
 import AppDevUtils from '../../src/utils/AppDevUtils';
@@ -7,8 +7,8 @@ let id;
 let id2;
 const googleId = AppDevUtils.randomCode(6);
 const googleId2 = AppDevUtils.randomCode(6);
-let session;
-let session2;
+let group;
+let group2;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
@@ -93,28 +93,28 @@ test('Get Users by googleId', async () => {
     expect(users.length).toEqual(0);
 });
 
-test('Get Sessions', async () => {
+test('Get Groups', async () => {
     const user = await UsersRepo.getUserById(id);
-    const code = await SessionsRepo.createCode();
-    session = await SessionsRepo.createSession('name', code);
-    const adminSessions1 = await UsersRepo.getSessionsById(id, 'admin');
-    const memberSessions1 = await UsersRepo.getSessionsById(id, 'member');
-    expect(adminSessions1.length).toEqual(0);
-    expect(memberSessions1.length).toEqual(0);
+    const code = await GroupsRepo.createCode();
+    group = await GroupsRepo.createGroup('name', code);
+    const adminGroups1 = await UsersRepo.getGroupsById(id, 'admin');
+    const memberGroups1 = await UsersRepo.getGroupsById(id, 'member');
+    expect(adminGroups1.length).toEqual(0);
+    expect(memberGroups1.length).toEqual(0);
 
-    await SessionsRepo.addUsersByIds(session.id, id, 'member');
-    session2 = await SessionsRepo.createSession('session2', SessionsRepo.createCode(), user);
-    const allSessions = await UsersRepo.getSessionsById(id);
-    const adminSessions2 = await UsersRepo.getSessionsById(id, 'admin');
-    const memberSessions2 = await UsersRepo.getSessionsById(id, 'member');
-    expect(allSessions.length).toEqual(2);
-    expect(adminSessions2.length).toEqual(1);
-    expect(adminSessions2[0].id).toBe(session2.id);
-    expect(memberSessions2.length).toEqual(1);
-    expect(memberSessions2[0].id).toBe(session.id);
+    await GroupsRepo.addUsersByIds(group.id, id, 'member');
+    group2 = await GroupsRepo.createGroup('group2', GroupsRepo.createCode(), user);
+    const allGroups = await UsersRepo.getGroupsById(id);
+    const adminGroups2 = await UsersRepo.getGroupsById(id, 'admin');
+    const memberGroups2 = await UsersRepo.getGroupsById(id, 'member');
+    expect(allGroups.length).toEqual(2);
+    expect(adminGroups2.length).toEqual(1);
+    expect(adminGroups2[0].id).toBe(group2.id);
+    expect(memberGroups2.length).toEqual(1);
+    expect(memberGroups2[0].id).toBe(group.id);
 
-    await SessionsRepo.deleteSessionById(session.id);
-    await SessionsRepo.deleteSessionById(session2.id);
+    await GroupsRepo.deleteGroupById(group.id);
+    await GroupsRepo.deleteGroupById(group2.id);
 });
 
 test('Delete User', async () => {

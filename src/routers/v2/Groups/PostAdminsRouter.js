@@ -2,7 +2,7 @@
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import LogUtils from '../../../utils/LogUtils';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import GroupsRepo from '../../../repos/GroupsRepo';
 import constants from '../../../utils/Constants';
 
 class PostAdminsRouter extends AppDevRouter<Object> {
@@ -11,7 +11,7 @@ class PostAdminsRouter extends AppDevRouter<Object> {
     }
 
     getPath(): string {
-        return '/sessions/:id/admins/';
+        return '/groups/:id/admins/';
     }
 
     async content(req: Request) {
@@ -21,11 +21,11 @@ class PostAdminsRouter extends AppDevRouter<Object> {
 
         if (!adminIds) throw LogUtils.logError('List of admin ids missing!');
 
-        if (!await SessionsRepo.isAdmin(id, user)) {
-            throw LogUtils.logError('You are not authorized to add admins to this session!');
+        if (!await GroupsRepo.isAdmin(id, user)) {
+            throw LogUtils.logError('You are not authorized to add admins to this group!');
         }
 
-        await SessionsRepo.addUsersByIds(id, adminIds, 'admin');
+        await GroupsRepo.addUsersByIds(id, adminIds, 'admin');
         return null;
     }
 }

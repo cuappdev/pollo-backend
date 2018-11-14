@@ -9,7 +9,7 @@ import {
 import Base from './Base';
 import Draft from './Draft';
 import Question from './Question';
-import Session from './Session';
+import Group from './Group';
 import appDevUtils from '../utils/AppDevUtils';
 
 @Entity('users')
@@ -42,13 +42,13 @@ class User extends Base {
   /** User last name */
   lastName: string = '';
 
-  @ManyToMany(type => Session, session => session.admins)
-  /** Sessions that the user is an admin of */
-  adminSessions: ?Session[] = [];
+  @ManyToMany(type => Group, group => group.admins)
+  /** Groups that the user is an admin of */
+  adminGroups: ?Group[] = [];
 
-  @ManyToMany(type => Session, session => session.members)
-  /** Sessions that the user is a member of */
-  memberSessions: ?Session[] = [];
+  @ManyToMany(type => Group, group => group.members)
+  /** Groups that the user is a member of */
+  memberGroups: ?Group[] = [];
 
   @OneToMany(type => Question, question => question.user)
   /** Questions that a user has asked */

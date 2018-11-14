@@ -2,7 +2,7 @@
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/Constants';
-import SessionsRepo from '../../repos/SessionsRepo';
+import GroupsRepo from '../../repos/GroupsRepo';
 
 class EndPollRouter extends AppDevRouter<Object> {
     constructor() {
@@ -17,16 +17,16 @@ class EndPollRouter extends AppDevRouter<Object> {
         const { id } = req.params;
         const { save } = req.body;
 
-        const poll = await SessionsRepo.getSessionById(id);
+        const poll = await GroupsRepo.getGroupById(id);
         if (!poll) {
             throw new Error(`No poll with id ${id} found.`);
         }
 
         if (save === 'false' || save === '0') {
-            await SessionsRepo.deleteSessionById(id);
+            await GroupsRepo.deleteGroupById(id);
         }
 
-        req.app.sessionManager.endSession(poll, save);
+        req.app.groupManager.endGroup(poll, save);
 
         return null;
     }

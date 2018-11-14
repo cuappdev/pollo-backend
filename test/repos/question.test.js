@@ -1,4 +1,4 @@
-import SessionsRepo from '../../src/repos/SessionsRepo';
+import GroupsRepo from '../../src/repos/GroupsRepo';
 import QuestionsRepo from '../../src/repos/QuestionsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
@@ -6,8 +6,8 @@ import dbConnection from '../../src/db/DbConnection';
 let question1;
 let question2;
 let question3;
-let session;
-let session2;
+let group;
+let group2;
 let user;
 
 beforeAll(async () => {
@@ -16,20 +16,20 @@ beforeAll(async () => {
         process.exit();
     });
     user = await UsersRepo.createDummyUser('googleId');
-    session = await SessionsRepo.createSession('Session', SessionsRepo.createCode(), user);
-    session2 = await SessionsRepo.createSession('Session2', SessionsRepo.createCode(), user);
+    group = await GroupsRepo.createGroup('Group', GroupsRepo.createCode(), user);
+    group2 = await GroupsRepo.createGroup('Group2', GroupsRepo.createCode(), user);
 });
 
 test('Create Question', async () => {
-    const text = 'Why do we have to test shit? (PG-13)';
-    question1 = await QuestionsRepo.createQuestion(text, session, user);
+    const text = 'Why do we have to test s***? (PG-13)';
+    question1 = await QuestionsRepo.createQuestion(text, group, user);
     expect(question1.text).toBe(text);
-    expect(question1.session.id).toBe(session.id);
+    expect(question1.group.id).toBe(group.id);
     expect(question1.user.id).toBe(user.id);
 
-    question3 = await QuestionsRepo.createQuestion('', session, user);
+    question3 = await QuestionsRepo.createQuestion('', group, user);
     expect(question3.text).toBe('');
-    expect(question3.session.id).toBe(session.id);
+    expect(question3.group.id).toBe(group.id);
     expect(question3.user.id).toBe(user.id);
 });
 
@@ -53,17 +53,17 @@ test('Update Question', async () => {
 
 test('Create A New Question', async () => {
     const text = 'Why is testing so annoying?';
-    question2 = await QuestionsRepo.createQuestion(text, session, user);
+    question2 = await QuestionsRepo.createQuestion(text, group, user);
     expect(question2.text).toBe(text);
     expect(question2.user.id).toBe(user.id);
-    expect(question2.session.id).toBe(session.id);
+    expect(question2.group.id).toBe(group.id);
 });
 
-test('Get Session from Both Questions', async () => {
-    let temp = await QuestionsRepo.getSessionFromQuestionId(question1.id);
-    expect(temp.id).toBe(session.id);
-    temp = await QuestionsRepo.getSessionFromQuestionId(question2.id);
-    expect(temp.id).toBe(session.id);
+test('Get Group from Both Questions', async () => {
+    let temp = await QuestionsRepo.getGroupFromQuestionId(question1.id);
+    expect(temp.id).toBe(group.id);
+    temp = await QuestionsRepo.getGroupFromQuestionId(question2.id);
+    expect(temp.id).toBe(group.id);
 });
 
 test('Verify Ownership', async () => {
@@ -85,7 +85,7 @@ test('Delete Question', async () => {
 
 afterAll(async () => {
     await UsersRepo.deleteUserById(user.id);
-    await SessionsRepo.deleteSessionById(session.id);
-    await SessionsRepo.deleteSessionById(session2.id);
+    await GroupsRepo.deleteGroupById(group.id);
+    await GroupsRepo.deleteGroupById(group2.id);
     console.log('Passed all question tests');
 });

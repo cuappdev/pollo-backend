@@ -17,7 +17,7 @@ export type NodeResponse<T> = Response<AppDevNodeResponse<T>>
 export type EdgesResponse<T> = Response<AppDevEdgesResponse<T>>
 
 // ************************ POLLO OBJECT TYPES ************************
-export type APISession = {|
+export type APIGroup = {|
   id: id,
   name: string,
   code: string

@@ -3,7 +3,7 @@ import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import LogUtils from '../../../utils/LogUtils';
 import constants from '../../../utils/Constants';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import GroupsRepo from '../../../repos/GroupsRepo';
 
 class DeleteAdminsRouter extends AppDevRouter<Object> {
     constructor() {
@@ -11,21 +11,21 @@ class DeleteAdminsRouter extends AppDevRouter<Object> {
     }
 
     getPath(): string {
-        return '/sessions/:id/admins/';
+        return '/groups/:id/admins/';
     }
 
     async content(req: Request) {
-        const sessionId = req.params.id;
+        const groupId = req.params.id;
         const { user } = req;
         const adminIds = JSON.parse(req.body.adminIds);
 
         if (!adminIds) throw LogUtils.logError('List of admin ids missing!');
 
-        if (!await SessionsRepo.isAdmin(sessionId, user)) {
-            throw LogUtils.logError('You are not authorized to remove admins from this session!');
+        if (!await GroupsRepo.isAdmin(groupId, user)) {
+            throw LogUtils.logError('You are not authorized to remove admins from this group!');
         }
 
-        await SessionsRepo.removeUserBySessionId(sessionId, adminIds, 'admin');
+        await GroupsRepo.removeUserByGroupId(groupId, adminIds, 'admin');
         return null;
     }
 }

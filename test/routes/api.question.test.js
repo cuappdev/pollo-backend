@@ -1,13 +1,14 @@
 import dbConnection from '../../src/db/DbConnection';
 import UsersRepo from '../../src/repos/UsersRepo';
 import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
-import SessionsRepo from '../../src/repos/SessionsRepo';
+import GroupsRepo from '../../src/repos/GroupsRepo';
 
 const request = require('request-promise-native');
 const {
     get, post, del, put,
 } = require('./lib');
 
+let group;
 let session;
 let question;
 let admin;
@@ -25,28 +26,28 @@ beforeAll(async () => {
     adminToken = (await UserSessionsRepo.createOrUpdateSession(admin, null, null)).sessionToken;
     memberToken = (await UserSessionsRepo.createOrUpdateSession(member, null, null)).sessionToken;
 
-    const opts = { name: 'Test session', code: SessionsRepo.createCode() };
-    const result = await request(post('/sessions/', opts, adminToken));
-    session = result.data.node;
+    const opts = { name: 'Test group', code: GroupsRepo.createCode() };
+    const result = await request(post('/groups/', opts, adminToken));
+    group = result.data.node;
     expect(result.success).toBe(true);
 
-    await SessionsRepo.addUsersByGoogleIds(session.id, ['member'], 'member');
+    await GroupsRepo.addUsersByGoogleIds(group.id, ['member'], 'member');
 });
 
 test('create question', async () => {
     const opts = {
-        text: 'Why do we have to test shit? (PG-13)',
+        text: 'Why do we have to test s***? (PG-13)',
     };
-    const result = await request(post(`/sessions/${session.id}/questions`, opts, memberToken));
+    const result = await request(post(`/groups/${group.id}/questions`, opts, memberToken));
     question = result.data.node;
     expect(result.success).toBe(true);
 });
 
 test('create question with invalid token', async () => {
     const opts = {
-        text: 'Why do we have to test shit? (PG-13)',
+        text: 'Why do we have to test s***? (PG-13)',
     };
-    const result = await request(post(`/sessions/${session.id}/questions`, opts, adminToken));
+    const result = await request(post(`/groups/${group.id}/questions`, opts, adminToken));
     expect(result.success).toBe(false);
 });
 
@@ -57,8 +58,8 @@ test('get question by id', async () => {
     expect(question.id).toBe(getres.data.node.id);
 });
 
-test('get questions by session', async () => {
-    const getstr = await request(get(`/sessions/${session.id}/questions`, adminToken));
+test('get questions by group', async () => {
+    const getstr = await request(get(`/groups/${group.id}/questions`, adminToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
     expect(question.id).toBe(getres.data.edges[0].node.id);
@@ -90,7 +91,7 @@ test('delete question', async () => {
 });
 
 afterAll(async () => {
-    const result = await request(del(`/sessions/${session.id}`, adminToken));
+    const result = await request(del(`/groups/${group.id}`, adminToken));
     expect(result.success).toBe(true);
     await UsersRepo.deleteUserById(admin.id);
     await UsersRepo.deleteUserById(member.id);

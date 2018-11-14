@@ -4,7 +4,7 @@ import AppDevRouter from '../../../utils/AppDevRouter';
 import LogUtils from '../../../utils/LogUtils';
 import PollsRepo from '../../../repos/PollsRepo';
 import constants from '../../../utils/Constants';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import GroupsRepo from '../../../repos/GroupsRepo';
 
 import type { APIPoll } from '../APITypes';
 
@@ -26,10 +26,10 @@ class UpdatePollRouter extends AppDevRouter<Object> {
             throw LogUtils.logError('No fields specified to update.');
         }
 
-        const session = await PollsRepo.getSessionFromPollId(pollId);
-        if (!session) throw LogUtils.logError(`Poll with id ${pollId} has no session!`);
+        const group = await PollsRepo.getGroupFromPollId(pollId);
+        if (!group) throw LogUtils.logError(`Poll with id ${pollId} has no group!`);
 
-        if (!await SessionsRepo.isAdmin(session.id, user)) {
+        if (!await GroupsRepo.isAdmin(group.id, user)) {
             throw LogUtils.logError('You are not authorized to update this poll!');
         }
         const poll = await PollsRepo.updatePollById(pollId, text,

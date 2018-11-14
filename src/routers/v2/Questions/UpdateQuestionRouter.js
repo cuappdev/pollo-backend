@@ -23,8 +23,8 @@ class UpdateQuestionRouter extends AppDevRouter<Object> {
 
         if (!text) throw LogUtils.logError('No fields specified to update.');
 
-        const session = await QuestionsRepo.getSessionFromQuestionId(questionId);
-        if (!session) throw LogUtils.logError(`Question with id ${questionId} has no session!`);
+        const group = await QuestionsRepo.getGroupFromQuestionId(questionId);
+        if (!group) throw LogUtils.logError(`Question with id ${questionId} has no group!`);
 
         if (!await QuestionsRepo.isOwnerById(questionId, user)) {
             throw LogUtils.logError('You are not authorized to update this question!');

@@ -1,13 +1,13 @@
 // @flow
 import SocketIO from 'socket.io';
-import Session from './models/Session';
+import Group from './models/Group';
 import PollsRepo from './repos/PollsRepo';
-import SessionsRepo from './repos/SessionsRepo';
+import GroupsRepo from './repos/GroupsRepo';
 import constants from './utils/Constants';
 
-/** Configuration for each SessionSocket */
-export type SessionSocketConfig = {
-  session: Session,
+/** Configuration for each GroupSocket */
+export type GroupSocketConfig = {
+  group: Group,
   nsp: SocketIO.Namespace,
   onClose: void => void
 }
@@ -15,7 +15,7 @@ export type SessionSocketConfig = {
 type id = number;
 type IOSocket = Object;
 
-/** Poll object used in SessionSockets
+/** Poll object used in GroupSockets
  * @name SocketPoll
  */
 type Poll = {
@@ -27,7 +27,7 @@ type Poll = {
   correctAnswer: string,
 }
 
-/** Answer object used in SessionSockets */
+/** Answer object used in GroupSockets */
 type Answer = {
   id: id,
   googleId: string,
@@ -36,7 +36,7 @@ type Answer = {
   text: string
 }
 
-/** Keeps track of current state of a Session Socket
+/** Keeps track of current state of a Group Socket
  * @example
  * let currentState = {
  *   poll: 1,
@@ -52,15 +52,15 @@ type CurrentState = {
 }
 
 /**
- * Represents a single running session
- * @param {SessionSocketConfig} config - Configuration for session socket
- * @param {Session} config.session - Session to make active
+ * Represents a single running group
+ * @param {GroupSocketConfig} config - Configuration for group socket
+ * @param {Group} config.group - Group to make active
  * @param {SocketIO.Namespace} config.nsp - Socket Namespace
  * @param {function} config.onClose - Function called when socket closes
  */
-export default class SessionSocket {
-  /** Session that is running */
-  session: Session;
+export default class GroupSocket {
+  /** Group that is running */
+  group: Group;
 
   /** Namespace of socket */
   nsp: SocketIO.Namespace;
@@ -70,7 +70,7 @@ export default class SessionSocket {
   closing: boolean = false;
 
   /**
-   * Stores all polls/answers for the session.
+   * Stores all polls/answers for the group.
    */
   polls: {
     [string]: {
@@ -95,8 +95,8 @@ export default class SessionSocket {
   // Previous state
   lastState = {};
 
-  // Google ids of admin/user to add to the session
-  // List of users saved to session when a user exits socket (same for admins)
+  // Google ids of admin/user to add to the group
+  // List of users saved to group when a user exits socket (same for admins)
   adminGoogleIds = [];
 
   userGoogleIds = [];
@@ -110,14 +110,14 @@ export default class SessionSocket {
   }
 
   /**
-   * Indicate whether session is live or not
+   * Indicate whether group is live or not
    * Becomes live when a poll is started
    * Becomes inactive when no admin is connected to socket && no live poll
    */
   isLive = false
 
-  constructor({ session, nsp, onClose }: SessionSocketConfig) {
-      this.session = session;
+  constructor({ group, nsp, onClose }: GroupSocketConfig) {
+      this.group = group;
       this.nsp = nsp;
       this.nsp.on('connect', this._onConnect.bind(this));
       this.onClose = onClose;
@@ -129,9 +129,9 @@ export default class SessionSocket {
   }
 
   // v1 message
-  saveSession() {
-      console.log('save this sessioning session on user side');
-      this.nsp.to('users').emit('user/poll/save', this.session);
+  saveGroup() {
+      console.log('save this grouping group on user side');
+      this.nsp.to('users').emit('user/poll/save', this.group);
   }
 
   _clientError(client: IOSocket, msg: string): void {
@@ -336,7 +336,7 @@ export default class SessionSocket {
 
       client.on('disconnect', async () => {
           console.log(`User ${client.id} disconnected.`);
-          await SessionsRepo.addUsersByGoogleIds(this.session.id,
+          await GroupsRepo.addUsersByGoogleIds(this.group.id,
               this.userGoogleIds, 'user');
           this.userGoogleIds = [];
 
@@ -402,7 +402,7 @@ export default class SessionSocket {
       if (!poll) {
           return;
       }
-      this.lastPoll = await PollsRepo.createPoll(poll.text, this.session,
+      this.lastPoll = await PollsRepo.createPoll(poll.text, this.group,
           this.current.results, poll.shared, poll.type, poll.correctAnswer,
           this.current.answers);
       this.lastState = this.current;
@@ -521,7 +521,7 @@ export default class SessionSocket {
 
       client.on('disconnect', async () => {
           console.log(`Admin ${client.id} disconnected.`);
-          await SessionsRepo.addUsersByGoogleIds(this.session.id,
+          await GroupsRepo.addUsersByGoogleIds(this.group.id,
               this.adminGoogleIds, 'admin');
           this.adminGoogleIds = [];
 

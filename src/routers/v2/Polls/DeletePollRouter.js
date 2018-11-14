@@ -4,7 +4,7 @@ import AppDevRouter from '../../../utils/AppDevRouter';
 import PollsRepo from '../../../repos/PollsRepo';
 import constants from '../../../utils/Constants';
 import LogUtils from '../../../utils/LogUtils';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import GroupsRepo from '../../../repos/GroupsRepo';
 
 class DeletePollRouter extends AppDevRouter<Object> {
     constructor() {
@@ -19,11 +19,11 @@ class DeletePollRouter extends AppDevRouter<Object> {
         const pollId = req.params.id;
         const { user } = req;
 
-        const session = await PollsRepo.getSessionFromPollId(pollId);
-        if (!session) {
-            throw LogUtils.logError(`Couldn't find session with poll ${pollId}`);
+        const group = await PollsRepo.getGroupFromPollId(pollId);
+        if (!group) {
+            throw LogUtils.logError(`Couldn't find group with poll ${pollId}`);
         }
-        if (!await SessionsRepo.isAdmin(session.id, user)) {
+        if (!await GroupsRepo.isAdmin(group.id, user)) {
             throw LogUtils.logError('You are not authorized to delete this poll!');
         }
         await PollsRepo.deletePollById(pollId);

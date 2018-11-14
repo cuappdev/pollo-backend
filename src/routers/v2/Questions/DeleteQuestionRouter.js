@@ -3,7 +3,7 @@ import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import LogUtils from '../../../utils/LogUtils';
 import QuestionsRepo from '../../../repos/QuestionsRepo';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import GroupsRepo from '../../../repos/GroupsRepo';
 import constants from '../../../utils/Constants';
 
 class DeleteQuestionRouter extends AppDevRouter<Object> {
@@ -19,11 +19,11 @@ class DeleteQuestionRouter extends AppDevRouter<Object> {
         const questionId = req.params.id;
         const { user } = req;
 
-        const session = await QuestionsRepo.getSessionFromQuestionId(questionId);
-        if (!session) {
-            throw LogUtils.logError(`Couldn't find session with question ${questionId}`);
+        const group = await QuestionsRepo.getGroupFromQuestionId(questionId);
+        if (!group) {
+            throw LogUtils.logError(`Couldn't find group with question ${questionId}`);
         }
-        if (!await SessionsRepo.isAdmin(session.id, user)
+        if (!await GroupsRepo.isAdmin(group.id, user)
           && !await QuestionsRepo.isOwnerById(questionId, user)) {
             throw LogUtils.logError('You are not authorized to delete this question!');
         }

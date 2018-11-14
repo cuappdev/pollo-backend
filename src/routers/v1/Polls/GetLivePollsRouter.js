@@ -17,7 +17,7 @@ class GetLivePollsRouter extends AppDevRouter<Object> {
 
         if (!codes) throw new Error('Poll codes are missing!');
 
-        const polls = await req.app.sessionManager.liveSessions(codes);
+        const polls = await req.app.groupManager.liveGroups(codes);
         return polls
             .filter(Boolean)
             .map(poll => ({

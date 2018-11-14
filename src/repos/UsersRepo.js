@@ -1,7 +1,7 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
 import LogUtils from '../utils/LogUtils';
-import Session from '../models/Session';
+import Group from '../models/Group';
 import User from '../models/User';
 import UserSessionsRepo from './UserSessionsRepo';
 import appDevUtils from '../utils/AppDevUtils';
@@ -171,30 +171,30 @@ const deleteUserById = async (id: number) => {
 };
 
 /**
- * Gets all sessions that a user is in
+ * Gets all groups that a user is in
  * @function
- * @param {number} id - Id of user to fetch sessions for
- * @param {?string} role - Specifies role which we want to fetch sessions for
- * Ex. If role is admin, we fetch all sessions the user is an admin of.
- * @return {Session[]} List of session for given user
+ * @param {number} id - Id of user to fetch groups for
+ * @param {?string} role - Specifies role which we want to fetch groups for
+ * Ex. If role is admin, we fetch all groups the user is an admin of.
+ * @return {Session[]} List of groups for given user
  */
-const getSessionsById = async (id: number, role: ?string):
-    Promise<Array<?Session>> => {
+const getGroupsById = async (id: number, role: ?string):
+    Promise<Array<?Group>> => {
     try {
         const user = await db().createQueryBuilder('users')
-            .leftJoinAndSelect('users.memberSessions', 'memberSessions')
-            .leftJoinAndSelect('users.adminSessions', 'adminSessions')
+            .leftJoinAndSelect('users.memberGroups', 'memberGroups')
+            .leftJoinAndSelect('users.adminGroups', 'adminGroups')
             .where('users.id = :userId')
             .setParameters({ userId: id })
             .getOne();
         if (role === constants.USER_TYPES.ADMIN) {
-            return user.adminSessions;
+            return user.adminGroups;
         } if (role === constants.USER_TYPES.MEMBER) {
-            return user.memberSessions;
+            return user.memberGroups;
         }
-        return user.memberSessions.concat(user.adminSessions);
+        return user.memberGroups.concat(user.adminGroups);
     } catch (e) {
-        throw LogUtils.logError(`Problem getting member sessions for user: ${id}`);
+        throw LogUtils.logError(`Problem getting member groups for user: ${id}`);
     }
 };
 
@@ -208,5 +208,5 @@ export default {
     getUsersByGoogleIds,
     getUsersFromIds,
     deleteUserById,
-    getSessionsById,
+    getGroupsById,
 };
