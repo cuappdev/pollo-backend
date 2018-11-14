@@ -44,7 +44,7 @@ const createPoll = async (text: string, group: ?Group, results: json,
  * @param {number} id - id of the poll we want
  * @return {?Poll} Poll with corresponding id
  */
-const getPollById = async (id: number): Promise<?Poll> => {
+const getPollByID = async (id: number): Promise<?Poll> => {
     try {
         return await db().findOneById(id);
     } catch (e) {
@@ -57,7 +57,7 @@ const getPollById = async (id: number): Promise<?Poll> => {
  * @function
  * @param {number} id - id of the poll to delete
  */
-const deletePollById = async (id: number) => {
+const deletePollByID = async (id: number) => {
     try {
         const poll = await db().findOneById(id);
         await db().remove(poll);
@@ -76,14 +76,14 @@ const deletePollById = async (id: number) => {
  * @param {json} [userAnswers] - new json of user answers
  * @return {?Poll} Updated poll
  */
-const updatePollById = async (id: number, text: ?string, results: ?json,
+const updatePollByID = async (id: number, text: ?string, results: ?json,
     canShare: ?boolean, userAnswers: ?json):
   Promise<?Poll> => {
     try {
         const poll = await db().createQueryBuilder('polls')
             .leftJoinAndSelect('polls.group', 'group')
-            .where('polls.id = :pollId')
-            .setParameters({ pollId: id })
+            .where('polls.id = :pollID')
+            .setParameters({ pollID: id })
             .getOne();
 
         if (text !== undefined && text !== null) poll.text = text;
@@ -104,11 +104,11 @@ const updatePollById = async (id: number, text: ?string, results: ?json,
  * @param {number} id - id of poll we want to find the group for
  * @return {?Group} Group that the poll belongs to
  */
-const getGroupFromPollId = async (id: number) : Promise<?Group> => {
+const getGroupFromPollID = async (id: number) : Promise<?Group> => {
     try {
         const poll = await db().createQueryBuilder('polls')
             .leftJoinAndSelect('polls.group', 'group')
-            .where('polls.id = :pollId', { pollId: id })
+            .where('polls.id = :pollID', { pollID: id })
             .getOne();
         return poll.group;
     } catch (e) {
@@ -118,8 +118,8 @@ const getGroupFromPollId = async (id: number) : Promise<?Group> => {
 
 export default {
     createPoll,
-    deletePollById,
-    getPollById,
-    updatePollById,
-    getGroupFromPollId,
+    deletePollByID,
+    getGroupFromPollID,
+    getPollByID,
+    updatePollByID,
 };

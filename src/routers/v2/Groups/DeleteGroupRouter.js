@@ -15,17 +15,17 @@ class DeleteGroupRouter extends AppDevRouter<Object> {
     }
 
     async content(req: Request) {
-        const groupId = req.params.id;
+        const groupID = req.params.id;
         const { user } = req;
 
-        const group = await GroupsRepo.getGroupById(groupId);
-        if (!group) throw LogUtils.logError(`Group with id ${groupId} not found!`);
+        const group = await GroupsRepo.getGroupByID(groupID);
+        if (!group) throw LogUtils.logError(`Group with id ${groupID} not found!`);
 
-        if (!await GroupsRepo.isAdmin(groupId, user)) {
+        if (!await GroupsRepo.isAdmin(groupID, user)) {
             throw LogUtils.logError('You are not authorized to delete this group!');
         }
 
-        await GroupsRepo.deleteGroupById(groupId);
+        await GroupsRepo.deleteGroupByID(groupID);
         return null;
     }
 }

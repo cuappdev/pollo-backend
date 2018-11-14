@@ -17,14 +17,14 @@ class PostMembersRouter extends AppDevRouter<Object> {
     async content(req: Request) {
         const { id } = req.params;
         const { user } = req;
-        const { memberIds } = req.body;
+        const { memberIDs } = req.body;
 
-        if (!memberIds) throw LogUtils.logError('List of member ids missing!');
+        if (!memberIDs) throw LogUtils.logError('List of member ids missing!');
 
         if (!await GroupsRepo.isAdmin(id, user)) {
             throw LogUtils.logError('You are not authorized to add members to this group!');
         }
-        await GroupsRepo.addUsersByIds(id, memberIds, 'member');
+        await GroupsRepo.addUsersByIDs(id, memberIDs, 'member');
         return null;
     }
 }

@@ -18,7 +18,7 @@ class UpdatePollRouter extends AppDevRouter<Object> {
     }
 
     async content(req: Request): Promise<{ node: APIPoll }> {
-        const pollId = req.params.id;
+        const pollID = req.params.id;
         const { text, results, shared } = req.body;
         const { user } = req;
 
@@ -26,16 +26,16 @@ class UpdatePollRouter extends AppDevRouter<Object> {
             throw LogUtils.logError('No fields specified to update.');
         }
 
-        const group = await PollsRepo.getGroupFromPollId(pollId);
-        if (!group) throw LogUtils.logError(`Poll with id ${pollId} has no group!`);
+        const group = await PollsRepo.getGroupFromPollID(pollID);
+        if (!group) throw LogUtils.logError(`Poll with id ${pollID} has no group!`);
 
         if (!await GroupsRepo.isAdmin(group.id, user)) {
             throw LogUtils.logError('You are not authorized to update this poll!');
         }
-        const poll = await PollsRepo.updatePollById(pollId, text,
+        const poll = await PollsRepo.updatePollByID(pollID, text,
             results, shared);
         if (!poll) {
-            throw LogUtils.logError(`Poll with id ${pollId} was not found!`);
+            throw LogUtils.logError(`Poll with id ${pollID} was not found!`);
         }
 
         return {

@@ -7,7 +7,7 @@ toc:
       - Draft
       - Poll
       - Question
-      - Session
+      - Group
       - User
       - UserSession
   - name: Drafts Repo
@@ -17,52 +17,52 @@ toc:
       - getDraftsByUser
       - updateDraft
       - deleteDraft
-      - getOwnerById
+      - getOwnerByID
   - name: Polls Repo
     children:
       - createPoll
-      - deletePollById
-      - getPollById
-      - updatePollById
-      - getSessionFromPollId
+      - deletePollByID
+      - getPollByID
+      - updatePollByID
+      - getGroupFromPollID
   - name: Questions Repo
     children:
         - createQuestion
-        - deleteQuestionById
-        - getQuestionById
-        - updateQuestionById
-        - getSessionFromQuestionId
-        - isOwnerById
-  - name: Sessions Repo
+        - deleteQuestionByID
+        - getQuestionByID
+        - updateQuestionByID
+        - getGroupFromQuestionID
+        - isOwnerByID
+  - name: Groups Repo
     children:
-      - sessionCodes
-      - createSession
+      - groupCodes
+      - createGroup
       - createCode
-      - getSessionById
-      - getSessionId
-      - updateSessionById
-      - deleteSessionById
-      - addUsersByGoogleIds
-      - removeUserBySessionId
-      - getUsersBySessionId
+      - getGroupByID
+      - getGroupID
+      - updateGroupByID
+      - deleteGroupByID
+      - addUsersByGoogleIDs
+      - removeUserByGroupID
+      - getUsersByGroupID
       - isAdmin
       - isMember
       - getPolls
       - getQuestions
-      - addUsersByIds
-      - latestActivityBySessionId
+      - addUsersByIDs
+      - latestActivityByGroupID
   - name: Users Repo
     children:
       - getUsers
       - createUser
       - createUserWithFields
       - createDummyUser
-      - getUserById
-      - getUserByGoogleId
-      - getUsersByGoogleIds
-      - getUsersFromIds
-      - deleteUserById
-      - getSessionsById
+      - getUserByID
+      - getUserByGoogleID
+      - getUsersByGoogleIDs
+      - getUsersFromIDs
+      - deleteUserByID
+      - getGroupsByID
   - name: User Sessions Repo
     children:
       - createOrUpdateSession
@@ -70,18 +70,18 @@ toc:
       - updateSession
       - verifySession
       - deleteSession
-      - deleteSessionFromUserId
-  - SessionSocket
-  - name: Session Socket Types
+      - deleteSessionFromUserID
+  - GroupSocket
+  - name: Group Socket Types
     children:
         - SocketPoll
         - Answer
-        - SessionSocketConfig
+        - GroupSocketConfig
         - CurrentState
-  - SessionManager
+  - GroupManager
   - name: Utility Functions
     children:
-        - netIdFromEmail
+        - netIDFromEmail
         - randomCode
   - name: Constants
     children:

@@ -17,13 +17,13 @@ class EndPollRouter extends AppDevRouter<Object> {
         const { id } = req.params;
         const { save } = req.body;
 
-        const poll = await GroupsRepo.getGroupById(id);
+        const poll = await GroupsRepo.getGroupByID(id);
         if (!poll) {
             throw new Error(`No poll with id ${id} found.`);
         }
 
         if (save === 'false' || save === '0') {
-            await GroupsRepo.deleteGroupById(id);
+            await GroupsRepo.deleteGroupByID(id);
         }
 
         req.app.groupManager.endGroup(poll, save);

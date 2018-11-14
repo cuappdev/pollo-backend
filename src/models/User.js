@@ -24,11 +24,11 @@ class User extends Base {
 
   @Column('string')
   /** Google ID of user */
-  googleId: string = '';
+  googleID: string = '';
 
   @Column('string')
   /** Net ID of user */
-  netId: string = '';
+  netID: string = '';
 
   @Column('string')
   /** Email of user */
@@ -66,11 +66,11 @@ class User extends Base {
    */
   static dummy(id: string): User {
       const user = new User();
-      user.googleId = id;
+      user.googleID = id;
       user.firstName = '';
       user.lastName = '';
       user.email = '';
-      user.netId = '';
+      user.netID = '';
       return user;
   }
 
@@ -82,11 +82,11 @@ class User extends Base {
    */
   static fromGoogleCreds(creds: Object): User {
       const user = new User();
-      user.googleId = creds.id;
+      user.googleID = creds.id;
       user.firstName = creds.name.givenName;
       user.lastName = creds.name.familyName;
       user.email = creds.emails[0].value;
-      user.netId = appDevUtils.netIdFromEmail(user.email);
+      user.netID = appDevUtils.netIDFromEmail(user.email);
       return user;
   }
 }

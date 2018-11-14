@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 // @flow
 import SocketIO from 'socket.io';
 import Group from './models/Group';
@@ -30,7 +32,7 @@ type Poll = {
 /** Answer object used in GroupSockets */
 type Answer = {
   id: id,
-  googleId: string,
+  googleID: string,
   poll: id,
   choice: string,
   text: string
@@ -82,9 +84,9 @@ export default class GroupSocket {
   }
 
   // Counter for generating poll/answer ids
-  pollId: number;
+  pollID: number;
 
-  answerId: number;
+  answerID: number;
 
   // Number of users connected
   usersConnected: number;
@@ -97,9 +99,9 @@ export default class GroupSocket {
 
   // Google ids of admin/user to add to the group
   // List of users saved to group when a user exits socket (same for admins)
-  adminGoogleIds = [];
+  adminGoogleIDs = [];
 
-  userGoogleIds = [];
+  userGoogleIDs = [];
 
   /** Current state of the socket */
   current: CurrentState = {
@@ -123,8 +125,8 @@ export default class GroupSocket {
       this.onClose = onClose;
 
       this.polls = {};
-      this.pollId = 0;
-      this.answerId = 0;
+      this.pollID = 0;
+      this.answerID = 0;
       this.usersConnected = 0;
   }
 
@@ -145,13 +147,13 @@ export default class GroupSocket {
    */
   _onConnect = async (client: IOSocket) => {
       const userType: ?string = client.handshake.query.userType || null;
-      const googleId: ?string = client.handshake.query.googleId || null;
+      const googleID: ?string = client.handshake.query.googleID || null;
 
       switch (userType) {
           case 'admin': {
               console.log(`Admin with id ${client.id} connected to socket`);
-              if (googleId) {
-                  this.adminGoogleIds.push(googleId);
+              if (googleID) {
+                  this.adminGoogleIDs.push(googleID);
               }
               this._setupAdminEvents(client);
               client.join('admins');
@@ -167,8 +169,8 @@ export default class GroupSocket {
           case 'member':
           case 'user': {
               console.log(`User with id ${client.id} connected to socket`);
-              if (googleId) {
-                  this.userGoogleIds.push(googleId);
+              if (googleID) {
+                  this.userGoogleIDs.push(googleID);
               }
               this._setupUserEvents(client);
               client.join('users');
@@ -213,13 +215,13 @@ export default class GroupSocket {
   _setupUserEvents(client: IOSocket): void {
       client.on('server/poll/tally', (answerObject: Object) => {
           const answer: Answer = {
-              id: this.answerId,
-              googleId: answerObject.googleId,
+              id: this.answerID,
+              googleID: answerObject.googleID,
               poll: answerObject.poll,
               choice: answerObject.choice,
               text: answerObject.text,
           };
-          this.answerId += 1;
+          this.answerID += 1;
           const poll = this._currentPoll();
           if (poll === null || poll === undefined) {
               console.log(`Client ${client.id} tried to answer with no active poll`);
@@ -231,17 +233,17 @@ export default class GroupSocket {
           }
 
           const nextState = { ...this.current };
-          const prev = nextState.answers[answer.googleId];
+          const prev = nextState.answers[answer.googleID];
 
           if (poll.type === constants.QUESTION_TYPES.MULTIPLE_CHOICE) {
-              nextState.answers[answer.googleId] = answer.choice; // update/add response
+              nextState.answers[answer.googleID] = answer.choice; // update/add response
               if (prev) { // User selected something before
                   nextState.results[prev].count -= 1;
               }
           } else if (prev) { // User submitted another FR answer
-              nextState.answers[answer.googleId].push(answer.id);
+              nextState.answers[answer.googleID].push(answer.id);
           } else { // User submitted first FR answer
-              nextState.answers[answer.googleId] = [answer.id];
+              nextState.answers[answer.googleID] = [answer.id];
           }
 
           const key = poll.type === constants.QUESTION_TYPES.MULTIPLE_CHOICE
@@ -261,20 +263,20 @@ export default class GroupSocket {
       });
 
       client.on('server/poll/upvote', (upvoteObject: Object) => {
-          const { answerId, googleId } = upvoteObject;
+          const { answerID, googleID } = upvoteObject;
           const poll = this._currentPoll();
           if (poll === null || poll === undefined) {
-              console.log(`Client with googleId ${googleId} tried to answer with no active poll`);
+              console.log(`Client with googleID ${googleID} tried to answer with no active poll`);
               return;
           }
           const nextState = { ...this.current };
-          const curTally = nextState.results[answerId];
+          const curTally = nextState.results[answerID];
           if (curTally) {
-              nextState.results[answerId].count += 1;
-              if (nextState.upvotes[googleId]) {
-                  nextState.upvotes[googleId].push(answerId);
+              nextState.results[answerID].count += 1;
+              if (nextState.upvotes[googleID]) {
+                  nextState.upvotes[googleID].push(answerID);
               } else {
-                  nextState.upvotes[googleId] = [answerId];
+                  nextState.upvotes[googleID] = [answerID];
               }
           }
           this.current = nextState;
@@ -287,13 +289,13 @@ export default class GroupSocket {
       // v1
       client.on('server/question/tally', (answerObject: Object) => {
           const answer: Answer = {
-              id: this.answerId,
-              googleId: answerObject.deviceId,
+              id: this.answerID,
+              googleID: answerObject.deviceID,
               poll: answerObject.question,
               choice: answerObject.choice,
               text: answerObject.text,
           };
-          this.answerId += 1;
+          this.answerID += 1;
           const question = this._currentPoll();
           if (question === null || question === undefined) {
               console.log(`Client ${client.id} answered on no question`);
@@ -305,9 +307,9 @@ export default class GroupSocket {
           }
 
           const nextState = { ...this.current };
-          const prev = nextState.answers[answer.googleId];
+          const prev = nextState.answers[answer.googleID];
           // update/input user's response
-          nextState.answers[answer.googleId] = answer.choice;
+          nextState.answers[answer.googleID] = answer.choice;
           if (prev) { // if truthy
               // has selected something before
               nextState.results[prev].count -= 1;
@@ -336,9 +338,9 @@ export default class GroupSocket {
 
       client.on('disconnect', async () => {
           console.log(`User ${client.id} disconnected.`);
-          await GroupsRepo.addUsersByGoogleIds(this.group.id,
-              this.userGoogleIds, 'user');
-          this.userGoogleIds = [];
+          await GroupsRepo.addUsersByGoogleIDs(this.group.id,
+              this.userGoogleIDs, 'user');
+          this.userGoogleIDs = [];
 
           if (this.nsp.connected.length === 0) {
               await this._endPoll();
@@ -447,14 +449,14 @@ export default class GroupSocket {
       // Start poll
       client.on('server/poll/start', async (pollObject: Object) => {
           const poll: Poll = {
-              id: this.pollId,
+              id: this.pollID,
               text: pollObject.text,
               type: pollObject.type,
               options: pollObject.options,
               shared: pollObject.shared,
               correctAnswer: pollObject.correctAnswer,
           };
-          this.pollId += 1;
+          this.pollID += 1;
           console.log('starting', poll);
           if (this.current.poll !== -1) {
               await this._endPoll();
@@ -465,14 +467,14 @@ export default class GroupSocket {
       // v1
       client.on('server/question/start', async (questionObject: Object) => {
           const question: Poll = {
-              id: this.pollId,
+              id: this.pollID,
               text: questionObject.text,
               type: questionObject.type,
               options: questionObject.options,
               shared: false,
               correctAnswer: questionObject.correctAnswer,
           };
-          this.pollId += 1;
+          this.pollID += 1;
           console.log('starting', question);
           if (this.current.poll !== -1) {
               await this._endPoll();
@@ -485,7 +487,7 @@ export default class GroupSocket {
           console.log('sharing results');
           // Update poll to 'shared'
           if (this.lastPoll) {
-              await PollsRepo.updatePollById(this.lastPoll.id, null,
+              await PollsRepo.updatePollByID(this.lastPoll.id, null,
                   null, true);
           }
           const current = this.lastState;
@@ -496,7 +498,7 @@ export default class GroupSocket {
       client.on('server/question/results', async () => {
           console.log('sharing results');
           if (this.lastPoll) {
-              await PollsRepo.updatePollById(this.lastPoll.id, null,
+              await PollsRepo.updatePollByID(this.lastPoll.id, null,
                   null, true);
           }
           const current = this.lastState;
@@ -521,9 +523,9 @@ export default class GroupSocket {
 
       client.on('disconnect', async () => {
           console.log(`Admin ${client.id} disconnected.`);
-          await GroupsRepo.addUsersByGoogleIds(this.group.id,
-              this.adminGoogleIds, 'admin');
-          this.adminGoogleIds = [];
+          await GroupsRepo.addUsersByGoogleIDs(this.group.id,
+              this.adminGoogleIDs, 'admin');
+          this.adminGoogleIDs = [];
 
           if (this.current.poll === -1) this.isLive = false;
 

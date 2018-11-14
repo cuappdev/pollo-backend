@@ -18,16 +18,16 @@ class PostQuestionRouter extends AppDevRouter<Object> {
     }
 
     async content(req: Request): Promise<{ node: APIQuestion }> {
-        const groupId = req.params.id;
+        const groupID = req.params.id;
         const { text } = req.body;
         const { user } = req;
 
         if (!text) throw LogUtils.logError('Cannot post empty question!');
 
-        const group = await GroupsRepo.getGroupById(groupId);
-        if (!group) throw LogUtils.logError(`Couldn't find group with id ${groupId}`);
+        const group = await GroupsRepo.getGroupByID(groupID);
+        if (!group) throw LogUtils.logError(`Couldn't find group with id ${groupID}`);
 
-        if (!await GroupsRepo.isMember(groupId, user)) {
+        if (!await GroupsRepo.isMember(groupID, user)) {
             throw LogUtils.logError('You are not authorized to post a poll!');
         }
 

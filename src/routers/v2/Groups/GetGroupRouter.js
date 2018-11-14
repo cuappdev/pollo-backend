@@ -9,8 +9,8 @@ class GetGroupRouter extends AppDevNodeRouter<APIGroup> {
         return '/groups/:id/';
     }
 
-    async fetchWithId(id: number) {
-        const group = await GroupsRepo.getGroupById(id);
+    async fetchWithID(id: number) {
+        const group = await GroupsRepo.getGroupByID(id);
         return group && {
             id: group.id,
             name: group.name,

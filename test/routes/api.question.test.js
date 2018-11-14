@@ -18,6 +18,7 @@ let memberToken;
 
 beforeAll(async () => {
     await dbConnection().catch((e) => {
+        // eslint-disable-next-line no-console
         console.log('Error connecting to database');
         process.exit();
     });
@@ -31,7 +32,7 @@ beforeAll(async () => {
     group = result.data.node;
     expect(result.success).toBe(true);
 
-    await GroupsRepo.addUsersByGoogleIds(group.id, ['member'], 'member');
+    await GroupsRepo.addUsersByGoogleIDs(group.id, ['member'], 'member');
 });
 
 test('create question', async () => {
@@ -93,8 +94,9 @@ test('delete question', async () => {
 afterAll(async () => {
     const result = await request(del(`/groups/${group.id}`, adminToken));
     expect(result.success).toBe(true);
-    await UsersRepo.deleteUserById(admin.id);
-    await UsersRepo.deleteUserById(member.id);
+    await UsersRepo.deleteUserByID(admin.id);
+    await UsersRepo.deleteUserByID(member.id);
     await UserSessionsRepo.deleteSession(session.id);
+    // eslint-disable-next-line no-console
     console.log('Passed all question route tests');
 });

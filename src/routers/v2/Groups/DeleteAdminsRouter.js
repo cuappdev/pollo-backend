@@ -15,17 +15,17 @@ class DeleteAdminsRouter extends AppDevRouter<Object> {
     }
 
     async content(req: Request) {
-        const groupId = req.params.id;
+        const groupID = req.params.id;
         const { user } = req;
-        const adminIds = JSON.parse(req.body.adminIds);
+        const adminIDs = JSON.parse(req.body.adminIDs);
 
-        if (!adminIds) throw LogUtils.logError('List of admin ids missing!');
+        if (!adminIDs) throw LogUtils.logError('List of admin ids missing!');
 
-        if (!await GroupsRepo.isAdmin(groupId, user)) {
+        if (!await GroupsRepo.isAdmin(groupID, user)) {
             throw LogUtils.logError('You are not authorized to remove admins from this group!');
         }
 
-        await GroupsRepo.removeUserByGroupId(groupId, adminIds, 'admin');
+        await GroupsRepo.removeUserByGroupID(groupID, adminIDs, 'admin');
         return null;
     }
 }

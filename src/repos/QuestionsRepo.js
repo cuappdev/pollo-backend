@@ -33,10 +33,10 @@ const createQuestion = async (text: string, group: Group, user: User):
 /**
  * Get a question by id
  * @function
- * @param {number} id - Id of question to fetch
+ * @param {number} id - ID of question to fetch
  * @return {?Question} Question with specified id
  */
-const getQuestionById = async (id: number): Promise<?Question> => {
+const getQuestionByID = async (id: number): Promise<?Question> => {
     try {
         return await db().findOneById(id);
     } catch (e) {
@@ -47,9 +47,9 @@ const getQuestionById = async (id: number): Promise<?Question> => {
 /**
  * Delete a question
  * @function
- * @param {number} id - Id of question to delete
+ * @param {number} id - ID of question to delete
  */
-const deleteQuestionById = async (id: number) => {
+const deleteQuestionByID = async (id: number) => {
     try {
         const question = await db().findOneById(id);
         await db().remove(question);
@@ -61,19 +61,19 @@ const deleteQuestionById = async (id: number) => {
 /**
  * Update a question
  * @function
- * @param {number} id - Id of question to update
+ * @param {number} id - ID of question to update
  * @param {string} text - New text of question
  * @return {?Question} Updated question
  */
-const updateQuestionById = async (id: number, text: string):
+const updateQuestionByID = async (id: number, text: string):
   Promise<?Question> => {
     try {
         const field = {};
         if (text !== undefined && text !== null) {
             field.text = text;
             await db().createQueryBuilder('questions')
-                .where('questions.id = :questionId')
-                .setParameters({ questionId: id })
+                .where('questions.id = :questionID')
+                .setParameters({ questionID: id })
                 .update(field)
                 .execute();
         }
@@ -87,14 +87,14 @@ const updateQuestionById = async (id: number, text: string):
 /**
  * Get group that question belongs to
  * @function
- * @param {number} id - Id of question we want to get the group for
+ * @param {number} id - ID of question we want to get the group for
  * @return {?Group} Group that the question belongs to
  */
-const getGroupFromQuestionId = async (id: number) : Promise<?Group> => {
+const getGroupFromQuestionID = async (id: number) : Promise<?Group> => {
     try {
         const question = await db().createQueryBuilder('questions')
             .leftJoinAndSelect('questions.group', 'group')
-            .where('questions.id = :questionId', { questionId: id })
+            .where('questions.id = :questionID', { questionID: id })
             .getOne();
         return question.group;
     } catch (e) {
@@ -105,15 +105,15 @@ const getGroupFromQuestionId = async (id: number) : Promise<?Group> => {
 /**
  * Returns if user is the owner of a question
  * @function
- * @param {number} id - Id of question we want to check the owner of
+ * @param {number} id - ID of question we want to check the owner of
  * @param {User} user - User that we want to check if they are the owner
  * @return {boolean} Whether the given user is the owner of the question
  */
-const isOwnerById = async (id: number, user: User) : Promise<?boolean> => {
+const isOwnerByID = async (id: number, user: User) : Promise<?boolean> => {
     try {
         const question = await db().createQueryBuilder('questions')
             .leftJoinAndSelect('questions.user', 'user')
-            .where('questions.id = :questionId', { questionId: id })
+            .where('questions.id = :questionID', { questionID: id })
             .getOne();
 
         return user && question.user.id === user.id;
@@ -124,9 +124,9 @@ const isOwnerById = async (id: number, user: User) : Promise<?boolean> => {
 
 export default {
     createQuestion,
-    deleteQuestionById,
-    getQuestionById,
-    updateQuestionById,
-    getGroupFromQuestionId,
-    isOwnerById,
+    deleteQuestionByID,
+    getGroupFromQuestionID,
+    getQuestionByID,
+    isOwnerByID,
+    updateQuestionByID,
 };

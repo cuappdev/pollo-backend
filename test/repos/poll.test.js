@@ -12,6 +12,7 @@ let user;
 // Connects to db before running tests and does setup
 beforeAll(async () => {
     await dbConnection().catch((e) => {
+        // eslint-disable-next-line no-console
         console.log('Error connecting to database');
         process.exit();
     });
@@ -46,29 +47,29 @@ test('Create Poll', async () => {
 });
 
 test('Get Poll', async () => {
-    const poll = await PollsRepo.getPollById(id);
+    const poll = await PollsRepo.getPollByID(id);
     expect(poll.text).toBe('Poll');
     expect(poll.shared).toBe(true);
     expect(poll.type).toBe('MULTIPLE_CHOICE');
 
-    const poll2 = await PollsRepo.getPollById(id2);
+    const poll2 = await PollsRepo.getPollByID(id2);
     expect(poll2.text).toBe('');
     expect(poll2.shared).toBe(false);
     expect(poll2.type).toBe('FREE_RESPONSE');
 });
 
 test('Update Poll', async () => {
-    const poll = await PollsRepo.updatePollById(id, 'New Poll', null, false);
+    const poll = await PollsRepo.updatePollByID(id, 'New Poll', null, false);
     expect(poll.text).toBe('New Poll');
     expect(poll.shared).toBe(false);
 
-    const poll2 = await PollsRepo.updatePollById(id2, '', { user: 'result' });
+    const poll2 = await PollsRepo.updatePollByID(id2, '', { user: 'result' });
     expect(poll2.text).toBe('');
     expect(poll2.results.user).toBe('result');
 });
 
 test('Get Group from Poll', async () => {
-    const p = await PollsRepo.getGroupFromPollId(id);
+    const p = await PollsRepo.getGroupFromPollID(id);
     expect(p.id).toBe(group.id);
 });
 
@@ -82,16 +83,17 @@ test('Get Polls from Group', async () => {
 });
 
 test('Delete Poll', async () => {
-    await PollsRepo.deletePollById(id);
-    await PollsRepo.deletePollById(id2);
-    expect(await PollsRepo.getPollById(id)).not.toBeDefined();
-    expect(await PollsRepo.getPollById(id2)).not.toBeDefined();
+    await PollsRepo.deletePollByID(id);
+    await PollsRepo.deletePollByID(id2);
+    expect(await PollsRepo.getPollByID(id)).not.toBeDefined();
+    expect(await PollsRepo.getPollByID(id2)).not.toBeDefined();
 });
 
 // Teardown
 afterAll(async () => {
-    await GroupsRepo.deleteGroupById(group.id);
-    await GroupsRepo.deleteGroupById(group2.id);
-    await UsersRepo.deleteUserById(user.id);
+    await GroupsRepo.deleteGroupByID(group.id);
+    await GroupsRepo.deleteGroupByID(group2.id);
+    await UsersRepo.deleteUserByID(user.id);
+    // eslint-disable-next-line no-console
     console.log('Passed all poll tests');
 });

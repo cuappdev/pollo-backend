@@ -13,22 +13,23 @@ const {
 
 const opts = { name: 'Test group', code: GroupsRepo.createCode() };
 const opts2 = { name: 'New group' };
-const googleId = 'usertest';
+const googleID = 'usertest';
 let adminToken;
 let userToken;
 let session;
 let group;
-let adminId;
-let userId;
+let adminID;
+let userID;
 
 beforeAll(async () => {
     await dbConnection().catch((e) => {
+        // eslint-disable-next-line no-console
         console.log('Error connecting to database');
         process.exit();
     });
 
-    const user = await UsersRepo.createDummyUser(googleId);
-    adminId = user.id;
+    const user = await UsersRepo.createDummyUser(googleID);
+    adminID = user.id;
     session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
     adminToken = session.sessionToken;
 });
@@ -59,9 +60,9 @@ test('get groups for admin', async () => {
 
 test('add admins to group', async () => {
     const user = await UsersRepo.createDummyUser('dummy');
-    userId = user.id;
+    userID = user.id;
     const body = {
-        adminIds: [userId],
+        adminIDs: [userID],
     };
     const getstr = await request(post(`/groups/${group.data.node.id}/admins/`, body,
         adminToken));
@@ -75,27 +76,27 @@ test('get admins for group', async () => {
     expect(getres.success).toBe(true);
     const { edges } = getres.data;
     expect(edges.length).toBe(2);
-    expect(edges[0].node.id).toBe(adminId);
-    expect(edges[1].node.id).toBe(userId);
+    expect(edges[0].node.id).toBe(adminID);
+    expect(edges[1].node.id).toBe(userID);
 });
 
 test('remove admin from group', async () => {
     const body = {
-        adminIds: [userId],
+        adminIDs: [userID],
     };
     const getstr = await request(put(`/groups/${group.data.node.id}/admins/`, body,
         adminToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
-    UsersRepo.deleteUserById(userId);
+    UsersRepo.deleteUserByID(userID);
 });
 
 test('add members to group', async () => {
     const user = await UsersRepo.createDummyUser('dummy');
-    userId = user.id;
+    userID = user.id;
     userToken = (await UserSessionsRepo.createOrUpdateSession(user, null, null)).sessionToken;
     const body = {
-        memberIds: [userId],
+        memberIDs: [userID],
     };
     const getstr = await request(post(`/groups/${group.data.node.id}/members/`, body,
         adminToken));
@@ -119,7 +120,7 @@ test('get members of group', async () => {
     expect(getres.success).toBe(true);
     const { edges } = getres.data;
     expect(edges.length).toBe(1);
-    expect(edges[0].node.id).toBe(userId);
+    expect(edges[0].node.id).toBe(userID);
 });
 
 test('leave group', async () => {
@@ -135,7 +136,7 @@ test('leave group', async () => {
         });
 
     const postBody = {
-        memberIds: [userId],
+        memberIDs: [userID],
     };
     await request(post(`/groups/${group.data.node.id}/members/`, postBody, adminToken),
         (error, res, body) => {
@@ -145,13 +146,13 @@ test('leave group', async () => {
 
 test('remove member from group', async () => {
     const body = {
-        memberIds: [userId],
+        memberIDs: [userID],
     };
     const getstr = await request(put(`/groups/${group.data.node.id}/members`, body,
         adminToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
-    await UsersRepo.deleteUserById(userId);
+    await UsersRepo.deleteUserByID(userID);
 });
 
 test('get groups for admin', async () => {
@@ -188,7 +189,8 @@ test('delete group', async () => {
 });
 
 afterAll(async () => {
-    await UsersRepo.deleteUserById(adminId);
+    await UsersRepo.deleteUserByID(adminID);
     await UserSessionsRepo.deleteSession(session.id);
+    // eslint-disable-next-line no-console
     console.log('Passed all group route tests');
 });

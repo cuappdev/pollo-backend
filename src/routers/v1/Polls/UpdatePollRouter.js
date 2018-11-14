@@ -16,21 +16,21 @@ class UpdatePollRouter extends AppDevRouter<Object> {
     }
 
     async content(req: Request): Promise<{ node: APIPoll }> {
-        const { name, deviceId } = req.body;
-        const pollId = req.params.id;
+        const { name, deviceID } = req.body;
+        const pollID = req.params.id;
 
-        let poll = await GroupsRepo.getGroupById(pollId);
-        if (!poll) throw new Error(`Poll with id ${pollId} was not found!`);
+        let poll = await GroupsRepo.getGroupByID(pollID);
+        if (!poll) throw new Error(`Poll with id ${pollID} was not found!`);
 
-        const users = await GroupsRepo.getUsersByGroupId(pollId, 'admin');
-        if (users && users[0] && deviceId !== users[0].googleId) {
+        const users = await GroupsRepo.getUsersByGroupID(pollID, 'admin');
+        if (users && users[0] && deviceID !== users[0].googleID) {
             throw new Error('You are not authorized to delete this poll!');
         }
 
         if (!name) throw new Error('No fields specified to update.');
 
-        poll = await GroupsRepo.updateGroupById(pollId, name);
-        if (!poll) throw new Error(`Poll with id ${pollId} was not found!`);
+        poll = await GroupsRepo.updateGroupByID(pollID, name);
+        if (!poll) throw new Error(`Poll with id ${pollID} was not found!`);
         return {
             node: {
                 id: poll.id,

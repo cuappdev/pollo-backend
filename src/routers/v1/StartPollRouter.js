@@ -19,7 +19,7 @@ class StartPollRouter extends AppDevRouter<APIPoll> {
         let { name } = req.body;
 
         if (!name) name = '';
-        let poll = await GroupsRepo.getGroupById(id);
+        let poll = await GroupsRepo.getGroupByID(id);
 
         if (!(id || code)) {
             throw new Error('Poll id, or code and device id required.');

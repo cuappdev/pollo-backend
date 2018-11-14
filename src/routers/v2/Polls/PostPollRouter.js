@@ -18,7 +18,7 @@ class PostPollRouter extends AppDevRouter<Object> {
     }
 
     async content(req: Request): Promise<{ node: APIPoll }> {
-        const groupId = req.params.id;
+        const groupID = req.params.id;
         let { text, results, shared } = req.body;
         const { type, correctAnswer } = req.body;
         const { user } = req;
@@ -30,10 +30,10 @@ class PostPollRouter extends AppDevRouter<Object> {
             throw LogUtils.logError('Valid poll type not found');
         }
 
-        const group = await GroupsRepo.getGroupById(groupId);
-        if (!group) throw LogUtils.logError(`Couldn't find group with id ${groupId}`);
+        const group = await GroupsRepo.getGroupByID(groupID);
+        if (!group) throw LogUtils.logError(`Couldn't find group with id ${groupID}`);
 
-        if (!await GroupsRepo.isAdmin(groupId, user)) {
+        if (!await GroupsRepo.isAdmin(groupID, user)) {
             throw LogUtils.logError('You are not authorized to post a poll!');
         }
 

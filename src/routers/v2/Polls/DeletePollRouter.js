@@ -16,17 +16,17 @@ class DeletePollRouter extends AppDevRouter<Object> {
     }
 
     async content(req: Request) {
-        const pollId = req.params.id;
+        const pollID = req.params.id;
         const { user } = req;
 
-        const group = await PollsRepo.getGroupFromPollId(pollId);
+        const group = await PollsRepo.getGroupFromPollID(pollID);
         if (!group) {
-            throw LogUtils.logError(`Couldn't find group with poll ${pollId}`);
+            throw LogUtils.logError(`Couldn't find group with poll ${pollID}`);
         }
         if (!await GroupsRepo.isAdmin(group.id, user)) {
             throw LogUtils.logError('You are not authorized to delete this poll!');
         }
-        await PollsRepo.deletePollById(pollId);
+        await PollsRepo.deletePollByID(pollID);
         return null;
     }
 }

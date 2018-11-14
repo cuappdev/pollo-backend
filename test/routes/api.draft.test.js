@@ -9,16 +9,17 @@ const {
 
 let draft1;
 let draft2;
-let userId;
+let userID;
 let userToken;
 
 beforeAll(async () => {
     await dbConnection().catch((e) => {
+        // eslint-disable-next-line no-console
         console.log('Error connecting to database');
         process.exit();
     });
-    const user = await UsersRepo.createDummyUser('googleId');
-    userId = user.id;
+    const user = await UsersRepo.createDummyUser('googleID');
+    userID = user.id;
     const session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
     userToken = session.sessionToken;
 });
@@ -94,5 +95,5 @@ test('Delete draft', async () => {
 });
 
 afterAll(async () => {
-    UsersRepo.deleteUserById(userId);
+    UsersRepo.deleteUserByID(userID);
 });

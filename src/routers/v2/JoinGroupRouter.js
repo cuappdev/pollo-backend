@@ -24,13 +24,13 @@ class JoinGroupRouter extends AppDevRouter<APIGroup> {
         }
 
         if (code) {
-            id = await GroupsRepo.getGroupId(code);
+            id = await GroupsRepo.getGroupID(code);
             if (!id) {
                 throw LogUtils.logError(`No group with code ${code} found.`);
             }
         }
 
-        const group = await GroupsRepo.getGroupById(id);
+        const group = await GroupsRepo.getGroupByID(id);
         if (!group) {
             throw LogUtils.logError(`No group with id ${id} found.`);
         }

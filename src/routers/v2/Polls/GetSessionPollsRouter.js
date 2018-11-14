@@ -32,7 +32,7 @@ class GetGroupPollsRouter extends AppDevRouter<Object> {
                 results: poll.results,
                 shared: poll.shared,
                 type: poll.type,
-                answer: isAdmin ? null : poll.userAnswers[req.user.googleId],
+                answer: isAdmin ? null : poll.userAnswers[req.user.googleID],
                 correctAnswer: poll.correctAnswer,
             };
             if (pollsByDate[date]) {

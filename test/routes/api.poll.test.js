@@ -11,20 +11,21 @@ const {
 // Polls
 // Must be running server to test
 
-const googleId = 'usertest';
+const googleID = 'usertest';
 let group;
 let session;
 let poll;
-let userId;
+let userID;
 let token;
 
 beforeAll(async () => {
     await dbConnection().catch((e) => {
+        // eslint-disable-next-line no-console
         console.log('Error connecting to database');
         process.exit();
     });
-    const user = await UsersRepo.createDummyUser(googleId);
-    userId = user.id;
+    const user = await UsersRepo.createDummyUser(googleID);
+    userID = user.id;
     session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
     token = session.sessionToken;
 
@@ -103,7 +104,8 @@ test('delete poll', async () => {
 afterAll(async () => {
     const result = await request(del(`/groups/${group.id}`, token));
     expect(result.success).toBe(true);
-    await UsersRepo.deleteUserById(userId);
-    await UserSessionsRepo.deleteSession(session.id); // TODO: should this be group.id
+    await UsersRepo.deleteUserByID(userID);
+    await UserSessionsRepo.deleteSession(session.id);
+    // eslint-disable-next-line no-console
     console.log('Passed all poll route tests');
 });

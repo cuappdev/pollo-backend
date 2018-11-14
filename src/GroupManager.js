@@ -4,7 +4,7 @@ import Group from './models/Group';
 import GroupSocket from './GroupSocket';
 
 /**
- * GroupManager is responsibble for handling all socket groups
+ * GroupManager is responsible for handling all socket groups
  */
 class GroupManager {
   /** All the groups currently running. */
@@ -25,11 +25,7 @@ class GroupManager {
   async startNewGroup(group: Group) {
       const nsp = this.io.of(`/${group.id}`);
       this.groupSockets.push(new GroupSocket({
-          group,
-          nsp,
-          onClose: () => {
-              this.endGroup(group, true);
-          },
+          group, nsp, onClose: () => { this.endGroup(group, true); },
       }));
   }
 
@@ -45,25 +41,23 @@ class GroupManager {
           return groupUndefined ? false : x.group.id === group.id;
       });
 
-      if (index !== -1) {
-          const socket = this.groupSockets[index];
+      if (index === -1) return;
 
-          if (socket.closing) return;
-          socket.closing = true;
+      const socket = this.groupSockets[index];
 
-          if (save) {
-              socket.saveGroup();
-          }
+      if (socket.closing) return;
+      socket.closing = true;
 
-          const connectedSockets = Object.keys(socket.nsp.connected);
-          connectedSockets.forEach((id) => {
-              socket.nsp.connected[id].disconnect();
-          });
-          socket.nsp.removeAllListeners();
+      if (save) socket.saveGroup();
 
-          this.groupSockets.splice(index, 1);
-          delete this.io.nsps[`/${group.id}`];
-      }
+      const connectedSockets = Object.keys(socket.nsp.connected);
+      connectedSockets.forEach((id) => {
+          socket.nsp.connected[id].disconnect();
+      });
+      socket.nsp.removeAllListeners();
+
+      this.groupSockets.splice(index, 1);
+      delete this.io.nsps[`/${group.id}`];
   }
 
   /**

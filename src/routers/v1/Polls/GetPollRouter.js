@@ -13,8 +13,8 @@ class GetPollRouter extends AppDevNodeRouter<APIPoll> {
         return '/polls/:id/';
     }
 
-    async fetchWithId(id: number) {
-        const poll = await GroupsRepo.getGroupById(id);
+    async fetchWithID(id: number) {
+        const poll = await GroupsRepo.getGroupByID(id);
         return poll && {
             id: poll.id,
             name: poll.name,

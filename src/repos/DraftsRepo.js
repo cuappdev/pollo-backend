@@ -32,15 +32,15 @@ const createDraft = async (text: string, options: string[], user: User):
 /**
 * Gets draft by id
 * @function
-* @param {number} id - Id of draft we want to fetch
+* @param {number} id - ID of draft we want to fetch
 * @return {Draft} Draft with given id
 */
 const getDraft = async (id: number): Promise<Draft> => {
     try {
         return await db().createQueryBuilder('drafts')
             .leftJoinAndSelect('drafts.user', 'users')
-            .where('drafts.id = :draftId')
-            .setParameters({ draftId: id })
+            .where('drafts.id = :draftID')
+            .setParameters({ draftID: id })
             .getOne();
     } catch (e) {
         throw LogUtils.logError(`Problem getting draft with id: ${id}`);
@@ -50,14 +50,14 @@ const getDraft = async (id: number): Promise<Draft> => {
 /**
 * Gets draft by user id
 * @function
-* @param {number} id - Id of user we want to fetch drafts for
+* @param {number} id - ID of user we want to fetch drafts for
 * @return {Draft[]} Drafts belonging to the user specified
 */
 const getDraftsByUser = async (id: number): Promise<Array<?Draft>> => {
     try {
         return await db().createQueryBuilder('drafts')
-            .innerJoinAndSelect('drafts.user', 'user', 'user.id = :userId')
-            .setParameters({ userId: id })
+            .innerJoinAndSelect('drafts.user', 'user', 'user.id = :userID')
+            .setParameters({ userID: id })
             .getMany();
     } catch (e) {
         throw LogUtils.logError(`Problem getting drafts for user with id: ${id}`);
@@ -67,7 +67,7 @@ const getDraftsByUser = async (id: number): Promise<Array<?Draft>> => {
 /**
 * Updates draft
 * @function
-* @param {number} id - Id of draft to update
+* @param {number} id - ID of draft to update
 * @param {string} [text] - New text of draft
 * @param {string[]} [options] - New options of draft
 * @return {?Draft} Updated draft
@@ -77,8 +77,8 @@ const updateDraft = async (id: number, text: ?string, options: ?string[]):
     try {
         const draft = await db().createQueryBuilder('drafts')
             .leftJoinAndSelect('drafts.user', 'user')
-            .where('drafts.id = :draftId')
-            .setParameters({ draftId: id })
+            .where('drafts.id = :draftID')
+            .setParameters({ draftID: id })
             .getOne();
 
         if (options) draft.options = options;
@@ -94,7 +94,7 @@ const updateDraft = async (id: number, text: ?string, options: ?string[]):
 /**
 * Deletes draft
 * @function
-* @param {number} id - Id of draft to delete
+* @param {number} id - ID of draft to delete
 */
 const deleteDraft = async (id: number) => {
     try {
@@ -108,15 +108,15 @@ const deleteDraft = async (id: number) => {
 /**
 * Get owner of a draft
 * @function
-* @param {number} id - Id of draft to get owner of
+* @param {number} id - ID of draft to get owner of
 * @return {?User} owner of draft
 */
-const getOwnerById = async (id: number): Promise<?User> => {
+const getOwnerByID = async (id: number): Promise<?User> => {
     try {
         const draft = await db().createQueryBuilder('drafts')
             .leftJoinAndSelect('drafts.user', 'user')
-            .where('drafts.id = :draftId')
-            .setParameters({ draftId: id })
+            .where('drafts.id = :draftID')
+            .setParameters({ draftID: id })
             .getOne();
 
         return draft.user;
@@ -131,5 +131,5 @@ export default {
     updateDraft,
     deleteDraft,
     getDraft,
-    getOwnerById,
+    getOwnerByID,
 };

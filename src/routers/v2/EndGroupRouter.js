@@ -17,7 +17,7 @@ class EndGroupRouter extends AppDevRouter<Object> {
     async content(req: Request) {
         const { id, save } = req.params;
 
-        const group = await GroupsRepo.getGroupById(id);
+        const group = await GroupsRepo.getGroupByID(id);
         if (!group) {
             throw LogUtils.logError(`No group with id ${id} found.`);
         }
@@ -27,11 +27,10 @@ class EndGroupRouter extends AppDevRouter<Object> {
         }
 
         if (save === 'false' || save === '0') {
-            await GroupsRepo.deleteGroupById(id);
+            await GroupsRepo.deleteGroupByID(id);
         }
 
         await req.app.groupManager.endGroup(group, save);
-
         return null;
     }
 }

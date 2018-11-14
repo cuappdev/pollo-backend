@@ -15,14 +15,14 @@ class GetAdminsRouter extends AppDevEdgeRouter<APIUser> {
 
     async contentArray(req, pageInfo, error) {
         const { id } = req.params;
-        const users = await GroupsRepo.getUsersByGroupId(id, 'admin');
+        const users = await GroupsRepo.getUsersByGroupID(id, 'admin');
         return users
             .filter(Boolean)
             .map(user => ({
                 node: {
                     id: user.id,
                     name: `${user.firstName} ${user.lastName}`,
-                    netId: user.netId,
+                    netID: user.netID,
                 },
                 cursor: user.createdAt.valueOf(),
             }));

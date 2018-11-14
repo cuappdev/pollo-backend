@@ -17,15 +17,15 @@ class PostAdminsRouter extends AppDevRouter<Object> {
     async content(req: Request) {
         const { id } = req.params;
         const { user } = req;
-        const { adminIds } = req.body;
+        const { adminIDs } = req.body;
 
-        if (!adminIds) throw LogUtils.logError('List of admin ids missing!');
+        if (!adminIDs) throw LogUtils.logError('List of admin ids missing!');
 
         if (!await GroupsRepo.isAdmin(id, user)) {
             throw LogUtils.logError('You are not authorized to add admins to this group!');
         }
 
-        await GroupsRepo.addUsersByIds(id, adminIds, 'admin');
+        await GroupsRepo.addUsersByIDs(id, adminIDs, 'admin');
         return null;
     }
 }

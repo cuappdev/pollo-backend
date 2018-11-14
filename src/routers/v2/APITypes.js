@@ -46,7 +46,7 @@ export type APIQuestion = {|
 export type APIUser = {|
   id: id,
   name: string,
-  netId: string
+  netID: string
 |}
 
 export type APIUserSession = {|
