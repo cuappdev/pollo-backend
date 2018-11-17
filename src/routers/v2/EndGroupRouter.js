@@ -11,7 +11,7 @@ class EndGroupRouter extends AppDevRouter<Object> {
     }
 
     getPath(): string {
-        return '/groups/:id/end/';
+        return '/sessions/:id/end/';
     }
 
     async content(req: Request) {

@@ -6,7 +6,7 @@ import type { APIGroup } from '../APITypes';
 
 class GetGroupRouter extends AppDevNodeRouter<APIGroup> {
     getPath(): string {
-        return '/groups/:id/';
+        return '/sessions/:id/';
     }
 
     async fetchWithID(id: number) {

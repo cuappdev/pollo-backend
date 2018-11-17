@@ -11,7 +11,7 @@ class GetGroupPollsRouter extends AppDevRouter<Object> {
     }
 
     getPath(): string {
-        return '/groups/:id/polls/';
+        return '/sessions/:id/polls/';
     }
 
     async content(req: Request) {

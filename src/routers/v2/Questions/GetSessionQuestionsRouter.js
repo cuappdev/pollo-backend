@@ -11,7 +11,7 @@ class GetGroupQuestionsRouter extends AppDevRouter<Object> {
     }
 
     getPath(): string {
-        return '/groups/:id/questions/date/';
+        return '/sessions/:id/questions/date/';
     }
 
     async content(req: Request) {

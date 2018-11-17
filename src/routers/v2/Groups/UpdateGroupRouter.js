@@ -13,7 +13,7 @@ class UpdateGroupRouter extends AppDevRouter<APIGroup> {
     }
 
     getPath(): string {
-        return '/groups/:id/';
+        return '/sessions/:id/';
     }
 
     async content(req: Request): Promise<{ node: APIGroup }> {

@@ -11,7 +11,7 @@ class DeleteGroupRouter extends AppDevRouter<Object> {
     }
 
     getPath(): string {
-        return '/groups/:id/';
+        return '/sessions/:id/';
     }
 
     async content(req: Request) {

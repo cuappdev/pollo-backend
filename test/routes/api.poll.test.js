@@ -31,7 +31,7 @@ beforeAll(async () => {
 
     // Create a group
     const opts = { name: 'Test group', code: GroupsRepo.createCode() };
-    const result = await request(post('/groups/', opts, token));
+    const result = await request(post('/sessions/', opts, token));
     group = result.data.node;
     expect(result.success).toBe(true);
 });
@@ -40,7 +40,7 @@ test('create poll', async () => {
     const opts = {
         text: 'Poll text', shared: true, type: 'MULTIPLE_CHOICE', correctAnswer: 'B',
     };
-    const result = await request(post(`/groups/${group.id}/polls`, opts, token));
+    const result = await request(post(`/sessions/${group.id}/polls`, opts, token));
     poll = result.data.node;
     expect(result.success).toBe(true);
 });
@@ -49,7 +49,7 @@ test('create poll with invalid token', async () => {
     const opts = {
         text: 'Poll text', results: {}, shared: true, correctAnswer: '',
     };
-    const result = await request(post(`/groups/${group.id}/polls`, opts, 'invalid'));
+    const result = await request(post(`/sessions/${group.id}/polls`, opts, 'invalid'));
     expect(result.success).toBe(false);
 });
 
@@ -61,7 +61,7 @@ test('get poll by id', async () => {
 });
 
 test('get polls by group', async () => {
-    const getstr = await request(get(`/groups/${group.id}/polls`, token));
+    const getstr = await request(get(`/sessions/${group.id}/polls`, token));
     const getres = getstr;
     expect(getres.success).toBe(true);
     const date = Object.keys(getres.data);
@@ -102,7 +102,7 @@ test('delete poll', async () => {
 });
 
 afterAll(async () => {
-    const result = await request(del(`/groups/${group.id}`, token));
+    const result = await request(del(`/sessions/${group.id}`, token));
     expect(result.success).toBe(true);
     await UsersRepo.deleteUserByID(userID);
     await UserSessionsRepo.deleteSession(session.id);

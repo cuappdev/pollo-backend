@@ -35,21 +35,21 @@ beforeAll(async () => {
 });
 
 test('create group', async () => {
-    const option = post('/groups/', opts, adminToken);
+    const option = post('/sessions/', opts, adminToken);
     const result = await request(option);
     group = result;
     expect(group.success).toBe(true);
 });
 
 test('get single group', async () => {
-    const getstr = await request(get(`/groups/${group.data.node.id}`, adminToken));
+    const getstr = await request(get(`/sessions/${group.data.node.id}`, adminToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
     expect(group).toMatchObject(getres);
 });
 
 test('get groups for admin', async () => {
-    const getstr = await request(get('/groups/all/admin', adminToken));
+    const getstr = await request(get('/sessions/all/admin', adminToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
     const node = getres.data[0];
@@ -64,14 +64,14 @@ test('add admins to group', async () => {
     const body = {
         adminIDs: [userID],
     };
-    const getstr = await request(post(`/groups/${group.data.node.id}/admins/`, body,
+    const getstr = await request(post(`/sessions/${group.data.node.id}/admins/`, body,
         adminToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
 });
 
 test('get admins for group', async () => {
-    const getstr = await request(get(`/groups/${group.data.node.id}/admins/`, adminToken));
+    const getstr = await request(get(`/sessions/${group.data.node.id}/admins/`, adminToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
     const { edges } = getres.data;
@@ -84,7 +84,7 @@ test('remove admin from group', async () => {
     const body = {
         adminIDs: [userID],
     };
-    const getstr = await request(put(`/groups/${group.data.node.id}/admins/`, body,
+    const getstr = await request(put(`/sessions/${group.data.node.id}/admins/`, body,
         adminToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
@@ -98,14 +98,14 @@ test('add members to group', async () => {
     const body = {
         memberIDs: [userID],
     };
-    const getstr = await request(post(`/groups/${group.data.node.id}/members/`, body,
+    const getstr = await request(post(`/sessions/${group.data.node.id}/members/`, body,
         adminToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
 });
 
 test('get groups as member', async () => {
-    const getstr = await request(get('/groups/all/member/', userToken));
+    const getstr = await request(get('/sessions/all/member/', userToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
     const node = getres.data[0];
@@ -115,7 +115,7 @@ test('get groups as member', async () => {
 });
 
 test('get members of group', async () => {
-    const getstr = await request(get(`/groups/${group.data.node.id}/members/`, adminToken));
+    const getstr = await request(get(`/sessions/${group.data.node.id}/members/`, adminToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
     const { edges } = getres.data;
@@ -124,12 +124,12 @@ test('get members of group', async () => {
 });
 
 test('leave group', async () => {
-    await request(del(`/groups/${group.data.node.id}/members/`, userToken),
+    await request(del(`/sessions/${group.data.node.id}/members/`, userToken),
         (error, res, body) => {
             expect(body.success).toBe(true);
         });
 
-    await request(get(`/groups/${group.data.node.id}/members/`, adminToken),
+    await request(get(`/sessions/${group.data.node.id}/members/`, adminToken),
         (error, res, body) => {
             expect(body.success).toBe(true);
             expect(body.data.edges.length).toBe(0);
@@ -138,7 +138,7 @@ test('leave group', async () => {
     const postBody = {
         memberIDs: [userID],
     };
-    await request(post(`/groups/${group.data.node.id}/members/`, postBody, adminToken),
+    await request(post(`/sessions/${group.data.node.id}/members/`, postBody, adminToken),
         (error, res, body) => {
             expect(body.success).toBe(true);
         });
@@ -148,7 +148,7 @@ test('remove member from group', async () => {
     const body = {
         memberIDs: [userID],
     };
-    const getstr = await request(put(`/groups/${group.data.node.id}/members`, body,
+    const getstr = await request(put(`/sessions/${group.data.node.id}/members`, body,
         adminToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
@@ -156,7 +156,7 @@ test('remove member from group', async () => {
 });
 
 test('get groups for admin', async () => {
-    const getstr = await request(get('/groups/all/admin/', adminToken));
+    const getstr = await request(get('/sessions/all/admin/', adminToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
     const node = getres.data[0];
@@ -166,25 +166,25 @@ test('get groups for admin', async () => {
 });
 
 test('update group', async () => {
-    const getstr = await request(put(`/groups/${group.data.node.id}`, opts2, adminToken));
+    const getstr = await request(put(`/sessions/${group.data.node.id}`, opts2, adminToken));
     const getres = getstr;
     expect(getres.success).toBe(true);
     expect(getres.data.node.name).toBe('New group');
 });
 
 test('update group with invalid adminToken', async () => {
-    const getstr = await request(put(`/groups/${group.data.node.id}`, opts2, 'invalid'));
+    const getstr = await request(put(`/sessions/${group.data.node.id}`, opts2, 'invalid'));
     const getres = getstr;
     expect(getres.success).toBe(false);
 });
 
 test('delete group with invalid adminToken', async () => {
-    const result = await request(del(`/groups/${group.data.node.id}`, 'invalid'));
+    const result = await request(del(`/sessions/${group.data.node.id}`, 'invalid'));
     expect(result.success).toBe(false);
 });
 
 test('delete group', async () => {
-    const result = await request(del(`/groups/${group.data.node.id}`, adminToken));
+    const result = await request(del(`/sessions/${group.data.node.id}`, adminToken));
     expect(result.success).toBe(true);
 });
 

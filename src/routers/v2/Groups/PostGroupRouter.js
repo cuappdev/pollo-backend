@@ -13,7 +13,7 @@ class PostGroupRouter extends AppDevRouter<Object> {
     }
 
     getPath(): string {
-        return '/groups/';
+        return '/sessions/';
     }
 
     async content(req: Request): Promise<{ node: APIGroup }> {

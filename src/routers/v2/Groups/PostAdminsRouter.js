@@ -11,7 +11,7 @@ class PostAdminsRouter extends AppDevRouter<Object> {
     }
 
     getPath(): string {
-        return '/groups/:id/admins/';
+        return '/sessions/:id/admins/';
     }
 
     async content(req: Request) {

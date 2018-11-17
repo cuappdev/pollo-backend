@@ -11,7 +11,7 @@ class PostMembersRouter extends AppDevRouter<Object> {
     }
 
     getPath(): string {
-        return '/groups/:id/members/';
+        return '/sessions/:id/members/';
     }
 
     async content(req: Request) {

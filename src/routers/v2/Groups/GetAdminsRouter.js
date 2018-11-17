@@ -10,7 +10,7 @@ class GetAdminsRouter extends AppDevEdgeRouter<APIUser> {
     }
 
     getPath(): string {
-        return '/groups/:id/admins/';
+        return '/sessions/:id/admins/';
     }
 
     async contentArray(req, pageInfo, error) {

@@ -10,7 +10,7 @@ class GetQuestionsRouter extends AppDevEdgeRouter<APIQuestion> {
     }
 
     getPath(): string {
-        return '/groups/:id/questions/';
+        return '/sessions/:id/questions/';
     }
 
     async contentArray(req, pageInfo, error) {

@@ -10,7 +10,7 @@ class GetMembersRouter extends AppDevEdgeRouter<APIUser> {
     }
 
     getPath(): string {
-        return '/groups/:id/members/';
+        return '/sessions/:id/members/';
     }
 
     async contentArray(req, pageInfo, error) {

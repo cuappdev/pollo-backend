@@ -12,7 +12,7 @@ class GetGroupsRouter extends AppDevRouter<Object> {
     }
 
     getPath(): string {
-        return '/groups/all/member/';
+        return '/sessions/all/member/';
     }
 
     async content(req: Request) {

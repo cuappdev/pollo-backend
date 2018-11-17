@@ -14,7 +14,7 @@ class PostQuestionRouter extends AppDevRouter<Object> {
     }
 
     getPath(): string {
-        return '/groups/:id/questions/';
+        return '/sessions/:id/questions/';
     }
 
     async content(req: Request): Promise<{ node: APIQuestion }> {
