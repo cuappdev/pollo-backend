@@ -3,9 +3,9 @@ import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';
 import LogUtils from '../../../utils/LogUtils';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import GroupsRepo from '../../../repos/GroupsRepo';
 
-class LeaveSessionRouter extends AppDevRouter<Object> {
+class LeaveGroupRouter extends AppDevRouter<Object> {
     constructor() {
         super(constants.REQUEST_TYPES.DELETE);
     }
@@ -15,16 +15,16 @@ class LeaveSessionRouter extends AppDevRouter<Object> {
     }
 
     async content(req: Request) {
-        const sessionId = req.params.id;
+        const groupID = req.params.id;
         const { user } = req;
 
-        if (await SessionsRepo.isAdmin(sessionId, user)) {
-            throw LogUtils.logError('You are not allowed to leave your own session!');
+        if (await GroupsRepo.isAdmin(groupID, user)) {
+            throw LogUtils.logError('You are not allowed to leave your own group!');
         }
 
-        await SessionsRepo.removeUserBySessionId(sessionId, user, 'member');
+        await GroupsRepo.removeUserByGroupID(groupID, user, 'member');
         return null;
     }
 }
 
-export default new LeaveSessionRouter().router;
+export default new LeaveGroupRouter().router;

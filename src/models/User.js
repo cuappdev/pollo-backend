@@ -9,7 +9,7 @@ import {
 import Base from './Base';
 import Draft from './Draft';
 import Question from './Question';
-import Session from './Session';
+import Group from './Group';
 import appDevUtils from '../utils/AppDevUtils';
 
 @Entity('users')
@@ -24,11 +24,11 @@ class User extends Base {
 
   @Column('string')
   /** Google ID of user */
-  googleId: string = '';
+  googleID: string = '';
 
   @Column('string')
   /** Net ID of user */
-  netId: string = '';
+  netID: string = '';
 
   @Column('string')
   /** Email of user */
@@ -42,13 +42,13 @@ class User extends Base {
   /** User last name */
   lastName: string = '';
 
-  @ManyToMany(type => Session, session => session.admins)
-  /** Sessions that the user is an admin of */
-  adminSessions: ?Session[] = [];
+  @ManyToMany(type => Group, group => group.admins)
+  /** Groups that the user is an admin of */
+  adminGroups: ?Group[] = [];
 
-  @ManyToMany(type => Session, session => session.members)
-  /** Sessions that the user is a member of */
-  memberSessions: ?Session[] = [];
+  @ManyToMany(type => Group, group => group.members)
+  /** Groups that the user is a member of */
+  memberGroups: ?Group[] = [];
 
   @OneToMany(type => Question, question => question.user)
   /** Questions that a user has asked */
@@ -66,11 +66,11 @@ class User extends Base {
    */
   static dummy(id: string): User {
       const user = new User();
-      user.googleId = id;
+      user.googleID = id;
       user.firstName = '';
       user.lastName = '';
       user.email = '';
-      user.netId = '';
+      user.netID = '';
       return user;
   }
 
@@ -82,11 +82,11 @@ class User extends Base {
    */
   static fromGoogleCreds(creds: Object): User {
       const user = new User();
-      user.googleId = creds.id;
+      user.googleID = creds.id;
       user.firstName = creds.name.givenName;
       user.lastName = creds.name.familyName;
       user.email = creds.emails[0].value;
-      user.netId = appDevUtils.netIdFromEmail(user.email);
+      user.netID = appDevUtils.netIDFromEmail(user.email);
       return user;
   }
 }

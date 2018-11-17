@@ -2,7 +2,7 @@
 import { getConnectionManager, json, Repository } from 'typeorm';
 import LogUtils from '../utils/LogUtils';
 import Poll from '../models/Poll';
-import Session from '../models/Session';
+import Group from '../models/Group';
 
 const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Poll);
 
@@ -10,7 +10,7 @@ const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Po
  * Create a poll and saves it to the db
  * @function
  * @param {string} text - Text of poll
- * @param {Session} [session] - Session that the poll belongs to
+ * @param {Group} [group] - Group that the poll belongs to
  * @param {json} results - Results of poll
  * @param {boolean} canShare - Whether the results of the poll are shared
  * @param {string} type - Type of poll, see Poll class for more info
@@ -18,13 +18,13 @@ const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Po
  * @param {json} [userAnswers] - Json mapping users to their answers
  * @return {Poll} New poll created
  */
-const createPoll = async (text: string, session: ?Session, results: json,
+const createPoll = async (text: string, group: ?Group, results: json,
     canShare: boolean, type: string, correctAnswer: string, userAnswers: ?json):
   Promise <Poll> => {
     try {
         const poll = new Poll();
         poll.text = text;
-        poll.session = session;
+        poll.group = group;
         poll.results = results;
         poll.shared = canShare;
         poll.type = type;
@@ -44,7 +44,7 @@ const createPoll = async (text: string, session: ?Session, results: json,
  * @param {number} id - id of the poll we want
  * @return {?Poll} Poll with corresponding id
  */
-const getPollById = async (id: number): Promise<?Poll> => {
+const getPollByID = async (id: number): Promise<?Poll> => {
     try {
         return await db().findOneById(id);
     } catch (e) {
@@ -57,7 +57,7 @@ const getPollById = async (id: number): Promise<?Poll> => {
  * @function
  * @param {number} id - id of the poll to delete
  */
-const deletePollById = async (id: number) => {
+const deletePollByID = async (id: number) => {
     try {
         const poll = await db().findOneById(id);
         await db().remove(poll);
@@ -76,14 +76,14 @@ const deletePollById = async (id: number) => {
  * @param {json} [userAnswers] - new json of user answers
  * @return {?Poll} Updated poll
  */
-const updatePollById = async (id: number, text: ?string, results: ?json,
+const updatePollByID = async (id: number, text: ?string, results: ?json,
     canShare: ?boolean, userAnswers: ?json):
   Promise<?Poll> => {
     try {
         const poll = await db().createQueryBuilder('polls')
-            .leftJoinAndSelect('polls.session', 'session')
-            .where('polls.id = :pollId')
-            .setParameters({ pollId: id })
+            .leftJoinAndSelect('polls.group', 'group')
+            .where('polls.id = :pollID')
+            .setParameters({ pollID: id })
             .getOne();
 
         if (text !== undefined && text !== null) poll.text = text;
@@ -99,27 +99,27 @@ const updatePollById = async (id: number, text: ?string, results: ?json,
 };
 
 /**
- * Get session that a poll belongs to
+ * Get group that a poll belongs to
  * @function
- * @param {number} id - id of poll we want to find the session for
- * @return {?Session} Session that the poll belongs to
+ * @param {number} id - id of poll we want to find the group for
+ * @return {?Group} Group that the poll belongs to
  */
-const getSessionFromPollId = async (id: number) : Promise<?Session> => {
+const getGroupFromPollID = async (id: number) : Promise<?Group> => {
     try {
         const poll = await db().createQueryBuilder('polls')
-            .leftJoinAndSelect('polls.session', 'session')
-            .where('polls.id = :pollId', { pollId: id })
+            .leftJoinAndSelect('polls.group', 'group')
+            .where('polls.id = :pollID', { pollID: id })
             .getOne();
-        return poll.session;
+        return poll.group;
     } catch (e) {
-        throw LogUtils.logError(`Problem getting session from quesiton with id: ${id}!`);
+        throw LogUtils.logError(`Problem getting group from quesiton with id: ${id}!`);
     }
 };
 
 export default {
     createPoll,
-    deletePollById,
-    getPollById,
-    updatePollById,
-    getSessionFromPollId,
+    deletePollByID,
+    getGroupFromPollID,
+    getPollByID,
+    updatePollByID,
 };

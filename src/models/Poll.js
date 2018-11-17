@@ -7,7 +7,7 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import Base from './Base';
-import Session from './Session';
+import Group from './Group';
 
 @Entity('polls')
 /**
@@ -27,11 +27,11 @@ class Poll extends Base {
   /** Type of question either MULTIPLE_CHOICE or FREE_RESPONSE */
   type: string = '';
 
-  @ManyToOne(type => Session, session => session.polls, {
+  @ManyToOne(type => Group, group => group.polls, {
       onDelete: 'CASCADE',
   })
-  /** Session the poll belongs to */
-  session: ?Session = null;
+  /** Group the poll belongs to */
+  group: ?Group = null;
 
   @Column('json')
   /**

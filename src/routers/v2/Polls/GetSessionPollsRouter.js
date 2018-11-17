@@ -2,10 +2,10 @@
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import LogUtils from '../../../utils/LogUtils';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import GroupsRepo from '../../../repos/GroupsRepo';
 import constants from '../../../utils/Constants';
 
-class GetSessionPollsRouter extends AppDevRouter<Object> {
+class GetGroupPollsRouter extends AppDevRouter<Object> {
     constructor() {
         super(constants.REQUEST_TYPES.GET);
     }
@@ -16,9 +16,9 @@ class GetSessionPollsRouter extends AppDevRouter<Object> {
 
     async content(req: Request) {
         const { id } = req.params;
-        const isAdmin = await SessionsRepo.isAdmin(id, req.user);
-        const polls = await SessionsRepo.getPolls(id, !isAdmin);
-        if (!polls) throw LogUtils.logError(`Problem getting polls from session id: ${id}!`);
+        const isAdmin = await GroupsRepo.isAdmin(id, req.user);
+        const polls = await GroupsRepo.getPolls(id, !isAdmin);
+        if (!polls) throw LogUtils.logError(`Problem getting polls from group id: ${id}!`);
 
         // Date mapped to list of polls
         const pollsByDate = {};
@@ -32,7 +32,7 @@ class GetSessionPollsRouter extends AppDevRouter<Object> {
                 results: poll.results,
                 shared: poll.shared,
                 type: poll.type,
-                answer: isAdmin ? null : poll.userAnswers[req.user.googleId],
+                answer: isAdmin ? null : poll.userAnswers[req.user.googleID],
                 correctAnswer: poll.correctAnswer,
             };
             if (pollsByDate[date]) {
@@ -45,4 +45,4 @@ class GetSessionPollsRouter extends AppDevRouter<Object> {
     }
 }
 
-export default new GetSessionPollsRouter().router;
+export default new GetGroupPollsRouter().router;

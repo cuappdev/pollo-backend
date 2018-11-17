@@ -17,21 +17,21 @@ class UpdateQuestionRouter extends AppDevRouter<Object> {
     }
 
     async content(req: Request): Promise<{ node: APIQuestion }> {
-        const questionId = req.params.id;
+        const questionID = req.params.id;
         const { text } = req.body;
         const { user } = req;
 
         if (!text) throw LogUtils.logError('No fields specified to update.');
 
-        const session = await QuestionsRepo.getSessionFromQuestionId(questionId);
-        if (!session) throw LogUtils.logError(`Question with id ${questionId} has no session!`);
+        const group = await QuestionsRepo.getGroupFromQuestionID(questionID);
+        if (!group) throw LogUtils.logError(`Question with id ${questionID} has no group!`);
 
-        if (!await QuestionsRepo.isOwnerById(questionId, user)) {
+        if (!await QuestionsRepo.isOwnerByID(questionID, user)) {
             throw LogUtils.logError('You are not authorized to update this question!');
         }
-        const question = await QuestionsRepo.updateQuestionById(questionId, text);
+        const question = await QuestionsRepo.updateQuestionByID(questionID, text);
         if (!question) {
-            throw LogUtils.logError(`Question with id ${questionId} was not found!`);
+            throw LogUtils.logError(`Question with id ${questionID} was not found!`);
         }
 
         return {

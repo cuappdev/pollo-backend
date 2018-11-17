@@ -1,7 +1,7 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
-import SessionsRepo from '../../repos/SessionsRepo';
+import GroupsRepo from '../../repos/GroupsRepo';
 import constants from '../../utils/Constants';
 
 class GenerateCodeRouter extends AppDevRouter<Object> {
@@ -15,7 +15,7 @@ class GenerateCodeRouter extends AppDevRouter<Object> {
 
     async content(req: Request) {
         return {
-            code: SessionsRepo.createCode(),
+            code: GroupsRepo.createCode(),
         };
     }
 }

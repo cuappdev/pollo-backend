@@ -11,7 +11,7 @@ import Change1521233644145 from './migrations/Change1521233644145';
 import Draft from '../models/Draft';
 import Poll from '../models/Poll';
 import Question from '../models/Question';
-import Session from '../models/Session';
+import Group from '../models/Group';
 import User from '../models/User';
 import UserSession from '../models/UserSession';
 
@@ -31,7 +31,7 @@ const entities = [
     Draft,
     Poll,
     Question,
-    Session,
+    Group,
     User,
     UserSession,
 ];

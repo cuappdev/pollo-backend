@@ -6,13 +6,13 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import Base from './Base';
-import Session from './Session';
+import Group from './Group';
 import User from './User';
 
 @Entity('questions')
 /**
  * Question class represents questions a member can ask an admin
- * during a session.
+ * during a group.
  * @extends {Base}
  */
 class Question extends Base {
@@ -24,11 +24,11 @@ class Question extends Base {
   /** Text of question user is asking */
   text: string = '';
 
-  @ManyToOne(type => Session, session => session.polls, {
+  @ManyToOne(type => Group, group => group.polls, {
       onDelete: 'CASCADE',
   })
-  /** Session that the question is being asked in */
-  session: ?Session = null;
+  /** Group that the question is being asked in */
+  group: ?Group = null;
 
   @ManyToOne(type => User, user => user.questions)
   /** User who asked the question */

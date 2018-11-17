@@ -16,7 +16,7 @@ class DeleteDraftRouter extends AppDevRouter<Object> {
 
     async content(req: Request) {
         const { id } = req.params;
-        const admin = await DraftsRepo.getOwnerById(id);
+        const admin = await DraftsRepo.getOwnerByID(id);
         if (!admin) throw LogUtils.logError(`Can't get owner for draft with id ${id}`);
         if (admin.id !== req.user.id) {
             throw LogUtils.logError('Not authorized to delete draft!');

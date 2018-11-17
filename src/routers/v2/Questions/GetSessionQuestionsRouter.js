@@ -2,10 +2,10 @@
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import LogUtils from '../../../utils/LogUtils';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import GroupsRepo from '../../../repos/GroupsRepo';
 import constants from '../../../utils/Constants';
 
-class GetSessionQuestionsRouter extends AppDevRouter<Object> {
+class GetGroupQuestionsRouter extends AppDevRouter<Object> {
     constructor() {
         super(constants.REQUEST_TYPES.GET);
     }
@@ -16,9 +16,9 @@ class GetSessionQuestionsRouter extends AppDevRouter<Object> {
 
     async content(req: Request) {
         const { id } = req.params;
-        const questions = await SessionsRepo.getQuestions(id);
+        const questions = await GroupsRepo.getQuestions(id);
         if (!questions) {
-            throw LogUtils.logError(`Problem getting questions from session id: ${id}!`);
+            throw LogUtils.logError(`Problem getting questions from group id: ${id}!`);
         }
         // Date mapped to list of questions
         const questionsByDate = {};
@@ -39,4 +39,4 @@ class GetSessionQuestionsRouter extends AppDevRouter<Object> {
     }
 }
 
-export default new GetSessionQuestionsRouter().router;
+export default new GetGroupQuestionsRouter().router;

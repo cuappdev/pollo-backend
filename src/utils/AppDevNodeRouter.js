@@ -16,14 +16,14 @@ class AppDevNodeRouter<T> extends AppDevRouter<AppDevNodeResponse<T>> {
         super('GET', auth);
     }
 
-    async fetchWithId(givenId: id, req: Request): Promise<?T> {
+    async fetchWithID(givenID: id, req: Request): Promise<?T> {
         throw LogUtils.logError(`Not implemented for path ${this.getPath()}`);
     }
 
     async content(req: Request): Promise<AppDevNodeResponse<T>> {
-        const givenId = parseInt(req.params.id);
-        if (Number.isNaN(givenId)) throw LogUtils.logError(`Invalid id ${req.params.id}`);
-        const node: ?T = await this.fetchWithId(givenId, req);
+        const givenID = parseInt(req.params.id);
+        if (Number.isNaN(givenID)) throw LogUtils.logError(`Invalid id ${req.params.id}`);
+        const node: ?T = await this.fetchWithID(givenID, req);
         if (!node) throw LogUtils.logError(`Could not fetch id:${req.params.id}`);
         return { node };
     }

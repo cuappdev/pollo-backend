@@ -2,23 +2,24 @@ import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
 
-const googleId = 'usertest1';
-let sessionId;
+const googleID = 'usertest1';
+let sessionID;
 let user;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
     await dbConnection().catch((e) => {
+        // eslint-disable-next-line no-console
         console.log('Error connecting to database');
         process.exit();
     });
 
-    user = await UsersRepo.createDummyUser(googleId);
+    user = await UsersRepo.createDummyUser(googleID);
 });
 
 test('Create Session', async () => {
     const session = await UserSessionsRepo.createOrUpdateSession(user, 'access', 'refresh');
-    sessionId = session.id;
+    sessionID = session.id;
     expect(session.isActive).toBe(true);
     expect(session.sessionToken).toBe('access');
     expect(session.updateToken).toBe('refresh');
@@ -26,7 +27,7 @@ test('Create Session', async () => {
 
 test('Get User from Token', async () => {
     user = await UserSessionsRepo.getUserFromToken('access');
-    expect(user.googleId).toEqual(googleId);
+    expect(user.googleID).toEqual(googleID);
     const nullUser = await UserSessionsRepo.getUserFromToken('invalid');
     expect(nullUser).toBeNull();
 });
@@ -47,7 +48,8 @@ test('Update Session', async () => {
 
 // Teardown
 afterAll(async () => {
-    await UserSessionsRepo.deleteSession(sessionId);
-    await UsersRepo.deleteUserById(user.id);
+    await UserSessionsRepo.deleteSession(sessionID);
+    await UsersRepo.deleteUserByID(user.id);
+    // eslint-disable-next-line no-console
     console.log('Passed all session tests');
 });
