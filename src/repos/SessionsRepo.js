@@ -1,5 +1,6 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
+import LogUtils from '../utils/LogUtils';
 import Poll from '../models/Poll';
 import Question from '../models/Question';
 import Session from '../models/Session';
@@ -30,7 +31,7 @@ const createSession = async (name: string, code: string, user: ?User):
         session.admins = user ? [user] : [];
 
         if (sessionCodes[code]) {
-            throw new Error('Session code is already in use');
+            throw LogUtils.logError('Session code is already in use');
         }
 
         await db().persist(session);
@@ -38,7 +39,7 @@ const createSession = async (name: string, code: string, user: ?User):
 
         return session;
     } catch (e) {
-        throw new Error('Problem creating session!');
+        throw LogUtils.logError('Problem creating session!');
     }
 };
 
@@ -66,7 +67,7 @@ const getSessionById = async (id: number): Promise<?Session> => {
     try {
         return await db().findOneById(id);
     } catch (e) {
-        throw new Error(`Problem getting session by id: ${id}!`);
+        throw LogUtils.logError(`Problem getting session by id: ${id}!`);
     }
 };
 
@@ -96,7 +97,7 @@ const deleteSessionById = async (id: number) => {
 
         await db().remove(session);
     } catch (e) {
-        throw new Error(`Problem deleting session by id: ${id}!`);
+        throw LogUtils.logError(`Problem deleting session by id: ${id}!`);
     }
 };
 
@@ -122,7 +123,7 @@ const updateSessionById = async (id: number, name: string):
 
         return await db().findOneById(id);
     } catch (e) {
-        throw new Error(`Problem updating session by id: ${id}!`);
+        throw LogUtils.logError(`Problem updating session by id: ${id}!`);
     }
 };
 
@@ -162,7 +163,7 @@ const addUsersByGoogleIds = async (id: number, googleIds: string[],
         await db().persist(session);
         return session;
     } catch (e) {
-        throw new Error('Problem adding users to session by google ids!');
+        throw LogUtils.logError('Problem adding users to session by google ids!');
     }
 };
 
@@ -200,7 +201,7 @@ const addUsersByIds = async (id: number, userIds: number[],
         await db().persist(session);
         return session;
     } catch (e) {
-        throw new Error('Problem adding users to session by ids!');
+        throw LogUtils.logError('Problem adding users to session by ids!');
     }
 };
 
@@ -235,7 +236,7 @@ const removeUserBySessionId = async (id: number, user: User, role: ?string):
 
         return session;
     } catch (e) {
-        throw new Error(`Problem removing admin from session by id: ${id}`);
+        throw LogUtils.logError(`Problem removing admin from session by id: ${id}`);
     }
 };
 
@@ -258,7 +259,7 @@ const isAdmin = async (id: number, user: User):
         const admin = session.admins.find(x => x.googleId === user.googleId);
         return admin !== undefined;
     } catch (e) {
-        throw new Error(`Problem verifying admin status for session ${id}`);
+        throw LogUtils.logError(`Problem verifying admin status for session ${id}`);
     }
 };
 
@@ -281,7 +282,7 @@ const isMember = async (id: number, user: User):
         const member = session.members.find(x => x.googleId === user.googleId);
         return member !== undefined;
     } catch (e) {
-        throw new Error(`Problem verifying member status for session ${id}`);
+        throw LogUtils.logError(`Problem verifying member status for session ${id}`);
     }
 };
 
@@ -308,7 +309,7 @@ const getUsersBySessionId = async (id: number, role: ?string):
         }
         return session.admins.concat(session.members);
     } catch (e) {
-        throw new Error(`Problem getting admins for session with id: ${id}!`);
+        throw LogUtils.logError(`Problem getting admins for session with id: ${id}!`);
     }
 };
 
@@ -331,7 +332,7 @@ const getPolls = async (id: number, sharedOnly: boolean):
 
         return sharedOnly === true ? session.polls.filter(poll => poll.shared) : session.polls;
     } catch (e) {
-        throw new Error('Problem getting polls');
+        throw LogUtils.logError('Problem getting polls');
     }
 };
 
@@ -351,7 +352,7 @@ const getQuestions = async (id: number): Promise<Array<?Question>> => {
             .getOne();
         return session.questions;
     } catch (e) {
-        throw new Error('Problem getting questions');
+        throw LogUtils.logError('Problem getting questions');
     }
 };
 
@@ -364,7 +365,7 @@ const getQuestions = async (id: number): Promise<Array<?Question>> => {
 const latestActivityBySessionId = async (id: number): Promise<?number> => {
     try {
         const session = await db().findOneById(id);
-        if (!session) throw new Error(`Can't find session with id ${id}!`);
+        if (!session) throw LogUtils.logError(`Can't find session with id ${id}!`);
 
         return await getPolls(id, false).then((p: Array<?Poll>) => {
             const lastPoll = p.slice(-1).pop();
@@ -374,7 +375,7 @@ const latestActivityBySessionId = async (id: number): Promise<?number> => {
             return session.updatedAt > lastPoll.updatedAt ? session.updatedAt : lastPoll.updatedAt;
         });
     } catch (e) {
-        throw new Error('Problem getting latest activity');
+        throw LogUtils.logError('Problem getting latest activity');
     }
 };
 

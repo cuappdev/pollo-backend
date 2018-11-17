@@ -1,5 +1,6 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
+import LogUtils from '../utils/LogUtils';
 import User from '../models/User';
 import UserSession from '../models/UserSession';
 
@@ -95,7 +96,7 @@ const deleteSession = async (id: number) => {
         const session = await db().findOneById(id);
         await db().remove(session);
     } catch (e) {
-        throw new Error(`Problem deleting session by id: ${id}!`);
+        throw LogUtils.logError(`Problem deleting session by id: ${id}!`);
     }
 };
 
@@ -112,7 +113,7 @@ const deleteSessionFromUserId = async (userId: number) => {
             .getOne();
         if (session) db().remove(session);
     } catch (e) {
-        throw new Error('Problem deleting session!');
+        throw LogUtils.logError('Problem deleting session!');
     }
 };
 

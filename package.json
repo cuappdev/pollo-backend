@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "ajv": "^6.5.3",
+    "appdev": "git+https://github.com/cuappdev/appdev.js.git",
     "axios": "^0.16.2",
     "body-parser": "^1.17.2",
     "cors": "^2.8.4",

@@ -2,6 +2,7 @@
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/Constants';
+import LogUtils from '../../utils/LogUtils';
 import SessionsRepo from '../../repos/SessionsRepo';
 import type { APISession } from './APITypes';
 
@@ -21,7 +22,7 @@ class StartSessionRouter extends AppDevRouter<APISession> {
         if (!name) name = '';
 
         if (!code) {
-            throw new Error('Code required.');
+            throw LogUtils.logError('Code required.');
         }
 
         const session = await SessionsRepo.createSession(name, code, req.user);

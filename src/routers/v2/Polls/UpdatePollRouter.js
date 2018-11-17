@@ -1,6 +1,7 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
+import LogUtils from '../../../utils/LogUtils';
 import PollsRepo from '../../../repos/PollsRepo';
 import constants from '../../../utils/Constants';
 import SessionsRepo from '../../../repos/SessionsRepo';
@@ -22,19 +23,19 @@ class UpdatePollRouter extends AppDevRouter<Object> {
         const { user } = req;
 
         if (!results && !text && shared === null) {
-            throw new Error('No fields specified to update.');
+            throw LogUtils.logError('No fields specified to update.');
         }
 
         const session = await PollsRepo.getSessionFromPollId(pollId);
-        if (!session) throw new Error(`Poll with id ${pollId} has no session!`);
+        if (!session) throw LogUtils.logError(`Poll with id ${pollId} has no session!`);
 
         if (!await SessionsRepo.isAdmin(session.id, user)) {
-            throw new Error('You are not authorized to update this poll!');
+            throw LogUtils.logError('You are not authorized to update this poll!');
         }
         const poll = await PollsRepo.updatePollById(pollId, text,
             results, shared);
         if (!poll) {
-            throw new Error(`Poll with id ${pollId} was not found!`);
+            throw LogUtils.logError(`Poll with id ${pollId} was not found!`);
         }
 
         return {
@@ -45,6 +46,7 @@ class UpdatePollRouter extends AppDevRouter<Object> {
                 shared: poll.shared,
                 type: poll.type,
                 answer: null,
+                correctAnswer: poll.correctAnswer,
             },
         };
     }

@@ -1,6 +1,7 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
+import LogUtils from '../../../utils/LogUtils';
 import SessionsRepo from '../../../repos/SessionsRepo';
 import constants from '../../../utils/Constants';
 
@@ -21,8 +22,8 @@ class PostSessionRouter extends AppDevRouter<Object> {
         const { user } = req;
 
         if (!name) name = '';
-        if (!user) throw new Error('User missing');
-        if (!code) throw new Error('Code missing');
+        if (!user) throw LogUtils.logError('User missing');
+        if (!code) throw LogUtils.logError('Code missing');
 
         const session = await SessionsRepo.createSession(name, code, user);
 

@@ -1,5 +1,6 @@
 // @flow
 import { getConnectionManager, json, Repository } from 'typeorm';
+import LogUtils from '../utils/LogUtils';
 import Poll from '../models/Poll';
 import Session from '../models/Session';
 
@@ -13,11 +14,12 @@ const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Po
  * @param {json} results - Results of poll
  * @param {boolean} canShare - Whether the results of the poll are shared
  * @param {string} type - Type of poll, see Poll class for more info
+ * @param {string} correctAnswer - Correct answer choice for MC
  * @param {json} [userAnswers] - Json mapping users to their answers
  * @return {Poll} New poll created
  */
 const createPoll = async (text: string, session: ?Session, results: json,
-    canShare: boolean, type: string, userAnswers: ?json):
+    canShare: boolean, type: string, correctAnswer: string, userAnswers: ?json):
   Promise <Poll> => {
     try {
         const poll = new Poll();
@@ -26,12 +28,13 @@ const createPoll = async (text: string, session: ?Session, results: json,
         poll.results = results;
         poll.shared = canShare;
         poll.type = type;
+        poll.correctAnswer = correctAnswer;
         poll.userAnswers = userAnswers || {};
 
         await db().persist(poll);
         return poll;
     } catch (e) {
-        throw new Error('Problem creating poll!');
+        throw LogUtils.logError('Problem creating poll!');
     }
 };
 
@@ -45,7 +48,7 @@ const getPollById = async (id: number): Promise<?Poll> => {
     try {
         return await db().findOneById(id);
     } catch (e) {
-        throw new Error(`Problem getting poll by id: ${id}!`);
+        throw LogUtils.logError(`Problem getting poll by id: ${id}!`);
     }
 };
 
@@ -59,7 +62,7 @@ const deletePollById = async (id: number) => {
         const poll = await db().findOneById(id);
         await db().remove(poll);
     } catch (e) {
-        throw new Error(`Problem deleting poll with id: ${id}!`);
+        throw LogUtils.logError(`Problem deleting poll with id: ${id}!`);
     }
 };
 
@@ -91,7 +94,7 @@ const updatePollById = async (id: number, text: ?string, results: ?json,
         await db().persist(poll);
         return poll;
     } catch (e) {
-        throw new Error(`Problem updating poll by id: ${id}!`);
+        throw LogUtils.logError(`Problem updating poll by id: ${id}!`);
     }
 };
 
@@ -109,7 +112,7 @@ const getSessionFromPollId = async (id: number) : Promise<?Session> => {
             .getOne();
         return poll.session;
     } catch (e) {
-        throw new Error(`Problem getting session from quesiton with id: ${id}!`);
+        throw LogUtils.logError(`Problem getting session from quesiton with id: ${id}!`);
     }
 };
 

@@ -35,14 +35,18 @@ beforeAll(async () => {
 });
 
 test('create poll', async () => {
-    const opts = { text: 'Poll text', shared: true, type: 'MULTIPLE_CHOICE' };
+    const opts = {
+        text: 'Poll text', shared: true, type: 'MULTIPLE_CHOICE', correctAnswer: 'B',
+    };
     const result = await request(post(`/sessions/${session.id}/polls`, opts, token));
     poll = result.data.node;
     expect(result.success).toBe(true);
 });
 
 test('create poll with invalid token', async () => {
-    const opts = { text: 'Poll text', results: {}, shared: true };
+    const opts = {
+        text: 'Poll text', results: {}, shared: true, correctAnswer: '',
+    };
     const result = await request(post(`/sessions/${session.id}/polls`, opts, 'invalid'));
     expect(result.success).toBe(false);
 });

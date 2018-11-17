@@ -1,6 +1,7 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
+import LogUtils from '../../../utils/LogUtils';
 import constants from '../../../utils/Constants';
 import SessionsRepo from '../../../repos/SessionsRepo';
 
@@ -18,10 +19,10 @@ class DeleteAdminsRouter extends AppDevRouter<Object> {
         const { user } = req;
         const adminIds = JSON.parse(req.body.adminIds);
 
-        if (!adminIds) throw new Error('List of admin ids missing!');
+        if (!adminIds) throw LogUtils.logError('List of admin ids missing!');
 
         if (!await SessionsRepo.isAdmin(sessionId, user)) {
-            throw new Error('You are not authorized to remove admins from this session!');
+            throw LogUtils.logError('You are not authorized to remove admins from this session!');
         }
 
         await SessionsRepo.removeUserBySessionId(sessionId, adminIds, 'admin');

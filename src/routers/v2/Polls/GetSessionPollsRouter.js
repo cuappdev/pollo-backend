@@ -1,6 +1,7 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
+import LogUtils from '../../../utils/LogUtils';
 import SessionsRepo from '../../../repos/SessionsRepo';
 import constants from '../../../utils/Constants';
 
@@ -17,7 +18,7 @@ class GetSessionPollsRouter extends AppDevRouter<Object> {
         const { id } = req.params;
         const isAdmin = await SessionsRepo.isAdmin(id, req.user);
         const polls = await SessionsRepo.getPolls(id, !isAdmin);
-        if (!polls) throw new Error(`Problem getting polls from session id: ${id}!`);
+        if (!polls) throw LogUtils.logError(`Problem getting polls from session id: ${id}!`);
 
         // Date mapped to list of polls
         const pollsByDate = {};
@@ -32,6 +33,7 @@ class GetSessionPollsRouter extends AppDevRouter<Object> {
                 shared: poll.shared,
                 type: poll.type,
                 answer: isAdmin ? null : poll.userAnswers[req.user.googleId],
+                correctAnswer: poll.correctAnswer,
             };
             if (pollsByDate[date]) {
                 pollsByDate[date].push(p);
