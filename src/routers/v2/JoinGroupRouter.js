@@ -12,7 +12,7 @@ class JoinGroupRouter extends AppDevRouter<APIGroup> {
     }
 
     getPath(): string {
-        return '/join/group/';
+        return '/join/session/';
     }
 
     async content(req: Request) {
