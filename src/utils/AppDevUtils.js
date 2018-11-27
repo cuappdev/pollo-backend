@@ -14,7 +14,7 @@ const googleAxios = axios.create({
  * @param {string} email - Email to extract netid from
  * @return {string} Netid from email
  */
-const netIdFromEmail = (email: string): string => email.substring(0, email.indexOf('@'));
+const netIDFromEmail = (email: string): string => email.substring(0, email.indexOf('@'));
 
 /**
  * Generates random alphanumeric string
@@ -27,6 +27,6 @@ const randomCode = (length: number): string => Math.round(((36 ** (length + 1)) 
 
 export default {
     googleAxios,
-    netIdFromEmail,
+    netIDFromEmail,
     randomCode,
 };

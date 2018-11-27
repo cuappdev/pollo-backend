@@ -1,8 +1,9 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
+import LogUtils from '../../../utils/LogUtils';
 import QuestionsRepo from '../../../repos/QuestionsRepo';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import GroupsRepo from '../../../repos/GroupsRepo';
 import constants from '../../../utils/Constants';
 
 class DeleteQuestionRouter extends AppDevRouter<Object> {
@@ -15,18 +16,18 @@ class DeleteQuestionRouter extends AppDevRouter<Object> {
     }
 
     async content(req: Request) {
-        const questionId = req.params.id;
+        const questionID = req.params.id;
         const { user } = req;
 
-        const session = await QuestionsRepo.getSessionFromQuestionId(questionId);
-        if (!session) {
-            throw new Error(`Couldn't find session with question ${questionId}`);
+        const group = await QuestionsRepo.getGroupFromQuestionID(questionID);
+        if (!group) {
+            throw LogUtils.logError(`Couldn't find group with question ${questionID}`);
         }
-        if (!await SessionsRepo.isAdmin(session.id, user)
-          && !await QuestionsRepo.isOwnerById(questionId, user)) {
-            throw new Error('You are not authorized to delete this question!');
+        if (!await GroupsRepo.isAdmin(group.id, user)
+          && !await QuestionsRepo.isOwnerByID(questionID, user)) {
+            throw LogUtils.logError('You are not authorized to delete this question!');
         }
-        await QuestionsRepo.deleteQuestionById(questionId);
+        await QuestionsRepo.deleteQuestionByID(questionID);
         return null;
     }
 }

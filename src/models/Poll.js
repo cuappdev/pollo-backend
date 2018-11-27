@@ -7,7 +7,7 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import Base from './Base';
-import Session from './Session';
+import Group from './Group';
 
 @Entity('polls')
 /**
@@ -27,11 +27,11 @@ class Poll extends Base {
   /** Type of question either MULTIPLE_CHOICE or FREE_RESPONSE */
   type: string = '';
 
-  @ManyToOne(type => Session, session => session.polls, {
+  @ManyToOne(type => Group, group => group.polls, {
       onDelete: 'CASCADE',
   })
-  /** Session the poll belongs to */
-  session: ?Session = null;
+  /** Group the poll belongs to */
+  group: ?Group = null;
 
   @Column('json')
   /**
@@ -49,6 +49,15 @@ class Poll extends Base {
   @Column('boolean')
   /** If the results of the poll is shared to all users */
   shared: boolean = true;
+
+  @Column('string')
+  /**
+   * Correct answer choice for MC.
+   * Empty string if FR or no correct answer chosen for MC.
+   * @example
+   * let correctAnswer = 'A'
+  */
+  correctAnswer: string = '';
 }
 
 export default Poll;

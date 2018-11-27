@@ -1,7 +1,7 @@
 import dbConnection from '../../src/db/DbConnection';
 import UsersRepo from '../../src/repos/UsersRepo';
 import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
-import SessionsRepo from '../../src/repos/SessionsRepo';
+import GroupsRepo from '../../src/repos/GroupsRepo';
 
 const request = require('request-promise-native');
 const {
@@ -11,39 +11,45 @@ const {
 // Polls
 // Must be running server to test
 
-const googleId = 'usertest';
+const googleID = 'usertest';
+let group;
 let session;
 let poll;
-let userId;
+let userID;
 let token;
 
 beforeAll(async () => {
     await dbConnection().catch((e) => {
+        // eslint-disable-next-line no-console
         console.log('Error connecting to database');
         process.exit();
     });
-    const user = await UsersRepo.createDummyUser(googleId);
-    userId = user.id;
+    const user = await UsersRepo.createDummyUser(googleID);
+    userID = user.id;
     session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
     token = session.sessionToken;
 
-    // Create a session
-    const opts = { name: 'Test session', code: SessionsRepo.createCode() };
+    // Create a group
+    const opts = { name: 'Test group', code: GroupsRepo.createCode() };
     const result = await request(post('/sessions/', opts, token));
-    session = result.data.node;
+    group = result.data.node;
     expect(result.success).toBe(true);
 });
 
 test('create poll', async () => {
-    const opts = { text: 'Poll text', shared: true, type: 'MULTIPLE_CHOICE' };
-    const result = await request(post(`/sessions/${session.id}/polls`, opts, token));
+    const opts = {
+        text: 'Poll text', shared: true, type: 'MULTIPLE_CHOICE', correctAnswer: 'B',
+    };
+    const result = await request(post(`/sessions/${group.id}/polls`, opts, token));
     poll = result.data.node;
     expect(result.success).toBe(true);
 });
 
 test('create poll with invalid token', async () => {
-    const opts = { text: 'Poll text', results: {}, shared: true };
-    const result = await request(post(`/sessions/${session.id}/polls`, opts, 'invalid'));
+    const opts = {
+        text: 'Poll text', results: {}, shared: true, correctAnswer: '',
+    };
+    const result = await request(post(`/sessions/${group.id}/polls`, opts, 'invalid'));
     expect(result.success).toBe(false);
 });
 
@@ -54,8 +60,8 @@ test('get poll by id', async () => {
     expect(poll.id).toBe(getres.data.node.id);
 });
 
-test('get polls by session', async () => {
-    const getstr = await request(get(`/sessions/${session.id}/polls`, token));
+test('get polls by group', async () => {
+    const getstr = await request(get(`/sessions/${group.id}/polls`, token));
     const getres = getstr;
     expect(getres.success).toBe(true);
     const date = Object.keys(getres.data);
@@ -96,9 +102,10 @@ test('delete poll', async () => {
 });
 
 afterAll(async () => {
-    const result = await request(del(`/sessions/${session.id}`, token));
+    const result = await request(del(`/sessions/${group.id}`, token));
     expect(result.success).toBe(true);
-    await UsersRepo.deleteUserById(userId);
+    await UsersRepo.deleteUserByID(userID);
     await UserSessionsRepo.deleteSession(session.id);
+    // eslint-disable-next-line no-console
     console.log('Passed all poll route tests');
 });

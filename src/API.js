@@ -49,7 +49,7 @@ class API {
           callbackURL: process.env.GOOGLE_REDIRECT_URI,
       },
       (async (accessToken, refreshToken, profile, done) => {
-          let user = await UsersRepo.getUserByGoogleId(profile.id);
+          let user = await UsersRepo.getUserByGoogleID(profile.id);
           if (!user) {
               user = await UsersRepo.createUser(profile);
           }
@@ -93,14 +93,14 @@ class API {
 
           async function sendResponse(login) {
               const payload = login.getPayload();
-              const googleId = payload.sub;
+              const googleID = payload.sub;
               const first = payload.given_name;
               const last = payload.family_name;
               const { email } = payload;
 
-              let user = await UsersRepo.getUserByGoogleId(googleId);
+              let user = await UsersRepo.getUserByGoogleID(googleID);
               if (!user) {
-                  user = await UsersRepo.createUserWithFields(googleId, first, last,
+                  user = await UsersRepo.createUserWithFields(googleID, first, last,
                       email);
               }
 

@@ -1,8 +1,9 @@
 // @flow
 import { Request } from 'express';
 import AppDevNodeRouter from '../../../utils/AppDevNodeRouter';
+import LogUtils from '../../../utils/LogUtils';
 import PollsRepo from '../../../repos/PollsRepo';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import GroupsRepo from '../../../repos/GroupsRepo';
 
 import type { APIPoll } from '../APITypes';
 
@@ -11,14 +12,14 @@ class GetPollRouter extends AppDevNodeRouter<APIPoll> {
         return '/polls/:id/';
     }
 
-    async fetchWithId(id: number, req: Request) {
-        const poll = await PollsRepo.getPollById(id);
-        if (!poll) throw new Error(`Poll with id ${id} cannot be found`);
+    async fetchWithID(id: number, req: Request) {
+        const poll = await PollsRepo.getPollByID(id);
+        if (!poll) throw LogUtils.logError(`Poll with id ${id} cannot be found`);
 
-        const session = await PollsRepo.getSessionFromPollId(poll.id);
-        if (!session) throw new Error(`Session with id ${id} cannot be found`);
+        const group = await PollsRepo.getGroupFromPollID(poll.id);
+        if (!group) throw LogUtils.logError(`Group with id ${id} cannot be found`);
 
-        const isAdmin = await SessionsRepo.isAdmin(session.id, req.user);
+        const isAdmin = await GroupsRepo.isAdmin(group.id, req.user);
 
         return poll && {
             id: poll.id,
@@ -26,7 +27,8 @@ class GetPollRouter extends AppDevNodeRouter<APIPoll> {
             results: poll.results,
             shared: poll.shared,
             type: poll.type,
-            answer: isAdmin ? null : poll.userAnswers[req.user.googleId],
+            answer: isAdmin ? null : poll.userAnswers[req.user.googleID],
+            correctAnswer: poll.correctAnswer,
         };
     }
 }

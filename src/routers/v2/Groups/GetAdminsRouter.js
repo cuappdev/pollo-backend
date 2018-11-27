@@ -1,6 +1,6 @@
 // @flow
 import AppDevEdgeRouter from '../../../utils/AppDevEdgeRouter';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import GroupsRepo from '../../../repos/GroupsRepo';
 import constants from '../../../utils/Constants';
 import type { APIUser } from '../APITypes';
 
@@ -15,14 +15,14 @@ class GetAdminsRouter extends AppDevEdgeRouter<APIUser> {
 
     async contentArray(req, pageInfo, error) {
         const { id } = req.params;
-        const users = await SessionsRepo.getUsersBySessionId(id, 'admin');
+        const users = await GroupsRepo.getUsersByGroupID(id, 'admin');
         return users
             .filter(Boolean)
             .map(user => ({
                 node: {
                     id: user.id,
                     name: `${user.firstName} ${user.lastName}`,
-                    netId: user.netId,
+                    netID: user.netID,
                 },
                 cursor: user.createdAt.valueOf(),
             }));

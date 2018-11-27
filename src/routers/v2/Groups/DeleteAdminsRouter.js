@@ -1,8 +1,9 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
+import LogUtils from '../../../utils/LogUtils';
 import constants from '../../../utils/Constants';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import GroupsRepo from '../../../repos/GroupsRepo';
 
 class DeleteAdminsRouter extends AppDevRouter<Object> {
     constructor() {
@@ -14,17 +15,17 @@ class DeleteAdminsRouter extends AppDevRouter<Object> {
     }
 
     async content(req: Request) {
-        const sessionId = req.params.id;
+        const groupID = req.params.id;
         const { user } = req;
-        const adminIds = JSON.parse(req.body.adminIds);
+        const adminIDs = JSON.parse(req.body.adminIDs);
 
-        if (!adminIds) throw new Error('List of admin ids missing!');
+        if (!adminIDs) throw LogUtils.logError('List of admin ids missing!');
 
-        if (!await SessionsRepo.isAdmin(sessionId, user)) {
-            throw new Error('You are not authorized to remove admins from this session!');
+        if (!await GroupsRepo.isAdmin(groupID, user)) {
+            throw LogUtils.logError('You are not authorized to remove admins from this group!');
         }
 
-        await SessionsRepo.removeUserBySessionId(sessionId, adminIds, 'admin');
+        await GroupsRepo.removeUserByGroupID(groupID, adminIDs, 'admin');
         return null;
     }
 }

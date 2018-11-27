@@ -12,45 +12,45 @@ import Poll from './Poll';
 import Question from './Question';
 import User from './User';
 
-@Entity('sessions')
+@Entity('groups')
 /**
- * Session class represents a grouping of polls.
+ * Group class represents a grouping of polls.
  * @extends {Base}
  */
-class Session extends Base {
+class Group extends Base {
   @PrimaryGeneratedColumn()
   /** Unique identifier */
   id: any = null;
 
   @Column('string')
-  /** Name of session */
+  /** Name of group */
   name: string = '';
 
   @Column('string')
-  /** Unique code to join session */
+  /** Unique code to join group */
   code: string = '';
 
-  @ManyToMany(type => User, user => user.adminSessions)
+  @ManyToMany(type => User, user => user.adminGroups)
   @JoinTable()
-  /** Admins of the session */
+  /** Admins of the group */
   admins: ?User[] = [];
 
-  @OneToMany(type => Poll, poll => poll.session, {
+  @OneToMany(type => Poll, poll => poll.group, {
       cascadeRemove: true,
   })
-  /** Polls belonging to the session */
+  /** Polls belonging to the group */
   polls: ?Poll[] = [];
 
-  @OneToMany(type => Question, question => question.session, {
+  @OneToMany(type => Question, question => question.group, {
       cascadeRemove: true,
   })
-  /** Questions belonging to the session */
+  /** Questions belonging to the group */
   questions: ?Question[] = [];
 
-  @ManyToMany(type => User, user => user.memberSessions)
+  @ManyToMany(type => User, user => user.memberGroups)
   @JoinTable()
-  /** Member of the session */
+  /** Member of the group */
   members: ?User[] = [];
 }
 
-export default Session;
+export default Group;

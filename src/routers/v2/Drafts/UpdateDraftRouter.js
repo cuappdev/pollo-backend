@@ -3,7 +3,7 @@ import { Request } from 'express';
 import DraftsRepo from '../../../repos/DraftsRepo';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';
-
+import LogUtils from '../../../utils/LogUtils';
 import type { APIDraft } from '../APITypes';
 
 class UpdateDraftRouter extends AppDevRouter<Object> {
@@ -16,22 +16,22 @@ class UpdateDraftRouter extends AppDevRouter<Object> {
     }
 
     async content(req: Request): Promise<{ node: APIDraft }> {
-        const draftId = req.params.id;
+        const draftID = req.params.id;
         const { text, options } = req.body;
-        const admin = await DraftsRepo.getOwnerById(draftId);
-        if (!admin) throw new Error(`Draft with id ${draftId} was not found!`);
+        const admin = await DraftsRepo.getOwnerByID(draftID);
+        if (!admin) throw LogUtils.logError(`Draft with id ${draftID} was not found!`);
 
         if (!options && !text) {
-            throw new Error('No fields specified to update.');
+            throw LogUtils.logError('No fields specified to update.');
         }
 
         if (admin.id !== req.user.id) {
-            throw new Error('Not authorized to update draft!');
+            throw LogUtils.logError('Not authorized to update draft!');
         }
 
-        const draft = await DraftsRepo.updateDraft(draftId, text, options);
+        const draft = await DraftsRepo.updateDraft(draftID, text, options);
         if (!draft) {
-            throw new Error(`Draft with id ${draftId} was not found!`);
+            throw LogUtils.logError(`Draft with id ${draftID} was not found!`);
         }
 
         return {

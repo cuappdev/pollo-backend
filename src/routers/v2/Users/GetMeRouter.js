@@ -17,7 +17,7 @@ class GetMeRouter extends AppDevRouter<APIUser> {
         return req.user && {
             id: req.user.id,
             name: `${req.user.firstName} ${req.user.lastName}`,
-            netId: req.user.netId,
+            netID: req.user.netID,
         };
     }
 }

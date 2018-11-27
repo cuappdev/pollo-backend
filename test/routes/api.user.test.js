@@ -8,17 +8,18 @@ const { get } = require('./lib');
 // Users
 // Must be running server to test
 
-const googleId = 'usertest';
+const googleID = 'usertest';
 let session;
 let user;
 let token;
 
 beforeAll(async () => {
     await dbConnection().catch((e) => {
+        // eslint-disable-next-line no-console
         console.log('Error connecting to database');
         process.exit();
     });
-    user = await UsersRepo.createDummyUser(googleId);
+    user = await UsersRepo.createDummyUser(googleID);
     session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
     token = session.sessionToken;
 });
@@ -28,11 +29,12 @@ test('get user', async () => {
     const getres = getstr;
     expect(getres.success).toBe(true);
     expect(user.id).toBe(getres.data.id);
-    expect(user.netId).toBe(getres.data.netId);
+    expect(user.netID).toBe(getres.data.netID);
 });
 
 afterAll(async () => {
-    await UsersRepo.deleteUserById(user.id);
+    await UsersRepo.deleteUserByID(user.id);
     await UserSessionsRepo.deleteSession(session.id);
+    // eslint-disable-next-line no-console
     console.log('Passed all user route tests');
 });

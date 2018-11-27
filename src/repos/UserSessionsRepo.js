@@ -1,5 +1,6 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
+import LogUtils from '../utils/LogUtils';
 import User from '../models/User';
 import UserSession from '../models/UserSession';
 
@@ -17,7 +18,7 @@ const createOrUpdateSession = async (
     user: User, accessToken: ?string, refreshToken: ?string,
 ): Promise<UserSession> => {
     const optionalSession = await db().createQueryBuilder('usersessions')
-        .where('usersessions.user = :userId', { userId: user.id })
+        .where('usersessions.user = :userID', { userID: user.id })
         .innerJoinAndSelect('usersessions.user', 'users')
         .getOne();
 
@@ -88,31 +89,31 @@ const verifySession = async (accessToken: string): Promise<boolean> => {
 /**
  * Delete a session
  * @function
- * @param {number} id - Id of session to delete
+ * @param {number} id - ID of session to delete
  */
 const deleteSession = async (id: number) => {
     try {
         const session = await db().findOneById(id);
         await db().remove(session);
     } catch (e) {
-        throw new Error(`Problem deleting session by id: ${id}!`);
+        throw LogUtils.logError(`Problem deleting session by id: ${id}!`);
     }
 };
 
 /**
  * Delete the session for a user
  * @function
- * @param {number} userId - Id of use to delete the session for
+ * @param {number} userID - ID of use to delete the session for
  */
-const deleteSessionFromUserId = async (userId: number) => {
+const deleteSessionFromUserID = async (userID: number) => {
     try {
         const session = await db().createQueryBuilder('usersessions')
-            .innerJoin('usersessions.user', 'user', 'user.id = :userId')
-            .setParameters({ userId })
+            .innerJoin('usersessions.user', 'user', 'user.id = :userID')
+            .setParameters({ userID })
             .getOne();
         if (session) db().remove(session);
     } catch (e) {
-        throw new Error('Problem deleting session!');
+        throw LogUtils.logError('Problem deleting session!');
     }
 };
 
@@ -122,5 +123,5 @@ export default {
     updateSession,
     verifySession,
     deleteSession,
-    deleteSessionFromUserId,
+    deleteSessionFromUserID,
 };

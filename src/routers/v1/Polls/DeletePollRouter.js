@@ -1,7 +1,7 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import GroupsRepo from '../../../repos/GroupsRepo';
 import constants from '../../../utils/Constants';
 
 class DeletePollRouter extends AppDevRouter<Object> {
@@ -10,21 +10,21 @@ class DeletePollRouter extends AppDevRouter<Object> {
     }
 
     getPath(): string {
-        return '/polls/:id/:deviceId/';
+        return '/polls/:id/:deviceID/';
     }
 
     async content(req: Request) {
-        const { id, deviceId } = req.params;
+        const { id, deviceID } = req.params;
 
-        const poll = await SessionsRepo.getSessionId(id);
+        const poll = await GroupsRepo.getGroupID(id);
         if (!poll) throw new Error(`Poll with id ${id} not found!`);
 
-        const users = await SessionsRepo.getUsersBySessionId(id, 'admin');
-        if (users && users[0] && deviceId !== users[0].googleId) {
+        const users = await GroupsRepo.getUsersByGroupID(id, 'admin');
+        if (users && users[0] && deviceID !== users[0].googleID) {
             throw new Error('You are not authorized to delete this poll!');
         }
 
-        await SessionsRepo.deleteSessionById(id);
+        await GroupsRepo.deleteGroupByID(id);
         return null;
     }
 }

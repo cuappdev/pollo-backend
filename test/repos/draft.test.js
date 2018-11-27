@@ -11,6 +11,7 @@ let user2;
 // Connects to db before running tests and does setup
 beforeAll(async () => {
     await dbConnection().catch((e) => {
+        // eslint-disable-next-line no-console
         console.log('Error connecting to database');
         process.exit();
     });
@@ -78,7 +79,7 @@ test('Update Draft', async () => {
 });
 
 test('Get Owner of Draft', async () => {
-    const user = await DraftsRepo.getOwnerById(draft1.id);
+    const user = await DraftsRepo.getOwnerByID(draft1.id);
     expect(user.id).toBe(user1.id);
 });
 
@@ -93,7 +94,8 @@ test('Delete Draft', async () => {
 
 // Teardown
 afterAll(async () => {
-    await UsersRepo.deleteUserById(user1.id);
-    await UsersRepo.deleteUserById(user2.id);
+    await UsersRepo.deleteUserByID(user1.id);
+    await UsersRepo.deleteUserByID(user2.id);
+    // eslint-disable-next-line no-console
     console.log('Passed all draft tests');
 });

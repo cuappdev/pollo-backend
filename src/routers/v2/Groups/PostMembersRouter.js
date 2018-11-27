@@ -1,7 +1,8 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import LogUtils from '../../../utils/LogUtils';
+import GroupsRepo from '../../../repos/GroupsRepo';
 import constants from '../../../utils/Constants';
 
 class PostMembersRouter extends AppDevRouter<Object> {
@@ -16,14 +17,14 @@ class PostMembersRouter extends AppDevRouter<Object> {
     async content(req: Request) {
         const { id } = req.params;
         const { user } = req;
-        const { memberIds } = req.body;
+        const { memberIDs } = req.body;
 
-        if (!memberIds) throw new Error('List of member ids missing!');
+        if (!memberIDs) throw LogUtils.logError('List of member ids missing!');
 
-        if (!await SessionsRepo.isAdmin(id, user)) {
-            throw new Error('You are not authorized to add members to this session!');
+        if (!await GroupsRepo.isAdmin(id, user)) {
+            throw LogUtils.logError('You are not authorized to add members to this group!');
         }
-        await SessionsRepo.addUsersByIds(id, memberIds, 'member');
+        await GroupsRepo.addUsersByIDs(id, memberIDs, 'member');
         return null;
     }
 }

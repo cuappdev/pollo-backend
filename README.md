@@ -13,6 +13,8 @@ CREATE DATABASE pollo;
 
 ### Required variables:
 ````bash
+export CHRONICLE_ACCESS_KEY=FILL_IN
+export CHRONICLE_SECRET_KEY=FILL_IN
 export DB_HOST=localhost
 export DB_USERNAME=FILL_IN
 export DB_PASSWORD=FILL_IN

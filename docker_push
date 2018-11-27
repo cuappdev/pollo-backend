@@ -1,6 +1,7 @@
 #!/bin/bash
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-docker build -t pollo --no-cache .
-docker tag $(docker images -q pollo) cornellappdev/pollo:"$TRAVIS_COMMIT"
+docker build -t cornellappdev/pollo:"$TRAVIS_COMMIT" --no-cache .
 docker push cornellappdev/pollo:"$TRAVIS_COMMIT"
-
+chmod 600 server.pem
+ssh -i server.pem appdev@pollo-backend.cornellappdev.com "cd docker-compose; export IMAGE_TAG='$TRAVIS_COMMIT'; 
+    docker stack deploy --compose-file docker-compose.yml the-stack"

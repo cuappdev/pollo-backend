@@ -1,6 +1,7 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from './AppDevRouter';
+import LogUtils from './LogUtils';
 
 export type Cursor = number
 
@@ -34,7 +35,7 @@ class AppDevEdgeRouter<T> extends AppDevRouter<AppDevEdgesResponse<T>> {
         pageInfo: PageInfo,
         error: ErrorCollector,
     ): Promise<Array<AppDevEdge<T>>> {
-        throw new Error(`Didn't implement contentArray for ${this.getPath()}`);
+        throw LogUtils.logError(`Didn't implement contentArray for ${this.getPath()}`);
     }
 
     async content(req: Request) {

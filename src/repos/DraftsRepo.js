@@ -1,6 +1,7 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
 import Draft from '../models/Draft';
+import LogUtils from '../utils/LogUtils';
 import User from '../models/User';
 
 const db = (): Repository<Draft> => getConnectionManager().get().getRepository(Draft);
@@ -24,49 +25,49 @@ const createDraft = async (text: string, options: string[], user: User):
         await db().persist(draft);
         return draft;
     } catch (e) {
-        throw new Error('Problem creating draft!');
+        throw LogUtils.logError('Problem creating draft!');
     }
 };
 
 /**
 * Gets draft by id
 * @function
-* @param {number} id - Id of draft we want to fetch
+* @param {number} id - ID of draft we want to fetch
 * @return {Draft} Draft with given id
 */
 const getDraft = async (id: number): Promise<Draft> => {
     try {
         return await db().createQueryBuilder('drafts')
             .leftJoinAndSelect('drafts.user', 'users')
-            .where('drafts.id = :draftId')
-            .setParameters({ draftId: id })
+            .where('drafts.id = :draftID')
+            .setParameters({ draftID: id })
             .getOne();
     } catch (e) {
-        throw new Error(`Problem getting draft with id: ${id}`);
+        throw LogUtils.logError(`Problem getting draft with id: ${id}`);
     }
 };
 
 /**
 * Gets draft by user id
 * @function
-* @param {number} id - Id of user we want to fetch drafts for
+* @param {number} id - ID of user we want to fetch drafts for
 * @return {Draft[]} Drafts belonging to the user specified
 */
 const getDraftsByUser = async (id: number): Promise<Array<?Draft>> => {
     try {
         return await db().createQueryBuilder('drafts')
-            .innerJoinAndSelect('drafts.user', 'user', 'user.id = :userId')
-            .setParameters({ userId: id })
+            .innerJoinAndSelect('drafts.user', 'user', 'user.id = :userID')
+            .setParameters({ userID: id })
             .getMany();
     } catch (e) {
-        throw new Error(`Problem getting drafts for user with id: ${id}`);
+        throw LogUtils.logError(`Problem getting drafts for user with id: ${id}`);
     }
 };
 
 /**
 * Updates draft
 * @function
-* @param {number} id - Id of draft to update
+* @param {number} id - ID of draft to update
 * @param {string} [text] - New text of draft
 * @param {string[]} [options] - New options of draft
 * @return {?Draft} Updated draft
@@ -76,8 +77,8 @@ const updateDraft = async (id: number, text: ?string, options: ?string[]):
     try {
         const draft = await db().createQueryBuilder('drafts')
             .leftJoinAndSelect('drafts.user', 'user')
-            .where('drafts.id = :draftId')
-            .setParameters({ draftId: id })
+            .where('drafts.id = :draftID')
+            .setParameters({ draftID: id })
             .getOne();
 
         if (options) draft.options = options;
@@ -86,41 +87,41 @@ const updateDraft = async (id: number, text: ?string, options: ?string[]):
         await db().persist(draft);
         return draft;
     } catch (e) {
-        throw new Error(`Problem updating draft with id: ${id}`);
+        throw LogUtils.logError(`Problem updating draft with id: ${id}`);
     }
 };
 
 /**
 * Deletes draft
 * @function
-* @param {number} id - Id of draft to delete
+* @param {number} id - ID of draft to delete
 */
 const deleteDraft = async (id: number) => {
     try {
         const draft = await db().findOneById(id);
         await db().remove(draft);
     } catch (e) {
-        throw new Error(`Problem deleting draft with id: ${id}`);
+        throw LogUtils.logError(`Problem deleting draft with id: ${id}`);
     }
 };
 
 /**
 * Get owner of a draft
 * @function
-* @param {number} id - Id of draft to get owner of
+* @param {number} id - ID of draft to get owner of
 * @return {?User} owner of draft
 */
-const getOwnerById = async (id: number): Promise<?User> => {
+const getOwnerByID = async (id: number): Promise<?User> => {
     try {
         const draft = await db().createQueryBuilder('drafts')
             .leftJoinAndSelect('drafts.user', 'user')
-            .where('drafts.id = :draftId')
-            .setParameters({ draftId: id })
+            .where('drafts.id = :draftID')
+            .setParameters({ draftID: id })
             .getOne();
 
         return draft.user;
     } catch (e) {
-        throw new Error(`Problem getting owner of draft with id: ${id}`);
+        throw LogUtils.logError(`Problem getting owner of draft with id: ${id}`);
     }
 };
 
@@ -130,5 +131,5 @@ export default {
     updateDraft,
     deleteDraft,
     getDraft,
-    getOwnerById,
+    getOwnerByID,
 };

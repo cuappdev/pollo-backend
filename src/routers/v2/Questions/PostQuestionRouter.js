@@ -1,8 +1,9 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
+import LogUtils from '../../../utils/LogUtils';
 import QuestionsRepo from '../../../repos/QuestionsRepo';
-import SessionsRepo from '../../../repos/SessionsRepo';
+import GroupsRepo from '../../../repos/GroupsRepo';
 import constants from '../../../utils/Constants';
 
 import type { APIQuestion } from '../APITypes';
@@ -17,20 +18,20 @@ class PostQuestionRouter extends AppDevRouter<Object> {
     }
 
     async content(req: Request): Promise<{ node: APIQuestion }> {
-        const sessionId = req.params.id;
+        const groupID = req.params.id;
         const { text } = req.body;
         const { user } = req;
 
-        if (!text) throw new Error('Cannot post empty question!');
+        if (!text) throw LogUtils.logError('Cannot post empty question!');
 
-        const session = await SessionsRepo.getSessionById(sessionId);
-        if (!session) throw new Error(`Couldn't find session with id ${sessionId}`);
+        const group = await GroupsRepo.getGroupByID(groupID);
+        if (!group) throw LogUtils.logError(`Couldn't find group with id ${groupID}`);
 
-        if (!await SessionsRepo.isMember(sessionId, user)) {
-            throw new Error('You are not authorized to post a poll!');
+        if (!await GroupsRepo.isMember(groupID, user)) {
+            throw LogUtils.logError('You are not authorized to post a poll!');
         }
 
-        const poll = await QuestionsRepo.createQuestion(text, session, user);
+        const poll = await QuestionsRepo.createQuestion(text, group, user);
 
         return {
             node: {
