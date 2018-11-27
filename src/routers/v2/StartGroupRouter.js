@@ -12,7 +12,7 @@ class StartGroupRouter extends AppDevRouter<APIGroup> {
     }
 
     getPath(): string {
-        return '/start/group/';
+        return '/start/session/';
     }
 
     async content(req: Request) {
