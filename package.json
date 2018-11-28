@@ -15,6 +15,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^21.1.1",
+    "appdev": "^1.0.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.25.0",
     "babel-eslint": "^9.0.0",
@@ -45,7 +46,6 @@
   },
   "dependencies": {
     "ajv": "^6.5.3",
-    "appdev": "git+https://github.com/cuappdev/appdev.js.git",
     "axios": "^0.16.2",
     "body-parser": "^1.17.2",
     "cors": "^2.8.4",
