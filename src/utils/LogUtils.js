@@ -1,4 +1,4 @@
-const { ChronicleSession } = require('../../node_modules/appdev/build/bundle');
+const { ChronicleSession } = require('appdev');
 
 const chroniclePollo = new ChronicleSession(
     process.env.CHRONICLE_ACCESS_KEY,
