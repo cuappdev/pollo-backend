@@ -41,7 +41,7 @@
         "radix": ["error", "as-needed"],
 
         // allow long lines
-        "max-len": ["error", { "code": 100 }],
+        "max-len": ["error", { "code": 120 }],
 
         // allow unary operator
         "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
@@ -70,6 +70,8 @@
 
         "import/extensions": "never",
 
-        "function-paren-newline": ["error", "consistent"]
+        "function-paren-newline": ["error", "consistent"],
+
+        "no-console": 0
       }
 }
