@@ -36,14 +36,12 @@ const entities = [
     UserSession,
 ];
 
-const autoSchemaSync = true;
-
 // Setup options
 const connectionOptions: ConnectionOptions = {
     driver,
     entities,
-    autoSchemaSync,
     migrations: [Change1521233644145],
+    migrationsRun: true,
     cli: {
         entitiesDir: 'src/models',
         migrationsDir: 'src/db/migrations',
