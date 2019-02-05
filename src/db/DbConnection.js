@@ -36,13 +36,13 @@ const entities = [
     UserSession,
 ];
 
-const autoSchemaSync = process.env.NODE_ENV === 'production';
+const synchronize = process.env.NODE_ENV === 'development';
 
 // Setup options
 const connectionOptions: ConnectionOptions = {
     driver,
     entities,
-    autoSchemaSync,
+    synchronize,
     migrations: [RenameColumn1549303297337],
     cli: {
         entitiesDir: 'src/models',
@@ -50,7 +50,8 @@ const connectionOptions: ConnectionOptions = {
     },
 };
 
-const dbConnection = (): Promise<any> => createConnection(connectionOptions).then(async (connection) => {
-    await connection.runMigrations();
-});
+const dbConnection = (): Promise<any> => createConnection(connectionOptions)
+    .then(async (connection) => {
+        await connection.runMigrations();
+    });
 export default dbConnection;
