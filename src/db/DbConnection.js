@@ -7,7 +7,7 @@ import {
 
 // All entities
 import Base from '../models/Base';
-import Change1521233644145 from './migrations/Change1521233644145';
+import { RenameColumn1549303297337 } from './migrations/1549303297337-RenameColumn';
 import Draft from '../models/Draft';
 import Poll from '../models/Poll';
 import Question from '../models/Question';
@@ -36,17 +36,21 @@ const entities = [
     UserSession,
 ];
 
+const autoSchemaSync = process.env.NODE_ENV === 'production';
+
 // Setup options
 const connectionOptions: ConnectionOptions = {
     driver,
     entities,
-    migrations: [Change1521233644145],
-    migrationsRun: true,
+    autoSchemaSync,
+    migrations: [RenameColumn1549303297337],
     cli: {
         entitiesDir: 'src/models',
         migrationsDir: 'src/db/migrations',
     },
 };
 
-const dbConnection = (): Promise<any> => createConnection(connectionOptions);
+const dbConnection = (): Promise<any> => createConnection(connectionOptions).then(async (connection) => {
+    await connection.runMigrations();
+});
 export default dbConnection;
