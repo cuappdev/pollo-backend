@@ -64,8 +64,7 @@ test('get polls by group', async () => {
     const getstr = await request(get(`/sessions/${group.id}/polls`, token));
     const getres = getstr;
     expect(getres.success).toBe(true);
-    const date = Object.keys(getres.data);
-    expect(poll.id).toBe(getres.data[date][0].id);
+    expect(poll.id).toBe(getres.data[0].polls[0].id);
 });
 
 test('update poll', async () => {

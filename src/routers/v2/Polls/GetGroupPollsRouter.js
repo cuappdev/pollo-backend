@@ -26,6 +26,7 @@ class GetGroupPollsRouter extends AppDevRouter<Object> {
             let date = (new Date(1000 * poll.createdAt)).toDateString();
             // Date string has format 'Wed Oct 03 2018'
             date = date.substring(date.indexOf(' '));
+            pollsByDate.date = date;
             const p = {
                 id: poll.id,
                 text: poll.text,
@@ -35,13 +36,13 @@ class GetGroupPollsRouter extends AppDevRouter<Object> {
                 answer: isAdmin ? null : poll.userAnswers[req.user.googleID],
                 correctAnswer: poll.correctAnswer,
             };
-            if (pollsByDate[date]) {
-                pollsByDate[date].push(p);
+            if (pollsByDate.polls) {
+                pollsByDate.polls.push(p);
             } else {
-                pollsByDate[date] = [p];
+                pollsByDate.polls = [p];
             }
         });
-        return pollsByDate;
+        return [pollsByDate];
     }
 }
 
