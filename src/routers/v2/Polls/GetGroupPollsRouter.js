@@ -42,7 +42,7 @@ class GetGroupPollsRouter extends AppDevRouter<Object> {
                 pollsByDate.polls = [p];
             }
         });
-        return [pollsByDate];
+        return Object.keys(pollsByDate).length === 0 ? [] : [pollsByDate];
     }
 }
 
