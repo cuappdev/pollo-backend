@@ -7,7 +7,7 @@ import {
 
 // All entities
 import Base from '../models/Base';
-import Change1521233644145 from './migrations/Change1521233644145';
+import { Change1549303297337 } from './migrations/1549303297337-Change';
 import Draft from '../models/Draft';
 import Poll from '../models/Poll';
 import Question from '../models/Question';
@@ -36,19 +36,19 @@ const entities = [
     UserSession,
 ];
 
-const autoSchemaSync = true;
-
 // Setup options
 const connectionOptions: ConnectionOptions = {
     driver,
     entities,
-    autoSchemaSync,
-    migrations: [Change1521233644145],
+    migrations: [Change1549303297337],
     cli: {
         entitiesDir: 'src/models',
         migrationsDir: 'src/db/migrations',
     },
 };
 
-const dbConnection = (): Promise<any> => createConnection(connectionOptions);
+const dbConnection = (): Promise<any> => createConnection(connectionOptions)
+    .then(async (connection) => {
+        await connection.runMigrations();
+    });
 export default dbConnection;
