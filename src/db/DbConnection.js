@@ -7,7 +7,7 @@ import {
 
 // All entities
 import Base from '../models/Base';
-import { RenameColumn1549303297337 } from './migrations/1549303297337-RenameColumn';
+import { Change1549303297337 } from './migrations/1549303297337-Change';
 import Draft from '../models/Draft';
 import Poll from '../models/Poll';
 import Question from '../models/Question';
@@ -36,14 +36,11 @@ const entities = [
     UserSession,
 ];
 
-const synchronize = process.env.NODE_ENV === 'development';
-
 // Setup options
 const connectionOptions: ConnectionOptions = {
     driver,
     entities,
-    synchronize,
-    migrations: [RenameColumn1549303297337],
+    migrations: [Change1549303297337],
     cli: {
         entitiesDir: 'src/models',
         migrationsDir: 'src/db/migrations',
