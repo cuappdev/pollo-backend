@@ -6,6 +6,7 @@
   "scripts": {
     "start": "webpack && node build/bundle.js",
     "prod": "webpack -p && node build/bundle.js",
+    "build": "webpack --config webpack.config.js",
     "test": "jest --forceExit -i",
     "flow": "node_modules/.bin/flow",
     "flow-stop": "node_modules/.bin/flow stop",

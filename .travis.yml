@@ -26,5 +26,5 @@ deploy:
   on:
     branch: release
 script:
-- npm run start &
+- npm run build; npm run start &
 - sleep 10; npm run test
