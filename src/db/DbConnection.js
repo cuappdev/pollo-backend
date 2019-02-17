@@ -49,6 +49,6 @@ const connectionOptions: ConnectionOptions = {
 
 const dbConnection = (): Promise<any> => createConnection(connectionOptions)
     .then(async (connection) => {
-        await connection.runMigrations();
+        if (process.env.NODE_ENV === 'production') await connection.runMigrations();
     });
 export default dbConnection;
