@@ -36,8 +36,11 @@ const entities = [
     UserSession,
 ];
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 // Setup options
 const connectionOptions: ConnectionOptions = {
+    autoSchemaSync: !isProduction,
     driver,
     entities,
     migrations: [Change1549303297337],
@@ -49,6 +52,6 @@ const connectionOptions: ConnectionOptions = {
 
 const dbConnection = (): Promise<any> => createConnection(connectionOptions)
     .then(async (connection) => {
-        await connection.runMigrations();
+        if (isProduction) await connection.runMigrations();
     });
 export default dbConnection;
