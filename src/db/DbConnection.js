@@ -7,7 +7,6 @@ import {
 
 // All entities
 import Base from '../models/Base';
-import { Change1549303297337 } from './migrations/1549303297337-Change';
 import Draft from '../models/Draft';
 import Poll from '../models/Poll';
 import Question from '../models/Question';
@@ -25,6 +24,9 @@ const driver = {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
+    extra: {
+        ssl: isProduction,
+    },
 };
 
 const entities = [
@@ -42,7 +44,7 @@ const connectionOptions: ConnectionOptions = {
     autoSchemaSync: !isProduction,
     driver,
     entities,
-    migrations: [Change1549303297337],
+    migrations: [],
     cli: {
         entitiesDir: 'src/models',
         migrationsDir: 'src/db/migrations',
