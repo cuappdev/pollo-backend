@@ -21,11 +21,13 @@ class DeleteQuestionRouter extends AppDevRouter<Object> {
 
         const group = await QuestionsRepo.getGroupFromQuestionID(questionID);
         if (!group) {
-            throw LogUtils.logError(`Couldn't find group with question ${questionID}`);
+            throw LogUtils.logErr({ message: `Couldn't find group with question ${questionID}` });
         }
         if (!await GroupsRepo.isAdmin(group.id, user)
           && !await QuestionsRepo.isOwnerByID(questionID, user)) {
-            throw LogUtils.logError('You are not authorized to delete this question!');
+            throw LogUtils.logErr(
+                {}, { questionID, user }, 'You are not authorized to delete this question!',
+            );
         }
         await QuestionsRepo.deleteQuestionByID(questionID);
         return null;

@@ -26,7 +26,7 @@ export default class AppDevRouter<T: Object> {
   authenticated: boolean;
 
   getPath(): string {
-      throw LogUtils.logError('You must implement getPath() with a valid path!');
+      throw LogUtils.logErr({ message: 'You must implement getPath() with a valid path!' });
   }
 
   constructor(type: RequestType, auth: ?boolean) {
@@ -47,11 +47,11 @@ export default class AppDevRouter<T: Object> {
 
       // Error handle path
       if (path.length < 2) {
-          throw LogUtils.logError('Invalid path!');
+          throw LogUtils.logErr({}, { path }, 'Invalid path!');
       } else if (path[0] !== '/') {
-          throw LogUtils.logError('Path must start with a \'/\'!');
+          throw LogUtils.logErr({}, { path }, 'Path must start with a \'/\'!');
       } else if (path[path.length - 1] !== '/') {
-          throw LogUtils.logError('Path must end with a \'/\'!');
+          throw LogUtils.logErr({}, { path }, 'Path must end with a \'/\'!');
       }
       // Attach content to router
       if (this.authenticated) {
@@ -97,7 +97,7 @@ export default class AppDevRouter<T: Object> {
           res.json(new AppDevResponse(true, content));
       } catch (e) {
           if (e.message === 1) {
-              throw LogUtils.logError('You must implement content()!');
+              throw LogUtils.logErr({ message: 'You must implement content()!' });
           } else {
               console.error(e);
               res.json(new AppDevResponse(false, { errors: [e.message] }));

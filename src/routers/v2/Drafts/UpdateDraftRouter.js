@@ -19,19 +19,20 @@ class UpdateDraftRouter extends AppDevRouter<Object> {
         const draftID = req.params.id;
         const { text, options } = req.body;
         const admin = await DraftsRepo.getOwnerByID(draftID);
-        if (!admin) throw LogUtils.logError(`Draft with id ${draftID} was not found!`);
+        if (!admin) throw LogUtils.logErr({ message: `Draft with id ${draftID} was not found!` });
 
         if (!options && !text) {
-            throw LogUtils.logError('No fields specified to update.');
+            throw LogUtils.logErr({}, { options, text }, 'No fields specified to update.');
         }
 
         if (admin.id !== req.user.id) {
-            throw LogUtils.logError('Not authorized to update draft!');
+            throw LogUtils.logErr({},
+                { admin: admin.id, id: req.user.id }, 'Not authorized to update draft!');
         }
 
         const draft = await DraftsRepo.updateDraft(draftID, text, options);
         if (!draft) {
-            throw LogUtils.logError(`Draft with id ${draftID} was not found!`);
+            throw LogUtils.logErr({ message: `Draft with id ${draftID} was not found!` });
         }
 
         return {

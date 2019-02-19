@@ -19,10 +19,12 @@ class PostMembersRouter extends AppDevRouter<Object> {
         const { user } = req;
         const { memberIDs } = req.body;
 
-        if (!memberIDs) throw LogUtils.logError('List of member ids missing!');
+        if (!memberIDs) throw LogUtils.logErr({ message: 'List of member ids missing!' });
 
         if (!await GroupsRepo.isAdmin(id, user)) {
-            throw LogUtils.logError('You are not authorized to add members to this group!');
+            throw LogUtils.logErr(
+                {}, { id, user }, 'You are not authorized to add members to this group!',
+            );
         }
         await GroupsRepo.addUsersByIDs(id, memberIDs, 'member');
         return null;

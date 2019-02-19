@@ -31,7 +31,7 @@ const createGroup = async (name: string, code: string, user: ?User):
         group.admins = user ? [user] : [];
 
         if (groupCodes[code]) {
-            throw LogUtils.logError('Group code is already in use');
+            throw LogUtils.logErr({ message: `Group code is already in use: ${code}` });
         }
 
         await db().persist(group);
@@ -39,7 +39,7 @@ const createGroup = async (name: string, code: string, user: ?User):
 
         return group;
     } catch (e) {
-        throw LogUtils.logError('Problem creating group!');
+        throw LogUtils.logErr(e, { name, code, user }, 'Problem creating group!');
     }
 };
 
@@ -67,7 +67,7 @@ const getGroupByID = async (id: number): Promise<?Group> => {
     try {
         return await db().findOneById(id);
     } catch (e) {
-        throw LogUtils.logError(`Problem getting group by id: ${id}!`);
+        throw LogUtils.logErr(e, null, `Problem getting group by id: ${id}`);
     }
 };
 
@@ -96,7 +96,7 @@ const deleteGroupByID = async (id: number) => {
         delete groupCodes[group.code];
         await db().remove(group);
     } catch (e) {
-        throw LogUtils.logError(`Problem deleting group by id: ${id}!`);
+        throw LogUtils.logErr(e, null, `Problem deleting group by id: ${id}`);
     }
 };
 
@@ -121,7 +121,7 @@ const updateGroupByID = async (id: number, name: string):
         }
         return await db().findOneById(id);
     } catch (e) {
-        throw LogUtils.logError(`Problem updating group by id: ${id}!`);
+        throw LogUtils.logErr(e, { name }, `Problem updating group by id: ${id}`);
     }
 };
 
@@ -160,7 +160,7 @@ const addUsersByGoogleIDs = async (id: number, googleIDs: string[],
         await db().persist(group);
         return group;
     } catch (e) {
-        throw LogUtils.logError('Problem adding users to group by google ids!');
+        throw LogUtils.logErr(e, { id, googleIDs, role }, 'Problem adding users to group by google ids!');
     }
 };
 
@@ -197,7 +197,7 @@ const addUsersByIDs = async (id: number, userIDs: number[],
         await db().persist(group);
         return group;
     } catch (e) {
-        throw LogUtils.logError('Problem adding users to group by ids!');
+        throw LogUtils.logErr(e, { id, userIDs, role }, 'Problem adding users to group by ids!');
     }
 };
 
@@ -232,7 +232,7 @@ const removeUserByGroupID = async (id: number, user: User, role: ?string):
 
         return group;
     } catch (e) {
-        throw LogUtils.logError(`Problem removing admin from group by id: ${id}`);
+        throw LogUtils.logErr(e, { user, role }, `Problem removing admin from group by id: ${id}`);
     }
 };
 
@@ -255,7 +255,7 @@ const isAdmin = async (id: number, user: User):
         const admin = group.admins.find(x => x.googleID === user.googleID);
         return admin !== undefined;
     } catch (e) {
-        throw LogUtils.logError(`Problem verifying admin status for group ${id}`);
+        throw LogUtils.logErr(e, { user }, `Problem verifying admin status for group: ${id}`);
     }
 };
 
@@ -278,7 +278,7 @@ const isMember = async (id: number, user: User):
         const member = group.members.find(x => x.googleID === user.googleID);
         return member !== undefined;
     } catch (e) {
-        throw LogUtils.logError(`Problem verifying member status for group ${id}`);
+        throw LogUtils.logErr(e, { user }, `Problem verifying member status for group: ${id}`);
     }
 };
 
@@ -306,7 +306,7 @@ const getUsersByGroupID = async (id: number, role: ?string):
         }
         return group.admins.concat(group.members);
     } catch (e) {
-        throw LogUtils.logError(`Problem getting admins for group with id: ${id}!`);
+        throw LogUtils.logErr(e, { role }, `Problem getting admins for group by id: ${id}`);
     }
 };
 
@@ -328,7 +328,7 @@ const getPolls = async (id: number, sharedOnly: boolean):
             .getOne();
         return sharedOnly === true ? group.polls.filter(poll => poll.shared) : group.polls;
     } catch (e) {
-        throw LogUtils.logError('Problem getting polls');
+        throw LogUtils.logErr(e, { sharedOnly }, `Problem getting polls from group: ${id}`);
     }
 };
 
@@ -348,7 +348,7 @@ const getQuestions = async (id: number): Promise<Array<?Question>> => {
             .getOne();
         return group.questions;
     } catch (e) {
-        throw LogUtils.logError('Problem getting questions');
+        throw LogUtils.logErr(e, null, `Problem getting questions from group: ${id}`);
     }
 };
 
@@ -361,7 +361,7 @@ const getQuestions = async (id: number): Promise<Array<?Question>> => {
 const latestActivityByGroupID = async (id: number): Promise<?number> => {
     try {
         const group = await db().findOneById(id);
-        if (!group) throw LogUtils.logError(`Can't find group with id ${id}!`);
+        if (!group) throw LogUtils.logErr({ message: `Can't find group by id: ${id}` });
 
         return await getPolls(id, false).then((p: Array<?Poll>) => {
             const lastPoll = p.slice(-1).pop();
@@ -371,7 +371,7 @@ const latestActivityByGroupID = async (id: number): Promise<?number> => {
             return group.updatedAt > lastPoll.updatedAt ? group.updatedAt : lastPoll.updatedAt;
         });
     } catch (e) {
-        throw LogUtils.logError('Problem getting latest activity');
+        throw LogUtils.logErr(e, null, `Problem getting latest activity from group by id: ${id}`);
     }
 };
 

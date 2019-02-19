@@ -41,7 +41,7 @@ function log(obj: Object, error: ?boolean = false) {
 function logErr(
     error: Object,
     data: ?Object = {},
-    note: ?string = '', //
+    note: ?string = '',
     disableConsoleOut: ?boolean = false,
 ) {
     try { // try block because if the error logging has an error... ?

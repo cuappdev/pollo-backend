@@ -34,7 +34,7 @@ const createPoll = async (text: string, group: ?Group, results: json,
         await db().persist(poll);
         return poll;
     } catch (e) {
-        throw LogUtils.logError('Problem creating poll!');
+        throw LogUtils.logErr(e, null, 'Problem creating poll!');
     }
 };
 
@@ -48,7 +48,7 @@ const getPollByID = async (id: number): Promise<?Poll> => {
     try {
         return await db().findOneById(id);
     } catch (e) {
-        throw LogUtils.logError(`Problem getting poll by id: ${id}!`);
+        throw LogUtils.logErr(e, null, `Problem getting poll by id: ${id}`);
     }
 };
 
@@ -62,7 +62,7 @@ const deletePollByID = async (id: number) => {
         const poll = await db().findOneById(id);
         await db().remove(poll);
     } catch (e) {
-        throw LogUtils.logError(`Problem deleting poll with id: ${id}!`);
+        throw LogUtils.logErr(e, null, `Problem deleting poll by id: ${id}`);
     }
 };
 
@@ -94,7 +94,7 @@ const updatePollByID = async (id: number, text: ?string, results: ?json,
         await db().persist(poll);
         return poll;
     } catch (e) {
-        throw LogUtils.logError(`Problem updating poll by id: ${id}!`);
+        throw LogUtils.logErr(e, null, `Problem updating poll by id: ${id}`);
     }
 };
 
@@ -112,7 +112,7 @@ const getGroupFromPollID = async (id: number) : Promise<?Group> => {
             .getOne();
         return poll.group;
     } catch (e) {
-        throw LogUtils.logError(`Problem getting group from quesiton with id: ${id}!`);
+        throw LogUtils.logErr(e, null, `Problem getting group from question by id: ${id}`);
     }
 };
 
