@@ -21,6 +21,7 @@ Create a .env file in the repository with the following contents:
 export DB_HOST=localhost
 export DB_USERNAME=FILL_IN
 export DB_PASSWORD=FILL_IN
+export DB_PORT=5432
 export DB_NAME=pollo
 export GOOGLE_CLIENT_ID=FILL_IN
 export GOOGLE_CLIENT_SECRET=FILL_IN
