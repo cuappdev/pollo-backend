@@ -16,11 +16,12 @@ import User from '../models/User';
 import UserSession from '../models/UserSession';
 
 dotenv.config(); // establish env variables
+const isProduction = process.env.NODE_ENV === 'production';
 
 const driver = {
     type: 'postgres',
     host: process.env.DB_HOST,
-    port: 5432,
+    port: isProduction ? process.env.DB_PORT : 5432,
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
@@ -35,8 +36,6 @@ const entities = [
     User,
     UserSession,
 ];
-
-const isProduction = process.env.NODE_ENV === 'production';
 
 // Setup options
 const connectionOptions: ConnectionOptions = {
