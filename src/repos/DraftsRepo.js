@@ -25,7 +25,7 @@ const createDraft = async (text: string, options: string[], user: User):
         await db().persist(draft);
         return draft;
     } catch (e) {
-        throw LogUtils.logErr(e, { text, options, user }, 'Problem creating draft!');
+        throw LogUtils.logErr(e, { text, options, user }, 'Problem creating draft');
     }
 };
 

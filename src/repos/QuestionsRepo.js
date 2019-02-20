@@ -26,7 +26,7 @@ const createQuestion = async (text: string, group: Group, user: User):
         await db().persist(question);
         return question;
     } catch (e) {
-        throw LogUtils.logErr(e, { text, group, user }, 'Problem creating question!');
+        throw LogUtils.logErr(e, { text, group, user }, 'Problem creating question');
     }
 };
 

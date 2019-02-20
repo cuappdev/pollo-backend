@@ -34,7 +34,7 @@ class PostPollRouter extends AppDevRouter<Object> {
         if (!group) throw LogUtils.logErr({ message: `Couldn't find group with id ${groupID}` });
 
         if (!await GroupsRepo.isAdmin(groupID, user)) {
-            throw LogUtils.logErr({}, { groupID, user }, 'You are not authorized to post a poll!');
+            throw LogUtils.logErr({}, { groupID, user }, 'You are not authorized to post a poll');
         }
 
         const poll = await PollsRepo

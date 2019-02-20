@@ -39,7 +39,7 @@ const createGroup = async (name: string, code: string, user: ?User):
 
         return group;
     } catch (e) {
-        throw LogUtils.logErr(e, { name, code, user }, 'Problem creating group!');
+        throw LogUtils.logErr(e, { name, code, user }, 'Problem creating group');
     }
 };
 
@@ -160,7 +160,7 @@ const addUsersByGoogleIDs = async (id: number, googleIDs: string[],
         await db().persist(group);
         return group;
     } catch (e) {
-        throw LogUtils.logErr(e, { id, googleIDs, role }, 'Problem adding users to group by google ids!');
+        throw LogUtils.logErr(e, { googleIDs, role }, `Problem adding users to group ${id} by google ids`);
     }
 };
 
@@ -197,7 +197,7 @@ const addUsersByIDs = async (id: number, userIDs: number[],
         await db().persist(group);
         return group;
     } catch (e) {
-        throw LogUtils.logErr(e, { id, userIDs, role }, 'Problem adding users to group by ids!');
+        throw LogUtils.logErr(e, { userIDs, role }, `Problem adding users to group ${id} by ids`);
     }
 };
 
@@ -232,7 +232,7 @@ const removeUserByGroupID = async (id: number, user: User, role: ?string):
 
         return group;
     } catch (e) {
-        throw LogUtils.logErr(e, { user, role }, `Problem removing admin from group by id: ${id}`);
+        throw LogUtils.logErr(e, { user, role }, `Problem removing user from group by id: ${id}`);
     }
 };
 
@@ -306,7 +306,7 @@ const getUsersByGroupID = async (id: number, role: ?string):
         }
         return group.admins.concat(group.members);
     } catch (e) {
-        throw LogUtils.logErr(e, { role }, `Problem getting admins for group by id: ${id}`);
+        throw LogUtils.logErr(e, { role }, `Problem getting users for group by id: ${id}`);
     }
 };
 

@@ -26,7 +26,7 @@ class DeleteQuestionRouter extends AppDevRouter<Object> {
         if (!await GroupsRepo.isAdmin(group.id, user)
           && !await QuestionsRepo.isOwnerByID(questionID, user)) {
             throw LogUtils.logErr(
-                {}, { questionID, user }, 'You are not authorized to delete this question!',
+                {}, { questionID, user }, 'You are not authorized to delete this question',
             );
         }
         await QuestionsRepo.deleteQuestionByID(questionID);

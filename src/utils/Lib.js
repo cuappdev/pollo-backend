@@ -33,13 +33,13 @@ async function ensureAuthenticated(req: Request, res: Response,
     const header = req.get('Authorization');
     if (!header) {
         res.send(new AppDevResponse(false,
-            { errors: ['Authorization header missing!'] }));
+            { errors: ['Authorization header missing'] }));
         return next(true);
     }
     const bearerToken = header.replace('Bearer ', '').trim();
     if (!bearerToken) {
         res.send(new AppDevResponse(false,
-            { errors: ['Invalid authorization header!'] }));
+            { errors: ['Invalid authorization header'] }));
         return next(true);
     }
 
@@ -65,20 +65,20 @@ async function updateSession(req: Request, res: Response, next: NextFunction) {
     const header = req.get('Authorization');
     if (!header) {
         res.send(new AppDevResponse(false,
-            { errors: ['Authorization header missing!'] }));
+            { errors: ['Authorization header missing'] }));
         return next(true);
     }
     const bearerToken = header.replace('Bearer ', '').trim();
     if (!bearerToken) {
         res.send(new AppDevResponse(false,
-            { errors: ['Invalid authorization header!'] }));
+            { errors: ['Invalid authorization header'] }));
         return next(true);
     }
 
     const session = await UserSessionsRepo.updateSession(bearerToken);
     if (!session) {
         res.send(new AppDevResponse(false,
-            { errors: ['Invalid refresh token!'] }));
+            { errors: ['Invalid refresh token'] }));
         return next(true);
     }
     req.session = session;

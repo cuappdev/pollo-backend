@@ -30,7 +30,7 @@ class UpdateGroupRouter extends AppDevRouter<APIGroup> {
 
         if (!await GroupsRepo.isAdmin(groupID, user)) {
             throw LogUtils.logErr(
-                {}, { groupID, user }, 'You are not authorized to update this group!',
+                {}, { groupID, user }, 'You are not authorized to update this group',
             );
         }
 

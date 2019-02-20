@@ -34,7 +34,9 @@ const createPoll = async (text: string, group: ?Group, results: json,
         await db().persist(poll);
         return poll;
     } catch (e) {
-        throw LogUtils.logErr(e, null, 'Problem creating poll!');
+        throw LogUtils.logErr(e, {
+            text, group, results, canShare, type, correctAnswer, userAnswers,
+        }, 'Problem creating poll');
     }
 };
 

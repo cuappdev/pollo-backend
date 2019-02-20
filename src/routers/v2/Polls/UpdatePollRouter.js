@@ -31,7 +31,7 @@ class UpdatePollRouter extends AppDevRouter<Object> {
 
         if (!await GroupsRepo.isAdmin(group.id, user)) {
             throw LogUtils.logErr(
-                {}, { pollID, user }, 'You are not authorized to update this poll!',
+                {}, { pollID, user }, 'You are not authorized to update this poll',
             );
         }
         const poll = await PollsRepo.updatePollByID(pollID, text,

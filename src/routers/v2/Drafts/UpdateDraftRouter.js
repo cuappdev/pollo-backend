@@ -27,7 +27,7 @@ class UpdateDraftRouter extends AppDevRouter<Object> {
 
         if (admin.id !== req.user.id) {
             throw LogUtils.logErr({},
-                { admin: admin.id, id: req.user.id }, 'Not authorized to update draft!');
+                { admin: admin.id, id: req.user.id }, 'Not authorized to update draft');
         }
 
         const draft = await DraftsRepo.updateDraft(draftID, text, options);

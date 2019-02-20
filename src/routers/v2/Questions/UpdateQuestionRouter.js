@@ -27,7 +27,7 @@ class UpdateQuestionRouter extends AppDevRouter<Object> {
         if (!group) throw LogUtils.logErr({ message: `Question with id ${questionID} has no group!` });
 
         if (!await QuestionsRepo.isOwnerByID(questionID, user)) {
-            throw LogUtils.logErr({}, { questionID, user }, 'You are not authorized to update this question!');
+            throw LogUtils.logErr({}, { questionID, user }, 'You are not authorized to update this question');
         }
         const question = await QuestionsRepo.updateQuestionByID(questionID, text);
         if (!question) {

@@ -80,7 +80,7 @@ class API {
           res.json(r);
       });
       this.express.get('/error',
-          (req, res) => res.send('Error authenticating!'));
+          (req, res) => res.send('Error authenticating'));
       this.express.post('/api/v2/auth/mobile', async (req, res) => {
           client.verifyIdToken({
               idToken: req.body.idToken,

@@ -17,7 +17,7 @@ class GetGroupsRouter extends AppDevRouter<Object> {
 
     async content(req: Request) {
         const groups = await UsersRepo.getGroupsByID(req.user.id, 'member');
-        if (!groups) throw LogUtils.logErr({ message: 'Can\'t find groups for user!' });
+        if (!groups) throw LogUtils.logErr({ message: 'Can\'t find member groups for user' });
         const nodes = await groups
             .filter(Boolean)
             .map(async group => ({
