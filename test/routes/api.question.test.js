@@ -48,8 +48,10 @@ test('create question with invalid token', async () => {
     const opts = {
         text: 'Why do we have to test s***? (PG-13)',
     };
-    const result = await request(post(`/sessions/${group.id}/questions`, opts, adminToken));
-    expect(result.success).toBe(false);
+    await request(post(`/sessions/${group.id}/questions`, opts, adminToken))
+        .catch((e) => {
+            expect(e.statusCode).toBe(401);
+        });
 });
 
 test('get question by id', async () => {
@@ -81,9 +83,10 @@ test('update question with invalid token', async () => {
     const opts = {
         text: 'Why do we have to test stuff? (PG)',
     };
-    const getstr = await request(put(`/questions/${question.id}`, opts, adminToken));
-    const getres = getstr;
-    expect(getres.success).toBe(false);
+    await request(put(`/questions/${question.id}`, opts, adminToken))
+        .catch((e) => {
+            expect(e.statusCode).toBe(401);
+        });
 });
 
 test('delete question', async () => {

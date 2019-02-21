@@ -173,14 +173,17 @@ test('update group', async () => {
 });
 
 test('update group with invalid adminToken', async () => {
-    const getstr = await request(put(`/sessions/${group.data.node.id}`, opts2, 'invalid'));
-    const getres = getstr;
-    expect(getres.success).toBe(false);
+    await request(put(`/sessions/${group.data.node.id}`, opts2, 'invalid'))
+        .catch((e) => {
+            expect(e.statusCode).toBe(401);
+        });
 });
 
 test('delete group with invalid adminToken', async () => {
-    const result = await request(del(`/sessions/${group.data.node.id}`, 'invalid'));
-    expect(result.success).toBe(false);
+    await request(del(`/sessions/${group.data.node.id}`, 'invalid'))
+        .catch((e) => {
+            expect(e.statusCode).toBe(401);
+        });
 });
 
 test('delete group', async () => {

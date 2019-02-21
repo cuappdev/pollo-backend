@@ -44,8 +44,7 @@ async function ensureAuthenticated(req: Request, res: Response,
     }
 
     if (!await UserSessionsRepo.verifySession(bearerToken)) {
-        res.send(new AppDevResponse(false,
-            { errors: ['Invalid session token'] }));
+        res.send(401, 'Invalid session token');
         return next(true);
     }
     const user = await UserSessionsRepo.getUserFromToken(bearerToken);
