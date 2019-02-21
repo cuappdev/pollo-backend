@@ -21,20 +21,22 @@ class UpdateGroupRouter extends AppDevRouter<APIGroup> {
         const groupID = req.params.id;
         const { user } = req;
 
-        if (!name) throw LogUtils.logError('No fields specified to update.');
+        if (!name) throw LogUtils.logErr({ message: 'No fields specified to update.' });
 
         let group = await GroupsRepo.getGroupByID(groupID);
         if (!group) {
-            throw LogUtils.logError(`Group with id ${groupID} was not found!`);
+            throw LogUtils.logErr({ message: `Group with id ${groupID} was not found!` });
         }
 
         if (!await GroupsRepo.isAdmin(groupID, user)) {
-            throw LogUtils.logError('You are not authorized to update this group!');
+            throw LogUtils.logErr(
+                {}, { groupID, user }, 'You are not authorized to update this group',
+            );
         }
 
         group = await GroupsRepo.updateGroupByID(groupID, name);
         if (!group) {
-            throw LogUtils.logError(`Group with id ${groupID} was not found!`);
+            throw LogUtils.logErr({ message: `Group with id ${groupID} was not found!` });
         }
         return {
             node: {

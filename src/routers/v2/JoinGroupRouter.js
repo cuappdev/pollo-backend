@@ -20,19 +20,19 @@ class JoinGroupRouter extends AppDevRouter<APIGroup> {
         let { id } = req.body;
 
         if (!id && !code) {
-            throw LogUtils.logError('Group id or code required.');
+            throw LogUtils.logErr({ message: 'Group id or code required.' });
         }
 
         if (code) {
             id = await GroupsRepo.getGroupID(code);
             if (!id) {
-                throw LogUtils.logError(`No group with code ${code} found.`);
+                throw LogUtils.logErr({ message: `No group with code ${code} found.` });
             }
         }
 
         const group = await GroupsRepo.getGroupByID(id);
         if (!group) {
-            throw LogUtils.logError(`No group with id ${id} found.`);
+            throw LogUtils.logErr({ message: `No group with id ${id} found.` });
         }
 
         if (req.app.groupManager.findSocket(code, id) === undefined) {

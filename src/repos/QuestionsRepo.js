@@ -26,7 +26,7 @@ const createQuestion = async (text: string, group: Group, user: User):
         await db().persist(question);
         return question;
     } catch (e) {
-        throw LogUtils.logError('Problem creating question!');
+        throw LogUtils.logErr(e, { text, group, user }, 'Problem creating question');
     }
 };
 
@@ -40,7 +40,7 @@ const getQuestionByID = async (id: number): Promise<?Question> => {
     try {
         return await db().findOneById(id);
     } catch (e) {
-        throw LogUtils.logError(`Problem getting question by id: ${id}`);
+        throw LogUtils.logErr(e, null, `Problem getting question by id: ${id}`);
     }
 };
 
@@ -54,7 +54,7 @@ const deleteQuestionByID = async (id: number) => {
         const question = await db().findOneById(id);
         await db().remove(question);
     } catch (e) {
-        throw LogUtils.logError(`Problem deleting question with id: ${id}`);
+        throw LogUtils.logErr(e, null, `Problem deleting question by id: ${id}`);
     }
 };
 
@@ -80,7 +80,7 @@ const updateQuestionByID = async (id: number, text: string):
 
         return await db().findOneById(id);
     } catch (e) {
-        throw LogUtils.logError(`Problem updating question by id: ${id}`);
+        throw LogUtils.logErr(e, { text }, `Problem updating question by id: ${id}`);
     }
 };
 
@@ -98,7 +98,7 @@ const getGroupFromQuestionID = async (id: number) : Promise<?Group> => {
             .getOne();
         return question.group;
     } catch (e) {
-        throw LogUtils.logError(`Problem getting group from question with id: ${id}`);
+        throw LogUtils.logErr(e, null, `Problem getting group from question by id: ${id}`);
     }
 };
 
@@ -118,7 +118,7 @@ const isOwnerByID = async (id: number, user: User) : Promise<?boolean> => {
 
         return user && question.user.id === user.id;
     } catch (e) {
-        throw LogUtils.logError(`Could not verify ownership of question with id: ${id}`);
+        throw LogUtils.logErr(e, { user }, `Could not verify ownership of question by id: ${id}`);
     }
 };
 

@@ -1,49 +1,69 @@
-const { ChronicleSession } = require('appdev');
-
-const chroniclePollo = new ChronicleSession(
-    process.env.CHRONICLE_ACCESS_KEY,
-    process.env.CHRONICLE_SECRET_KEY,
-    'Pollo',
-);
-
-const errorType = {
-    date: { type: 'INT64' },
-    message: { type: 'UTF8' },
-    stackTrace: { type: 'UTF8' },
-};
+// @flow
+import util from 'util';
 
 /**
- * Get stack trace at this location
- * @returns {string} The stack trace
+ * Write object to console, if in production, condense message
+ *
+ * @param obj
+ * @param error
  */
-function getStackTrace(): string {
-    return Error().stack || (() => {
-        const obj = {};
-        Error.captureStackTrace(obj, getStackTrace);
-        return obj.stack;
-    });
+function log(obj: Object, error: ?boolean = false) {
+    const options = {
+        showHidden: false,
+        depth: Infinity,
+        colors: true,
+        maxArrayLength: 10,
+        breakLength: Infinity,
+        compact: false,
+    };
+
+    if (process.env.NODE_ENV === 'production') {
+        options.compact = true;
+        options.colors = false;
+    }
+
+    if (error) {
+        console.error(util.inspect(obj, options));
+    } else {
+        console.log(util.inspect(obj, options));
+    }
 }
 
 /**
- * Log error to Chronicle if production
- * @param {string} msg The error message
+ * Log error using log()
+ *
+ * @param error, the error object
+ * @param data, data such as parameters or an object that would help in debugging
+ * @param note, description of error
+ * @param disableConsoleOut, disable console.out in development env, for tests
+ * @returns {*}
  */
-function logError(msg: string) {
-    const st = getStackTrace();
-    const env = process.env.NODE_ENV || 'development';
+function logErr(
+    error: Object,
+    data: ?Object = {},
+    note: ?string = '',
+    disableConsoleOut: ?boolean = false,
+) {
+    try { // try block because if the error logging has an error... ?
+        if (!error) {
+            return null;
+        }
 
-    if (env === 'production') {
-        const log = {
-            date: Date.now(),
-            message: msg,
-            stackTrace: st,
+        const responseJSON = {
+            time: Date.now(),
+            error,
+            data,
+            note,
         };
-        chroniclePollo.log('error', errorType, log);
-    }
 
-    return new Error(msg);
+        log(responseJSON, true);
+        return responseJSON;
+    } catch (e) {
+        return error;
+    }
 }
 
 export default {
-    logError,
+    log,
+    logErr,
 };

@@ -22,8 +22,8 @@ class PostGroupRouter extends AppDevRouter<Object> {
         const { user } = req;
 
         if (!name) name = '';
-        if (!user) throw LogUtils.logError('User missing');
-        if (!code) throw LogUtils.logError('Code missing');
+        if (!user) throw LogUtils.logErr({ message: 'User missing' });
+        if (!code) throw LogUtils.logErr({ message: 'Code missing' });
 
         const group = await GroupsRepo.createGroup(name, code, user);
 
