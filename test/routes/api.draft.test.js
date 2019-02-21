@@ -46,9 +46,10 @@ test('Get drafts (Authorized)', async () => {
 });
 
 test('Get drafts (Unauthorized)', async () => {
-    const getstr = await request(get('/drafts/', 'blah'));
-    const getres = getstr;
-    expect(getres.success).toBe(false);
+    await request(get('/drafts/', 'blah'))
+        .catch((e) => {
+            expect(e.statusCode).toBe(401);
+        });
 });
 
 test('Update a draft', async () => {

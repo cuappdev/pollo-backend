@@ -49,8 +49,10 @@ test('create poll with invalid token', async () => {
     const opts = {
         text: 'Poll text', results: {}, shared: true, correctAnswer: '',
     };
-    const result = await request(post(`/sessions/${group.id}/polls`, opts, 'invalid'));
-    expect(result.success).toBe(false);
+    await request(post(`/sessions/${group.id}/polls`, opts, 'invalid'))
+        .catch((e) => {
+            expect(e.statusCode).toBe(401);
+        });
 });
 
 test('get poll by id', async () => {
@@ -85,14 +87,17 @@ test('update poll with invalid token', async () => {
         text: 'Updated text',
         results: { A: 1 },
     };
-    const getstr = await request(put(`/polls/${poll.id}`, opts, 'invalid'));
-    const getres = getstr;
-    expect(getres.success).toBe(false);
+    await request(put(`/polls/${poll.id}`, opts, 'invalid'))
+        .catch((e) => {
+            expect(e.statusCode).toBe(401);
+        });
 });
 
 test('delete poll with invalid token', async () => {
-    const result = await request(del(`/polls/${poll.id}`, 'invalid'));
-    expect(result.success).toBe(false);
+    await request(del(`/polls/${poll.id}`, 'invalid'))
+        .catch((e) => {
+            expect(e.statusCode).toBe(401);
+        });
 });
 
 test('delete poll', async () => {
