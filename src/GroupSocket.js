@@ -423,6 +423,15 @@ export default class GroupSocket {
   }
 
   /**
+   * Deletes current poll
+   * @param {number} deleteID - Poll ID to delete
+  */
+  _deleteQuestion = async (deleteID: number) => {
+      await PollsRepo.deletePollByID(deleteID);
+      this.nsp.to('users').emit('user/poll/delete', deleteID);
+  }
+
+  /**
    * Setups up events for users on admin side
    * Admin events:
    * 'server/poll/start' (pollObject: Object) (Poll object without id field)
@@ -519,6 +528,12 @@ export default class GroupSocket {
       client.on('server/question/end', async () => {
           console.log('ending question');
           await this._endPoll();
+      });
+
+      // Delete poll
+      client.on('server/poll/delete', async (deleteID: number) => {
+          console.log('deleting question');
+          await this._deleteQuestion(deleteID);
       });
 
       client.on('disconnect', async () => {
