@@ -79,6 +79,10 @@ class API {
           const r = { success: true, data: req.session };
           res.json(r);
       });
+      this.express.post('/api/v2/auth/refresh', lib.updateSession, (req, res) => {
+          const r = { success: true, data: req.session };
+          res.json(r);
+      });
       this.express.get('/error',
           (req, res) => res.send('Error authenticating'));
       this.express.post('/api/v2/auth/mobile', async (req, res) => {
