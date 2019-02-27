@@ -5,7 +5,11 @@ import constants from '../../../utils/Constants';
 
 class GetLivePollsRouter extends AppDevRouter<Object> {
     constructor() {
-        super(constants.REQUEST_TYPES.POST, false);
+        super(constants.REQUEST_TYPES.POST);
+    }
+
+    middleware() {
+        return (req, res, next) => next();
     }
 
     getPath(): string {

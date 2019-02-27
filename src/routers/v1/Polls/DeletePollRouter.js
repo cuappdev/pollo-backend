@@ -6,7 +6,11 @@ import constants from '../../../utils/Constants';
 
 class DeletePollRouter extends AppDevRouter<Object> {
     constructor() {
-        super(constants.REQUEST_TYPES.DELETE, false);
+        super(constants.REQUEST_TYPES.DELETE);
+    }
+
+    middleware() {
+        return (req, res, next) => next();
     }
 
     getPath(): string {

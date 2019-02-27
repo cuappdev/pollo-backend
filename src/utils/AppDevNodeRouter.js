@@ -12,8 +12,8 @@ export type AppDevNodeResponse<T> = { node: T }
  * NOTE: Expects the path to contain an :id field!
  */
 class AppDevNodeRouter<T> extends AppDevRouter<AppDevNodeResponse<T>> {
-    constructor(auth: ?boolean) {
-        super('GET', auth);
+    constructor() {
+        super('GET');
     }
 
     async fetchWithID(givenID: id, req: Request): Promise<?T> {

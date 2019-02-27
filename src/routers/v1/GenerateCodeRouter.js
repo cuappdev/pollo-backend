@@ -6,7 +6,11 @@ import constants from '../../utils/Constants';
 
 class GenerateCodeRouter extends AppDevRouter<Object> {
     constructor() {
-        super(constants.REQUEST_TYPES.GET, false);
+        super(constants.REQUEST_TYPES.GET);
+    }
+
+    middleware() {
+        return (req, res, next) => next();
     }
 
     getPath(): string {
