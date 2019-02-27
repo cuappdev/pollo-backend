@@ -132,12 +132,12 @@ export default class GroupSocket {
 
   // v1 message
   saveGroup() {
-      console.log('save this grouping group on user side');
+      // console.log('save this grouping group on user side');
       this.nsp.to('users').emit('user/poll/save', this.group);
   }
 
   _clientError(client: IOSocket, msg: string): void {
-      console.log(msg);
+      // console.log(msg);
   }
 
   /**
@@ -151,7 +151,7 @@ export default class GroupSocket {
 
       switch (userType) {
           case 'admin': {
-              console.log(`Admin with id ${client.id} connected to socket`);
+              // console.log(`Admin with id ${client.id} connected to socket`);
               if (googleID) {
                   this.adminGoogleIDs.push(googleID);
               }
@@ -168,7 +168,7 @@ export default class GroupSocket {
           }
           case 'member':
           case 'user': {
-              console.log(`User with id ${client.id} connected to socket`);
+              // console.log(`User with id ${client.id} connected to socket`);
               if (googleID) {
                   this.userGoogleIDs.push(googleID);
               }
@@ -224,11 +224,11 @@ export default class GroupSocket {
           this.answerID += 1;
           const poll = this._currentPoll();
           if (poll === null || poll === undefined) {
-              console.log(`Client ${client.id} tried to answer with no active poll`);
+              // console.log(`Client ${client.id} tried to answer with no active poll`);
               return;
           }
           if (poll.id !== answer.poll) {
-              console.log(`Poll ${answer.poll} is not the current poll`);
+              // console.log(`Poll ${answer.poll} is not the current poll`);
               return;
           }
 
@@ -266,7 +266,7 @@ export default class GroupSocket {
           const { answerID, googleID } = upvoteObject;
           const poll = this._currentPoll();
           if (poll === null || poll === undefined) {
-              console.log(`Client with googleID ${googleID} tried to answer with no active poll`);
+              // console.log(`Client with googleID ${googleID} tried to answer with no active poll`);
               return;
           }
           const nextState = { ...this.current };
@@ -298,11 +298,11 @@ export default class GroupSocket {
           this.answerID += 1;
           const question = this._currentPoll();
           if (question === null || question === undefined) {
-              console.log(`Client ${client.id} answered on no question`);
+              // console.log(`Client ${client.id} answered on no question`);
               return;
           }
           if (question.id !== answer.poll) {
-              console.log(`Poll ${answer.poll} is not the current poll`);
+              // console.log(`Poll ${answer.poll} is not the current poll`);
               return;
           }
 
@@ -337,7 +337,7 @@ export default class GroupSocket {
       });
 
       client.on('disconnect', async () => {
-          console.log(`User ${client.id} disconnected.`);
+          // console.log(`User ${client.id} disconnected.`);
           await GroupsRepo.addUsersByGoogleIDs(this.group.id,
               this.userGoogleIDs, 'user');
           this.userGoogleIDs = [];
@@ -466,7 +466,7 @@ export default class GroupSocket {
               correctAnswer: pollObject.correctAnswer,
           };
           this.pollID += 1;
-          console.log('starting', poll);
+          // console.log('starting', poll);
           if (this.current.poll !== -1) {
               await this._endPoll();
           }
@@ -484,7 +484,7 @@ export default class GroupSocket {
               correctAnswer: questionObject.correctAnswer,
           };
           this.pollID += 1;
-          console.log('starting', question);
+          // console.log('starting', question);
           if (this.current.poll !== -1) {
               await this._endPoll();
           }
@@ -493,7 +493,7 @@ export default class GroupSocket {
 
       // share results
       client.on('server/poll/results', async () => {
-          console.log('sharing results');
+          // console.log('sharing results');
           // Update poll to 'shared'
           if (this.lastPoll) {
               await PollsRepo.updatePollByID(this.lastPoll.id, null,
@@ -505,7 +505,7 @@ export default class GroupSocket {
 
       // v1
       client.on('server/question/results', async () => {
-          console.log('sharing results');
+          // console.log('sharing results');
           if (this.lastPoll) {
               await PollsRepo.updatePollByID(this.lastPoll.id, null,
                   null, true);
@@ -520,24 +520,24 @@ export default class GroupSocket {
 
       // End poll
       client.on('server/poll/end', async () => {
-          console.log('ending question');
+          // console.log('ending question');
           await this._endPoll();
       });
 
       // v1
       client.on('server/question/end', async () => {
-          console.log('ending question');
+          // console.log('ending question');
           await this._endPoll();
       });
 
       // Delete poll
       client.on('server/poll/delete', async (deleteID: number) => {
-          console.log('deleting question');
+          // console.log('deleting question');
           await this._deleteQuestion(deleteID);
       });
 
       client.on('disconnect', async () => {
-          console.log(`Admin ${client.id} disconnected.`);
+          // console.log(`Admin ${client.id} disconnected.`);
           await GroupsRepo.addUsersByGoogleIDs(this.group.id,
               this.adminGoogleIDs, 'admin');
           this.adminGoogleIDs = [];
