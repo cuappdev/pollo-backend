@@ -20,23 +20,26 @@ class GetGroupQuestionsRouter extends AppDevRouter<Object> {
         if (!questions) {
             throw LogUtils.logErr({ message: `Problem getting questions from group id: ${id}!` });
         }
+        // Array of all dates
+        const datesArray = [];
         // Array of objects with a date and the date's questions
-        const questionsByDate = {};
+        const questionsByDate = [];
         questions.filter(Boolean).forEach((question) => {
             let date = (new Date(1000 * question.createdAt)).toLocaleString();
             date = date.substring(0, date.indexOf(','));
-            questionsByDate.date = date;
             const q = {
                 id: question.id,
                 text: question.text,
             };
-            if (questionsByDate.questions) {
-                questionsByDate.questions.push(q);
-            } else {
-                questionsByDate.questions = [q];
+            const ind = datesArray.indexOf(date);
+            if (ind === -1) { // date not found
+                datesArray.push(date);
+                questionsByDate.push({ date, questions: [q] });
+            } else { // date found
+                questionsByDate[ind].questions.push(q);
             }
         });
-        return Object.keys(questionsByDate).length === 0 ? [] : [questionsByDate];
+        return questionsByDate;
     }
 }
 
