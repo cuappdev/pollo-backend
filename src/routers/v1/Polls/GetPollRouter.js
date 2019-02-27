@@ -6,7 +6,7 @@ import type { APIPoll } from '../APITypes';
 
 class GetPollRouter extends AppDevNodeRouter<APIPoll> {
     middleware() {
-        return (req, res, next) => next();
+        return [];
     }
 
     getPath(): string {

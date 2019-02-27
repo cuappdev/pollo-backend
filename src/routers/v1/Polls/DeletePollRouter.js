@@ -10,7 +10,7 @@ class DeletePollRouter extends AppDevRouter<Object> {
     }
 
     middleware() {
-        return (req, res, next) => next();
+        return [];
     }
 
     getPath(): string {

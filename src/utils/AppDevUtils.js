@@ -36,6 +36,6 @@ const randomCode = (length: number): string => Math.round(((36 ** (length + 1)) 
 
 export default {
     netIDFromEmail,
-    tryCheckAppDevURL,
     randomCode,
+    tryCheckAppDevURL,
 };

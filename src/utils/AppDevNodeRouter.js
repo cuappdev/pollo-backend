@@ -1,6 +1,7 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from './AppDevRouter';
+import constants from './Constants';
 import LogUtils from './LogUtils';
 
 type id = number
@@ -13,7 +14,7 @@ export type AppDevNodeResponse<T> = { node: T }
  */
 class AppDevNodeRouter<T> extends AppDevRouter<AppDevNodeResponse<T>> {
     constructor() {
-        super('GET');
+        super(constants.REQUEST_TYPES.GET);
     }
 
     async fetchWithID(givenID: id, req: Request): Promise<?T> {

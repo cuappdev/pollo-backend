@@ -72,8 +72,9 @@ export default class AppDevRouter<T: Object> {
   /**
    * Subclasses must override this to supply middleware for the API.
    */
-  middleware(): ExpressCallback {
-      return lib.ensureAuthenticated;
+  middleware(): ExpressCallback[] {
+      // By default makes route secured
+      return [lib.ensureAuthenticated];
   }
 
   response = async (req: Request, res: Response, next: NextFunction) => {

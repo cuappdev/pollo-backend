@@ -29,7 +29,8 @@ export type APIPoll = {|
   results: Object,
   shared: boolean,
   type: string,
-  answer: ?string
+  answer: ?string,
+  correctAnswer: string
 |}
 
 export type APIDraft = {|

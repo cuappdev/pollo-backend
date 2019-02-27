@@ -11,7 +11,7 @@ class StartPollRouter extends AppDevRouter<APIPoll> {
     }
 
     middleware() {
-        return (req, res, next) => next();
+        return [];
     }
 
     getPath(): string {
