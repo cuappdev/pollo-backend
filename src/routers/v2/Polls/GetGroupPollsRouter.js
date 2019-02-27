@@ -20,13 +20,14 @@ class GetGroupPollsRouter extends AppDevRouter<Object> {
         const polls = await GroupsRepo.getPolls(id, !isAdmin);
         if (!polls) throw LogUtils.logErr({ message: `Problem getting polls from group id: ${id}!` });
 
+        // List of all dates
+        const datesArray = [];
         // Date mapped to list of polls
-        const pollsByDate = {};
+        const pollsByDate = [];
         polls.filter(Boolean).forEach((poll) => {
             let date = (new Date(1000 * poll.createdAt)).toDateString();
             // Date string has format 'Wed Oct 03 2018'
             date = date.substring(date.indexOf(' '));
-            pollsByDate.date = date;
             const p = {
                 id: poll.id,
                 text: poll.text,
@@ -36,13 +37,15 @@ class GetGroupPollsRouter extends AppDevRouter<Object> {
                 answer: isAdmin ? null : poll.userAnswers[req.user.googleID],
                 correctAnswer: poll.correctAnswer,
             };
-            if (pollsByDate.polls) {
-                pollsByDate.polls.push(p);
-            } else {
-                pollsByDate.polls = [p];
+            const ind = datesArray.indexOf(date);
+            if (ind === -1) { // date not found
+                datesArray.push(date);
+                pollsByDate.push({ date, polls: [p] });
+            } else { // date found
+                pollsByDate[ind].polls.push(p);
             }
         });
-        return Object.keys(pollsByDate).length === 0 ? [] : [pollsByDate];
+        return pollsByDate;
     }
 }
 
