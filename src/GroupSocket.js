@@ -417,7 +417,7 @@ export default class GroupSocket {
           correctAnswer: poll.correctAnswer,
       };
       this.nsp.to('admins').emit('admin/poll/ended', { poll: pollNode });
-      this.nsp.to('users').emit('user/poll/end', { poll });
+      this.nsp.to('users').emit('user/poll/end', { poll: pollNode });
       this.nsp.to('users').emit('user/question/end', { question: poll }); // v1
       this.current.poll = -1;
   }
