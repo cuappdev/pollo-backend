@@ -5,8 +5,8 @@ import GroupsRepo from '../../../repos/GroupsRepo';
 import type { APIPoll } from '../APITypes';
 
 class GetPollRouter extends AppDevNodeRouter<APIPoll> {
-    constructor() {
-        super(false);
+    middleware() {
+        return [];
     }
 
     getPath(): string {

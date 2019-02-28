@@ -7,7 +7,11 @@ import type { APIPoll } from './APITypes';
 
 class StartPollRouter extends AppDevRouter<APIPoll> {
     constructor() {
-        super(constants.REQUEST_TYPES.POST, false);
+        super(constants.REQUEST_TYPES.POST);
+    }
+
+    middleware() {
+        return [];
     }
 
     getPath(): string {

@@ -6,7 +6,11 @@ import GroupsRepo from '../../repos/GroupsRepo';
 
 class EndPollRouter extends AppDevRouter<Object> {
     constructor() {
-        super(constants.REQUEST_TYPES.POST, false);
+        super(constants.REQUEST_TYPES.POST);
+    }
+
+    middleware() {
+        return [];
     }
 
     getPath(): string {

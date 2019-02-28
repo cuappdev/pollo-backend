@@ -3,17 +3,25 @@
 // serving up JSON responses based on HTTP verb
 
 import {
-    Router,
+    NextFunction,
     Request,
     Response,
-    NextFunction,
+    Router,
 } from 'express';
-import type { RequestType } from './Constants';
-import AppDevResponse from './AppDevResponse';
 
+import AppDevResponse from './AppDevResponse';
+import AppDevUtils from './AppDevUtils';
 import constants from './Constants';
 import lib from './Lib';
 import LogUtils from './LogUtils';
+
+import type { RequestType } from './Constants';
+
+/**
+ * ExpressHandlerFunction - the function signature of callbacks for Express
+ * Router objects
+ */
+export type ExpressCallback = (Request, Response, NextFunction) => any;
 
 /**
  * T is the response type for AppDevRouter
@@ -23,20 +31,13 @@ export default class AppDevRouter<T: Object> {
 
   requestType: RequestType;
 
-  authenticated: boolean;
-
   getPath(): string {
       throw LogUtils.logErr({ message: 'You must implement getPath() with a valid path' });
   }
 
-  constructor(type: RequestType, auth: ?boolean) {
+  constructor(type: RequestType) {
       this.router = new Router();
       this.requestType = type;
-      if (auth !== undefined && auth !== null) {
-          this.authenticated = auth;
-      } else {
-          this.authenticated = true;
-      }
 
       // Initialize this router
       this.init();
@@ -44,51 +45,36 @@ export default class AppDevRouter<T: Object> {
 
   init() {
       const path = this.getPath();
+      const middleware = this.middleware();
 
-      // Error handle path
-      if (path.length < 2) {
-          throw LogUtils.logErr({}, { path }, 'Invalid path');
-      } else if (path[0] !== '/') {
-          throw LogUtils.logErr({}, { path }, 'Path must start with a \'/\'');
-      } else if (path[path.length - 1] !== '/') {
-          throw LogUtils.logErr({}, { path }, 'Path must end with a \'/\'');
-      }
+      // Make sure path conforms to specifications
+      AppDevUtils.tryCheckAppDevURL(path);
+
       // Attach content to router
-      if (this.authenticated) {
-          switch (this.requestType) {
-              case constants.REQUEST_TYPES.GET:
-                  this.router.get(path, lib.ensureAuthenticated, this.response);
-                  break;
-              case constants.REQUEST_TYPES.POST:
-                  this.router.post(path, lib.ensureAuthenticated, this.response);
-                  break;
-              case constants.REQUEST_TYPES.DELETE:
-                  this.router.delete(path, lib.ensureAuthenticated, this.response);
-                  break;
-              case constants.REQUEST_TYPES.PUT:
-                  this.router.put(path, lib.ensureAuthenticated, this.response);
-                  break;
-              default:
-                  break;
-          }
-      } else {
-          switch (this.requestType) {
-              case constants.REQUEST_TYPES.GET:
-                  this.router.get(path, this.response);
-                  break;
-              case constants.REQUEST_TYPES.POST:
-                  this.router.post(path, this.response);
-                  break;
-              case constants.REQUEST_TYPES.DELETE:
-                  this.router.delete(path, this.response);
-                  break;
-              case constants.REQUEST_TYPES.PUT:
-                  this.router.put(path, this.response);
-                  break;
-              default:
-                  break;
-          }
+      switch (this.requestType) {
+          case constants.REQUEST_TYPES.GET:
+              this.router.get(path, middleware, this.response);
+              break;
+          case constants.REQUEST_TYPES.POST:
+              this.router.post(path, middleware, this.response);
+              break;
+          case constants.REQUEST_TYPES.DELETE:
+              this.router.delete(path, middleware, this.response);
+              break;
+          case constants.REQUEST_TYPES.PUT:
+              this.router.put(path, middleware, this.response);
+              break;
+          default:
+              break;
       }
+  }
+  
+  /**
+   * Subclasses must override this to supply middleware for the API.
+   */
+  middleware(): ExpressCallback[] {
+      // By default makes route secured
+      return [lib.ensureAuthenticated];
   }
 
   response = async (req: Request, res: Response, next: NextFunction) => {

@@ -1,8 +1,10 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
+import { LoginTicket } from 'google-auth-library/build/src/auth/loginticket';
 import LogUtils from '../utils/LogUtils';
 import User from '../models/User';
 import UserSession from '../models/UserSession';
+import UsersRepo from './UsersRepo';
 
 const db = (): Repository<UserSession> => getConnectionManager().get().getRepository(UserSession);
 
@@ -117,6 +119,33 @@ const deleteSessionFromUserID = async (userID: number) => {
     }
 };
 
+/**
+ * Creates a user if one doesn't exist and then initializes a session for them
+ * @function
+ * @param {LoginTicket} login - login object supplied by Google
+ * @return {Object} Object containing session information for the user.
+ */
+const createUserAndInitializeSession = async (login: LoginTicket): Promise<Object> => {
+    const payload = login.getPayload();
+    const googleID = payload.sub;
+    const first = payload.given_name;
+    const last = payload.family_name;
+    const { email } = payload;
+
+    let user = await UsersRepo.getUserByGoogleID(googleID);
+    if (!user) {
+        user = await UsersRepo.createUserWithFields(googleID, first, last, email);
+    }
+
+    const session = await createOrUpdateSession(user, null, null);
+    return {
+        accessToken: session.sessionToken,
+        refreshToken: session.updateToken,
+        sessionExpiration: session.expiresAt,
+        isActive: session.isActive,
+    };
+};
+
 export default {
     createOrUpdateSession,
     getUserFromToken,
@@ -124,4 +153,5 @@ export default {
     verifySession,
     deleteSession,
     deleteSessionFromUserID,
+    createUserAndInitializeSession,
 };
