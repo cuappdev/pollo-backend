@@ -36,8 +36,8 @@ deploy:
   script: bash docker_push
   skip_cleanup: true
   on:
-    branch: release
-    branch: master
+    all_branches: true
+    condition: $TRAVIS_BRANCH =~ ^master|release$
 script:
 - npm run start &
 - sleep 10; npm run test
