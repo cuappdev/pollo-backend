@@ -25,7 +25,7 @@ const createDraft = async (text: string, options: string[], user: User):
         await db().persist(draft);
         return draft;
     } catch (e) {
-        throw LogUtils.logErr(e, { text, options, user }, 'Problem creating draft');
+        throw LogUtils.logErr('Problem creating draft', e, { text, options, user });
     }
 };
 
@@ -43,7 +43,7 @@ const getDraft = async (id: number): Promise<Draft> => {
             .setParameters({ draftID: id })
             .getOne();
     } catch (e) {
-        throw LogUtils.logErr(e, null, `Problem getting draft by id: ${id}`);
+        throw LogUtils.logErr(`Problem getting draft by id: ${id}`, e);
     }
 };
 
@@ -60,7 +60,7 @@ const getDraftsByUser = async (id: number): Promise<Array<?Draft>> => {
             .setParameters({ userID: id })
             .getMany();
     } catch (e) {
-        throw LogUtils.logErr(e, null, `Problem getting drafts for user by id: ${id}`);
+        throw LogUtils.logErr(`Problem getting drafts for user by id: ${id}`, e);
     }
 };
 
@@ -87,7 +87,7 @@ const updateDraft = async (id: number, text: ?string, options: ?string[]):
         await db().persist(draft);
         return draft;
     } catch (e) {
-        throw LogUtils.logErr(e, null, `Problem updating draft by id: ${id}`);
+        throw LogUtils.logErr(`Problem updating draft by id: ${id}`, e);
     }
 };
 
@@ -101,7 +101,7 @@ const deleteDraft = async (id: number) => {
         const draft = await db().findOneById(id);
         await db().remove(draft);
     } catch (e) {
-        throw LogUtils.logErr(e, null, `Problem deleting draft by id: ${id}`);
+        throw LogUtils.logErr(`Problem deleting draft by id: ${id}`, e);
     }
 };
 
@@ -121,7 +121,7 @@ const getOwnerByID = async (id: number): Promise<?User> => {
 
         return draft.user;
     } catch (e) {
-        throw LogUtils.logErr(e, null, `Problem getting owner of draft by id: ${id}`);
+        throw LogUtils.logErr(`Problem getting owner of draft by id: ${id}`, e);
     }
 };
 

@@ -189,9 +189,9 @@ export default class GroupSocket {
           }
           default: {
               if (!userType) {
-                  this._clientError(client, 'Invalid user connected: no userType.');
+                  this._clientError(client, 'Invalid user connected: no userType');
               } else {
-                  this._clientError(client, `Invalid userType ${userType} connected.`);
+                  this._clientError(client, `Invalid userType ${userType} connected`);
               }
           }
       }
@@ -451,7 +451,7 @@ export default class GroupSocket {
       const { address } = client.handshake;
 
       if (!address) {
-          this._clientError(client, 'No client address.');
+          this._clientError(client, 'No client address');
           return;
       }
 

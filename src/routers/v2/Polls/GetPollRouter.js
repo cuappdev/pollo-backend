@@ -14,10 +14,10 @@ class GetPollRouter extends AppDevNodeRouter<APIPoll> {
 
     async fetchWithID(id: number, req: Request) {
         const poll = await PollsRepo.getPollByID(id);
-        if (!poll) throw LogUtils.logErr({ message: `Poll with id ${id} cannot be found` });
+        if (!poll) throw LogUtils.logErr(`Poll with id ${id} cannot be found`);
 
         const group = await PollsRepo.getGroupFromPollID(poll.id);
-        if (!group) throw LogUtils.logErr({ message: `Group with id ${id} cannot be found` });
+        if (!group) throw LogUtils.logErr(`Group with id ${id} cannot be found`);
 
         const isAdmin = await GroupsRepo.isAdmin(group.id, req.user);
 

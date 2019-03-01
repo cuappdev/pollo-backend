@@ -32,7 +32,7 @@ export default class AppDevRouter<T: Object> {
   requestType: RequestType;
 
   getPath(): string {
-      throw LogUtils.logErr({ message: 'You must implement getPath() with a valid path' });
+      throw LogUtils.logErr('You must implement getPath() with a valid path');
   }
 
   constructor(type: RequestType) {
@@ -83,9 +83,8 @@ export default class AppDevRouter<T: Object> {
           res.json(new AppDevResponse(true, content));
       } catch (e) {
           if (e.message === 1) {
-              throw LogUtils.logErr({ message: 'You must implement content()' });
+              throw LogUtils.logErr('You must implement content()');
           } else {
-              console.error(e);
               res.json(new AppDevResponse(false, { errors: [e.message] }));
           }
       }

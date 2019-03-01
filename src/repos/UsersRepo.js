@@ -19,7 +19,7 @@ const createDummyUser = async (id: string): Promise<User> => {
     try {
         return await db().persist(User.dummy(id));
     } catch (e) {
-        throw LogUtils.logErr(e, { id }, 'Problem creating user');
+        throw LogUtils.logErr('Problem creating user', e, { id });
     }
 };
 
@@ -33,7 +33,7 @@ const createUser = async (fields: Object): Promise<User> => {
     try {
         return await db().persist(User.fromGoogleCreds(fields));
     } catch (e) {
-        throw LogUtils.logErr(e, { fields }, 'Problem creating user from google credentials');
+        throw LogUtils.logErr('Problem creating user from google credentials', e, { fields });
     }
 };
 
@@ -59,9 +59,9 @@ const createUserWithFields = async (googleID: string, firstName: string,
         await db().persist(user);
         return user;
     } catch (e) {
-        throw LogUtils.logErr(e, {
+        throw LogUtils.logErr('Problem creating user with fields', e, {
             googleID, firstName, lastName, email,
-        }, 'Problem creating user with fields');
+        });
     }
 };
 
@@ -75,7 +75,7 @@ const getUserByID = async (id: number): Promise<?User> => {
     try {
         return await db().findOneById(id);
     } catch (e) {
-        throw LogUtils.logErr(e, null, `Problem getting user by id: ${id}`);
+        throw LogUtils.logErr(`Problem getting user by id: ${id}`, e);
     }
 };
 
@@ -91,7 +91,7 @@ const getUserByGoogleID = async (googleID: string): Promise<?User> => {
             .where('users.googleID = :googleID', { googleID })
             .getOne();
     } catch (e) {
-        throw LogUtils.logErr(e, { googleID }, 'Problem getting user by google ID');
+        throw LogUtils.logErr('Problem getting user by google ID', e, { googleID });
     }
 };
 
@@ -105,7 +105,7 @@ const getUsers = async (): Promise<Array<?User>> => {
         return await db().createQueryBuilder('users')
             .getMany();
     } catch (e) {
-        throw LogUtils.logErr(e, null, 'Problem getting users');
+        throw LogUtils.logErr('Problem getting users', e);
     }
 };
 
@@ -129,7 +129,7 @@ Promise<?Array<User>> => {
             .where(query)
             .getMany();
     } catch (e) {
-        throw LogUtils.logErr(e, { userIDs, filter }, 'Problem getting users from ids');
+        throw LogUtils.logErr('Problem getting users from ids', e, { userIDs, filter });
     }
 };
 
@@ -153,7 +153,7 @@ const getUsersByGoogleIDs = async (googleIDs: string[], filter: ?string[]):
             .where(`users.googleID = ANY('${ids}'::text[])`)
             .getMany();
     } catch (e) {
-        throw LogUtils.logErr(e, { googleIDs, filter }, 'Problem getting users from googleIDs');
+        throw LogUtils.logErr('Problem getting users from googleIDs', e, { googleIDs, filter });
     }
 };
 
@@ -168,7 +168,7 @@ const deleteUserByID = async (id: number) => {
         await UserSessionsRepo.deleteSessionFromUserID(id);
         await db().remove(user);
     } catch (e) {
-        throw LogUtils.logErr(e, null, `Problem deleting user by id: ${id}`);
+        throw LogUtils.logErr(`Problem deleting user by id: ${id}`, e);
     }
 };
 
@@ -196,7 +196,7 @@ const getGroupsByID = async (id: number, role: ?string):
         }
         return user.memberGroups.concat(user.adminGroups);
     } catch (e) {
-        throw LogUtils.logErr(e, { role }, `Problem getting member groups for user: ${id}`);
+        throw LogUtils.logErr(`Problem getting member groups for user: ${id}`, e, { role });
     }
 };
 

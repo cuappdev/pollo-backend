@@ -18,7 +18,7 @@ class GetGroupQuestionsRouter extends AppDevRouter<Object> {
         const { id } = req.params;
         const questions = await GroupsRepo.getQuestions(id);
         if (!questions) {
-            throw LogUtils.logErr({ message: `Problem getting questions from group id: ${id}!` });
+            throw LogUtils.logErr(`Problem getting questions from group id: ${id}`);
         }
         // Array of all dates
         const datesArray = [];

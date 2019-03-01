@@ -32,16 +32,16 @@ function log(obj: Object, error: ?boolean = false) {
 /**
  * Log error using log()
  *
+ * @param message, description of error
  * @param error, the error object
  * @param data, data such as parameters or an object that would help in debugging
- * @param note, description of error
  * @param disableConsoleOut, disable console.out in development env, for tests
  * @returns {*}
  */
 function logErr(
-    error: Object,
+    message: string,
+    error: ?Object = {},
     data: ?Object = {},
-    note: ?string = '',
     disableConsoleOut: ?boolean = false,
 ) {
     try { // try block because if the error logging has an error... ?
@@ -50,10 +50,10 @@ function logErr(
         }
 
         const responseJSON = {
-            time: Date.now(),
-            error,
             data,
-            note,
+            error,
+            message,
+            time: Date.now(),
         };
 
         log(responseJSON, true);
