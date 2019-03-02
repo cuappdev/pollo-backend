@@ -13,7 +13,7 @@ class GetQuestionRouter extends AppDevNodeRouter<APIQuestion> {
 
     async fetchWithID(id: number, req: Request) {
         const question = await QuestionsRepo.getQuestionByID(id);
-        if (!question) throw LogUtils.logErr({ message: `Question with id ${id} cannot be found` });
+        if (!question) throw LogUtils.logErr(`Question with id ${id} cannot be found`);
 
         return question && {
             id: question.id,

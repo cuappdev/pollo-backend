@@ -98,7 +98,7 @@ const deleteSession = async (id: number) => {
         const session = await db().findOneById(id);
         await db().remove(session);
     } catch (e) {
-        throw LogUtils.logErr(e, null, `Problem deleting session by id: ${id}`);
+        throw LogUtils.logErr(`Problem deleting session by id: ${id}`, e);
     }
 };
 
@@ -115,7 +115,7 @@ const deleteSessionFromUserID = async (userID: number) => {
             .getOne();
         if (session) db().remove(session);
     } catch (e) {
-        throw LogUtils.logErr(e, null, `Problem deleting session by user: ${userID}`);
+        throw LogUtils.logErr(`Problem deleting session by user: ${userID}`, e);
     }
 };
 

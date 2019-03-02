@@ -22,7 +22,7 @@ class StartGroupRouter extends AppDevRouter<APIGroup> {
         if (!name) name = '';
 
         if (!code) {
-            throw LogUtils.logErr({ message: 'Code required.' });
+            throw LogUtils.logErr('Code required');
         }
 
         const group = await GroupsRepo.createGroup(name, code, req.user);

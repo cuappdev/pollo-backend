@@ -22,13 +22,13 @@ class PostQuestionRouter extends AppDevRouter<Object> {
         const { text } = req.body;
         const { user } = req;
 
-        if (!text) throw LogUtils.logErr({ message: 'Cannot post empty question' });
+        if (!text) throw LogUtils.logErr('Cannot post empty question');
 
         const group = await GroupsRepo.getGroupByID(groupID);
-        if (!group) throw LogUtils.logErr({ message: `Couldn't find group with id ${groupID}` });
+        if (!group) throw LogUtils.logErr(`Couldn't find group with id ${groupID}`);
 
         if (!await GroupsRepo.isMember(groupID, user)) {
-            throw LogUtils.logErr({}, { groupID, user }, 'You are not authorized to post a poll');
+            throw LogUtils.logErr('You are not authorized to post a poll', {}, { groupID, user });
         }
 
         const poll = await QuestionsRepo.createQuestion(text, group, user);

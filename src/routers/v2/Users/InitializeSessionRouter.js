@@ -28,8 +28,8 @@ class InitializeSessionRouter extends AppDevRouter<Object> {
                 aud: process.env.GOOGLE_CLIENT_ID, // audience
             })
             .then(login => UserSessionsRepo.createUserAndInitializeSession(login))
-            .catch((error) => {
-                LogUtils.logErr(error, null, 'Error authenticating');
+            .catch((e) => {
+                LogUtils.logErr('Error authenticating', e);
             });
     }
 }

@@ -27,14 +27,14 @@ class PostPollRouter extends AppDevRouter<Object> {
         if (!results) results = {};
         if (shared === null) shared = false;
         if (type !== 'FREE_RESPONSE' && type !== 'MULTIPLE_CHOICE') {
-            throw LogUtils.logErr({}, { type }, 'Valid poll type not found');
+            throw LogUtils.logErr('Valid poll type not found', {}, { type });
         }
 
         const group = await GroupsRepo.getGroupByID(groupID);
-        if (!group) throw LogUtils.logErr({ message: `Couldn't find group with id ${groupID}` });
+        if (!group) throw LogUtils.logErr(`Couldn't find group with id ${groupID}`);
 
         if (!await GroupsRepo.isAdmin(groupID, user)) {
-            throw LogUtils.logErr({}, { groupID, user }, 'You are not authorized to post a poll');
+            throw LogUtils.logErr('You are not authorized to post a poll', {}, { groupID, user });
         }
 
         const poll = await PollsRepo

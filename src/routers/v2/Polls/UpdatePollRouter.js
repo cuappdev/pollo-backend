@@ -23,21 +23,21 @@ class UpdatePollRouter extends AppDevRouter<Object> {
         const { user } = req;
 
         if (!results && !text && shared === null) {
-            throw LogUtils.logErr({ message: 'No fields specified to update.' });
+            throw LogUtils.logErr('No fields specified to update');
         }
 
         const group = await PollsRepo.getGroupFromPollID(pollID);
-        if (!group) throw LogUtils.logErr({ message: `Poll with id ${pollID} has no group!` });
+        if (!group) throw LogUtils.logErr(`Poll with id ${pollID} has no group`);
 
         if (!await GroupsRepo.isAdmin(group.id, user)) {
             throw LogUtils.logErr(
-                {}, { pollID, user }, 'You are not authorized to update this poll',
+                'You are not authorized to update this poll', {}, { pollID, user },
             );
         }
         const poll = await PollsRepo.updatePollByID(pollID, text,
             results, shared);
         if (!poll) {
-            throw LogUtils.logErr({ message: `Poll with id ${pollID} was not found!` });
+            throw LogUtils.logErr(`Poll with id ${pollID} was not found`);
         }
 
         return {
