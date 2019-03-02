@@ -4,6 +4,7 @@ import {
     Response,
     Request,
 } from 'express';
+import * as profanity from 'profanity-util';
 import AppDevResponse from './AppDevResponse';
 import UserSessionsRepo from '../repos/UserSessionsRepo';
 
@@ -84,8 +85,17 @@ async function updateSession(req: Request, res: Response, next: NextFunction) {
     return next();
 }
 
+/**
+ * Filters bad words
+ * @function
+ * @param {string} str - String to filter
+ * @return {Array<String>} - Array of bad words contained in string
+ */
+const filter = (str: string): Array<String> => profanity.check(str); // => [ 'badword1', 'badword2']
+
 export default {
     remove,
     ensureAuthenticated,
+    filter,
     updateSession,
 };

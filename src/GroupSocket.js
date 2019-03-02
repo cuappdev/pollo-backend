@@ -6,6 +6,7 @@ import Group from './models/Group';
 import PollsRepo from './repos/PollsRepo';
 import GroupsRepo from './repos/GroupsRepo';
 import constants from './utils/Constants';
+import filter from './utils/Lib.js';
 
 /** Configuration for each GroupSocket */
 export type GroupSocketConfig = {
@@ -235,15 +236,26 @@ export default class GroupSocket {
           const nextState = { ...this.current };
           const prev = nextState.answers[answer.googleID];
 
-          if (poll.type === constants.QUESTION_TYPES.MULTIPLE_CHOICE) {
-              nextState.answers[answer.googleID] = answer.choice; // update/add response
-              if (prev) { // User selected something before
-                  nextState.results[prev].count -= 1;
+          switch (poll.type) {
+              case constants.QUESTION_TYPES.MULTIPLE_CHOICE: // Multiple Choice
+                  nextState.answers[answer.googleID] = answer.choice; // update/add response
+                  if (prev) { // User selected something before
+                      nextState.results[prev].count -= 1;
+                  }
+                  break;
+              default: { // Free Response
+                  const filterArr = filter(answer.text);
+                  if (filterArr.length === 0) { // clean text
+                      if (prev) { // User submitted another FR answer
+                          nextState.answers[answer.googleID].push(answer.id);
+                      } else { // User submitted first FR answer
+                          nextState.answers[answer.googleID] = [answer.id];
+                      }
+                      client.emit('user/answer/success');
+                  } else { // not clean text
+                      client.emit('user/answer/filter', { text: answer.text, filter: filterArr });
+                  }
               }
-          } else if (prev) { // User submitted another FR answer
-              nextState.answers[answer.googleID].push(answer.id);
-          } else { // User submitted first FR answer
-              nextState.answers[answer.googleID] = [answer.id];
           }
 
           const key = poll.type === constants.QUESTION_TYPES.MULTIPLE_CHOICE
