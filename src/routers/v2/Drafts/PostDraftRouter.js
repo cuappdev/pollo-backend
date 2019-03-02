@@ -1,12 +1,12 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
-import DraftsRepo from '../../../repos/DraftsRepo';
 import constants from '../../../utils/Constants';
+import DraftsRepo from '../../../repos/DraftsRepo';
 
 import type { APIDraft } from '../APITypes';
 
-class PostDraftRouter extends AppDevRouter<Object> {
+class PostDraftRouter extends AppDevRouter<APIDraft> {
     constructor() {
         super(constants.REQUEST_TYPES.POST);
     }
@@ -15,7 +15,7 @@ class PostDraftRouter extends AppDevRouter<Object> {
         return '/drafts/';
     }
 
-    async content(req: Request): Promise<{ node: APIDraft }> {
+    async content(req: Request) {
         let { text, options } = req.body;
         const { user } = req;
 
@@ -25,11 +25,9 @@ class PostDraftRouter extends AppDevRouter<Object> {
         const draft = await DraftsRepo.createDraft(text, options, user);
 
         return {
-            node: {
-                id: draft.id,
-                text: draft.text,
-                options: draft.options,
-            },
+            id: draft.id,
+            text: draft.text,
+            options: draft.options,
         };
     }
 }

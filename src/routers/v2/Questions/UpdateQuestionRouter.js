@@ -1,13 +1,13 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
+import constants from '../../../utils/Constants';
 import LogUtils from '../../../utils/LogUtils';
 import QuestionsRepo from '../../../repos/QuestionsRepo';
-import constants from '../../../utils/Constants';
 
 import type { APIQuestion } from '../APITypes';
 
-class UpdateQuestionRouter extends AppDevRouter<Object> {
+class UpdateQuestionRouter extends AppDevRouter<APIQuestion> {
     constructor() {
         super(constants.REQUEST_TYPES.PUT);
     }
@@ -16,7 +16,7 @@ class UpdateQuestionRouter extends AppDevRouter<Object> {
         return '/questions/:id/';
     }
 
-    async content(req: Request): Promise<{ node: APIQuestion }> {
+    async content(req: Request) {
         const questionID = req.params.id;
         const { text } = req.body;
         const { user } = req;
@@ -35,10 +35,8 @@ class UpdateQuestionRouter extends AppDevRouter<Object> {
         }
 
         return {
-            node: {
-                id: question.id,
-                text: question.text,
-            },
+            id: question.id,
+            text: question.text,
         };
     }
 }

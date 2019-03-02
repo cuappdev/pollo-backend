@@ -1,9 +1,9 @@
+import request from 'request-promise-native';
 import dbConnection from '../../src/db/DbConnection';
+import GroupsRepo from '../../src/repos/GroupsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
-import GroupsRepo from '../../src/repos/GroupsRepo';
 
-const request = require('request-promise-native');
 const {
     get, post, del, put,
 } = require('./lib');
@@ -32,7 +32,7 @@ beforeAll(async () => {
     // Create a group
     const opts = { name: 'Test group', code: GroupsRepo.createCode() };
     const result = await request(post('/sessions/', opts, token));
-    group = result.data.node;
+    group = result.data;
     expect(result.success).toBe(true);
 });
 
@@ -40,9 +40,10 @@ test('create poll', async () => {
     const opts = {
         text: 'Poll text', shared: true, type: 'MULTIPLE_CHOICE', correctAnswer: 'B',
     };
-    const result = await request(post(`/sessions/${group.id}/polls`, opts, token));
-    poll = result.data.node;
-    expect(result.success).toBe(true);
+    await request(post(`/sessions/${group.id}/polls`, opts, token)).then((result) => {
+        expect(result.success).toBe(true);
+        poll = result.data;
+    });
 });
 
 test('create poll with invalid token', async () => {
@@ -56,17 +57,17 @@ test('create poll with invalid token', async () => {
 });
 
 test('get poll by id', async () => {
-    const getstr = await request(get(`/polls/${poll.id}`, token));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
-    expect(poll.id).toBe(getres.data.node.id);
+    await request(get(`/polls/${poll.id}`, token)).then((getres) => {
+        expect(getres.success).toBe(true);
+        expect(poll.id).toBe(getres.data.id);
+    });
 });
 
 test('get polls by group', async () => {
-    const getstr = await request(get(`/sessions/${group.id}/polls`, token));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
-    expect(poll.id).toBe(getres.data[0].polls[0].id);
+    await request(get(`/sessions/${group.id}/polls`, token)).then((getres) => {
+        expect(getres.success).toBe(true);
+        expect(poll.id).toBe(getres.data[0].polls[0].id);
+    });
 });
 
 test('update poll', async () => {
@@ -75,11 +76,11 @@ test('update poll', async () => {
         results: { A: 1 },
         shared: false,
     };
-    const getstr = await request(put(`/polls/${poll.id}`, opts, token));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
-    expect(getres.data.node.text).toBe('Updated text');
-    expect(getres.data.node.results).toMatchObject({ A: 1 });
+    await request(put(`/polls/${poll.id}`, opts, token)).then((getres) => {
+        expect(getres.success).toBe(true);
+        expect(getres.data.text).toBe('Updated text');
+        expect(getres.data.results).toMatchObject({ A: 1 });
+    });
 });
 
 test('update poll with invalid token', async () => {
@@ -101,13 +102,15 @@ test('delete poll with invalid token', async () => {
 });
 
 test('delete poll', async () => {
-    const result = await request(del(`/polls/${poll.id}`, token));
-    expect(result.success).toBe(true);
+    await request(del(`/polls/${poll.id}`, token)).then((result) => {
+        expect(result.success).toBe(true);
+    });
 });
 
 afterAll(async () => {
-    const result = await request(del(`/sessions/${group.id}`, token));
-    expect(result.success).toBe(true);
+    await request(del(`/sessions/${group.id}`, token)).then((result) => {
+        expect(result.success).toBe(true);
+    });
     await UsersRepo.deleteUserByID(userID);
     await UserSessionsRepo.deleteSession(session.id);
     // eslint-disable-next-line no-console

@@ -1,11 +1,11 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
-import LogUtils from '../../../utils/LogUtils';
-import GroupsRepo from '../../../repos/GroupsRepo';
 import constants from '../../../utils/Constants';
+import GroupsRepo from '../../../repos/GroupsRepo';
+import LogUtils from '../../../utils/LogUtils';
 
-class GetGroupQuestionsRouter extends AppDevRouter<Object> {
+class GetGroupQuestionsRouter extends AppDevRouter<Object[]> {
     constructor() {
         super(constants.REQUEST_TYPES.GET);
     }

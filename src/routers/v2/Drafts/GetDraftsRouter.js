@@ -1,10 +1,12 @@
 // @flow
-import AppDevEdgeRouter from '../../../utils/AppDevEdgeRouter';
-import DraftsRepo from '../../../repos/DraftsRepo';
+import { Request } from 'express';
+import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';
+import DraftsRepo from '../../../repos/DraftsRepo';
+
 import type { APIDraft } from '../APITypes';
 
-class GetDraftsRouter extends AppDevEdgeRouter<APIDraft> {
+class GetDraftsRouter extends AppDevRouter<APIDraft[]> {
     constructor() {
         super(constants.REQUEST_TYPES.GET);
     }
@@ -13,18 +15,16 @@ class GetDraftsRouter extends AppDevEdgeRouter<APIDraft> {
         return '/drafts/';
     }
 
-    async contentArray(req) {
+    async content(req: Request) {
         const drafts = await DraftsRepo.getDraftsByUser(req.user.id);
 
         return drafts
             .filter(Boolean)
             .map(draft => ({
-                node: {
-                    id: draft.id,
-                    text: draft.text,
-                    options: draft.options,
-                },
-                cursor: draft.createdAt.valueOf(),
+                id: draft.id,
+                text: draft.text,
+                options: draft.options,
+                createdAt: draft.createdAt.valueOf(),
             }));
     }
 }

@@ -2,10 +2,12 @@
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';
-import LogUtils from '../../../utils/LogUtils';
 import GroupsRepo from '../../../repos/GroupsRepo';
+import LogUtils from '../../../utils/LogUtils';
 
-class LeaveGroupRouter extends AppDevRouter<Object> {
+import type { NoResponse } from '../../../utils/AppDevRouter';
+
+class LeaveGroupRouter extends AppDevRouter<NoResponse> {
     constructor() {
         super(constants.REQUEST_TYPES.DELETE);
     }

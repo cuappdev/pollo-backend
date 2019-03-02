@@ -28,9 +28,10 @@ beforeAll(async () => {
     memberToken = (await UserSessionsRepo.createOrUpdateSession(member, null, null)).sessionToken;
 
     const opts = { name: 'Test group', code: GroupsRepo.createCode() };
-    const result = await request(post('/sessions/', opts, adminToken));
-    group = result.data.node;
-    expect(result.success).toBe(true);
+    await request(post('/sessions/', opts, adminToken)).then((result) => {
+        group = result.data;
+        expect(result.success).toBe(true);
+    });
 
     await GroupsRepo.addUsersByGoogleIDs(group.id, ['member'], 'member');
 });
@@ -39,9 +40,10 @@ test('create question', async () => {
     const opts = {
         text: 'Why do we have to test s***? (PG-13)',
     };
-    const result = await request(post(`/sessions/${group.id}/questions`, opts, memberToken));
-    question = result.data.node;
-    expect(result.success).toBe(true);
+    await request(post(`/sessions/${group.id}/questions`, opts, memberToken)).then((result) => {
+        question = result.data;
+        expect(result.success).toBe(true);
+    });
 });
 
 test('create question with invalid token', async () => {
@@ -55,28 +57,28 @@ test('create question with invalid token', async () => {
 });
 
 test('get question by id', async () => {
-    const getstr = await request(get(`/questions/${question.id}`, memberToken));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
-    expect(question.id).toBe(getres.data.node.id);
+    await request(get(`/questions/${question.id}`, memberToken)).then((getres) => {
+        expect(getres.success).toBe(true);
+        expect(question.id).toBe(getres.data.id);
+    });
 });
 
 test('get questions by group', async () => {
-    const getstr = await request(get(`/sessions/${group.id}/questions`, adminToken));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
-    expect(question.id).toBe(getres.data.edges[0].node.id);
+    await request(get(`/sessions/${group.id}/questions`, adminToken)).then((getres) => {
+        expect(getres.success).toBe(true);
+        expect(question.id).toBe(getres.data[0].id);
+    });
 });
 
 test('update question', async () => {
     const opts = {
         text: 'Why do we have to test stuff? (PG)',
     };
-    const getstr = await request(put(`/questions/${question.id}`, opts, memberToken));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
-    expect(getres.data.node.text).toBe('Why do we have to test stuff? (PG)');
-    expect(getres.data.node.id).toBe(question.id);
+    await request(put(`/questions/${question.id}`, opts, memberToken)).then((getres) => {
+        expect(getres.success).toBe(true);
+        expect(getres.data.text).toBe('Why do we have to test stuff? (PG)');
+        expect(getres.data.id).toBe(question.id);
+    });
 });
 
 test('update question with invalid token', async () => {
@@ -90,13 +92,15 @@ test('update question with invalid token', async () => {
 });
 
 test('delete question', async () => {
-    const result = await request(del(`/questions/${question.id}`, memberToken));
-    expect(result.success).toBe(true);
+    await request(del(`/questions/${question.id}`, memberToken)).then((result) => {
+        expect(result.success).toBe(true);
+    });
 });
 
 afterAll(async () => {
-    const result = await request(del(`/sessions/${group.id}`, adminToken));
-    expect(result.success).toBe(true);
+    await request(del(`/sessions/${group.id}`, adminToken)).then((result) => {
+        expect(result.success).toBe(true);
+    });
     await UsersRepo.deleteUserByID(admin.id);
     await UsersRepo.deleteUserByID(member.id);
     await UserSessionsRepo.deleteSession(session.id);

@@ -1,7 +1,7 @@
 // @flow
 import AppDevRouter from '../../utils/AppDevRouter';
-import GroupsRepo from '../../repos/GroupsRepo';
 import constants from '../../utils/Constants';
+import GroupsRepo from '../../repos/GroupsRepo';
 
 class GenerateCodeRouter extends AppDevRouter<Object> {
     constructor() {

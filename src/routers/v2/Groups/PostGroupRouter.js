@@ -1,13 +1,13 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
-import LogUtils from '../../../utils/LogUtils';
-import GroupsRepo from '../../../repos/GroupsRepo';
 import constants from '../../../utils/Constants';
+import GroupsRepo from '../../../repos/GroupsRepo';
+import LogUtils from '../../../utils/LogUtils';
 
 import type { APIGroup } from '../APITypes';
 
-class PostGroupRouter extends AppDevRouter<Object> {
+class PostGroupRouter extends AppDevRouter<APIGroup> {
     constructor() {
         super(constants.REQUEST_TYPES.POST);
     }
@@ -16,7 +16,7 @@ class PostGroupRouter extends AppDevRouter<Object> {
         return '/sessions/';
     }
 
-    async content(req: Request): Promise<{ node: APIGroup }> {
+    async content(req: Request) {
         let { name } = req.body;
         const { code } = req.body;
         const { user } = req;
@@ -28,11 +28,9 @@ class PostGroupRouter extends AppDevRouter<Object> {
         const group = await GroupsRepo.createGroup(name, code, user);
 
         return {
-            node: {
-                id: group.id,
-                name: group.name,
-                code: group.code,
-            },
+            id: group.id,
+            name: group.name,
+            code: group.code,
         };
     }
 }
