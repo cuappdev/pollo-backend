@@ -423,12 +423,21 @@ export default class GroupSocket {
   }
 
   /**
-   * Deletes current poll
+   * Deletes a poll that is already saved to database
    * @param {number} deleteID - Poll ID to delete
   */
-  _deleteQuestion = async (deleteID: number) => {
+  _deletePoll = async (deleteID: number) => {
       await PollsRepo.deletePollByID(deleteID);
       this.nsp.to('users').emit('user/poll/delete', deleteID);
+  }
+
+  /**
+   * Deletes a live poll
+   * @function
+  */
+  _deleteLivePoll = () => {
+      this.current.poll = -1;
+      this.nsp.to('users').emit('user/poll/deleteLive');
   }
 
   /**
@@ -520,7 +529,7 @@ export default class GroupSocket {
 
       // End poll
       client.on('server/poll/end', async () => {
-          // console.log('ending question');
+          // console.log('ending poll');
           await this._endPoll();
       });
 
@@ -530,10 +539,16 @@ export default class GroupSocket {
           await this._endPoll();
       });
 
-      // Delete poll
+      // Delete saved poll
       client.on('server/poll/delete', async (deleteID: number) => {
-          // console.log('deleting question');
-          await this._deleteQuestion(deleteID);
+          // console.log('deleting saved poll');
+          await this._deletePoll(deleteID);
+      });
+
+      // Delete live poll
+      client.on('server/poll/deleteLive', async () => {
+          // console.log('deleting live poll');
+          await this._deleteLivePoll();
       });
 
       client.on('disconnect', async () => {
