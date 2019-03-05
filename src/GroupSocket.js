@@ -4,7 +4,6 @@
 import SocketIO from 'socket.io';
 import Group from './models/Group';
 import PollsRepo from './repos/PollsRepo';
-import GroupsRepo from './repos/GroupsRepo';
 import constants from './utils/Constants';
 import filter from './utils/Lib.js';
 
@@ -98,12 +97,6 @@ export default class GroupSocket {
   // Previous state
   lastState = {};
 
-  // Google ids of admin/user to add to the group
-  // List of users saved to group when a user exits socket (same for admins)
-  adminGoogleIDs = [];
-
-  userGoogleIDs = [];
-
   /** Current state of the socket */
   current: CurrentState = {
       poll: -1, // id of current poll object
@@ -148,14 +141,10 @@ export default class GroupSocket {
    */
   _onConnect = async (client: IOSocket) => {
       const userType: ?string = client.handshake.query.userType || null;
-      const googleID: ?string = client.handshake.query.googleID || null;
 
       switch (userType) {
           case 'admin': {
               // console.log(`Admin with id ${client.id} connected to socket`);
-              if (googleID) {
-                  this.adminGoogleIDs.push(googleID);
-              }
               this._setupAdminEvents(client);
               client.join('admins');
               this.nsp.to('admins').emit('user/count', { count: this.usersConnected });
@@ -170,9 +159,6 @@ export default class GroupSocket {
           case 'member':
           case 'user': {
               // console.log(`User with id ${client.id} connected to socket`);
-              if (googleID) {
-                  this.userGoogleIDs.push(googleID);
-              }
               this._setupUserEvents(client);
               client.join('users');
 
@@ -208,8 +194,8 @@ export default class GroupSocket {
    *  - Adds their answer to results and remove their old answer if exists
    *
    * 'server/poll/upvote', (answerObject: Object) (Answer without id field)
-   *  - Client upvotes an answer
-   *  - Increases count of answer upvoted
+   *  - Client upvotes an answer or unupvotes if previously upvoted
+   *  - Increases count of answer upvoted or decreases count of answer unupvoted
    * @function
    * @param {IOSocket} client - Client's socket object
    */
@@ -284,10 +270,16 @@ export default class GroupSocket {
           const nextState = { ...this.current };
           const curTally = nextState.results[answerID];
           if (curTally) {
-              nextState.results[answerID].count += 1;
               if (nextState.upvotes[googleID]) {
-                  nextState.upvotes[googleID].push(answerID);
-              } else {
+                  if (nextState.upvotes[googleID].includes(answerID)) { // unupvote
+                      nextState.results[answerID].count -= 1;
+                      nextState.upvotes[googleID].filter(a => a !== answerID);
+                  } else { // upvote
+                      nextState.results[answerID].count += 1;
+                      nextState.upvotes[googleID].push(answerID);
+                  }
+              } else { // init array and upvote
+                  nextState.results[answerID].count += 1;
                   nextState.upvotes[googleID] = [answerID];
               }
           }
@@ -350,10 +342,6 @@ export default class GroupSocket {
 
       client.on('disconnect', async () => {
           // console.log(`User ${client.id} disconnected.`);
-          await GroupsRepo.addUsersByGoogleIDs(this.group.id,
-              this.userGoogleIDs, 'user');
-          this.userGoogleIDs = [];
-
           if (this.nsp.connected.length === 0) {
               await this._endPoll();
               this.onClose();
@@ -565,10 +553,6 @@ export default class GroupSocket {
 
       client.on('disconnect', async () => {
           // console.log(`Admin ${client.id} disconnected.`);
-          await GroupsRepo.addUsersByGoogleIDs(this.group.id,
-              this.adminGoogleIDs, 'admin');
-          this.adminGoogleIDs = [];
-
           if (this.current.poll === -1) this.isLive = false;
 
           if (this.nsp.connected.length === 0) {

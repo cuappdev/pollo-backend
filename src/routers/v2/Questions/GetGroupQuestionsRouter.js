@@ -25,8 +25,8 @@ class GetGroupQuestionsRouter extends AppDevRouter<Object[]> {
         // Array of objects with a date and the date's questions
         const questionsByDate = [];
         questions.filter(Boolean).forEach((question) => {
-            let date = (new Date(1000 * question.createdAt)).toLocaleString();
-            date = date.substring(0, date.indexOf(','));
+            // date is in Unix time in seconds
+            const date = question.createdAt;
             const q = {
                 id: question.id,
                 text: question.text,

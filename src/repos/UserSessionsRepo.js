@@ -11,7 +11,7 @@ const db = (): Repository<UserSession> => getConnectionManager().get().getReposi
 /**
  * Create or update session for a user
  * @function
- * @param {User} user - User to either create or update a sessionn for
+ * @param {User} user - User to either create or update a session for
  * @param {?string} accessToken - Access token to be used for the session
  * @param {?string} refreshToken - Refresh token to be used for the session
  * @return {UserSession} New or updated session
