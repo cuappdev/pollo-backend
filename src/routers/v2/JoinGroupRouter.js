@@ -18,6 +18,9 @@ class JoinGroupRouter extends AppDevRouter<APIGroup> {
     async content(req: Request) {
         const { code } = req.body;
         let { id } = req.body;
+        const { user } = req;
+
+        if (!user.id) throw LogUtils.logErr('User id missing');
 
         if (!id && !code) {
             throw LogUtils.logErr('Group id or code required');
@@ -37,6 +40,14 @@ class JoinGroupRouter extends AppDevRouter<APIGroup> {
 
         if (req.app.groupManager.findSocket(code, id) === undefined) {
             await req.app.groupManager.startNewGroup(group);
+        }
+
+        // add user as member if not in group in database
+        const [isAdmin, isMember] = await Promise.all(
+            [GroupsRepo.isAdmin(id, user), GroupsRepo.isMember(id, user)],
+        );
+        if (!isAdmin && !isMember) {
+            await GroupsRepo.addUsersByIDs(id, [user.id], 'member');
         }
 
         return {
