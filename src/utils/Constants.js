@@ -16,8 +16,7 @@ const REQUEST_TYPES = {
 };
 
 /** Custom type for question types */
-export type QuestionType = 'MULTIPLE_CHOICE' | 'FREE_RESPONSE' |
-  'MULTIPLE_ANSWER' | 'RANKING'
+export type QuestionType = 'MULTIPLE_CHOICE' | 'FREE_RESPONSE'
 
 /**
 * constants for question types
@@ -27,8 +26,6 @@ export type QuestionType = 'MULTIPLE_CHOICE' | 'FREE_RESPONSE' |
 const QUESTION_TYPES = {
     MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',
     FREE_RESPONSE: 'FREE_RESPONSE',
-    MULTIPLE_ANSWER: 'MULTIPLE_ANSWER',
-    RANKING: 'RANKING',
 };
 
 /**
