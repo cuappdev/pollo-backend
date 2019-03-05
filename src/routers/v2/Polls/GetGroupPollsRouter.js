@@ -25,9 +25,8 @@ class GetGroupPollsRouter extends AppDevRouter<Object> {
         // Date mapped to list of polls
         const pollsByDate = [];
         polls.filter(Boolean).forEach((poll) => {
-            let date = (new Date(1000 * poll.createdAt)).toDateString();
-            // Date string has format 'Wed Oct 03 2018'
-            date = date.substring(date.indexOf(' '));
+            // date is in Unix time in seconds
+            const date = poll.createdAt;
             const p = {
                 id: poll.id,
                 text: poll.text,
