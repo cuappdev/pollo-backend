@@ -1,10 +1,12 @@
 // @flow
-import AppDevEdgeRouter from '../../../utils/AppDevEdgeRouter';
-import GroupsRepo from '../../../repos/GroupsRepo';
+import { Request } from 'express';
+import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';
+import GroupsRepo from '../../../repos/GroupsRepo';
+
 import type { APIUser } from '../APITypes';
 
-class GetAdminsRouter extends AppDevEdgeRouter<APIUser> {
+class GetAdminsRouter extends AppDevRouter<APIUser[]> {
     constructor() {
         super(constants.REQUEST_TYPES.GET);
     }
@@ -13,18 +15,15 @@ class GetAdminsRouter extends AppDevEdgeRouter<APIUser> {
         return '/sessions/:id/admins/';
     }
 
-    async contentArray(req, pageInfo, error) {
+    async content(req: Request) {
         const { id } = req.params;
         const users = await GroupsRepo.getUsersByGroupID(id, 'admin');
         return users
             .filter(Boolean)
             .map(user => ({
-                node: {
-                    id: user.id,
-                    name: `${user.firstName} ${user.lastName}`,
-                    netID: user.netID,
-                },
-                cursor: user.createdAt.valueOf(),
+                id: user.id,
+                name: `${user.firstName} ${user.lastName}`,
+                netID: user.netID,
             }));
     }
 }

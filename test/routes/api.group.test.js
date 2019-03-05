@@ -1,9 +1,9 @@
+import request from 'request-promise-native';
 import dbConnection from '../../src/db/DbConnection';
 import UsersRepo from '../../src/repos/UsersRepo';
 import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
 import GroupsRepo from '../../src/repos/GroupsRepo';
 
-const request = require('request-promise-native');
 const {
     get, post, del, put,
 } = require('./lib');
@@ -35,27 +35,27 @@ beforeAll(async () => {
 });
 
 test('create group', async () => {
-    const option = post('/sessions/', opts, adminToken);
-    const result = await request(option);
-    group = result;
-    expect(group.success).toBe(true);
+    await request(post('/sessions/', opts, adminToken)).then((result) => {
+        expect(result.success).toBe(true);
+        group = result.data;
+    });
 });
 
 test('get single group', async () => {
-    const getstr = await request(get(`/sessions/${group.data.node.id}`, adminToken));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
-    expect(group).toMatchObject(getres);
+    await request(get(`/sessions/${group.id}`, adminToken)).then((getres) => {
+        expect(getres.success).toBe(true);
+        expect(group).toMatchObject(getres.data);
+    });
 });
 
 test('get groups for admin', async () => {
-    const getstr = await request(get('/sessions/all/admin', adminToken));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
-    const node = getres.data[0];
-    expect(group.data.id).toBe(node.id);
-    expect(group.data.name).toBe(node.name);
-    expect(group.data.code).toBe(node.code);
+    await request(get('/sessions/all/admin', adminToken)).then((getres) => {
+        expect(getres.success).toBe(true);
+        const groupRes = getres.data[0];
+        expect(group.id).toBe(groupRes.id);
+        expect(group.name).toBe(groupRes.name);
+        expect(group.code).toBe(groupRes.code);
+    });
 });
 
 test('add admins to group', async () => {
@@ -64,31 +64,31 @@ test('add admins to group', async () => {
     const body = {
         adminIDs: [userID],
     };
-    const getstr = await request(post(`/sessions/${group.data.node.id}/admins/`, body,
-        adminToken));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
+    await request(post(`/sessions/${group.id}/admins/`, body,
+        adminToken)).then((getres) => {
+        expect(getres.success).toBe(true);
+    });
 });
 
 test('get admins for group', async () => {
-    const getstr = await request(get(`/sessions/${group.data.node.id}/admins/`, adminToken));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
-    const { edges } = getres.data;
-    expect(edges.length).toBe(2);
-    expect(edges[0].node.id).toBe(adminID);
-    expect(edges[1].node.id).toBe(userID);
+    await request(get(`/sessions/${group.id}/admins/`, adminToken)).then((getres) => {
+        expect(getres.success).toBe(true);
+        const admins = getres.data;
+        expect(admins.length).toBe(2);
+        expect(admins[0].id).toBe(adminID);
+        expect(admins[1].id).toBe(userID);
+    });
 });
 
 test('remove admin from group', async () => {
     const body = {
         adminIDs: [userID],
     };
-    const getstr = await request(put(`/sessions/${group.data.node.id}/admins/`, body,
-        adminToken));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
-    UsersRepo.deleteUserByID(userID);
+    await request(put(`/sessions/${group.id}/admins/`, body,
+        adminToken)).then((getres) => {
+        expect(getres.success).toBe(true);
+        UsersRepo.deleteUserByID(userID);
+    });
 });
 
 test('add members to group', async () => {
@@ -98,47 +98,47 @@ test('add members to group', async () => {
     const body = {
         memberIDs: [userID],
     };
-    const getstr = await request(post(`/sessions/${group.data.node.id}/members/`, body,
-        adminToken));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
+    await request(post(`/sessions/${group.id}/members/`, body,
+        adminToken)).then((getres) => {
+        expect(getres.success).toBe(true);
+    });
 });
 
 test('get groups as member', async () => {
-    const getstr = await request(get('/sessions/all/member/', userToken));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
-    const node = getres.data[0];
-    expect(group.data.id).toBe(node.id);
-    expect(group.data.name).toBe(node.name);
-    expect(group.data.code).toBe(node.code);
+    await request(get('/sessions/all/member/', userToken)).then((getres) => {
+        expect(getres.success).toBe(true);
+        const groupRes = getres.data[0];
+        expect(group.id).toBe(groupRes.id);
+        expect(group.name).toBe(groupRes.name);
+        expect(group.code).toBe(groupRes.code);
+    });
 });
 
 test('get members of group', async () => {
-    const getstr = await request(get(`/sessions/${group.data.node.id}/members/`, adminToken));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
-    const { edges } = getres.data;
-    expect(edges.length).toBe(1);
-    expect(edges[0].node.id).toBe(userID);
+    await request(get(`/sessions/${group.id}/members/`, adminToken)).then((getres) => {
+        expect(getres.success).toBe(true);
+        const members = getres.data;
+        expect(members.length).toBe(1);
+        expect(members[0].id).toBe(userID);
+    });
 });
 
 test('leave group', async () => {
-    await request(del(`/sessions/${group.data.node.id}/members/`, userToken),
+    await request(del(`/sessions/${group.id}/members/`, userToken),
         (error, res, body) => {
             expect(body.success).toBe(true);
         });
 
-    await request(get(`/sessions/${group.data.node.id}/members/`, adminToken),
+    await request(get(`/sessions/${group.id}/members/`, adminToken),
         (error, res, body) => {
             expect(body.success).toBe(true);
-            expect(body.data.edges.length).toBe(0);
+            expect(body.data.length).toBe(0);
         });
 
     const postBody = {
         memberIDs: [userID],
     };
-    await request(post(`/sessions/${group.data.node.id}/members/`, postBody, adminToken),
+    await request(post(`/sessions/${group.id}/members/`, postBody, adminToken),
         (error, res, body) => {
             expect(body.success).toBe(true);
         });
@@ -148,46 +148,46 @@ test('remove member from group', async () => {
     const body = {
         memberIDs: [userID],
     };
-    const getstr = await request(put(`/sessions/${group.data.node.id}/members`, body,
-        adminToken));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
+    await request(put(`/sessions/${group.id}/members`, body,
+        adminToken)).then((getres) => {
+        expect(getres.success).toBe(true);
+    });
     await UsersRepo.deleteUserByID(userID);
 });
 
 test('get groups for admin', async () => {
-    const getstr = await request(get('/sessions/all/admin/', adminToken));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
-    const node = getres.data[0];
-    expect(group.data.id).toBe(node.id);
-    expect(group.data.name).toBe(node.name);
-    expect(group.data.code).toBe(node.code);
+    await request(get('/sessions/all/admin/', adminToken)).then((getres) => {
+        expect(getres.success).toBe(true);
+        const groupRes = getres.data[0];
+        expect(group.id).toBe(groupRes.id);
+        expect(group.name).toBe(groupRes.name);
+        expect(group.code).toBe(groupRes.code);
+    });
 });
 
 test('update group', async () => {
-    const getstr = await request(put(`/sessions/${group.data.node.id}`, opts2, adminToken));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
-    expect(getres.data.node.name).toBe('New group');
+    await request(put(`/sessions/${group.id}`, opts2, adminToken)).then((getres) => {
+        expect(getres.success).toBe(true);
+        expect(getres.data.name).toBe('New group');
+    });
 });
 
 test('update group with invalid adminToken', async () => {
-    await request(put(`/sessions/${group.data.node.id}`, opts2, 'invalid'))
+    await request(put(`/sessions/${group.id}`, opts2, 'invalid'))
         .catch((e) => {
             expect(e.statusCode).toBe(401);
         });
 });
 
 test('delete group with invalid adminToken', async () => {
-    await request(del(`/sessions/${group.data.node.id}`, 'invalid'))
+    await request(del(`/sessions/${group.id}`, 'invalid'))
         .catch((e) => {
             expect(e.statusCode).toBe(401);
         });
 });
 
 test('delete group', async () => {
-    const result = await request(del(`/sessions/${group.data.node.id}`, adminToken));
+    const result = await request(del(`/sessions/${group.id}`, adminToken));
     expect(result.success).toBe(true);
 });
 

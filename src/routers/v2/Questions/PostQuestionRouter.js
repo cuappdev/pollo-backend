@@ -1,14 +1,14 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
+import constants from '../../../utils/Constants';
+import GroupsRepo from '../../../repos/GroupsRepo';
 import LogUtils from '../../../utils/LogUtils';
 import QuestionsRepo from '../../../repos/QuestionsRepo';
-import GroupsRepo from '../../../repos/GroupsRepo';
-import constants from '../../../utils/Constants';
 
 import type { APIQuestion } from '../APITypes';
 
-class PostQuestionRouter extends AppDevRouter<Object> {
+class PostQuestionRouter extends AppDevRouter<APIQuestion> {
     constructor() {
         super(constants.REQUEST_TYPES.POST);
     }
@@ -17,7 +17,7 @@ class PostQuestionRouter extends AppDevRouter<Object> {
         return '/sessions/:id/questions/';
     }
 
-    async content(req: Request): Promise<{ node: APIQuestion }> {
+    async content(req: Request) {
         const groupID = req.params.id;
         const { text } = req.body;
         const { user } = req;
@@ -34,10 +34,8 @@ class PostQuestionRouter extends AppDevRouter<Object> {
         const poll = await QuestionsRepo.createQuestion(text, group, user);
 
         return {
-            node: {
-                id: poll.id,
-                text: poll.text,
-            },
+            id: poll.id,
+            text: poll.text,
         };
     }
 }

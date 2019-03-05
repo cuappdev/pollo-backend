@@ -1,14 +1,14 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
+import constants from '../../../utils/Constants';
+import GroupsRepo from '../../../repos/GroupsRepo';
 import LogUtils from '../../../utils/LogUtils';
 import PollsRepo from '../../../repos/PollsRepo';
-import GroupsRepo from '../../../repos/GroupsRepo';
-import constants from '../../../utils/Constants';
 
 import type { APIPoll } from '../APITypes';
 
-class PostPollRouter extends AppDevRouter<Object> {
+class PostPollRouter extends AppDevRouter<APIPoll> {
     constructor() {
         super(constants.REQUEST_TYPES.POST);
     }
@@ -17,7 +17,7 @@ class PostPollRouter extends AppDevRouter<Object> {
         return '/sessions/:id/polls/';
     }
 
-    async content(req: Request): Promise<{ node: APIPoll }> {
+    async content(req: Request) {
         const groupID = req.params.id;
         let { text, results, shared } = req.body;
         const { type, correctAnswer } = req.body;
@@ -41,15 +41,13 @@ class PostPollRouter extends AppDevRouter<Object> {
             .createPoll(text, group, results, shared, type, correctAnswer);
 
         return {
-            node: {
-                id: poll.id,
-                text: poll.text,
-                results: poll.results,
-                shared: poll.shared,
-                type: poll.type,
-                answer: null,
-                correctAnswer: poll.correctAnswer,
-            },
+            id: poll.id,
+            text: poll.text,
+            results: poll.results,
+            shared: poll.shared,
+            type: poll.type,
+            answer: null,
+            correctAnswer: poll.correctAnswer,
         };
     }
 }

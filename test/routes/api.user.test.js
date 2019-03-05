@@ -25,11 +25,11 @@ beforeAll(async () => {
 });
 
 test('get user', async () => {
-    const getstr = await request(get('/users/', token));
-    const getres = getstr;
-    expect(getres.success).toBe(true);
-    expect(user.id).toBe(getres.data.id);
-    expect(user.netID).toBe(getres.data.netID);
+    await request(get('/users/', token)).then((getres) => {
+        expect(getres.success).toBe(true);
+        expect(user.id).toBe(getres.data.id);
+        expect(user.netID).toBe(getres.data.netID);
+    });
 });
 
 afterAll(async () => {

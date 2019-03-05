@@ -6,7 +6,9 @@ import constants from '../../../utils/Constants';
 import LogUtils from '../../../utils/LogUtils';
 import UserSessionsRepo from '../../../repos/UserSessionsRepo';
 
-class InitializeSessionRouter extends AppDevRouter<Object> {
+import type { APIUserSession } from '../APITypes';
+
+class InitializeSessionRouter extends AppDevRouter<APIUserSession> {
     constructor() {
         super(constants.REQUEST_TYPES.POST);
     }

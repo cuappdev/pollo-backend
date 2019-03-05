@@ -1,12 +1,13 @@
 // @flow
 import { Request } from 'express';
-import DraftsRepo from '../../../repos/DraftsRepo';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';
+import DraftsRepo from '../../../repos/DraftsRepo';
 import LogUtils from '../../../utils/LogUtils';
+
 import type { APIDraft } from '../APITypes';
 
-class UpdateDraftRouter extends AppDevRouter<Object> {
+class UpdateDraftRouter extends AppDevRouter<APIDraft> {
     constructor() {
         super(constants.REQUEST_TYPES.PUT);
     }
@@ -15,7 +16,7 @@ class UpdateDraftRouter extends AppDevRouter<Object> {
         return '/drafts/:id/';
     }
 
-    async content(req: Request): Promise<{ node: APIDraft }> {
+    async content(req: Request) {
         const draftID = req.params.id;
         const { text, options } = req.body;
         const admin = await DraftsRepo.getOwnerByID(draftID);
@@ -36,11 +37,9 @@ class UpdateDraftRouter extends AppDevRouter<Object> {
         }
 
         return {
-            node: {
-                id: draft.id,
-                text: draft.text,
-                options: draft.options,
-            },
+            id: draft.id,
+            text: draft.text,
+            options: draft.options,
         };
     }
 }

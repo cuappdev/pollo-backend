@@ -4,7 +4,9 @@ import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';
 import lib from '../../../utils/Lib';
 
-class RefreshTokenRouter extends AppDevRouter<Object> {
+import type { APIUserSession } from '../APITypes';
+
+class RefreshTokenRouter extends AppDevRouter<APIUserSession> {
     constructor() {
         super(constants.REQUEST_TYPES.POST);
     }

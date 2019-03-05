@@ -24,9 +24,20 @@ import type { RequestType } from './Constants';
 export type ExpressCallback = (Request, Response, NextFunction) => any;
 
 /**
+ * NoResponse - specifies the empty response for requests such as deleting a resource
+ */
+export type NoResponse = null;
+
+/**
+ * ResponseType - specifies that the content a route can return either an object,
+ * a list of objects, or no response
+ */
+export type ResponseType = NoResponse | Object | any[];
+
+/**
  * T is the response type for AppDevRouter
  */
-export default class AppDevRouter<T: Object> {
+export default class AppDevRouter<T: ResponseType> {
   router: Router;
 
   requestType: RequestType;
@@ -90,7 +101,7 @@ export default class AppDevRouter<T: Object> {
       }
   }
 
-  async content(req: Request): Promise<any> {
+  async content(req: Request): Promise<T> {
       throw new Error(1);
   }
 }

@@ -1,8 +1,5 @@
 // @flow
 
-import type { AppDevEdgesResponse } from '../../utils/AppDevEdgeRouter';
-import type { AppDevNodeResponse } from '../../utils/AppDevNodeRouter';
-
 // *********************** GENERAL RESPONSE TYPES ***********************
 
 export type id = string
@@ -12,9 +9,6 @@ export type Response<T> = {
   data: T,
   errors?: Array<Error>
 }
-
-export type NodeResponse<T> = Response<AppDevNodeResponse<T>>
-export type EdgesResponse<T> = Response<AppDevEdgesResponse<T>>
 
 // ************************ POLLO OBJECT TYPES ************************
 export type APIGroup = {|
@@ -36,12 +30,14 @@ export type APIPoll = {|
 export type APIDraft = {|
   id: id,
   text: string,
-  options: string[]
+  options: string[],
+  createdAt?: number
 |}
 
 export type APIQuestion = {|
   id: id,
-  text: string
+  text: string,
+  createdAt?: number
 |}
 
 export type APIUser = {|

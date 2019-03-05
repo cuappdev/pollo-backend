@@ -1,11 +1,13 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
-import LogUtils from '../../../utils/LogUtils';
-import GroupsRepo from '../../../repos/GroupsRepo';
 import constants from '../../../utils/Constants';
+import GroupsRepo from '../../../repos/GroupsRepo';
+import LogUtils from '../../../utils/LogUtils';
 
-class DeleteGroupRouter extends AppDevRouter<Object> {
+import type { NoResponse } from '../../../utils/AppDevRouter';
+
+class DeleteGroupRouter extends AppDevRouter<NoResponse> {
     constructor() {
         super(constants.REQUEST_TYPES.DELETE);
     }

@@ -1,11 +1,13 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
-import DraftsRepo from '../../../repos/DraftsRepo';
 import constants from '../../../utils/Constants';
+import DraftsRepo from '../../../repos/DraftsRepo';
 import LogUtils from '../../../utils/LogUtils';
 
-class DeleteDraftRouter extends AppDevRouter<Object> {
+import type { NoResponse } from '../../../utils/AppDevRouter';
+
+class DeleteDraftRouter extends AppDevRouter<NoResponse> {
     constructor() {
         super(constants.REQUEST_TYPES.DELETE);
     }

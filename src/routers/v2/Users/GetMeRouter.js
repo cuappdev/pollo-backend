@@ -2,6 +2,7 @@
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';
+
 import type { APIUser } from '../APITypes';
 
 class GetMeRouter extends AppDevRouter<APIUser> {

@@ -2,8 +2,9 @@
 import { Request } from 'express';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/Constants';
-import LogUtils from '../../utils/LogUtils';
 import GroupsRepo from '../../repos/GroupsRepo';
+import LogUtils from '../../utils/LogUtils';
+
 import type { APIGroup } from './APITypes';
 
 class JoinGroupRouter extends AppDevRouter<APIGroup> {
@@ -40,11 +41,9 @@ class JoinGroupRouter extends AppDevRouter<APIGroup> {
         }
 
         return {
-            node: {
-                id: group.id,
-                name: group.name,
-                code: group.code,
-            },
+            id: group.id,
+            name: group.name,
+            code: group.code,
         };
     }
 }

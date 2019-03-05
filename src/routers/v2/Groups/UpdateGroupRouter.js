@@ -1,9 +1,9 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
-import LogUtils from '../../../utils/LogUtils';
-import GroupsRepo from '../../../repos/GroupsRepo';
 import constants from '../../../utils/Constants';
+import GroupsRepo from '../../../repos/GroupsRepo';
+import LogUtils from '../../../utils/LogUtils';
 
 import type { APIGroup } from '../APITypes';
 
@@ -16,7 +16,7 @@ class UpdateGroupRouter extends AppDevRouter<APIGroup> {
         return '/sessions/:id/';
     }
 
-    async content(req: Request): Promise<{ node: APIGroup }> {
+    async content(req: Request) {
         const { name } = req.body;
         const groupID = req.params.id;
         const { user } = req;
@@ -39,11 +39,9 @@ class UpdateGroupRouter extends AppDevRouter<APIGroup> {
             throw LogUtils.logErr(`Group with id ${groupID} was not found`);
         }
         return {
-            node: {
-                id: group.id,
-                name: group.name,
-                code: group.code,
-            },
+            id: group.id,
+            name: group.name,
+            code: group.code,
         };
     }
 }

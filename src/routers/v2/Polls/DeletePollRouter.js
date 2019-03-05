@@ -1,12 +1,14 @@
 // @flow
 import { Request } from 'express';
 import AppDevRouter from '../../../utils/AppDevRouter';
-import PollsRepo from '../../../repos/PollsRepo';
 import constants from '../../../utils/Constants';
-import LogUtils from '../../../utils/LogUtils';
 import GroupsRepo from '../../../repos/GroupsRepo';
+import LogUtils from '../../../utils/LogUtils';
+import PollsRepo from '../../../repos/PollsRepo';
 
-class DeletePollRouter extends AppDevRouter<Object> {
+import type { NoResponse } from '../../../utils/AppDevRouter';
+
+class DeletePollRouter extends AppDevRouter<NoResponse> {
     constructor() {
         super(constants.REQUEST_TYPES.DELETE);
     }

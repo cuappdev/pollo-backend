@@ -1,10 +1,12 @@
 // @flow
-import AppDevEdgeRouter from '../../../utils/AppDevEdgeRouter';
-import GroupsRepo from '../../../repos/GroupsRepo';
+import { Request } from 'express';
+import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';
+import GroupsRepo from '../../../repos/GroupsRepo';
+
 import type { APIQuestion } from '../APITypes';
 
-class GetQuestionsRouter extends AppDevEdgeRouter<APIQuestion> {
+class GetQuestionsRouter extends AppDevRouter<APIQuestion[]> {
     constructor() {
         super(constants.REQUEST_TYPES.GET);
     }
@@ -13,18 +15,16 @@ class GetQuestionsRouter extends AppDevEdgeRouter<APIQuestion> {
         return '/sessions/:id/questions/';
     }
 
-    async contentArray(req, pageInfo, error) {
+    async content(req: Request) {
         const { id } = req.params;
         const questions = await GroupsRepo.getQuestions(id);
 
         return questions
             .filter(Boolean)
             .map(question => ({
-                node: {
-                    id: question.id,
-                    text: question.text,
-                },
-                cursor: question.createdAt.valueOf(),
+                id: question.id,
+                text: question.text,
+                createdAt: question.createdAt.valueOf(),
             }));
     }
 }

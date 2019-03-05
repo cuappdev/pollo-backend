@@ -33,19 +33,32 @@ async function ensureAuthenticated(req: Request, res: Response,
     next: NextFunction) {
     const header = req.get('Authorization');
     if (!header) {
-        res.send(new AppDevResponse(false,
-            { errors: ['Authorization header missing'] }));
+        res.send(
+            new AppDevResponse(
+                false,
+                { errors: ['Authorization header missing'] },
+            ),
+        );
         return next(true);
     }
     const bearerToken = header.replace('Bearer ', '').trim();
     if (!bearerToken) {
-        res.send(new AppDevResponse(false,
-            { errors: ['Invalid authorization header'] }));
+        res.send(
+            new AppDevResponse(
+                false,
+                { errors: ['Invalid authorization header'] },
+            ),
+        );
         return next(true);
     }
 
     if (!await UserSessionsRepo.verifySession(bearerToken)) {
-        res.send(401, 'Invalid session token');
+        res.status(401).send(
+            new AppDevResponse(
+                false,
+                { errors: ['Invalid session token'] },
+            ),
+        );
         return next(true);
     }
     const user = await UserSessionsRepo.getUserFromToken(bearerToken);
@@ -64,21 +77,33 @@ async function ensureAuthenticated(req: Request, res: Response,
 async function updateSession(req: Request, res: Response, next: NextFunction) {
     const header = req.get('Authorization');
     if (!header) {
-        res.send(new AppDevResponse(false,
-            { errors: ['Authorization header missing'] }));
+        res.send(
+            new AppDevResponse(
+                false,
+                { errors: ['Authorization header missing'] },
+            ),
+        );
         return next(true);
     }
     const bearerToken = header.replace('Bearer ', '').trim();
     if (!bearerToken) {
-        res.send(new AppDevResponse(false,
-            { errors: ['Invalid authorization header'] }));
+        res.send(
+            new AppDevResponse(
+                false,
+                { errors: ['Invalid authorization header'] },
+            ),
+        );
         return next(true);
     }
 
     const session = await UserSessionsRepo.updateSession(bearerToken);
     if (!session) {
-        res.send(new AppDevResponse(false,
-            { errors: ['Invalid refresh token'] }));
+        res.send(
+            new AppDevResponse(
+                false,
+                { errors: ['Invalid refresh token'] },
+            ),
+        );
         return next(true);
     }
     req.session = session;
