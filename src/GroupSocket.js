@@ -207,8 +207,8 @@ export default class GroupSocket {
    *  - Adds their answer to results and remove their old answer if exists
    *
    * 'server/poll/upvote', (answerObject: Object) (Answer without id field)
-   *  - Client upvotes an answer
-   *  - Increases count of answer upvoted
+   *  - Client upvotes an answer or unupvotes if previously upvoted
+   *  - Increases count of answer upvoted or decreases count of answer unupvoted
    * @function
    * @param {IOSocket} client - Client's socket object
    */
@@ -272,10 +272,16 @@ export default class GroupSocket {
           const nextState = { ...this.current };
           const curTally = nextState.results[answerID];
           if (curTally) {
-              nextState.results[answerID].count += 1;
               if (nextState.upvotes[googleID]) {
-                  nextState.upvotes[googleID].push(answerID);
-              } else {
+                  if (nextState.upvotes[googleID].includes(answerID)) { // unupvote
+                      nextState.results[answerID].count -= 1;
+                      nextState.upvotes[googleID].filter(a => a !== answerID);
+                  } else { // upvote
+                      nextState.results[answerID].count += 1;
+                      nextState.upvotes[googleID].push(answerID);
+                  }
+              } else { // init array and upvote
+                  nextState.results[answerID].count += 1;
                   nextState.upvotes[googleID] = [answerID];
               }
           }
