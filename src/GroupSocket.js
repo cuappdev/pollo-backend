@@ -25,6 +25,7 @@ type Poll = {
   text: string,
   type: string,
   options: ?string[],
+  optionsWithChoices: Object[],
   shared: boolean,
   correctAnswer: string,
 }
@@ -383,7 +384,10 @@ export default class GroupSocket {
       const results = {};
       if (poll.options) {
           for (let i = 0; i < poll.options.length; i += 1) {
-              results[String.fromCharCode(65 + i)] = { text: poll.options[i], count: 0 };
+              const choice = String.fromCharCode(65 + i);
+              const option = poll.options[i];
+              results[choice] = { text: option, count: 0 };
+              poll.optionsWithChoices.push({ choice, option });
           }
       }
       this.current.results = results;
@@ -471,6 +475,7 @@ export default class GroupSocket {
               text: pollObject.text,
               type: pollObject.type,
               options: pollObject.options,
+              optionsWithChoices: [],
               shared: pollObject.shared,
               correctAnswer: pollObject.correctAnswer,
           };
@@ -489,6 +494,7 @@ export default class GroupSocket {
               text: questionObject.text,
               type: questionObject.type,
               options: questionObject.options,
+              optionsWithChoices: [],
               shared: false,
               correctAnswer: questionObject.correctAnswer,
           };
