@@ -2,10 +2,10 @@
 
 // @flow
 import SocketIO from 'socket.io';
-import Group from './models/Group';
-import PollsRepo from './repos/PollsRepo';
 import constants from './utils/Constants';
-import filter from './utils/Lib.js';
+import Group from './models/Group';
+import lib from './utils/Lib.js';
+import PollsRepo from './repos/PollsRepo';
 
 /** Configuration for each GroupSocket */
 export type GroupSocketConfig = {
@@ -231,8 +231,8 @@ export default class GroupSocket {
           }
           break;
         default: { // Free Response
-          const filterArr = filter(answer.text);
-          if (filterArr.length === 0) { // clean text
+          const badWords = lib.filterProfanity(answer.text);
+          if (badWords.length === 0) { // clean text
             if (prev) { // User submitted another FR answer
               nextState.answers[answer.googleID].push(answer.id);
             } else { // User submitted first FR answer
@@ -240,7 +240,7 @@ export default class GroupSocket {
             }
             client.emit('user/answer/success');
           } else { // not clean text
-            client.emit('user/answer/filter', { text: answer.text, filter: filterArr });
+            client.emit('user/answer/filter', { text: answer.text, filter: badWords });
           }
         }
       }
@@ -375,7 +375,7 @@ export default class GroupSocket {
     // start new poll
     this.current.poll = poll.id;
     if (this.polls[`${poll.id}`] !== null
-        || this.polls[`${poll.id}`] !== undefined) {
+      || this.polls[`${poll.id}`] !== undefined) {
       this.polls[`${poll.id}`] = {
         poll,
         answers: {},

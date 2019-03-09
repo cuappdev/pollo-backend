@@ -4,7 +4,7 @@ import {
   Response,
   Request,
 } from 'express';
-import * as profanity from 'profanity-util';
+import profanity from 'profanity-util';
 import AppDevResponse from './AppDevResponse';
 import UserSessionsRepo from '../repos/UserSessionsRepo';
 
@@ -14,7 +14,7 @@ import UserSessionsRepo from '../repos/UserSessionsRepo';
 * @param {(param: T, num: number) => boolean} pred - Predicate to determine which elements
 * to remove
 */
-function remove <T>(arr: Array<T>, pred: (param: T, num: number) => boolean) {
+function remove<T>(arr: Array<T>, pred: (param: T, num: number) => boolean) {
   for (let i = arr.length - 1; i > -1; i -= 1) {
     if (pred(arr[i], i)) {
       arr.splice(i, 1);
@@ -116,11 +116,11 @@ async function updateSession(req: Request, res: Response, next: NextFunction) {
  * @param {string} str - String to filter
  * @return {Array<String>} - Array of bad words contained in string
  */
-const filter = (str: string): Array<String> => profanity.check(str); // => [ 'badword1', 'badword2']
+const filterProfanity = (str: string): Array<String> => profanity.check(str); // => [ 'badword1', 'badword2']
 
 export default {
   remove,
   ensureAuthenticated,
-  filter,
+  filterProfanity,
   updateSession,
 };
