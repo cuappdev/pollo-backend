@@ -230,7 +230,7 @@ export default class GroupSocket {
             nextState.results[prev].count -= 1;
           }
           break;
-        default: { // Free Response
+        case constants.QUESTION_TYPES.FREE_RESPONSE: { // Free Response
           const badWords = lib.filterProfanity(answer.text);
           if (badWords.length === 0) { // clean text
             if (prev) { // User submitted another FR answer
@@ -242,7 +242,10 @@ export default class GroupSocket {
           } else { // not clean text
             client.emit('user/answer/filter', { text: answer.text, filter: badWords });
           }
+          break;
         }
+        default:
+          throw new Error('Unimplemented question type');
       }
 
       const key = poll.type === constants.QUESTION_TYPES.MULTIPLE_CHOICE
@@ -274,7 +277,7 @@ export default class GroupSocket {
         if (nextState.upvotes[googleID]) {
           if (nextState.upvotes[googleID].includes(answerID)) { // unupvote
             nextState.results[answerID].count -= 1;
-            nextState.upvotes[googleID].filter(a => a !== answerID);
+            nextState.upvotes[googleID] = nextState.upvotes[googleID].filter(a => a !== answerID);
           } else { // upvote
             nextState.results[answerID].count += 1;
             nextState.upvotes[googleID].push(answerID);
