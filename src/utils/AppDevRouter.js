@@ -3,10 +3,10 @@
 // serving up JSON responses based on HTTP verb
 
 import {
-    NextFunction,
-    Request,
-    Response,
-    Router,
+  NextFunction,
+  Request,
+  Response,
+  Router,
 } from 'express';
 
 import AppDevResponse from './AppDevResponse';
@@ -43,65 +43,65 @@ export default class AppDevRouter<T: ResponseType> {
   requestType: RequestType;
 
   getPath(): string {
-      throw LogUtils.logErr('You must implement getPath() with a valid path');
+    throw LogUtils.logErr('You must implement getPath() with a valid path');
   }
 
   constructor(type: RequestType) {
-      this.router = new Router();
-      this.requestType = type;
+    this.router = new Router();
+    this.requestType = type;
 
-      // Initialize this router
-      this.init();
+    // Initialize this router
+    this.init();
   }
 
   init() {
-      const path = this.getPath();
-      const middleware = this.middleware();
+    const path = this.getPath();
+    const middleware = this.middleware();
 
-      // Make sure path conforms to specifications
-      AppDevUtils.tryCheckAppDevURL(path);
+    // Make sure path conforms to specifications
+    AppDevUtils.tryCheckAppDevURL(path);
 
-      // Attach content to router
-      switch (this.requestType) {
-          case constants.REQUEST_TYPES.GET:
-              this.router.get(path, middleware, this.response);
-              break;
-          case constants.REQUEST_TYPES.POST:
-              this.router.post(path, middleware, this.response);
-              break;
-          case constants.REQUEST_TYPES.DELETE:
-              this.router.delete(path, middleware, this.response);
-              break;
-          case constants.REQUEST_TYPES.PUT:
-              this.router.put(path, middleware, this.response);
-              break;
-          default:
-              break;
-      }
+    // Attach content to router
+    switch (this.requestType) {
+      case constants.REQUEST_TYPES.GET:
+        this.router.get(path, middleware, this.response);
+        break;
+      case constants.REQUEST_TYPES.POST:
+        this.router.post(path, middleware, this.response);
+        break;
+      case constants.REQUEST_TYPES.DELETE:
+        this.router.delete(path, middleware, this.response);
+        break;
+      case constants.REQUEST_TYPES.PUT:
+        this.router.put(path, middleware, this.response);
+        break;
+      default:
+        break;
+    }
   }
   
   /**
    * Subclasses must override this to supply middleware for the API.
    */
   middleware(): ExpressCallback[] {
-      // By default makes route secured
-      return [lib.ensureAuthenticated];
+    // By default makes route secured
+    return [lib.ensureAuthenticated];
   }
 
   response = async (req: Request, res: Response, next: NextFunction) => {
-      try {
-          const content: T = await this.content(req);
-          res.json(new AppDevResponse(true, content));
-      } catch (e) {
-          if (e.message === 1) {
-              throw LogUtils.logErr('You must implement content()');
-          } else {
-              res.json(new AppDevResponse(false, { errors: [e.message] }));
-          }
+    try {
+      const content: T = await this.content(req);
+      res.json(new AppDevResponse(true, content));
+    } catch (e) {
+      if (e.message === 1) {
+        throw LogUtils.logErr('You must implement content()');
+      } else {
+        res.json(new AppDevResponse(false, { errors: [e.message] }));
       }
+    }
   }
 
   async content(req: Request): Promise<T> {
-      throw new Error(1);
+    throw new Error(1);
   }
 }

@@ -10,7 +10,7 @@
         "strict": 0,
 
         // indentation
-        "indent": [2, 4, { "SwitchCase": 1 }],
+        "indent": [2, 2, { "SwitchCase": 1 }],
 
         // spacing
         "object-curly-spacing": [2, "always"],
@@ -72,6 +72,8 @@
 
         "function-paren-newline": ["error", "consistent"],
 
-        "no-console": 0
+        "no-console": 0,
+
+        "no-mixed-operators": 0
       }
 }

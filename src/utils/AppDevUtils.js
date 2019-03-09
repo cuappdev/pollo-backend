@@ -8,13 +8,13 @@
  * characters in between.
  */
 const tryCheckAppDevURL = (path: string) => {
-    if (path !== '/' && path.length < 2) {
-        throw new Error('Invalid path');
-    } else if (path[0] !== '/') {
-        throw new Error('Path must start with a \'/\'');
-    } else if (path[path.length - 1] !== '/') {
-        throw new Error('Path must end with a \'/\'');
-    }
+  if (path !== '/' && path.length < 2) {
+    throw new Error('Invalid path');
+  } else if (path[0] !== '/') {
+    throw new Error('Path must start with a \'/\'');
+  } else if (path[path.length - 1] !== '/') {
+    throw new Error('Path must end with a \'/\'');
+  }
 };
 
 /**
@@ -35,7 +35,7 @@ const randomCode = (length: number): string => Math.round(((36 ** (length + 1)) 
     * (36 ** length))).toString(36).slice(1).toUpperCase();
 
 export default {
-    netIDFromEmail,
-    randomCode,
-    tryCheckAppDevURL,
+  netIDFromEmail,
+  randomCode,
+  tryCheckAppDevURL,
 };

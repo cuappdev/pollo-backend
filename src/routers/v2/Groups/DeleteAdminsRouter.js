@@ -8,30 +8,30 @@ import LogUtils from '../../../utils/LogUtils';
 import type { NoResponse } from '../../../utils/AppDevRouter';
 
 class DeleteAdminsRouter extends AppDevRouter<NoResponse> {
-    constructor() {
-        super(constants.REQUEST_TYPES.PUT);
+  constructor() {
+    super(constants.REQUEST_TYPES.PUT);
+  }
+
+  getPath(): string {
+    return '/sessions/:id/admins/';
+  }
+
+  async content(req: Request) {
+    const groupID = req.params.id;
+    const { user } = req;
+    const adminIDs = JSON.parse(req.body.adminIDs);
+
+    if (!adminIDs) throw LogUtils.logErr('List of admin ids missing');
+
+    if (!await GroupsRepo.isAdmin(groupID, user)) {
+      throw LogUtils.logErr(
+        'You are not authorized to remove admins from this group', {}, { groupID, user },
+      );
     }
 
-    getPath(): string {
-        return '/sessions/:id/admins/';
-    }
-
-    async content(req: Request) {
-        const groupID = req.params.id;
-        const { user } = req;
-        const adminIDs = JSON.parse(req.body.adminIDs);
-
-        if (!adminIDs) throw LogUtils.logErr('List of admin ids missing');
-
-        if (!await GroupsRepo.isAdmin(groupID, user)) {
-            throw LogUtils.logErr(
-                'You are not authorized to remove admins from this group', {}, { groupID, user },
-            );
-        }
-
-        await GroupsRepo.removeUserByGroupID(groupID, adminIDs, 'admin');
-        return null;
-    }
+    await GroupsRepo.removeUserByGroupID(groupID, adminIDs, 'admin');
+    return null;
+  }
 }
 
 export default new DeleteAdminsRouter().router;

@@ -1,6 +1,6 @@
 // @flow
 import {
-    AbstractEntity, BeforeInsert, BeforeUpdate, Column,
+  AbstractEntity, BeforeInsert, BeforeUpdate, Column,
 } from 'typeorm';
 
 @AbstractEntity()
@@ -21,9 +21,9 @@ class Base {
   * @function
   */
   setTimestamps() : void {
-      const time = Math.floor(new Date().getTime() / 1000);
-      this.createdAt = time;
-      this.updatedAt = time;
+    const time = Math.floor(new Date().getTime() / 1000);
+    this.createdAt = time;
+    this.updatedAt = time;
   }
 
   @BeforeUpdate()
@@ -31,7 +31,7 @@ class Base {
   * @function
   */
   updateTimestamps() : void {
-      this.updatedAt = Math.floor(new Date().getTime() / 1000);
+    this.updatedAt = Math.floor(new Date().getTime() / 1000);
   }
 }
 

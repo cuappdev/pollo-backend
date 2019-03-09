@@ -8,37 +8,37 @@ import QuestionsRepo from '../../../repos/QuestionsRepo';
 import type { APIQuestion } from '../APITypes';
 
 class UpdateQuestionRouter extends AppDevRouter<APIQuestion> {
-    constructor() {
-        super(constants.REQUEST_TYPES.PUT);
+  constructor() {
+    super(constants.REQUEST_TYPES.PUT);
+  }
+
+  getPath(): string {
+    return '/questions/:id/';
+  }
+
+  async content(req: Request) {
+    const questionID = req.params.id;
+    const { text } = req.body;
+    const { user } = req;
+
+    if (!text) throw LogUtils.logErr('No fields specified to update');
+
+    const group = await QuestionsRepo.getGroupFromQuestionID(questionID);
+    if (!group) throw LogUtils.logErr(`Question with id ${questionID} has no group`);
+
+    if (!await QuestionsRepo.isOwnerByID(questionID, user)) {
+      throw LogUtils.logErr('You are not authorized to update this question', {}, { questionID, user });
+    }
+    const question = await QuestionsRepo.updateQuestionByID(questionID, text);
+    if (!question) {
+      throw LogUtils.logErr(`Question with id ${questionID} was not found`);
     }
 
-    getPath(): string {
-        return '/questions/:id/';
-    }
-
-    async content(req: Request) {
-        const questionID = req.params.id;
-        const { text } = req.body;
-        const { user } = req;
-
-        if (!text) throw LogUtils.logErr('No fields specified to update');
-
-        const group = await QuestionsRepo.getGroupFromQuestionID(questionID);
-        if (!group) throw LogUtils.logErr(`Question with id ${questionID} has no group`);
-
-        if (!await QuestionsRepo.isOwnerByID(questionID, user)) {
-            throw LogUtils.logErr('You are not authorized to update this question', {}, { questionID, user });
-        }
-        const question = await QuestionsRepo.updateQuestionByID(questionID, text);
-        if (!question) {
-            throw LogUtils.logErr(`Question with id ${questionID} was not found`);
-        }
-
-        return {
-            id: question.id,
-            text: question.text,
-        };
-    }
+    return {
+      id: question.id,
+      text: question.text,
+    };
+  }
 }
 
 export default new UpdateQuestionRouter().router;

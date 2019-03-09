@@ -8,48 +8,48 @@ let user;
 
 // Connects to db before running tests and does setup
 beforeAll(async () => {
-    await dbConnection().catch((e) => {
-        // eslint-disable-next-line no-console
-        console.log('Error connecting to database');
-        process.exit();
-    });
+  await dbConnection().catch((e) => {
+    // eslint-disable-next-line no-console
+    console.log('Error connecting to database');
+    process.exit();
+  });
 
-    user = await UsersRepo.createDummyUser(googleID);
+  user = await UsersRepo.createDummyUser(googleID);
 });
 
 test('Create Session', async () => {
-    const session = await UserSessionsRepo.createOrUpdateSession(user, 'access', 'refresh');
-    sessionID = session.id;
-    expect(session.isActive).toBe(true);
-    expect(session.sessionToken).toBe('access');
-    expect(session.updateToken).toBe('refresh');
+  const session = await UserSessionsRepo.createOrUpdateSession(user, 'access', 'refresh');
+  sessionID = session.id;
+  expect(session.isActive).toBe(true);
+  expect(session.sessionToken).toBe('access');
+  expect(session.updateToken).toBe('refresh');
 });
 
 test('Get User from Token', async () => {
-    user = await UserSessionsRepo.getUserFromToken('access');
-    expect(user.googleID).toEqual(googleID);
-    const nullUser = await UserSessionsRepo.getUserFromToken('invalid');
-    expect(nullUser).toBeNull();
+  user = await UserSessionsRepo.getUserFromToken('access');
+  expect(user.googleID).toEqual(googleID);
+  const nullUser = await UserSessionsRepo.getUserFromToken('invalid');
+  expect(nullUser).toBeNull();
 });
 
 test('Verify Session', async () => {
-    const valid = await UserSessionsRepo.verifySession('access');
-    expect(valid).toBe(true);
-    const invalid = await UserSessionsRepo.verifySession('invalid');
-    expect(invalid).toBe(false);
+  const valid = await UserSessionsRepo.verifySession('access');
+  expect(valid).toBe(true);
+  const invalid = await UserSessionsRepo.verifySession('invalid');
+  expect(invalid).toBe(false);
 });
 
 test('Update Session', async () => {
-    const nullObj = await UserSessionsRepo.updateSession('invalid');
-    expect(nullObj).toBeNull();
-    const obj = await UserSessionsRepo.updateSession('refresh');
-    expect(obj.isActive).toBe(true);
+  const nullObj = await UserSessionsRepo.updateSession('invalid');
+  expect(nullObj).toBeNull();
+  const obj = await UserSessionsRepo.updateSession('refresh');
+  expect(obj.isActive).toBe(true);
 });
 
 // Teardown
 afterAll(async () => {
-    await UserSessionsRepo.deleteSession(sessionID);
-    await UsersRepo.deleteUserByID(user.id);
-    // eslint-disable-next-line no-console
-    console.log('Passed all session tests');
+  await UserSessionsRepo.deleteSession(sessionID);
+  await UsersRepo.deleteUserByID(user.id);
+  // eslint-disable-next-line no-console
+  console.log('Passed all session tests');
 });

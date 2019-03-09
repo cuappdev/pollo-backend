@@ -7,21 +7,21 @@ import lib from '../../../utils/Lib';
 import type { APIUserSession } from '../APITypes';
 
 class RefreshTokenRouter extends AppDevRouter<APIUserSession> {
-    constructor() {
-        super(constants.REQUEST_TYPES.POST);
-    }
+  constructor() {
+    super(constants.REQUEST_TYPES.POST);
+  }
 
-    getPath(): string {
-        return '/auth/refresh/';
-    }
+  getPath(): string {
+    return '/auth/refresh/';
+  }
 
-    middleware() {
-        return [lib.updateSession];
-    }
+  middleware() {
+    return [lib.updateSession];
+  }
 
-    async content(req: Request) {
-        return req.session;
-    }
+  async content(req: Request) {
+    return req.session;
+  }
 }
 
 export default new RefreshTokenRouter().router;

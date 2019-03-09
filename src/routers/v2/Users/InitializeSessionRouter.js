@@ -9,31 +9,31 @@ import UserSessionsRepo from '../../../repos/UserSessionsRepo';
 import type { APIUserSession } from '../APITypes';
 
 class InitializeSessionRouter extends AppDevRouter<APIUserSession> {
-    constructor() {
-        super(constants.REQUEST_TYPES.POST);
-    }
+  constructor() {
+    super(constants.REQUEST_TYPES.POST);
+  }
 
-    getPath(): string {
-        return '/auth/mobile/';
-    }
+  getPath(): string {
+    return '/auth/mobile/';
+  }
 
-    middleware() {
-        return [];
-    }
+  middleware() {
+    return [];
+  }
 
-    async content(req: Request) {
-        const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+  async content(req: Request) {
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-        return client
-            .verifyIdToken({
-                idToken: req.body.idToken,
-                aud: process.env.GOOGLE_CLIENT_ID, // audience
-            })
-            .then(login => UserSessionsRepo.createUserAndInitializeSession(login))
-            .catch((e) => {
-                LogUtils.logErr('Error authenticating', e);
-            });
-    }
+    return client
+      .verifyIdToken({
+        idToken: req.body.idToken,
+        aud: process.env.GOOGLE_CLIENT_ID, // audience
+      })
+      .then(login => UserSessionsRepo.createUserAndInitializeSession(login))
+      .catch((e) => {
+        LogUtils.logErr('Error authenticating', e);
+      });
+  }
 }
 
 export default new InitializeSessionRouter().router;
