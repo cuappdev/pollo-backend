@@ -1,8 +1,8 @@
 // @flow
 import dotenv from 'dotenv';
 import {
-    ConnectionOptions,
-    createConnection,
+  ConnectionOptions,
+  createConnection,
 } from 'typeorm';
 
 // All entities
@@ -18,41 +18,41 @@ dotenv.config(); // establish env variables
 const isProduction = process.env.NODE_ENV === 'production';
 
 const driver = {
-    type: 'postgres',
-    host: process.env.DB_HOST,
-    port: isProduction ? process.env.DB_PORT : 5432,
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    extra: {
-        ssl: isProduction,
-    },
+  type: 'postgres',
+  host: process.env.DB_HOST,
+  port: isProduction ? process.env.DB_PORT : 5432,
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  extra: {
+    ssl: isProduction,
+  },
 };
 
 const entities = [
-    Base,
-    Draft,
-    Poll,
-    Question,
-    Group,
-    User,
-    UserSession,
+  Base,
+  Draft,
+  Poll,
+  Question,
+  Group,
+  User,
+  UserSession,
 ];
 
 // Setup options
 const connectionOptions: ConnectionOptions = {
-    autoSchemaSync: !isProduction,
-    driver,
-    entities,
-    migrations: [],
-    cli: {
-        entitiesDir: 'src/models',
-        migrationsDir: 'src/db/migrations',
-    },
+  autoSchemaSync: !isProduction,
+  driver,
+  entities,
+  migrations: [],
+  cli: {
+    entitiesDir: 'src/models',
+    migrationsDir: 'src/db/migrations',
+  },
 };
 
 const dbConnection = (): Promise<any> => createConnection(connectionOptions)
-    .then(async (connection) => {
-        if (isProduction) await connection.runMigrations();
-    });
+  .then(async (connection) => {
+    if (isProduction) await connection.runMigrations();
+  });
 export default dbConnection;

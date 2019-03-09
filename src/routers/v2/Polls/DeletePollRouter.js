@@ -9,30 +9,30 @@ import PollsRepo from '../../../repos/PollsRepo';
 import type { NoResponse } from '../../../utils/AppDevRouter';
 
 class DeletePollRouter extends AppDevRouter<NoResponse> {
-    constructor() {
-        super(constants.REQUEST_TYPES.DELETE);
-    }
+  constructor() {
+    super(constants.REQUEST_TYPES.DELETE);
+  }
 
-    getPath(): string {
-        return '/polls/:id/';
-    }
+  getPath(): string {
+    return '/polls/:id/';
+  }
 
-    async content(req: Request) {
-        const pollID = req.params.id;
-        const { user } = req;
+  async content(req: Request) {
+    const pollID = req.params.id;
+    const { user } = req;
 
-        const group = await PollsRepo.getGroupFromPollID(pollID);
-        if (!group) {
-            throw LogUtils.logErr(`Couldn't find group with poll ${pollID}`);
-        }
-        if (!await GroupsRepo.isAdmin(group.id, user)) {
-            throw LogUtils.logErr(
-                'You are not authorized to delete this poll', {}, { pollID, user },
-            );
-        }
-        await PollsRepo.deletePollByID(pollID);
-        return null;
+    const group = await PollsRepo.getGroupFromPollID(pollID);
+    if (!group) {
+      throw LogUtils.logErr(`Couldn't find group with poll ${pollID}`);
     }
+    if (!await GroupsRepo.isAdmin(group.id, user)) {
+      throw LogUtils.logErr(
+        'You are not authorized to delete this poll', {}, { pollID, user },
+      );
+    }
+    await PollsRepo.deletePollByID(pollID);
+    return null;
+  }
 }
 
 export default new DeletePollRouter().router;

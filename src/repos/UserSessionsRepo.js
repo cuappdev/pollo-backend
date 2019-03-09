@@ -17,22 +17,22 @@ const db = (): Repository<UserSession> => getConnectionManager().get().getReposi
  * @return {UserSession} New or updated session
  */
 const createOrUpdateSession = async (
-    user: User, accessToken: ?string, refreshToken: ?string,
+  user: User, accessToken: ?string, refreshToken: ?string,
 ): Promise<UserSession> => {
-    const optionalSession = await db().createQueryBuilder('usersessions')
-        .where('usersessions.user = :userID', { userID: user.id })
-        .innerJoinAndSelect('usersessions.user', 'users')
-        .getOne();
+  const optionalSession = await db().createQueryBuilder('usersessions')
+    .where('usersessions.user = :userID', { userID: user.id })
+    .innerJoinAndSelect('usersessions.user', 'users')
+    .getOne();
 
-    let session;
-    if (optionalSession) {
-        session = await
-        db().persist(optionalSession.update(accessToken, refreshToken));
-        return session;
-    }
+  let session;
+  if (optionalSession) {
     session = await
-    db().persist(UserSession.fromUser(user, accessToken, refreshToken));
+    db().persist(optionalSession.update(accessToken, refreshToken));
     return session;
+  }
+  session = await
+  db().persist(UserSession.fromUser(user, accessToken, refreshToken));
+  return session;
 };
 
 /**
@@ -42,12 +42,12 @@ const createOrUpdateSession = async (
  * @return {?User} User that is associated with the access token
  */
 const getUserFromToken = async (accessToken: string): Promise<?User> => {
-    const session = await db().createQueryBuilder('usersessions')
-        .leftJoinAndSelect('usersessions.user', 'user')
-        .where('usersessions.sessionToken = :accessToken',
-            { accessToken })
-        .getOne();
-    return session ? session.user : null;
+  const session = await db().createQueryBuilder('usersessions')
+    .leftJoinAndSelect('usersessions.user', 'user')
+    .where('usersessions.sessionToken = :accessToken',
+      { accessToken })
+    .getOne();
+  return session ? session.user : null;
 };
 
 /**
@@ -57,19 +57,19 @@ const getUserFromToken = async (accessToken: string): Promise<?User> => {
  * @return {Object} Object containing the session info serialized
  */
 const updateSession = async (refreshToken: string): Promise<?Object> => {
-    let session = await db().createQueryBuilder('usersessions')
-        .leftJoinAndSelect('usersessions.user', 'user')
-        .where('usersessions.updateToken = :token', { token: refreshToken })
-        .getOne();
-    if (!session) return null;
-    session = session.update();
-    await db().persist(session);
-    return {
-        accessToken: session.sessionToken,
-        refreshToken: session.updateToken,
-        sessionExpiration: session.expiresAt,
-        isActive: session.isActive,
-    };
+  let session = await db().createQueryBuilder('usersessions')
+    .leftJoinAndSelect('usersessions.user', 'user')
+    .where('usersessions.updateToken = :token', { token: refreshToken })
+    .getOne();
+  if (!session) return null;
+  session = session.update();
+  await db().persist(session);
+  return {
+    accessToken: session.sessionToken,
+    refreshToken: session.updateToken,
+    sessionExpiration: session.expiresAt,
+    isActive: session.isActive,
+  };
 };
 
 /**
@@ -79,12 +79,12 @@ const updateSession = async (refreshToken: string): Promise<?Object> => {
  * @return {boolean} Whether or not the session is valid and active
  */
 const verifySession = async (accessToken: string): Promise<boolean> => {
-    const session = await db().createQueryBuilder('usersessions')
-        .where('usersessions.sessionToken = :accessToken',
-            { accessToken })
-        .getOne();
-    if (!session) return false;
-    return session.isActive
+  const session = await db().createQueryBuilder('usersessions')
+    .where('usersessions.sessionToken = :accessToken',
+      { accessToken })
+    .getOne();
+  if (!session) return false;
+  return session.isActive
     && session.expiresAt > Math.floor(new Date().getTime() / 1000);
 };
 
@@ -94,12 +94,12 @@ const verifySession = async (accessToken: string): Promise<boolean> => {
  * @param {number} id - ID of session to delete
  */
 const deleteSession = async (id: number) => {
-    try {
-        const session = await db().findOneById(id);
-        await db().remove(session);
-    } catch (e) {
-        throw LogUtils.logErr(`Problem deleting session by id: ${id}`, e);
-    }
+  try {
+    const session = await db().findOneById(id);
+    await db().remove(session);
+  } catch (e) {
+    throw LogUtils.logErr(`Problem deleting session by id: ${id}`, e);
+  }
 };
 
 /**
@@ -108,15 +108,15 @@ const deleteSession = async (id: number) => {
  * @param {number} userID - ID of use to delete the session for
  */
 const deleteSessionFromUserID = async (userID: number) => {
-    try {
-        const session = await db().createQueryBuilder('usersessions')
-            .innerJoin('usersessions.user', 'user', 'user.id = :userID')
-            .setParameters({ userID })
-            .getOne();
-        if (session) db().remove(session);
-    } catch (e) {
-        throw LogUtils.logErr(`Problem deleting session by user: ${userID}`, e);
-    }
+  try {
+    const session = await db().createQueryBuilder('usersessions')
+      .innerJoin('usersessions.user', 'user', 'user.id = :userID')
+      .setParameters({ userID })
+      .getOne();
+    if (session) db().remove(session);
+  } catch (e) {
+    throw LogUtils.logErr(`Problem deleting session by user: ${userID}`, e);
+  }
 };
 
 /**
@@ -126,32 +126,32 @@ const deleteSessionFromUserID = async (userID: number) => {
  * @return {Object} Object containing session information for the user.
  */
 const createUserAndInitializeSession = async (login: LoginTicket): Promise<Object> => {
-    const payload = login.getPayload();
-    const googleID = payload.sub;
-    const first = payload.given_name;
-    const last = payload.family_name;
-    const { email } = payload;
+  const payload = login.getPayload();
+  const googleID = payload.sub;
+  const first = payload.given_name;
+  const last = payload.family_name;
+  const { email } = payload;
 
-    let user = await UsersRepo.getUserByGoogleID(googleID);
-    if (!user) {
-        user = await UsersRepo.createUserWithFields(googleID, first, last, email);
-    }
+  let user = await UsersRepo.getUserByGoogleID(googleID);
+  if (!user) {
+    user = await UsersRepo.createUserWithFields(googleID, first, last, email);
+  }
 
-    const session = await createOrUpdateSession(user, null, null);
-    return {
-        accessToken: session.sessionToken,
-        refreshToken: session.updateToken,
-        sessionExpiration: session.expiresAt,
-        isActive: session.isActive,
-    };
+  const session = await createOrUpdateSession(user, null, null);
+  return {
+    accessToken: session.sessionToken,
+    refreshToken: session.updateToken,
+    sessionExpiration: session.expiresAt,
+    isActive: session.isActive,
+  };
 };
 
 export default {
-    createOrUpdateSession,
-    getUserFromToken,
-    updateSession,
-    verifySession,
-    deleteSession,
-    deleteSessionFromUserID,
-    createUserAndInitializeSession,
+  createOrUpdateSession,
+  getUserFromToken,
+  updateSession,
+  verifySession,
+  deleteSession,
+  deleteSessionFromUserID,
+  createUserAndInitializeSession,
 };

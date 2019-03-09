@@ -9,34 +9,34 @@ import PollsRepo from '../../../repos/PollsRepo';
 import type { APIPoll } from '../APITypes';
 
 class GetPollRouter extends AppDevRouter<APIPoll> {
-    constructor() {
-        super(constants.REQUEST_TYPES.GET);
-    }
+  constructor() {
+    super(constants.REQUEST_TYPES.GET);
+  }
 
-    getPath(): string {
-        return '/polls/:id/';
-    }
+  getPath(): string {
+    return '/polls/:id/';
+  }
 
-    async content(req: Request) {
-        const { id } = req.params;
-        const poll = await PollsRepo.getPollByID(id);
-        if (!poll) throw LogUtils.logErr(`Poll with id ${id} cannot be found`);
+  async content(req: Request) {
+    const { id } = req.params;
+    const poll = await PollsRepo.getPollByID(id);
+    if (!poll) throw LogUtils.logErr(`Poll with id ${id} cannot be found`);
 
-        const group = await PollsRepo.getGroupFromPollID(poll.id);
-        if (!group) throw LogUtils.logErr(`Group with id ${id} cannot be found`);
+    const group = await PollsRepo.getGroupFromPollID(poll.id);
+    if (!group) throw LogUtils.logErr(`Group with id ${id} cannot be found`);
 
-        const isAdmin = await GroupsRepo.isAdmin(group.id, req.user);
+    const isAdmin = await GroupsRepo.isAdmin(group.id, req.user);
 
-        return poll && {
-            id: poll.id,
-            text: poll.text,
-            results: poll.results,
-            shared: poll.shared,
-            type: poll.type,
-            answer: isAdmin ? null : poll.userAnswers[req.user.googleID],
-            correctAnswer: poll.correctAnswer,
-        };
-    }
+    return poll && {
+      id: poll.id,
+      text: poll.text,
+      results: poll.results,
+      shared: poll.shared,
+      type: poll.type,
+      answer: isAdmin ? null : poll.userAnswers[req.user.googleID],
+      correctAnswer: poll.correctAnswer,
+    };
+  }
 }
 
 export default new GetPollRouter().router;

@@ -16,17 +16,17 @@ const db = (): Repository<Draft> => getConnectionManager().get().getRepository(D
 */
 const createDraft = async (text: string, options: string[], user: User):
   Promise<Draft> => {
-    try {
-        const draft = new Draft();
-        draft.text = text;
-        draft.options = options;
-        draft.user = user;
+  try {
+    const draft = new Draft();
+    draft.text = text;
+    draft.options = options;
+    draft.user = user;
 
-        await db().persist(draft);
-        return draft;
-    } catch (e) {
-        throw LogUtils.logErr('Problem creating draft', e, { text, options, user });
-    }
+    await db().persist(draft);
+    return draft;
+  } catch (e) {
+    throw LogUtils.logErr('Problem creating draft', e, { text, options, user });
+  }
 };
 
 /**
@@ -36,15 +36,15 @@ const createDraft = async (text: string, options: string[], user: User):
 * @return {Draft} Draft with given id
 */
 const getDraft = async (id: number): Promise<Draft> => {
-    try {
-        return await db().createQueryBuilder('drafts')
-            .leftJoinAndSelect('drafts.user', 'users')
-            .where('drafts.id = :draftID')
-            .setParameters({ draftID: id })
-            .getOne();
-    } catch (e) {
-        throw LogUtils.logErr(`Problem getting draft by id: ${id}`, e);
-    }
+  try {
+    return await db().createQueryBuilder('drafts')
+      .leftJoinAndSelect('drafts.user', 'users')
+      .where('drafts.id = :draftID')
+      .setParameters({ draftID: id })
+      .getOne();
+  } catch (e) {
+    throw LogUtils.logErr(`Problem getting draft by id: ${id}`, e);
+  }
 };
 
 /**
@@ -54,14 +54,14 @@ const getDraft = async (id: number): Promise<Draft> => {
 * @return {Draft[]} Drafts belonging to the user specified
 */
 const getDraftsByUser = async (id: number): Promise<Array<?Draft>> => {
-    try {
-        return await db().createQueryBuilder('drafts')
-            .innerJoinAndSelect('drafts.user', 'user', 'user.id = :userID')
-            .setParameters({ userID: id })
-            .getMany();
-    } catch (e) {
-        throw LogUtils.logErr(`Problem getting drafts for user by id: ${id}`, e);
-    }
+  try {
+    return await db().createQueryBuilder('drafts')
+      .innerJoinAndSelect('drafts.user', 'user', 'user.id = :userID')
+      .setParameters({ userID: id })
+      .getMany();
+  } catch (e) {
+    throw LogUtils.logErr(`Problem getting drafts for user by id: ${id}`, e);
+  }
 };
 
 /**
@@ -74,21 +74,21 @@ const getDraftsByUser = async (id: number): Promise<Array<?Draft>> => {
 */
 const updateDraft = async (id: number, text: ?string, options: ?string[]):
   Promise<?Draft> => {
-    try {
-        const draft = await db().createQueryBuilder('drafts')
-            .leftJoinAndSelect('drafts.user', 'user')
-            .where('drafts.id = :draftID')
-            .setParameters({ draftID: id })
-            .getOne();
+  try {
+    const draft = await db().createQueryBuilder('drafts')
+      .leftJoinAndSelect('drafts.user', 'user')
+      .where('drafts.id = :draftID')
+      .setParameters({ draftID: id })
+      .getOne();
 
-        if (options) draft.options = options;
-        if (text !== undefined && text !== null) draft.text = text;
+    if (options) draft.options = options;
+    if (text !== undefined && text !== null) draft.text = text;
 
-        await db().persist(draft);
-        return draft;
-    } catch (e) {
-        throw LogUtils.logErr(`Problem updating draft by id: ${id}`, e);
-    }
+    await db().persist(draft);
+    return draft;
+  } catch (e) {
+    throw LogUtils.logErr(`Problem updating draft by id: ${id}`, e);
+  }
 };
 
 /**
@@ -97,12 +97,12 @@ const updateDraft = async (id: number, text: ?string, options: ?string[]):
 * @param {number} id - ID of draft to delete
 */
 const deleteDraft = async (id: number) => {
-    try {
-        const draft = await db().findOneById(id);
-        await db().remove(draft);
-    } catch (e) {
-        throw LogUtils.logErr(`Problem deleting draft by id: ${id}`, e);
-    }
+  try {
+    const draft = await db().findOneById(id);
+    await db().remove(draft);
+  } catch (e) {
+    throw LogUtils.logErr(`Problem deleting draft by id: ${id}`, e);
+  }
 };
 
 /**
@@ -112,24 +112,24 @@ const deleteDraft = async (id: number) => {
 * @return {?User} owner of draft
 */
 const getOwnerByID = async (id: number): Promise<?User> => {
-    try {
-        const draft = await db().createQueryBuilder('drafts')
-            .leftJoinAndSelect('drafts.user', 'user')
-            .where('drafts.id = :draftID')
-            .setParameters({ draftID: id })
-            .getOne();
+  try {
+    const draft = await db().createQueryBuilder('drafts')
+      .leftJoinAndSelect('drafts.user', 'user')
+      .where('drafts.id = :draftID')
+      .setParameters({ draftID: id })
+      .getOne();
 
-        return draft.user;
-    } catch (e) {
-        throw LogUtils.logErr(`Problem getting owner of draft by id: ${id}`, e);
-    }
+    return draft.user;
+  } catch (e) {
+    throw LogUtils.logErr(`Problem getting owner of draft by id: ${id}`, e);
+  }
 };
 
 export default {
-    createDraft,
-    getDraftsByUser,
-    updateDraft,
-    deleteDraft,
-    getDraft,
-    getOwnerByID,
+  createDraft,
+  getDraftsByUser,
+  updateDraft,
+  deleteDraft,
+  getDraft,
+  getOwnerByID,
 };

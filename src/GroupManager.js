@@ -14,7 +14,7 @@ class GroupManager {
   io: SocketIO.Server;
 
   constructor(server: SocketIO.Server) {
-      this.io = SocketIO(server);
+    this.io = SocketIO(server);
   }
 
   /**
@@ -23,10 +23,10 @@ class GroupManager {
    * @param {Group} group - Group to start
    */
   async startNewGroup(group: Group) {
-      const nsp = this.io.of(`/${group.id}`);
-      this.groupSockets.push(new GroupSocket({
-          group, nsp, onClose: () => { this.endGroup(group, true); },
-      }));
+    const nsp = this.io.of(`/${group.id}`);
+    this.groupSockets.push(new GroupSocket({
+      group, nsp, onClose: () => { this.endGroup(group, true); },
+    }));
   }
 
   /**
@@ -36,28 +36,28 @@ class GroupManager {
    * @param {bool} save - Whether to persist this group
    */
   endGroup(group: Group, save: bool): void {
-      const index = this.groupSockets.findIndex((x) => {
-          const groupUndefined = !x || !x.group;
-          return groupUndefined ? false : x.group.id === group.id;
-      });
+    const index = this.groupSockets.findIndex((x) => {
+      const groupUndefined = !x || !x.group;
+      return groupUndefined ? false : x.group.id === group.id;
+    });
 
-      if (index === -1) return;
+    if (index === -1) return;
 
-      const socket = this.groupSockets[index];
+    const socket = this.groupSockets[index];
 
-      if (socket.closing) return;
-      socket.closing = true;
+    if (socket.closing) return;
+    socket.closing = true;
 
-      if (save) socket.saveGroup();
+    if (save) socket.saveGroup();
 
-      const connectedSockets = Object.keys(socket.nsp.connected);
-      connectedSockets.forEach((id) => {
-          socket.nsp.connected[id].disconnect();
-      });
-      socket.nsp.removeAllListeners();
+    const connectedSockets = Object.keys(socket.nsp.connected);
+    connectedSockets.forEach((id) => {
+      socket.nsp.connected[id].disconnect();
+    });
+    socket.nsp.removeAllListeners();
 
-      this.groupSockets.splice(index, 1);
-      delete this.io.nsps[`/${group.id}`];
+    this.groupSockets.splice(index, 1);
+    delete this.io.nsps[`/${group.id}`];
   }
 
   /**
@@ -68,12 +68,12 @@ class GroupManager {
    * @return {Group[]} List of live groups
    */
   liveGroups(groupCodes: Array<string>): Array<Group> {
-      return this.groupSockets
-          .filter((x) => {
-              const isGroup = x && x.group;
-              return isGroup ? groupCodes.includes(x.group.code) : false;
-          })
-          .map((l : GroupSocket) => l.group);
+    return this.groupSockets
+      .filter((x) => {
+        const isGroup = x && x.group;
+        return isGroup ? groupCodes.includes(x.group.code) : false;
+      })
+      .map((l : GroupSocket) => l.group);
   }
 
   /**
@@ -84,10 +84,10 @@ class GroupManager {
    * @return {socket} Socket of the group
    */
   findSocket(groupCode: ?string, id: ?number): SocketIO.socket {
-      return this.groupSockets.find((x) => {
-          if (x && x.group) return x.group.code === groupCode || x.group.id === id;
-          return false;
-      });
+    return this.groupSockets.find((x) => {
+      if (x && x.group) return x.group.code === groupCode || x.group.id === id;
+      return false;
+    });
   }
 
   /**
@@ -98,8 +98,8 @@ class GroupManager {
    * @return {boolean} Whether the group is live
    */
   isLive(groupCode: ?string, id: ?number): boolean {
-      const socket = this.findSocket(groupCode, id);
-      return socket !== undefined ? socket.isLive : false;
+    const socket = this.findSocket(groupCode, id);
+    return socket !== undefined ? socket.isLive : false;
   }
 }
 

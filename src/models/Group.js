@@ -1,11 +1,11 @@
 // @flow
 import {
-    Column,
-    Entity,
-    JoinTable,
-    ManyToMany,
-    OneToMany,
-    PrimaryGeneratedColumn,
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import Base from './Base';
 import Poll from './Poll';
@@ -36,13 +36,13 @@ class Group extends Base {
   admins: ?User[] = [];
 
   @OneToMany(type => Poll, poll => poll.group, {
-      cascadeRemove: true,
+    cascadeRemove: true,
   })
   /** Polls belonging to the group */
   polls: ?Poll[] = [];
 
   @OneToMany(type => Question, question => question.group, {
-      cascadeRemove: true,
+    cascadeRemove: true,
   })
   /** Questions belonging to the group */
   questions: ?Question[] = [];

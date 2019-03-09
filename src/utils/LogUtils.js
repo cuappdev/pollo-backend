@@ -8,25 +8,25 @@ import util from 'util';
  * @param error
  */
 function log(obj: Object, error: ?boolean = false) {
-    const options = {
-        showHidden: false,
-        depth: Infinity,
-        colors: true,
-        maxArrayLength: 10,
-        breakLength: Infinity,
-        compact: false,
-    };
+  const options = {
+    showHidden: false,
+    depth: Infinity,
+    colors: true,
+    maxArrayLength: 10,
+    breakLength: Infinity,
+    compact: false,
+  };
 
-    if (process.env.NODE_ENV === 'production') {
-        options.compact = true;
-        options.colors = false;
-    }
+  if (process.env.NODE_ENV === 'production') {
+    options.compact = true;
+    options.colors = false;
+  }
 
-    if (error) {
-        console.error(util.inspect(obj, options));
-    } else {
-        console.log(util.inspect(obj, options));
-    }
+  if (error) {
+    console.error(util.inspect(obj, options));
+  } else {
+    console.log(util.inspect(obj, options));
+  }
 }
 
 /**
@@ -39,31 +39,31 @@ function log(obj: Object, error: ?boolean = false) {
  * @returns {*}
  */
 function logErr(
-    message: string,
-    error: ?Object = {},
-    data: ?Object = {},
-    disableConsoleOut: ?boolean = false,
+  message: string,
+  error: ?Object = {},
+  data: ?Object = {},
+  disableConsoleOut: ?boolean = false,
 ) {
-    try { // try block because if the error logging has an error... ?
-        if (!error) {
-            return null;
-        }
-
-        const responseJSON = {
-            data,
-            error,
-            message,
-            time: Date.now(),
-        };
-
-        log(responseJSON, true);
-        return responseJSON;
-    } catch (e) {
-        return error;
+  try { // try block because if the error logging has an error... ?
+    if (!error) {
+      return null;
     }
+
+    const responseJSON = {
+      data,
+      error,
+      message,
+      time: Date.now(),
+    };
+
+    log(responseJSON, true);
+    return responseJSON;
+  } catch (e) {
+    return error;
+  }
 }
 
 export default {
-    log,
-    logErr,
+  log,
+  logErr,
 };
