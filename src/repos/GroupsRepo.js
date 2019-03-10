@@ -324,7 +324,7 @@ const getPolls = async (id: number, sharedOnly: boolean):
       .leftJoinAndSelect('groups.polls', 'polls')
       .where('groups.id = :groupID')
       .setParameters({ groupID: id })
-      .orderBy('polls.createdAt', 'DESC')
+      .orderBy('polls.createdAt', 'ASC')
       .getOne();
     return sharedOnly === true ? group.polls.filter(poll => poll.shared) : group.polls;
   } catch (e) {
