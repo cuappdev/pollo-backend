@@ -311,13 +311,13 @@ const getUsersByGroupID = async (id: number, role: ?string):
 };
 
 /**
- * Gets polls from a group sorted by creation date desc.
+ * Gets polls from a group sorted by creation date in ascending order.
+ * Will hide poll results if poll is not shared.
  * @function
  * @param {number} id - ID of group to fetch polls from
- * @param {boolean} sharedOnly - Specifies if we only want shared polls or all polls
  * @return {Poll[]} List of polls from group
  */
-const getPolls = async (id: number, sharedOnly: boolean):
+const getPolls = async (id: number):
   Promise<Array<?Poll>> => {
   try {
     const group = await db().createQueryBuilder('groups')
@@ -326,9 +326,10 @@ const getPolls = async (id: number, sharedOnly: boolean):
       .setParameters({ groupID: id })
       .orderBy('polls.createdAt', 'ASC')
       .getOne();
-    return sharedOnly === true ? group.polls.filter(poll => poll.shared) : group.polls;
+    // obscure poll results if poll not shared
+    return group.polls.map(poll => (!poll.shared ? { ...poll, results: {} } : poll));
   } catch (e) {
-    throw LogUtils.logErr(`Problem getting polls from group: ${id}`, e, { sharedOnly });
+    throw LogUtils.logErr(`Problem getting polls from group: ${id}`, e);
   }
 };
 
@@ -363,7 +364,7 @@ const latestActivityByGroupID = async (id: number): Promise<?number> => {
     const group = await db().findOneById(id);
     if (!group) throw LogUtils.logErr(`Can't find group by id: ${id}`);
 
-    return await getPolls(id, false).then((p: Array<?Poll>) => {
+    return await getPolls(id).then((p: Array<?Poll>) => {
       const lastPoll = p.slice(-1).pop();
       if (p.length === 0 || !lastPoll) {
         return group.updatedAt;

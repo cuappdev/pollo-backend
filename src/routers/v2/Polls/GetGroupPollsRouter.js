@@ -17,7 +17,7 @@ class GetGroupPollsRouter extends AppDevRouter<Object[]> {
   async content(req: Request) {
     const { id } = req.params;
     const isAdmin = await GroupsRepo.isAdmin(id, req.user);
-    const polls = await GroupsRepo.getPolls(id, !isAdmin);
+    const polls = await GroupsRepo.getPolls(id);
     if (!polls) throw LogUtils.logErr(`Problem getting polls from group id: ${id}`);
 
     // List of all dates

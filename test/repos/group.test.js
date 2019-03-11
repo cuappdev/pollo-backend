@@ -182,15 +182,16 @@ test('Get Polls from Group', async () => {
   let polls = await GroupsRepo.getPolls(id);
   expect(polls.length).toEqual(0);
 
-  const poll = await PollsRepo.createPoll('Poll', group, {}, true, 'MULTIPLE_CHOICE', '');
-  const poll2 = await PollsRepo.createPoll('', group, {}, false, 'FREE_RESPONSE', '', {});
-  polls = await GroupsRepo.getPolls(id, true);
-  expect(polls.length).toEqual(1);
-  expect(polls[0].id).toBe(poll.id);
-  polls = await GroupsRepo.getPolls(id, false);
+  const results = { A: { text: 'blue', count: 1 } };
+  const results2 = { 1: { text: 'blue', count: 0 }, 2: { text: 'red', count: 2 } };
+  const poll = await PollsRepo.createPoll('Poll', group, results, true, 'MULTIPLE_CHOICE', '');
+  const poll2 = await PollsRepo.createPoll('', group, results2, false, 'FREE_RESPONSE', '', {});
+  polls = await GroupsRepo.getPolls(id);
   expect(polls.length).toEqual(2);
   expect(polls[0].id).toBe(poll.id);
   expect(polls[1].id).toBe(poll2.id);
+  expect(polls[0].results).toEqual(poll.results);
+  expect(polls[1].results).toEqual({});
 
   await PollsRepo.deletePollByID(poll.id);
   await PollsRepo.deletePollByID(poll2.id);
