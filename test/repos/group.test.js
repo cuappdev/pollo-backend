@@ -192,6 +192,9 @@ test('Get Polls from Group', async () => {
   expect(polls[1].id).toBe(poll2.id);
   expect(polls[0].results).toEqual(poll.results);
   expect(polls[1].results).toEqual({});
+  polls = await GroupsRepo.getPolls(id, false); // if admin, don't hide results
+  expect(polls[0].results).toEqual(poll.results);
+  expect(polls[1].results).toEqual(poll2.results);
 
   await PollsRepo.deletePollByID(poll.id);
   await PollsRepo.deletePollByID(poll2.id);

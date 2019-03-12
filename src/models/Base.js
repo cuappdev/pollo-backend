@@ -20,7 +20,7 @@ class Base {
   /** Set the timestamps to current time
   * @function
   */
-  setTimestamps() : void {
+  setTimestamps(): void {
     const time = Math.floor(new Date().getTime() / 1000);
     this.createdAt = time;
     this.updatedAt = time;
@@ -30,7 +30,7 @@ class Base {
   /** Set updatedAt timestamp to current time
   * @function
   */
-  updateTimestamps() : void {
+  updateTimestamps(): void {
     this.updatedAt = Math.floor(new Date().getTime() / 1000);
   }
 }
