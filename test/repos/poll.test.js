@@ -76,10 +76,8 @@ test('Get Group from Poll', async () => {
 test('Get Polls from Group', async () => {
   await PollsRepo
     .createPoll('Another poll', group, {}, true, 'FREE_RESPONSE', '');
-  let polls = await GroupsRepo.getPolls(group.id, false);
+  const polls = await GroupsRepo.getPolls(group.id);
   expect(polls.length).toBe(3);
-  polls = await GroupsRepo.getPolls(group.id, true);
-  expect(polls.length).toBe(1);
 });
 
 test('Delete Poll', async () => {
