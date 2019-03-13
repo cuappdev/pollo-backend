@@ -48,8 +48,6 @@ class GroupManager {
     if (socket.closing) return;
     socket.closing = true;
 
-    if (save) socket.saveGroup();
-
     const connectedSockets = Object.keys(socket.nsp.connected);
     connectedSockets.forEach((id) => {
       socket.nsp.connected[id].disconnect();

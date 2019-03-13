@@ -60,6 +60,8 @@ test('get question by id', async () => {
   await request(get(`/questions/${question.id}`, memberToken)).then((getres) => {
     expect(getres.success).toBe(true);
     expect(question.id).toBe(getres.data.id);
+    expect(question.createdAt).toBe(getres.data.createdAt);
+    expect(question.text).toBe(getres.data.text);
   });
 });
 
@@ -67,6 +69,8 @@ test('get questions by group', async () => {
   await request(get(`/sessions/${group.id}/questions`, adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
     expect(question.id).toBe(getres.data[0].id);
+    expect(question.createdAt).toBe(getres.data[0].createdAt);
+    expect(question.text).toBe(getres.data[0].text);
   });
 });
 

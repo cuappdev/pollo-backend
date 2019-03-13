@@ -22,9 +22,9 @@ class GetDraftsRouter extends AppDevRouter<APIDraft[]> {
       .filter(Boolean)
       .map(draft => ({
         id: draft.id,
+        createdAt: draft.createdAt,
         text: draft.text,
         options: draft.options,
-        createdAt: draft.createdAt.valueOf(),
       }));
   }
 }

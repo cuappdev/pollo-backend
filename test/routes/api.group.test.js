@@ -55,6 +55,7 @@ test('get groups for admin', async () => {
     expect(group.id).toBe(groupRes.id);
     expect(group.name).toBe(groupRes.name);
     expect(group.code).toBe(groupRes.code);
+    expect(group.updatedAt).toBe(groupRes.updatedAt);
   });
 });
 
@@ -111,6 +112,7 @@ test('get groups as member', async () => {
     expect(group.id).toBe(groupRes.id);
     expect(group.name).toBe(groupRes.name);
     expect(group.code).toBe(groupRes.code);
+    expect(group.updatedAt).toBe(groupRes.updatedAt);
   });
 });
 
@@ -162,6 +164,7 @@ test('get groups for admin', async () => {
     expect(group.id).toBe(groupRes.id);
     expect(group.name).toBe(groupRes.name);
     expect(group.code).toBe(groupRes.code);
+    expect(group.updatedAt).toBe(groupRes.updatedAt);
   });
 });
 

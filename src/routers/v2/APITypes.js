@@ -16,7 +16,7 @@ export type APIGroup = {|
   code: string,
   isLive: boolean,
   name: string,
-  updatedAt: number,
+  updatedAt: string,
 |}
 
 export type APIPoll = {|
@@ -31,14 +31,14 @@ export type APIPoll = {|
 
 export type APIDraft = {|
   id: id,
-  createdAt?: number,
+  createdAt: string,
   options: string[],
   text: string,
 |}
 
 export type APIQuestion = {|
   id: id,
-  createdAt?: number,
+  createdAt: string,
   text: string,
 |}
 
@@ -52,5 +52,5 @@ export type APIUserSession = {|
   accessToken: string,
   isActive: boolean,
   refreshToken: string,
-  sessionExpiration: number,
+  sessionExpiration: string,
 |}

@@ -23,8 +23,8 @@ class GetQuestionsRouter extends AppDevRouter<APIQuestion[]> {
       .filter(Boolean)
       .map(question => ({
         id: question.id,
+        createdAt: question.createdAt,
         text: question.text,
-        createdAt: question.createdAt.valueOf(),
       }));
   }
 }

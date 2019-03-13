@@ -62,6 +62,7 @@ test('Update a draft', async () => {
     expect(draft.text).toBe(body.text);
     expect(draft.options).toMatchObject(draft1.options);
     expect(draft.id).toBe(draft1.id);
+    expect(draft.createdAt).toBe(draft1.createdAt);
     draft1 = draft;
   });
 });

@@ -23,6 +23,7 @@ class GetQuestionRouter extends AppDevRouter<APIQuestion> {
 
     return question && {
       id: question.id,
+      createdAt: question.createdAt,
       text: question.text,
     };
   }

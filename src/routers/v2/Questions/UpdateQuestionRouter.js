@@ -36,6 +36,7 @@ class UpdateQuestionRouter extends AppDevRouter<APIQuestion> {
 
     return {
       id: question.id,
+      createdAt: question.createdAt,
       text: question.text,
     };
   }

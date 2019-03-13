@@ -38,6 +38,7 @@ class UpdateDraftRouter extends AppDevRouter<APIDraft> {
 
     return {
       id: draft.id,
+      createdAt: draft.createdAt,
       text: draft.text,
       options: draft.options,
     };
