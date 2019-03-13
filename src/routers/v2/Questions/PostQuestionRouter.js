@@ -31,11 +31,12 @@ class PostQuestionRouter extends AppDevRouter<APIQuestion> {
       throw LogUtils.logErr('You are not authorized to post a poll', {}, { groupID, user });
     }
 
-    const poll = await QuestionsRepo.createQuestion(text, group, user);
+    const question = await QuestionsRepo.createQuestion(text, group, user);
 
     return {
-      id: poll.id,
-      text: poll.text,
+      id: question.id,
+      createdAt: question.createdAt,
+      text: question.text,
     };
   }
 }

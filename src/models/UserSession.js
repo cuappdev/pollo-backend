@@ -26,7 +26,7 @@ class UserSession extends Base {
 
   @Column('bigint')
   /** Timestamp of when the session expires (Unix time) */
-  expiresAt: number = -1;
+  expiresAt: string = '-1';
 
   @Column('string')
   /** Refresh token associated with session */
@@ -69,7 +69,7 @@ class UserSession extends Base {
     this.updateToken = updateToken || crypto.randomBytes(64).toString('hex');
 
     // Session length is 1 day
-    this.expiresAt = Math.floor(new Date().getTime() / 1000) + 60 * 60 * 24;
+    this.expiresAt = String(Math.floor(new Date().getTime() / 1000) + 60 * 60 * 24);
     this.activate();
     return this;
   }

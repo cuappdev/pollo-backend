@@ -358,9 +358,9 @@ const getQuestions = async (id: number): Promise<Array<?Question>> => {
  * Get time of latest activity of a group
  * @function
  * @param {number} id - ID of group to get latest activity
- * @return {number} Time stamp of when the group was last updated
+ * @return {string} Time stamp of when the group was last updated
  */
-const latestActivityByGroupID = async (id: number): Promise<number> => {
+const latestActivityByGroupID = async (id: number): Promise<string> => {
   try {
     const group = await db().findOneById(id);
     if (!group) throw LogUtils.logErr(`Can't find group by id: ${id}`);
@@ -368,11 +368,11 @@ const latestActivityByGroupID = async (id: number): Promise<number> => {
     return await getPolls(id).then((polls: Array<?Poll>) => {
       const latestPoll = polls.slice(-1).pop();
       if (polls.length === 0 || !latestPoll) {
-        return Number(group.updatedAt);
+        return group.updatedAt;
       }
-      return group.updatedAt > latestPoll.updatedAt
-        ? Number(group.updatedAt)
-        : Number(latestPoll.updatedAt);
+      return parseInt(group.updatedAt) > parseInt(latestPoll.updatedAt)
+        ? group.updatedAt
+        : latestPoll.updatedAt;
     });
   } catch (e) {
     throw LogUtils.logErr(`Problem getting latest activity from group by id: ${id}`, e);
