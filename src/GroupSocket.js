@@ -125,12 +125,6 @@ export default class GroupSocket {
     this.usersConnected = 0;
   }
 
-  // v1 message
-  saveGroup() {
-    // console.log('save this grouping group on user side');
-    this.nsp.to('users').emit('user/poll/save', this.group);
-  }
-
   _clientError(client: IOSocket, msg: string): void {
     // console.log(msg);
   }
@@ -170,7 +164,6 @@ export default class GroupSocket {
         const currentPoll = this._currentPoll();
         if (currentPoll) {
           client.emit('user/poll/start', { poll: currentPoll });
-          client.emit('user/question/start', { question: currentPoll }); //     v1
           client.emit('user/poll/results/live', this.current);
         }
         break;
@@ -232,16 +225,16 @@ export default class GroupSocket {
           break;
         case constants.QUESTION_TYPES.FREE_RESPONSE: { // Free Response
           const badWords = lib.filterProfanity(answer.text);
-          if (badWords.length === 0) { // clean text
-            if (prev) { // User submitted another FR answer
-              nextState.answers[answer.googleID].push(answer.id);
-            } else { // User submitted first FR answer
-              nextState.answers[answer.googleID] = [answer.id];
-            }
-            client.emit('user/answer/success');
-          } else { // not clean text
+          if (badWords.length > 0) { // not clean text
             client.emit('user/answer/filter', { text: answer.text, filter: badWords });
+            return;
           }
+          if (prev) { // User submitted another FR answer
+            nextState.answers[answer.googleID].push(answer.id);
+          } else { // User submitted first FR answer
+            nextState.answers[answer.googleID] = [answer.id];
+          }
+          client.emit('user/answer/success');
           break;
         }
         default:
@@ -292,56 +285,6 @@ export default class GroupSocket {
       if (poll.shared || poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
         this.nsp.to('users').emit('user/poll/results', this.current);
       }
-    });
-
-    // v1
-    client.on('server/question/tally', (answerObject: Object) => {
-      const answer: Answer = {
-        id: this.answerID,
-        googleID: answerObject.deviceID,
-        poll: answerObject.question,
-        choice: answerObject.choice,
-        text: answerObject.text,
-      };
-      this.answerID += 1;
-      const question = this._currentPoll();
-      if (question === null || question === undefined) {
-        // console.log(`Client ${client.id} answered on no question`);
-        return;
-      }
-      if (question.id !== answer.poll) {
-        // console.log(`Poll ${answer.poll} is not the current poll`);
-        return;
-      }
-
-      const nextState = { ...this.current };
-      const prev = nextState.answers[answer.googleID];
-      // update/input user's response
-      nextState.answers[answer.googleID] = answer.choice;
-      if (prev) { // if truthy
-        // has selected something before
-        nextState.results[prev].count -= 1;
-        const poll = this._currentPoll();
-        if (poll && poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
-          if (nextState.results[prev].count <= 0) {
-            delete nextState.results[prev];
-          }
-        }
-      }
-
-      const curTally = nextState.results[answer.choice];
-      if (curTally) { // if truthy
-        nextState.results[answer.choice].count += 1;
-      } else {
-        nextState.results[answer.choice] = { text: answer.text, count: 1 };
-      }
-
-      this.current = nextState;
-      this.nsp.to('admins').emit('admin/question/updateTally', {
-        answers: nextState.answers,
-        results: nextState.results,
-        question: nextState.poll,
-      });
     });
 
     client.on('disconnect', async () => {
@@ -399,7 +342,6 @@ export default class GroupSocket {
     this.isLive = true;
 
     this.nsp.to('users').emit('user/poll/start', { poll });
-    this.nsp.to('users').emit('user/question/start', { question: poll }); // v1
   }
 
   /**
@@ -425,7 +367,6 @@ export default class GroupSocket {
     };
     this.nsp.to('admins').emit('admin/poll/ended', { poll: pollNode });
     this.nsp.to('users').emit('user/poll/end', { poll: pollNode });
-    this.nsp.to('users').emit('user/question/end', { question: poll }); // v1
     this.current.poll = -1;
   }
 
@@ -490,25 +431,6 @@ export default class GroupSocket {
       this._startPoll(poll);
     });
 
-    // v1
-    client.on('server/question/start', async (questionObject: Object) => {
-      const question: Poll = {
-        id: this.pollID,
-        text: questionObject.text,
-        type: questionObject.type,
-        options: questionObject.options,
-        optionsWithChoices: [],
-        shared: false,
-        correctAnswer: questionObject.correctAnswer,
-      };
-      this.pollID += 1;
-      // console.log('starting', question);
-      if (this.current.poll !== -1) {
-        await this._endPoll();
-      }
-      this._startPoll(question);
-    });
-
     // share results
     client.on('server/poll/results', async () => {
       // console.log('sharing results');
@@ -521,30 +443,9 @@ export default class GroupSocket {
       this.nsp.to('users').emit('user/poll/results', current);
     });
 
-    // v1
-    client.on('server/question/results', async () => {
-      // console.log('sharing results');
-      if (this.lastPoll) {
-        await PollsRepo.updatePollByID(this.lastPoll.id, null,
-          null, true);
-      }
-      const current = this.lastState;
-      this.nsp.to('users').emit('user/question/results', {
-        answers: current.answers,
-        results: current.results,
-        question: current.poll,
-      });
-    });
-
     // End poll
     client.on('server/poll/end', async () => {
       // console.log('ending poll');
-      await this._endPoll();
-    });
-
-    // v1
-    client.on('server/question/end', async () => {
-      // console.log('ending question');
       await this._endPoll();
     });
 
