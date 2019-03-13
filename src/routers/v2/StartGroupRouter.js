@@ -31,8 +31,10 @@ class StartGroupRouter extends AppDevRouter<APIGroup> {
 
     return {
       id: group.id,
-      name: group.name,
       code: group.code,
+      isLive: true,
+      name: group.name,
+      updatedAt: await GroupsRepo.latestActivityByGroupID(group.id),
     };
   }
 }

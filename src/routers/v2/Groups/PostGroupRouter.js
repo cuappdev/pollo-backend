@@ -29,8 +29,10 @@ class PostGroupRouter extends AppDevRouter<APIGroup> {
 
     return {
       id: group.id,
-      name: group.name,
       code: group.code,
+      isLive: false,
+      name: group.name,
+      updatedAt: group.updatedAt,
     };
   }
 }

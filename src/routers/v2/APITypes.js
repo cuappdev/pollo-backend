@@ -16,7 +16,7 @@ export type APIGroup = {|
   code: string,
   isLive: boolean,
   name: string,
-  updatedAt: string,
+  updatedAt: number,
 |}
 
 export type APIPoll = {|

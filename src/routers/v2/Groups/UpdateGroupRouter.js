@@ -40,8 +40,10 @@ class UpdateGroupRouter extends AppDevRouter<APIGroup> {
     }
     return {
       id: group.id,
-      name: group.name,
       code: group.code,
+      isLive: await req.app.groupManager.isLive(group.code),
+      name: group.name,
+      updatedAt: group.updatedAt,
     };
   }
 }
