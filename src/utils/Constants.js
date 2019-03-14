@@ -15,17 +15,14 @@ const REQUEST_TYPES = {
   PUT: 'PUT',
 };
 
-/** Custom type for question types */
-export type QuestionType = 'MULTIPLE_CHOICE' | 'FREE_RESPONSE'
-
 /**
 * constants for question types
 * @constant
 * @enum {string}
 */
 const QUESTION_TYPES = {
-  MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',
-  FREE_RESPONSE: 'FREE_RESPONSE',
+  MULTIPLE_CHOICE: 'multipleChoice',
+  FREE_RESPONSE: 'freeResponse',
 };
 
 /**
@@ -37,6 +34,10 @@ const USER_TYPES = {
   ADMIN: 'admin',
   MEMBER: 'member',
 };
+
+/** Custom types for Poll type */
+export type PollState = "live" | "ended" | "shared"
+export type PollType = "multipleChoice" | "freeResponse"
 
 export default {
   REQUEST_TYPES,

@@ -2,12 +2,32 @@
 import {
   Column,
   Entity,
-  json,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import Base from './Base';
 import Group from './Group';
+
+import type {
+  PollType, PollState,
+} from '../utils/Constants';
+
+export type PollUserAnswer = {|
+  googleID: string,
+  letter?: string,
+  text: string
+|}
+
+export type PollResult = {|
+  letter?: string,
+  text: string,
+  count?: number
+|}
+
+export type PollChoice = {|
+  letter?: string,
+  text: string
+|}
 
 @Entity('polls')
 /**
@@ -24,8 +44,8 @@ class Poll extends Base {
   text: string = '';
 
   @Column('string')
-  /** Type of question either MULTIPLE_CHOICE or FREE_RESPONSE */
-  type: string = '';
+  /** Type of question either multipleChoice or freeResponse */
+  type: PollType = 'multipleChoice';
 
   @ManyToOne(type => Group, group => group.polls, {
     onDelete: 'CASCADE',
@@ -35,20 +55,21 @@ class Poll extends Base {
 
   @Column('json')
   /**
-   * Result of the poll
+   * Choices for the poll
+   * count only exists when mc poll is shared
    * @example
-   * let results_mc = {'A': {'text': 'blue', 'count': 0}}
-   * let results_fr = {'blue': {'text': 'blue', 'count': 0}}
+   * let results_mc = {letter: "A", text: "Saturn", count: 5}
+   * let results_fr = {text: "Saturn", count: 10}
    */
-  results: json = {};
+  answerChoices: PollResult[] = [];
 
   @Column('json')
-  /** Google id of users mapped to their answer (key in results) */
-  userAnswers: json = {};
-
-  @Column('boolean')
-  /** If the results of the poll is shared to all users */
-  shared: boolean = true;
+  /** All the answers by students for the poll.
+   * the letter field is optional and only is returned on mc questions
+   * @example
+   * let userAnswer = {googldID: "abc123", letter: "A", text: "Saturn"}
+   */
+  userAnswers: PollUserAnswer[] = [];
 
   @Column('string')
   /**
@@ -58,6 +79,13 @@ class Poll extends Base {
    * let correctAnswer = 'A'
   */
   correctAnswer: string = '';
+
+  @Column('string')
+  /**
+   * The current state of the poll
+   */
+
+  state: PollState = 'live';
 }
 
 export default Poll;

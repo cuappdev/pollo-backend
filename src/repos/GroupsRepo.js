@@ -327,8 +327,17 @@ const getPolls = async (id: number, hideUnsharedResults: ?boolean = true):
       .setParameters({ groupID: id })
       .orderBy('polls.createdAt', 'ASC')
       .getOne();
+
     // obscure poll results if poll not shared
-    return group.polls.map(poll => (hideUnsharedResults && !poll.shared ? { ...poll, results: {} } : poll));
+    return group.polls.map((poll) => {
+      if (hideUnsharedResults && poll.state !== 'shared' && poll.type === 'multipleChoice') {
+        poll.answerChoices = poll.answerChoices.map((choice) => {
+          delete choice.count;
+          return choice;
+        });
+      }
+      return poll;
+    });
   } catch (e) {
     throw LogUtils.logErr(`Problem getting polls from group: ${id}`, e);
   }

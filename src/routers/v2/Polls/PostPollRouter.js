@@ -19,14 +19,13 @@ class PostPollRouter extends AppDevRouter<APIPoll> {
 
   async content(req: Request) {
     const groupID = req.params.id;
-    let { text, results, shared } = req.body;
+    let { text, answerChoices } = req.body;
     const { type, correctAnswer } = req.body;
     const { user } = req;
 
     if (!text) text = '';
-    if (!results) results = {};
-    if (shared === null) shared = false;
-    if (type !== 'FREE_RESPONSE' && type !== 'MULTIPLE_CHOICE') {
+    if (!answerChoices) answerChoices = [];
+    if (type !== 'freeResponse' && type !== 'multipleChoice') {
       throw LogUtils.logErr('Valid poll type not found', {}, { type });
     }
 
@@ -37,17 +36,21 @@ class PostPollRouter extends AppDevRouter<APIPoll> {
       throw LogUtils.logErr('You are not authorized to post a poll', {}, { groupID, user });
     }
 
+    // const poll = await PollsRepo
+    // .createPoll(text, group, results, shared, type, correctAnswer);
     const poll = await PollsRepo
-      .createPoll(text, group, results, shared, type, correctAnswer);
+      .createPoll(text, group, answerChoices, type, correctAnswer, [], 'live');
 
     return {
       id: poll.id,
-      text: poll.text,
-      results: poll.results,
-      shared: poll.shared,
-      type: poll.type,
-      answer: null,
+      answerChoices: poll.answerChoices,
       correctAnswer: poll.correctAnswer,
+      createdAt: poll.createdAt,
+      state: poll.state,
+      submittedAnswers: [],
+      text: poll.text,
+      type: poll.type,
+      updatedAt: poll.updatedAt,
     };
   }
 }
