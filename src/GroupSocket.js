@@ -6,6 +6,7 @@ import constants from './utils/Constants';
 import Group from './models/Group';
 import lib from './utils/Lib.js';
 import PollsRepo from './repos/PollsRepo';
+import UserSessionsRepo from './repos/UserSessionsRepo'
 
 /** Configuration for each GroupSocket */
 export type GroupSocketConfig = {
@@ -20,38 +21,31 @@ type IOSocket = Object;
 /** Poll object used in GroupSockets
  * @name SocketPoll
  */
-type Poll = {
-  id: number,
+type SocketPoll = {
   text: string,
-  type: string,
-  options: ?string[],
-  optionsWithChoices: Object[],
-  shared: boolean,
-  correctAnswer: string,
+  answerChoices: [PollResult], //CHANGE
+  type: enum, //CHANGE
+  correctAnswer: string?,
+  answers: {}, // id = google id to PollChoice for MC and array of PollChoice for FR
+  upvotes: {} // id = google id to array of PollChoice
 }
 
-/** Answer object used in GroupSockets */
-type Answer = {
-  id: id,
-  googleID: string,
-  poll: id,
-  choice: string,
-  text: string
+type ClientPoll = {
+  createdAt: ?string,
+  updatedAt: ?string,
+  id: ?id,
+  text: string,
+  answerChoices: [PollResult], //CHANGE
+  type: enum, //CHANGE
+  correctAnswer: string?,
+  submittedAnswers: [PollChoice], //CHANGE
+  state: enum //CHANGE
 }
 
-/** Keeps track of current state of a Group Socket
- * @example
- * let currentState = {
- *   poll: 1,
- *   results: {'A': {'text': 'blue', 'count': 2}},
- *   answers: {'1': 'A', '2': 'A'}
- * }
- */
-type CurrentState = {
-  poll: number,
-  results: {}, // MC: {'A': {'text': 'blue', 'count': 1}}, FR: {1: {'text': 'blue', 'count': 1}}
-  answers: {}, // id = google id to answer choice for MC and array of answer ids for FR
-  upvotes: {} // id = google id to array of answer ids
+type PollFilter = {
+  success: boolean,
+  text: ?string,
+  filter: ?[string]
 }
 
 /**
@@ -70,41 +64,8 @@ export default class GroupSocket {
 
   onClose: void => void;
 
-  closing: boolean = false;
-
-  /**
-   * Stores all polls/answers for the group.
-   */
-  polls: {
-    [string]: {
-      poll: Poll,
-      answers: {
-        [string]: Answer
-      }
-    }
-  }
-
-  // Counter for generating poll/answer ids
-  pollID: number;
-
-  answerID: number;
-
-  // Number of users connected
-  usersConnected: number;
-
-  // Previous poll
-  lastPoll = null;
-
-  // Previous state
-  lastState = {};
-
-  /** Current state of the socket */
-  current: CurrentState = {
-    poll: -1, // id of current poll object
-    results: {},
-    answers: {},
-    upvotes: {},
-  }
+  /** Current poll*/
+  current: SocketPoll = null;
 
   /**
    * Indicate whether group is live or not
@@ -122,7 +83,6 @@ export default class GroupSocket {
     this.polls = {};
     this.pollID = 0;
     this.answerID = 0;
-    this.usersConnected = 0;
   }
 
   _clientError(client: IOSocket, msg: string): void {
@@ -134,37 +94,27 @@ export default class GroupSocket {
    * @function
    * @param {IOSocket} client - The client object upon connection
    */
-  _onConnect = async (client: IOSocket) => {
+  _onConnect = async (client: IOSocket, accessToken: string) => {
     const userType: ?string = client.handshake.query.userType || null;
+    const googleID = UserSessionsRepo.getUserFromToken(accessToken)
+                                     .then(user => user.googleID)
 
     switch (userType) {
       case 'admin': {
         // console.log(`Admin with id ${client.id} connected to socket`);
-        this._setupAdminEvents(client);
+        this._setupAdminEvents(client, accessToken);
         client.join('admins');
-        this.nsp.to('admins').emit('user/count', { count: this.usersConnected });
-
-        const currentPoll = this._currentPoll();
         if (currentPoll) {
-          client.emit('admin/poll/start', { poll: currentPoll });
-          client.emit('admin/poll/updateTally/live', this.current);
+          client.emit('admin/poll/start', this._currentPoll(googleID));
         }
         break;
       }
-      case 'member':
       case 'user': {
         // console.log(`User with id ${client.id} connected to socket`);
-        this._setupUserEvents(client);
+        this._setupUserEvents(client, accessToken);
         client.join('users');
-
-        this.usersConnected += 1;
-        this.nsp.to('users').emit('user/count', { count: this.usersConnected });
-        this.nsp.to('admins').emit('user/count', { count: this.usersConnected });
-
-        const currentPoll = this._currentPoll();
         if (currentPoll) {
-          client.emit('user/poll/start', { poll: currentPoll });
-          client.emit('user/poll/results/live', this.current);
+          client.emit('user/poll/start', this._currentPoll(googleID));
         }
         break;
       }
@@ -193,67 +143,53 @@ export default class GroupSocket {
    * @function
    * @param {IOSocket} client - Client's socket object
    */
-  _setupUserEvents(client: IOSocket): void {
-    client.on('server/poll/tally', (answerObject: Object) => {
-      const answer: Answer = {
-        id: this.answerID,
-        googleID: answerObject.googleID,
-        poll: answerObject.poll,
-        choice: answerObject.choice,
-        text: answerObject.text,
-      };
-      this.answerID += 1;
-      const poll = this._currentPoll();
-      if (poll === null || poll === undefined) {
+  _setupUserEvents(client: IOSocket, googleID: string): void {
+    client.on('server/poll/answer', (userAnswer: PollChoice) => {
+      const poll = this._currentPoll(accessToken);
+      if (!poll) {
         // console.log(`Client ${client.id} tried to answer with no active poll`);
         return;
       }
-      if (poll.id !== answer.poll) {
-        // console.log(`Poll ${answer.poll} is not the current poll`);
-        return;
-      }
-
-      const nextState = { ...this.current };
-      const prev = nextState.answers[answer.googleID];
 
       switch (poll.type) {
         case constants.QUESTION_TYPES.MULTIPLE_CHOICE: // Multiple Choice
-          nextState.answers[answer.googleID] = answer.choice; // update/add response
-          if (prev) { // User selected something before
-            nextState.results[prev].count -= 1;
+          if (answers.googleID) { // User selected something before
+            poll.answerChoices = poll.answerChoices.map(p => {
+                if (p.letter === answers.googleID[0].letter) {p.count -= 1}
+              })
           }
+          // update/add response
+          answers.googleID = [userAnswer]
+          poll.answerChoices = poll.answerChoices.map(p => {
+              if (p.letter === userAnswer.letter) {p.count += 1}
+            })
           break;
         case constants.QUESTION_TYPES.FREE_RESPONSE: { // Free Response
-          const badWords = lib.filterProfanity(answer.text);
+          const badWords = lib.filterProfanity(userAnswer.option);
           if (badWords.length > 0) { // not clean text
-            client.emit('user/answer/filter', { text: answer.text, filter: badWords });
+            client.emit('user/poll/fr/filter',
+              { success: false, text: answer.text, filter: badWords });
             return;
           }
-          if (prev) { // User submitted another FR answer
-            nextState.answers[answer.googleID].push(answer.id);
+          if (answers.googleID) { // User submitted another FR answer
+            poll.answers.googleID.push(userAnswer);
+            poll.upvotes.googleID.push(userAnswer);
           } else { // User submitted first FR answer
-            nextState.answers[answer.googleID] = [answer.id];
+            poll.answers.googleID = userAnswer;
+            poll.upvotes.googleID = userAnswer;
           }
-          client.emit('user/answer/success');
+          poll.answerChoices.push({ ...userAnswer, count: 1 })
+          client.emit('user/poll/fr/filter', { success: true });
           break;
         }
         default:
           throw new Error('Unimplemented question type');
       }
 
-      const key = poll.type === constants.QUESTION_TYPES.MULTIPLE_CHOICE
-        ? answer.choice : answer.id;
-
-      if (nextState.results[key]) { // if answer already in results
-        nextState.results[key].count += 1;
-      } else {
-        nextState.results[key] = { text: answer.text, count: 1 };
-      }
-
-      this.current = nextState;
-      this.nsp.to('admins').emit('admin/poll/updateTally', this.current);
-      if (poll.shared || poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
-        this.nsp.to('users').emit('user/poll/results', this.current);
+      this.current = poll;
+      this.nsp.to('admins').emit('admin/poll/updates', this._currentPoll(googleID));
+      if (poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
+        this.nsp.to('users').emit('user/poll/results', this._currentPoll(googleID));
       }
     });
 
@@ -293,9 +229,6 @@ export default class GroupSocket {
         await this._endPoll();
         this.onClose();
       }
-      this.usersConnected -= 1;
-      this.nsp.to('users').emit('user/count', { count: this.usersConnected });
-      this.nsp.to('admins').emit('user/count', { count: this.usersConnected });
     });
   }
 
@@ -303,15 +236,21 @@ export default class GroupSocket {
 
   /**
    * Gives current poll
-   * @function
-   * @return {?SocketPoll} Socket poll object
+   * @param {String} accessToken
+   * @return {?ClientPoll} Socket poll object
    */
-  _currentPoll(): Poll | null {
-    if (this.current.poll === -1) {
-      return null;
+  _currentPoll(googleID: string): ClientPoll | null {
+    if (!this.current) return null // no live poll
+    const { text, answerChoices, type, correctAnswer, answers, upvotes } = this.current
+    const state = constants.LIVE //change
+    let submittedAnswers;
+    if (type = constants.multipleChoice) { //change
+      submittedAnswers = answers[googleID]
+    } else {
+      submittedAnswers = upvotes[googleID]
     }
-    return this.polls[`${this.current.poll}`].poll;
-  }
+    if (!submittedAnswers) submittedAnswers = []
+    return { text, answerChoices, type, correctAnswer, submittedAnswers, state}
 
   /**
    * Starts poll on the socket
