@@ -79,10 +79,6 @@ export default class GroupSocket {
     this.nsp = nsp;
     this.nsp.on('connect', this._onConnect.bind(this));
     this.onClose = onClose;
-
-    this.polls = {};
-    this.pollID = 0;
-    this.answerID = 0;
   }
 
   _clientError(client: IOSocket, msg: string): void {
