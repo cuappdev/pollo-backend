@@ -2,12 +2,27 @@
 import {
   Column,
   Entity,
-  json,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import Base from './Base';
+import constants from '../utils/Constants';
 import Group from './Group';
+
+import type {
+  PollType, PollState,
+} from '../utils/Constants';
+
+export type PollResult = {|
+  letter: ?string,
+  text: string,
+  count: ?number
+|}
+
+export type PollChoice = {|
+  letter: ?string,
+  text: string
+|}
 
 @Entity('polls')
 /**
@@ -24,8 +39,8 @@ class Poll extends Base {
   text: string = '';
 
   @Column('string')
-  /** Type of question either MULTIPLE_CHOICE or FREE_RESPONSE */
-  type: string = '';
+  /** Type of question either multipleChoice or freeResponse */
+  type: PollType = constants.POLL_TYPES.MULTIPLE_CHOICE;
 
   @ManyToOne(type => Group, group => group.polls, {
     onDelete: 'CASCADE',
@@ -35,20 +50,29 @@ class Poll extends Base {
 
   @Column('json')
   /**
-   * Result of the poll
+   * Choices for the poll
    * @example
-   * let results_mc = {'A': {'text': 'blue', 'count': 0}}
-   * let results_fr = {'blue': {'text': 'blue', 'count': 0}}
+   * let answerChoices_mc = [{letter: "A", text: "Saturn", count: 5}]
+   * let answerChoices_fr = [{text: "Saturn", count: 10}]
    */
-  results: json = {};
+  answerChoices: PollResult[] = [];
 
   @Column('json')
-  /** Google id of users mapped to their answer (key in results) */
-  userAnswers: json = {};
+  /** All the answers by students for the poll.
+   * Letter field is optional and only is returned on mc questions
+   * @example
+   * let answers_MC = {googleID: [{letter: "A", text: "Saturn"}]}
+   * let answers_FR = {googleID: [{text: "Saturn"}, {text: "Mars"}]}
+   */
+  answers: { string: PollChoice[] } = {};
 
-  @Column('boolean')
-  /** If the results of the poll is shared to all users */
-  shared: boolean = true;
+  @Column('json')
+  /** All the upvotes by students for the FR poll. Empty if MC.
+   * @example
+   * let upvotes_MC = {}
+   * let upvotes_FR = {googleID: [{text: "Saturn"}, {text: "Mars"}]}
+   */
+  upvotes: { string: PollChoice[] } = {};
 
   @Column('string')
   /**
@@ -58,6 +82,13 @@ class Poll extends Base {
    * let correctAnswer = 'A'
   */
   correctAnswer: string = '';
+
+  @Column('string')
+  /**
+   * The current state of the poll
+   */
+
+  state: PollState = constants.POLL_STATES.ENDED;
 }
 
 export default Poll;

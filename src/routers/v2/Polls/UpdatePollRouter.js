@@ -19,10 +19,12 @@ class UpdatePollRouter extends AppDevRouter<APIPoll> {
 
   async content(req: Request) {
     const pollID = req.params.id;
-    const { text, results, shared } = req.body;
+    const {
+      text, answerChoices, state, answers, upvotes,
+    } = req.body;
     const { user } = req;
 
-    if (!results && !text && shared === null) {
+    if (!answerChoices && !text && !state && !answers && !upvotes) {
       throw LogUtils.logErr('No fields specified to update');
     }
 
@@ -34,20 +36,24 @@ class UpdatePollRouter extends AppDevRouter<APIPoll> {
         'You are not authorized to update this poll', {}, { pollID, user },
       );
     }
+
     const poll = await PollsRepo.updatePollByID(pollID, text,
-      results, shared);
+      answerChoices, answers, upvotes, state);
     if (!poll) {
       throw LogUtils.logErr(`Poll with id ${pollID} was not found`);
     }
 
     return {
       id: poll.id,
-      text: poll.text,
-      results: poll.results,
-      shared: poll.shared,
-      type: poll.type,
-      answer: null,
+      answerChoices: poll.answerChoices,
       correctAnswer: poll.correctAnswer,
+      createdAt: poll.createdAt,
+      state: poll.state,
+      text: poll.text,
+      type: poll.type,
+      updatedAt: poll.updatedAt,
+      userAnswers: poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
+        ? poll.answers[req.user.googleID] : poll.upvotes[req.user.googleID],
     };
   }
 }

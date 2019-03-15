@@ -4,15 +4,20 @@
 import SocketIO from 'socket.io';
 import constants from './utils/Constants';
 import Group from './models/Group';
+import GroupsRepo from './repos/GroupsRepo';
 import lib from './utils/Lib.js';
 import PollsRepo from './repos/PollsRepo';
+import UserSessionsRepo from './repos/UserSessionsRepo';
+
+import type { PollChoice, PollResult } from './models/Poll';
+import type { PollState, PollType } from './utils/Constants';
 
 /** Configuration for each GroupSocket */
 export type GroupSocketConfig = {
   group: Group,
   nsp: SocketIO.Namespace,
   onClose: void => void
-}
+};
 
 type id = number;
 type IOSocket = Object;
@@ -20,39 +25,36 @@ type IOSocket = Object;
 /** Poll object used in GroupSockets
  * @name SocketPoll
  */
-type Poll = {
-  id: number,
+type SocketPoll = {
+  id?: id,
+  createdAt?: string,
+  updatedAt?: string,
+  answers: { string: PollChoice[] }, // {googleID: [PollChoice]} for MC and {googleID: PollChoice[]} for FR
+  answerChoices: PollResult[],
+  correctAnswer: ?string, // letter of MC PollChoice
+  state: PollState,
   text: string,
-  type: string,
-  options: ?string[],
-  optionsWithChoices: Object[],
-  shared: boolean,
-  correctAnswer: string,
-}
+  type: PollType,
+  upvotes: { string: PollChoice[] } // {} for MC and {googleID: PollChoice[]} for FR
+};
 
-/** Answer object used in GroupSockets */
-type Answer = {
-  id: id,
-  googleID: string,
-  poll: id,
-  choice: string,
-  text: string
-}
+type ClientPoll = {
+  id?: id,
+  answerChoices: PollResult[], // count is null if user is 'member' and MC question is live or ended
+  correctAnswer?: string,
+  createdAt?: string,
+  state: PollState,
+  text: string,
+  type: PollType,
+  updatedAt?: string,
+  userAnswers: { string: PollChoice[] } // {googleID: PollChoice[]} of answers for MC and upvotes for FR}
+};
 
-/** Keeps track of current state of a Group Socket
- * @example
- * let currentState = {
- *   poll: 1,
- *   results: {'A': {'text': 'blue', 'count': 2}},
- *   answers: {'1': 'A', '2': 'A'}
- * }
- */
-type CurrentState = {
-  poll: number,
-  results: {}, // MC: {'A': {'text': 'blue', 'count': 1}}, FR: {1: {'text': 'blue', 'count': 1}}
-  answers: {}, // id = google id to answer choice for MC and array of answer ids for FR
-  upvotes: {} // id = google id to array of answer ids
-}
+type PollFilter = {
+  success: boolean,
+  text?: string,
+  filter?: String[]
+};
 
 /**
  * Represents a single running group
@@ -70,59 +72,23 @@ export default class GroupSocket {
 
   onClose: void => void;
 
+  /** Current poll */
+  current: ?SocketPoll;
+
   closing: boolean = false;
-
-  /**
-   * Stores all polls/answers for the group.
-   */
-  polls: {
-    [string]: {
-      poll: Poll,
-      answers: {
-        [string]: Answer
-      }
-    }
-  }
-
-  // Counter for generating poll/answer ids
-  pollID: number;
-
-  answerID: number;
-
-  // Number of users connected
-  usersConnected: number;
-
-  // Previous poll
-  lastPoll = null;
-
-  // Previous state
-  lastState = {};
-
-  /** Current state of the socket */
-  current: CurrentState = {
-    poll: -1, // id of current poll object
-    results: {},
-    answers: {},
-    upvotes: {},
-  }
 
   /**
    * Indicate whether group is live or not
    * Becomes live when a poll is started
    * Becomes inactive when no admin is connected to socket && no live poll
    */
-  isLive = false
+  isLive = false;
 
   constructor({ group, nsp, onClose }: GroupSocketConfig) {
     this.group = group;
     this.nsp = nsp;
     this.nsp.on('connect', this._onConnect.bind(this));
     this.onClose = onClose;
-
-    this.polls = {};
-    this.pollID = 0;
-    this.answerID = 0;
-    this.usersConnected = 0;
   }
 
   _clientError(client: IOSocket, msg: string): void {
@@ -135,36 +101,30 @@ export default class GroupSocket {
    * @param {IOSocket} client - The client object upon connection
    */
   _onConnect = async (client: IOSocket) => {
-    const userType: ?string = client.handshake.query.userType || null;
+    const user = await UserSessionsRepo.getUserFromToken(client.handshake.query.accessToken);
+    if (!user) {
+      this._clientError(client, 'Invalid accessToken: user does not exist');
+      return;
+    }
+
+    const userType = await GroupsRepo.isAdmin(this.group.id, user) ? 'admin' : 'member';
 
     switch (userType) {
       case 'admin': {
         // console.log(`Admin with id ${client.id} connected to socket`);
         this._setupAdminEvents(client);
         client.join('admins');
-        this.nsp.to('admins').emit('user/count', { count: this.usersConnected });
-
-        const currentPoll = this._currentPoll();
-        if (currentPoll) {
-          client.emit('admin/poll/start', { poll: currentPoll });
-          client.emit('admin/poll/updateTally/live', this.current);
+        if (this.current) {
+          client.emit('admin/poll/start', this._currentPoll(constants.USER_TYPES.ADMIN));
         }
         break;
       }
-      case 'member':
       case 'user': {
         // console.log(`User with id ${client.id} connected to socket`);
-        this._setupUserEvents(client);
+        this._setupUserEvents(client, user.googleID);
         client.join('users');
-
-        this.usersConnected += 1;
-        this.nsp.to('users').emit('user/count', { count: this.usersConnected });
-        this.nsp.to('admins').emit('user/count', { count: this.usersConnected });
-
-        const currentPoll = this._currentPoll();
-        if (currentPoll) {
-          client.emit('user/poll/start', { poll: currentPoll });
-          client.emit('user/poll/results/live', this.current);
+        if (this.current) {
+          client.emit('user/poll/start', this._currentPoll(constants.USER_TYPES.MEMBER));
         }
         break;
       }
@@ -176,114 +136,114 @@ export default class GroupSocket {
         }
       }
     }
-  }
+  };
 
   // ***************************** User Side ***************************
   // i.e. the server hears 'server/poll/respond
   /**
    * Sets up user events on the member side.
    * User Events:
-   * 'server/poll/tally', (answerObject: Object) (Answer without id field)
+   * 'server/poll/answer' (PollChoice)
    *  - Client answers current poll
-   *  - Adds their answer to results and remove their old answer if exists
+   *  - Adds the answer to answers
+   *  - If poll is free response, then also add to upvotes
    *
-   * 'server/poll/upvote', (answerObject: Object) (Answer without id field)
+   * 'server/poll/upvote', (PollChoice)
    *  - Client upvotes an answer or unupvotes if previously upvoted
-   *  - Increases count of answer upvoted or decreases count of answer unupvoted
+   *  - Increases count of answer upvoted or decreases count of answer unupvoted in answerChoices
    * @function
    * @param {IOSocket} client - Client's socket object
+   * @param {String} googleID
    */
-  _setupUserEvents(client: IOSocket): void {
-    client.on('server/poll/tally', (answerObject: Object) => {
-      const answer: Answer = {
-        id: this.answerID,
-        googleID: answerObject.googleID,
-        poll: answerObject.poll,
-        choice: answerObject.choice,
-        text: answerObject.text,
-      };
-      this.answerID += 1;
-      const poll = this._currentPoll();
-      if (poll === null || poll === undefined) {
+  _setupUserEvents(client: IOSocket, googleID: string): void {
+    client.on('server/poll/answer', (submittedAnswer: PollChoice) => {
+      const poll = this.current;
+      if (!poll) {
         // console.log(`Client ${client.id} tried to answer with no active poll`);
         return;
       }
-      if (poll.id !== answer.poll) {
-        // console.log(`Poll ${answer.poll} is not the current poll`);
-        return;
-      }
-
-      const nextState = { ...this.current };
-      const prev = nextState.answers[answer.googleID];
 
       switch (poll.type) {
-        case constants.QUESTION_TYPES.MULTIPLE_CHOICE: // Multiple Choice
-          nextState.answers[answer.googleID] = answer.choice; // update/add response
-          if (prev) { // User selected something before
-            nextState.results[prev].count -= 1;
+        case constants.POLL_TYPES.MULTIPLE_CHOICE: // Multiple Choice
+          if (poll.answers[googleID]) { // User selected something before
+            poll.answerChoices.forEach((p: PollResult) => {
+              if (p.letter && p.count && p.letter === poll.answers[googleID].letter) { p.count -= 1; }
+            });
           }
+          // update/add response
+          poll.answers[googleID] = [submittedAnswer];
+          poll.answerChoices.forEach((p: PollResult) => {
+            if (p.letter && p.count && p.letter === submittedAnswer.letter) { p.count += 1; }
+          });
           break;
         case constants.QUESTION_TYPES.FREE_RESPONSE: { // Free Response
-          const badWords = lib.filterProfanity(answer.text);
+          const badWords = lib.filterProfanity(submittedAnswer.text);
           if (badWords.length > 0) { // not clean text
-            client.emit('user/answer/filter', { text: answer.text, filter: badWords });
+            client.emit('user/poll/fr/filter',
+              ({ success: false, text: submittedAnswer.text, filter: badWords }: PollFilter));
             return;
           }
-          if (prev) { // User submitted another FR answer
-            nextState.answers[answer.googleID].push(answer.id);
+          if (poll.answers[googleID]) { // User submitted another FR answer
+            poll.answers[googleID].push(submittedAnswer);
+            poll.upvotes[googleID].push(submittedAnswer);
           } else { // User submitted first FR answer
-            nextState.answers[answer.googleID] = [answer.id];
+            poll.answers[googleID] = [submittedAnswer];
+            poll.upvotes[googleID] = [submittedAnswer];
           }
-          client.emit('user/answer/success');
+
+          poll.answerChoices.push({ count: 1, text: submittedAnswer.text, letter: null });
+          client.emit('user/poll/fr/filter', ({ success: true }: PollFilter));
           break;
         }
         default:
           throw new Error('Unimplemented question type');
       }
 
-      const key = poll.type === constants.QUESTION_TYPES.MULTIPLE_CHOICE
-        ? answer.choice : answer.id;
+      this.current = poll;
 
-      if (nextState.results[key]) { // if answer already in results
-        nextState.results[key].count += 1;
-      } else {
-        nextState.results[key] = { text: answer.text, count: 1 };
-      }
+      this.nsp.to('admins').emit('admin/poll/updates', this._currentPoll(constants.USER_TYPES.ADMIN));
 
-      this.current = nextState;
-      this.nsp.to('admins').emit('admin/poll/updateTally', this.current);
-      if (poll.shared || poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
-        this.nsp.to('users').emit('user/poll/results', this.current);
+      if (poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
+        this.nsp.to('users').emit('user/poll/fr/live', this._currentPoll(constants.USER_TYPES.MEMBER));
       }
     });
 
-    client.on('server/poll/upvote', (upvoteObject: Object) => {
-      const { answerID, googleID } = upvoteObject;
-      const poll = this._currentPoll();
-      if (poll === null || poll === undefined) {
+    client.on('server/poll/upvote', (upvoteObject: PollChoice) => {
+      const { text } = upvoteObject;
+      const poll = this.current;
+      if (!poll || !text) {
         // console.log(`Client with googleID ${googleID} tried to answer with no active poll`);
         return;
       }
-      const nextState = { ...this.current };
-      const curTally = nextState.results[answerID];
-      if (curTally) {
-        if (nextState.upvotes[googleID]) {
-          if (nextState.upvotes[googleID].includes(answerID)) { // unupvote
-            nextState.results[answerID].count -= 1;
-            nextState.upvotes[googleID] = nextState.upvotes[googleID].filter(a => a !== answerID);
+
+      const currAnswer: ?PollResult = poll.answerChoices.find((p: PollResult) => p.text === text);
+      if (currAnswer) { // User selected a valid answer
+        const userUpvotes = poll.upvotes[googleID];
+        if (userUpvotes) { // User upvoted something before
+          if (userUpvotes.find((p: PollChoice) => p.text === text)) { // unupvote
+            poll.upvotes[googleID] = userUpvotes.filter(p => p.text !== text);
+            poll.answerChoices.forEach((p: PollResult) => {
+              if (p.count && p.text === text) { p.count -= 1; }
+            });
           } else { // upvote
-            nextState.results[answerID].count += 1;
-            nextState.upvotes[googleID].push(answerID);
+            poll.upvotes[googleID].push({ text });
+            poll.answerChoices.forEach((p: PollResult) => {
+              if (p.count && p.text === text) { p.count += 1; }
+            });
           }
         } else { // init array and upvote
-          nextState.results[answerID].count += 1;
-          nextState.upvotes[googleID] = [answerID];
+          poll.answerChoices.forEach((p: PollResult) => {
+            if (p.count && p.text === text) { p.count -= 1; }
+          });
+          poll.upvotes[googleID] = [{ text }];
         }
       }
-      this.current = nextState;
-      this.nsp.to('admins').emit('admin/poll/updateTally', this.current);
-      if (poll.shared || poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
-        this.nsp.to('users').emit('user/poll/results', this.current);
+
+      this.current = poll;
+
+      this.nsp.to('admins').emit('admin/poll/updates', this._currentPoll(constants.USER_TYPES.ADMIN));
+      if (poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
+        this.nsp.to('users').emit('user/poll/fr/live', this._currentPoll(constants.USER_TYPES.MEMBER));
       }
     });
 
@@ -293,182 +253,224 @@ export default class GroupSocket {
         await this._endPoll();
         this.onClose();
       }
-      this.usersConnected -= 1;
-      this.nsp.to('users').emit('user/count', { count: this.usersConnected });
-      this.nsp.to('admins').emit('user/count', { count: this.usersConnected });
     });
   }
 
   // *************************** Admin Side ***************************
 
   /**
-   * Gives current poll
-   * @function
-   * @return {?SocketPoll} Socket poll object
-   */
-  _currentPoll(): Poll | null {
-    if (this.current.poll === -1) {
-      return null;
+* Gives current poll
+* @param {String} userRole
+* @return {?ClientPoll} Socket poll object
+*/
+  _currentPoll(userRole: string): ClientPoll | null {
+    if (!this.current) return null; // no live poll
+    let { correctAnswer } = this.current;
+    const {
+      createdAt, updatedAt, answers, answerChoices, state, text, type, upvotes,
+    } = this.current;
+    const pollID = this.current.id;
+
+    let userAnswers;
+    const isMultipleChoice = type === constants.POLL_TYPES.MULTIPLE_CHOICE;
+    if (isMultipleChoice) {
+      userAnswers = answers;
+    } else {
+      userAnswers = upvotes;
     }
-    return this.polls[`${this.current.poll}`].poll;
+    if (!userAnswers) userAnswers = {};
+    if (!correctAnswer) correctAnswer = '';
+
+    const filteredChoices = userRole === 'admin'
+      || !isMultipleChoice
+      || state === constants.POLL_STATES.SHARED
+      ? answerChoices
+      : answerChoices.map((a) => {
+        a.count = null;
+        return a;
+      });
+
+    return {
+      pollID,
+      createdAt,
+      updatedAt,
+      answerChoices: filteredChoices,
+      correctAnswer,
+      state,
+      text,
+      type,
+      userAnswers,
+    };
   }
 
   /**
-   * Starts poll on the socket
-   * @param {SocketPoll} poll - Poll object to start
-   */
-  _startPoll(poll: Poll) {
-    // start new poll
-    this.current.poll = poll.id;
-    if (this.polls[`${poll.id}`] !== null
-      || this.polls[`${poll.id}`] !== undefined) {
-      this.polls[`${poll.id}`] = {
-        poll,
-        answers: {},
-      };
-    }
-    const results = {};
-    if (poll.options) {
-      for (let i = 0; i < poll.options.length; i += 1) {
-        const choice = String.fromCharCode(65 + i);
-        const option = poll.options[i];
-        results[choice] = { text: option, count: 0 };
-        poll.optionsWithChoices.push({ choice, option });
-      }
-    }
-    this.current.results = results;
-    this.current.answers = {};
-    this.current.upvotes = {};
-    this.isLive = true;
-
-    this.nsp.to('users').emit('user/poll/start', { poll });
-  }
-
-  /**
-   * Ends current poll
-   * @function
-   */
-  _endPoll = async () => {
-    const poll = this._currentPoll();
-    if (!poll) {
-      return;
-    }
-    this.lastPoll = await PollsRepo.createPoll(poll.text, this.group,
-      this.current.results, poll.shared, poll.type, poll.correctAnswer,
-      this.current.answers);
-    this.lastState = this.current;
-    const pollNode = {
-      id: this.lastPoll.id,
+* Starts poll on the socket
+* @param {ClientPoll} poll - Poll object to start
+*/
+  _startPoll(poll: ClientPoll) {
+  // start new poll
+    const newPoll: SocketPoll = {
+      answerChoices: poll.answerChoices,
+      correctAnswer: poll.correctAnswer,
+      state: constants.POLL_STATES.LIVE,
       text: poll.text,
       type: poll.type,
-      options: poll.options,
-      shared: poll.shared,
-      correctAnswer: poll.correctAnswer,
+      answers: {},
+      upvotes: {},
     };
-    this.nsp.to('admins').emit('admin/poll/ended', { poll: pollNode });
-    this.nsp.to('users').emit('user/poll/end', { poll: pollNode });
-    this.current.poll = -1;
+
+    this.current = newPoll;
+    this.isLive = true;
+
+    this.nsp.to('users').emit('user/poll/start', this._currentPoll(constants.USER_TYPES.MEMBER));
   }
 
-  /**
-   * Deletes a poll that is already saved to database
-   * @param {number} deleteID - Poll ID to delete
-  */
-  _deletePoll = async (deleteID: number) => {
-    await PollsRepo.deletePollByID(deleteID);
-    this.nsp.to('users').emit('user/poll/delete', deleteID);
+/**
+ * Ends current poll
+ * @function
+ */
+_endPoll = async () => {
+  const poll = this.current;
+  if (!poll) {
+    return;
+  }
+  poll.state = constants.POLL_STATES.ENDED;
+  const createdPoll = await PollsRepo.createPoll(
+    poll.text,
+    this.group,
+    poll.answerChoices,
+    poll.type,
+    poll.correctAnswer,
+    poll.answers,
+    poll.state,
+    poll.upvotes,
+  );
+  this.current = { ...createdPoll };
+
+  this.nsp.to('admins').emit('admin/poll/ended', this._currentPoll(constants.USER_TYPES.ADMIN));
+  this.nsp.to('users').emit('user/poll/end', this._currentPoll(constants.USER_TYPES.MEMBER));
+
+  this.current = null;
+};
+
+/**
+ * Deletes a poll that is already saved to database
+ * @param {id} pollID - Poll ID to delete
+ */
+_deletePoll = async (pollID: id) => {
+  await PollsRepo.deletePollByID(pollID);
+  this.nsp.to('users').emit('user/poll/delete', pollID);
+};
+
+/**
+ * Deletes a live poll
+ * @function
+ */
+_deleteLivePoll = () => {
+  this.current = null;
+  this.nsp.to('users').emit('user/poll/delete/live');
+};
+
+/**
+ * Setups up events for users on admin side
+ * Admin events:
+ * 'server/poll/start' (ClientPoll) (no id and updatedAt)
+ * - Admin wants to start a poll
+ * - Notifies members new poll has started
+ *
+ * 'server/poll/end' (void)
+ * - Admin wants to close a poll
+ * - Persists recieved polls
+ * - Notifies members and admins that poll is now closed
+ *
+ * 'server/poll/results' (pollID)
+ * - Shares poll results with members
+ * - Notifies members with shared poll
+ *
+ * 'server/poll/delete' (pollID)
+ * - Delete saved poll
+ * - Notifies members that poll with pollID is deleted
+ *
+ * 'server/poll/delete/live' (void)
+ * - Delete current poll
+ * - Notifies members that live poll is deleted
+ * @function
+ * @param {IOSocket} client - Client's socket object
+ */
+_setupAdminEvents(client: IOSocket): void {
+  const { address } = client.handshake;
+
+  if (!address) {
+    this._clientError(client, 'No client address');
+    return;
   }
 
-  /**
-   * Deletes a live poll
-   * @function
-  */
-  _deleteLivePoll = () => {
-    this.current.poll = -1;
-    this.nsp.to('users').emit('user/poll/deleteLive');
-  }
+  // Start poll
+  client.on('server/poll/start', async (pollObject: ClientPoll) => {
+    // console.log('starting', poll);
+    if (this.current && this.current.state === constants.POLL_STATES.LIVE) {
+      await this._endPoll();
+    }
+    this._startPoll(pollObject);
+  });
 
-  /**
-   * Setups up events for users on admin side
-   * Admin events:
-   * 'server/poll/start' (pollObject: Object) (Poll object without id field)
-   * - Admin wants to start a poll
-   * - Creates cache to store answers
-   * - Notifies clients new poll has started
-   *
-   * 'server/poll/end' (void)
-   * - Admin wants to close a poll
-   * - Persists recieved polls
-   * - Notifies clients quesiton is now closed
-   *
-   * 'server/poll/results' (void)
-   * - Shares poll results with members
-   */
-  _setupAdminEvents(client: Object): void {
-    const { address } = client.handshake;
+  // share results
+  client.on('server/poll/results', async (pollID: id) => {
+    // console.log('sharing results');
+    // Update poll to 'shared'
+    const sharedPoll = await PollsRepo.updatePollByID(
+      pollID, null, null, null, constants.POLL_STATES.SHARED,
+    );
 
-    if (!address) {
-      this._clientError(client, 'No client address');
+    if (!sharedPoll) {
+      this._clientError(client, 'Cannot find poll to update.');
       return;
     }
 
-    // Start poll
-    client.on('server/poll/start', async (pollObject: Object) => {
-      const poll: Poll = {
-        id: this.pollID,
-        text: pollObject.text,
-        type: pollObject.type,
-        options: pollObject.options,
-        optionsWithChoices: [],
-        shared: pollObject.shared,
-        correctAnswer: pollObject.correctAnswer,
-      };
-      this.pollID += 1;
-      // console.log('starting', poll);
-      if (this.current.poll !== -1) {
-        await this._endPoll();
-      }
-      this._startPoll(poll);
-    });
+    const {
+      createdAt, updatedAt, answers, answerChoices, correctAnswer, state, text, type, upvotes,
+    } = sharedPoll;
 
-    // share results
-    client.on('server/poll/results', async () => {
-      // console.log('sharing results');
-      // Update poll to 'shared'
-      if (this.lastPoll) {
-        await PollsRepo.updatePollByID(this.lastPoll.id, null,
-          null, true);
-      }
-      const current = this.lastState;
-      this.nsp.to('users').emit('user/poll/results', current);
-    });
+    let userAnswers;
+    const isMultipleChoice = type === constants.POLL_TYPES.MULTIPLE_CHOICE;
+    if (isMultipleChoice) {
+      userAnswers = answers;
+    } else {
+      userAnswers = upvotes;
+    }
+    if (!userAnswers) userAnswers = {};
 
-    // End poll
-    client.on('server/poll/end', async () => {
-      // console.log('ending poll');
+    this.nsp.to('users').emit('user/poll/results', {
+      pollID, createdAt, updatedAt, answerChoices, correctAnswer, state, text, type, userAnswers,
+    });
+  });
+
+  // End poll
+  client.on('server/poll/end', async () => {
+    // console.log('ending poll');
+    await this._endPoll();
+  });
+
+  // Delete saved poll
+  client.on('server/poll/delete', async (pollID: id) => {
+    // console.log('deleting saved poll');
+    await this._deletePoll(pollID);
+  });
+
+  // Delete live poll
+  client.on('server/poll/delete/live', async () => {
+    // console.log('deleting live poll');
+    await this._deleteLivePoll();
+  });
+
+  client.on('disconnect', async () => {
+    // console.log(`Admin ${client.id} disconnected.`);
+    if (this.current === null) this.isLive = false;
+
+    if (this.nsp.connected.length === 0) {
       await this._endPoll();
-    });
-
-    // Delete saved poll
-    client.on('server/poll/delete', async (deleteID: number) => {
-      // console.log('deleting saved poll');
-      await this._deletePoll(deleteID);
-    });
-
-    // Delete live poll
-    client.on('server/poll/deleteLive', async () => {
-      // console.log('deleting live poll');
-      await this._deleteLivePoll();
-    });
-
-    client.on('disconnect', async () => {
-      // console.log(`Admin ${client.id} disconnected.`);
-      if (this.current.poll === -1) this.isLive = false;
-
-      if (this.nsp.connected.length === 0) {
-        await this._endPoll();
-        this.onClose();
-      }
-    });
-  }
+      this.onClose();
+    }
+  });
+}
 }
