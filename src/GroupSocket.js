@@ -201,7 +201,7 @@ export default class GroupSocket {
 
       if (poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
         // TODO
-        this.nsp.to('users').emit('user/poll/results', this.current);
+        this.nsp.to('users').emit('user/poll/fr/live', this.current);
       }
     });
 
@@ -232,10 +232,10 @@ export default class GroupSocket {
 
       this.current = poll;
       
-      this.nsp.to('admins').emit('admin/poll/updateTally', this.current);
-      if (poll.shared || poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
+      this.nsp.to('admins').emit('admin/poll/updates', this.current);
+      if (poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
         // TODO
-        this.nsp.to('users').emit('user/poll/results', this.current);
+        this.nsp.to('users').emit('user/poll/fr/live', this.current);
       }
     });
 
@@ -372,7 +372,7 @@ export default class GroupSocket {
   */
   _deleteLivePoll = () => {
     this.current = null;
-    this.nsp.to('users').emit('user/poll/deleteLive');
+    this.nsp.to('users').emit('user/poll/delete/live');
   }
 
   /**
@@ -434,7 +434,7 @@ export default class GroupSocket {
     });
 
     // Delete live poll
-    client.on('server/poll/deleteLive', async () => {
+    client.on('server/poll/delete/live', async () => {
       // console.log('deleting live poll');
       await this._deleteLivePoll();
     });
