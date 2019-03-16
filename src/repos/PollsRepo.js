@@ -21,12 +21,12 @@ const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Po
  * @return {Poll} New poll created
  */
 const createPoll = async (text: string, group: ?Group, answerChoices: PollResult[],
-  type: PollType, correctAnswer: string, userAnswers: Object, state: PollState):
+  type: PollType, correctAnswer: ?string, userAnswers: Object, state: PollState):
   Promise <Poll> => {
   try {
     const poll = new Poll();
     poll.answerChoices = answerChoices;
-    poll.correctAnswer = correctAnswer;
+    poll.correctAnswer = correctAnswer || '';
     poll.group = group;
     poll.state = state;
     poll.text = text;

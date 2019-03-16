@@ -14,9 +14,9 @@ import type {
 } from '../utils/Constants';
 
 export type PollResult = {|
-  letter?: string,
+  letter: ?string,
   text: string,
-  count: number
+  count: ?number
 |}
 
 export type PollChoice = {|
