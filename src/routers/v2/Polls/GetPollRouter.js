@@ -27,27 +27,20 @@ class GetPollRouter extends AppDevRouter<APIPoll> {
 
     const isAdmin = await GroupsRepo.isAdmin(group.id, req.user);
 
-    if (!isAdmin && poll.state !== 'shared') {
+    if (!isAdmin && poll.state !== constants.POLL_STATES.SHARED) {
       poll.answerChoices = poll.answerChoices.map((answer) => {
         delete answer.count;
         return answer;
       });
     }
 
-    const submittedAnswers = poll.userAnswers
-      .filter(answer => answer.googleID === req.user.googleID)
-      .map(answer => ({
-        letter: answer.letter,
-        text: answer.text,
-      }));
-
-    return poll && {
+    return {
       id: poll.id,
       answerChoices: poll.answerChoices,
       correctAnswer: poll.correctAnswer,
       createdAt: poll.createdAt,
       state: poll.state,
-      submittedAnswers,
+      submittedAnswers: poll.userAnswers[req.user.googleID],
       text: poll.text,
       type: poll.type,
       updatedAt: poll.updatedAt,

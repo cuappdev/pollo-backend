@@ -16,11 +16,22 @@ const REQUEST_TYPES = {
 };
 
 /**
+* constants for poll states
+* @constant
+* @enum {string}
+*/
+const POLL_STATES = {
+  LIVE: 'live',
+  ENDED: 'ended',
+  SHARED: 'shared',
+};
+
+/**
 * constants for question types
 * @constant
 * @enum {string}
 */
-const QUESTION_TYPES = {
+const POLL_TYPES = {
   MULTIPLE_CHOICE: 'multipleChoice',
   FREE_RESPONSE: 'freeResponse',
 };
@@ -36,11 +47,12 @@ const USER_TYPES = {
 };
 
 /** Custom types for Poll type */
-export type PollState = "live" | "ended" | "shared"
-export type PollType = "multipleChoice" | "freeResponse"
+export type PollState = 'live' | 'ended' | 'shared'
+export type PollType = 'multipleChoice' | 'freeResponse'
 
 export default {
+  POLL_STATES,
+  POLL_TYPES,
   REQUEST_TYPES,
-  QUESTION_TYPES,
   USER_TYPES,
 };

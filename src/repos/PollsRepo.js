@@ -2,12 +2,8 @@
 import { getConnectionManager, Repository } from 'typeorm';
 import LogUtils from '../utils/LogUtils';
 import Poll from '../models/Poll';
-import type {
-  PollType, PollState,
-} from '../utils/Constants';
-import type {
-  PollResult, PollUserAnswer,
-} from '../models/Poll';
+import type { PollType, PollState } from '../utils/Constants';
+import type { PollResult } from '../models/Poll';
 import Group from '../models/Group';
 
 const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Poll);
@@ -20,12 +16,12 @@ const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Po
  * @param {PollResult[]} answerChoices - the answer choices for the given poll
  * @param {string} type - Type of poll, see Poll class for more info
  * @param {string} correctAnswer - Correct answer choice for MC
- * @param {PollUserAnswer[]} [userAnswers] - answers given from students
+ * @param {Object} [userAnswers] - answers given from students
  * @param {PollState} state - the current state of the poll
  * @return {Poll} New poll created
  */
 const createPoll = async (text: string, group: ?Group, answerChoices: PollResult[],
-  type: PollType, correctAnswer: string, userAnswers: PollUserAnswer[], state: PollState):
+  type: PollType, correctAnswer: string, userAnswers: Object, state: PollState):
   Promise <Poll> => {
   try {
     const poll = new Poll();
@@ -80,12 +76,12 @@ const deletePollByID = async (id: number) => {
  * @param {number} id - id of the poll to update
  * @param {string} [text] - new text for poll
  * @param {PollResult[]} answerChoices - the answer choices for the given poll
- * @param {PollUserAnswer[]} [userAnswers] - the students answers to the poll
+ * @param {Object} [userAnswers] - the students answers to the poll
  * @param {PollState} [state] - the state of the poll
  * @return {?Poll} Updated poll
  */
 const updatePollByID = async (id: number, text: ?string, answerChoices: ?PollResult[],
-  userAnswers: ?PollUserAnswer[], state: ?PollState):
+  userAnswers: ?Object, state: ?PollState):
   Promise<?Poll> => {
   try {
     const poll = await db().createQueryBuilder('polls')

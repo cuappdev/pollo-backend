@@ -6,22 +6,17 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import Base from './Base';
+import constants from '../utils/Constants';
 import Group from './Group';
 
 import type {
   PollType, PollState,
 } from '../utils/Constants';
 
-export type PollUserAnswer = {|
-  googleID: string,
-  letter?: string,
-  text: string
-|}
-
 export type PollResult = {|
   letter?: string,
   text: string,
-  count?: number
+  count: number
 |}
 
 export type PollChoice = {|
@@ -69,7 +64,7 @@ class Poll extends Base {
    * @example
    * let userAnswer = {googldID: "abc123", letter: "A", text: "Saturn"}
    */
-  userAnswers: PollUserAnswer[] = [];
+  userAnswers: {[string]: PollChoice[]} = {};
 
   @Column('string')
   /**
@@ -85,7 +80,7 @@ class Poll extends Base {
    * The current state of the poll
    */
 
-  state: PollState = 'live';
+  state: PollState = constants.POLL_STATES.LIVE;
 }
 
 export default Poll;

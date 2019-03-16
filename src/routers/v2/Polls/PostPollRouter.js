@@ -25,7 +25,8 @@ class PostPollRouter extends AppDevRouter<APIPoll> {
 
     if (!text) text = '';
     if (!answerChoices) answerChoices = [];
-    if (type !== 'freeResponse' && type !== 'multipleChoice') {
+    if (type !== constants.POLL_TYPES.FREE_RESPONSE
+      && type !== constants.POLL_TYPES.MULTIPLE_CHOICE) {
       throw LogUtils.logErr('Valid poll type not found', {}, { type });
     }
 
@@ -36,10 +37,8 @@ class PostPollRouter extends AppDevRouter<APIPoll> {
       throw LogUtils.logErr('You are not authorized to post a poll', {}, { groupID, user });
     }
 
-    // const poll = await PollsRepo
-    // .createPoll(text, group, results, shared, type, correctAnswer);
     const poll = await PollsRepo
-      .createPoll(text, group, answerChoices, type, correctAnswer, [], 'live');
+      .createPoll(text, group, answerChoices, type, correctAnswer, {}, constants.POLL_STATES.LIVE);
 
     return {
       id: poll.id,

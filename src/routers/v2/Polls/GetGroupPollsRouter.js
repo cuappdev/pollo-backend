@@ -25,13 +25,6 @@ class GetGroupPollsRouter extends AppDevRouter<Object[]> {
     // Date mapped to list of polls
     const pollsByDate = [];
     polls.filter(Boolean).forEach((poll) => {
-      const userAnswers = poll.userAnswers
-        .filter(answer => answer.googleID === req.user.googleID)
-        .map((answer) => {
-          delete answer.googleID;
-          return answer;
-        });
-
       // date is in Unix time in seconds
       const date = poll.createdAt;
       const p = {
@@ -40,7 +33,7 @@ class GetGroupPollsRouter extends AppDevRouter<Object[]> {
         correctAnswer: poll.correctAnswer,
         createdAt: poll.createdAt,
         state: poll.state,
-        submittedAnswers: userAnswers,
+        submittedAnswers: poll.userAnswers[req.user.googleID],
         text: poll.text,
         type: poll.type,
         updatedAt: poll.updatedAt,

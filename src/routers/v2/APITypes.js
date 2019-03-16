@@ -1,8 +1,5 @@
 // @flow
-import type {
-  PollType, PollChoice, PollState,
-} from '../../utils/Constants';
-
+import type { PollChoice, PollState, PollType } from '../../utils/Constants';
 import type { PollResult } from '../../models/Poll';
 
 // *********************** GENERAL RESPONSE TYPES ***********************
