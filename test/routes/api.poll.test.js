@@ -38,7 +38,7 @@ beforeAll(async () => {
 
 test('create poll', async () => {
   const opts = {
-    text: 'Poll text', shared: true, type: 'MULTIPLE_CHOICE', correctAnswer: 'B',
+    text: 'Poll text', answerChoices: [{ letter: 'A', text: 'Saturn' }], type: 'multipleChoice', correctAnswer: 'A',
   };
   await request(post(`/sessions/${group.id}/polls`, opts, token)).then((result) => {
     expect(result.success).toBe(true);
@@ -73,13 +73,14 @@ test('get polls by group', async () => {
 test('update poll', async () => {
   const opts = {
     text: 'Updated text',
-    results: { A: 1 },
-    shared: false,
+    answerChoices: { letter: 'A', text: 'Mars' },
+    state: 'ended',
   };
   await request(put(`/polls/${poll.id}`, opts, token)).then((getres) => {
     expect(getres.success).toBe(true);
     expect(getres.data.text).toBe('Updated text');
-    expect(getres.data.results).toMatchObject({ A: 1 });
+    expect(getres.data.state).toBe('ended');
+    expect(getres.data.answerChoices).toMatchObject({ letter: 'A', text: 'Mars' });
   });
 });
 

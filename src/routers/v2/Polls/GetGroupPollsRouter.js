@@ -29,12 +29,14 @@ class GetGroupPollsRouter extends AppDevRouter<Object[]> {
       const date = poll.createdAt;
       const p = {
         id: poll.id,
-        text: poll.text,
-        results: poll.results,
-        shared: poll.shared,
-        type: poll.type,
-        answer: isAdmin ? null : poll.userAnswers[req.user.googleID],
+        answerChoices: poll.answerChoices,
         correctAnswer: poll.correctAnswer,
+        createdAt: poll.createdAt,
+        state: poll.state,
+        submittedAnswers: poll.userAnswers[req.user.googleID],
+        text: poll.text,
+        type: poll.type,
+        updatedAt: poll.updatedAt,
       };
       const ind = datesArray.indexOf(date);
       if (ind === -1) { // date not found

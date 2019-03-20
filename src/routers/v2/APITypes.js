@@ -1,4 +1,6 @@
 // @flow
+import type { PollChoice, PollState, PollType } from '../../utils/Constants';
+import type { PollResult } from '../../models/Poll';
 
 // *********************** GENERAL RESPONSE TYPES ***********************
 
@@ -21,12 +23,14 @@ export type APIGroup = {|
 
 export type APIPoll = {|
   id: id,
-  answer: ?string,
-  correctAnswer: string,
-  results: Object,
-  shared: boolean,
+  createdAt?: string,
+  updatedAt?: string,
   text: string,
-  type: string,
+  answerChoices: PollResult[],
+  type: PollType,
+  correctAnswer: string,
+  submittedAnswers: PollChoice[],
+  state: PollState
 |}
 
 export type APIDraft = {|
