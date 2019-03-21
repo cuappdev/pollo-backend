@@ -47,7 +47,7 @@ type ClientPoll = {
   text: string,
   type: PollType,
   updatedAt?: string,
-  userAnswers: { string: PollChoice[] } // {googleID: [PollChoice]} of answers for MC and {googleID: PollChoice[]} of upvotes for FR}
+  userAnswers: { string: PollChoice[] } // {googleID: PollChoice[]} of answers for MC and upvotes for FR}
 };
 
 type PollFilter = {

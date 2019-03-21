@@ -38,7 +38,7 @@ const createPoll = async (text: string, group: ?Group, answerChoices: PollResult
     return poll;
   } catch (e) {
     throw LogUtils.logErr('Problem creating poll', e, {
-      text, group, answerChoices, type, correctAnswer, answers, state, upvotes
+      text, group, answerChoices, type, correctAnswer, answers, state, upvotes,
     });
   }
 };

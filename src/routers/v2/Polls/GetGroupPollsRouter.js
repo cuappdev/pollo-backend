@@ -37,7 +37,8 @@ class GetGroupPollsRouter extends AppDevRouter<Object[]> {
         text: poll.text,
         type: poll.type,
         updatedAt: poll.updatedAt,
-        userAnswers: poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE ? poll.answers[req.user.googleID] : poll.upvotes[req.user.googleID],
+        userAnswers: poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
+          ? poll.answers[req.user.googleID] : poll.upvotes[req.user.googleID],
       };
       const ind = datesArray.indexOf(date);
       if (ind === -1) { // date not found
