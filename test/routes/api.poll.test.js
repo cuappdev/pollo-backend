@@ -1,6 +1,7 @@
 import request from 'request-promise-native';
 import dbConnection from '../../src/db/DbConnection';
 import GroupsRepo from '../../src/repos/GroupsRepo';
+import PollsRepo from '../../src/repos/PollsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
 
@@ -33,27 +34,11 @@ beforeAll(async () => {
   const opts = { name: 'Test group', code: GroupsRepo.createCode() };
   const result = await request(post('/sessions/', opts, token));
   group = result.data;
+
+  poll = await PollsRepo.createPoll('Poll text', group, [{ letter: 'A', text: 'Saturn' }],
+    'multiplechoice', 'A', null, 'ended')
+
   expect(result.success).toBe(true);
-});
-
-test('create poll', async () => {
-  const opts = {
-    text: 'Poll text', answerChoices: [{ letter: 'A', text: 'Saturn' }], type: 'multipleChoice', correctAnswer: 'A',
-  };
-  await request(post(`/sessions/${group.id}/polls`, opts, token)).then((result) => {
-    expect(result.success).toBe(true);
-    poll = result.data;
-  });
-});
-
-test('create poll with invalid token', async () => {
-  const opts = {
-    text: 'Poll text', results: {}, shared: true, correctAnswer: '',
-  };
-  await request(post(`/sessions/${group.id}/polls`, opts, 'invalid'))
-    .catch((e) => {
-      expect(e.statusCode).toBe(401);
-    });
 });
 
 test('get poll by id', async () => {
