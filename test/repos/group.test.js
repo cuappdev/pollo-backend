@@ -181,13 +181,13 @@ test('Get Polls from Group', async () => {
   const group = await GroupsRepo.getGroupByID(id);
   let polls = await GroupsRepo.getPolls(id);
   expect(polls.length).toEqual(0);
-  'Poll', group, [], 'MULTIPLE_CHOICE', 'A', null, 'shared', {}
+
   const answerChoices1 = [{ letter: 'A', text: 'blue', count: 1 }];
   const answerChoices2 = [{ text: 'blue', count: 0 }, { text: 'red', count: 2 }];
   const answerChoices1WithoutCounts = [{ letter: 'A', text: 'blue' }];
 
   const poll = await PollsRepo.createPoll('Poll', group, answerChoices1, 'multipleChoice', '', null, 'ended');
-  const poll2 = await PollsRepo.createPoll('', group, answerChoices2, 'freeResponse', '', null, 'ended')
+  const poll2 = await PollsRepo.createPoll('', group, answerChoices2, 'freeResponse', '', null, 'ended');
   polls = await GroupsRepo.getPolls(id);
   expect(polls.length).toEqual(2);
   expect(polls[0].id).toBe(poll.id);

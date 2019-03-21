@@ -27,7 +27,8 @@ class GetPollRouter extends AppDevRouter<APIPoll> {
 
     const isAdmin = await GroupsRepo.isAdmin(group.id, req.user);
 
-    if (!isAdmin && poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE && poll.state !== constants.POLL_STATES.SHARED) {
+    if (!isAdmin && poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
+      && poll.state !== constants.POLL_STATES.SHARED) {
       poll.answerChoices = poll.answerChoices.map((answer) => {
         delete answer.count;
         return answer;
@@ -43,7 +44,8 @@ class GetPollRouter extends AppDevRouter<APIPoll> {
       text: poll.text,
       type: poll.type,
       updatedAt: poll.updatedAt,
-      userAnswers: poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE ? poll.answers[req.user.googleID] : poll.upvotes[req.user.googleID],
+      userAnswers: poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
+        ? poll.answers[req.user.googleID] : poll.upvotes[req.user.googleID],
     };
   }
 }

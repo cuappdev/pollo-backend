@@ -19,7 +19,9 @@ class UpdatePollRouter extends AppDevRouter<APIPoll> {
 
   async content(req: Request) {
     const pollID = req.params.id;
-    const { text, answerChoices, state, answers, upvotes } = req.body;
+    const {
+      text, answerChoices, state, answers, upvotes,
+    } = req.body;
     const { user } = req;
 
     if (!answerChoices && !text && !state && !answers && !upvotes) {
@@ -50,7 +52,8 @@ class UpdatePollRouter extends AppDevRouter<APIPoll> {
       text: poll.text,
       type: poll.type,
       updatedAt: poll.updatedAt,
-      userAnswers: poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE ? poll.answers[req.user.googleID] : poll.upvotes[req.user.googleID],
+      userAnswers: poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
+        ? poll.answers[req.user.googleID] : poll.upvotes[req.user.googleID],
     };
   }
 }

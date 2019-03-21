@@ -47,7 +47,7 @@ type ClientPoll = {
   text: string,
   type: PollType,
   updatedAt?: string,
-  userAnswers: { string: PollChoice[] } // {googleID: [PollChoice]} of answersfor MC and {googleID: PollChoice[]} of upvotes for FR}
+  userAnswers: { string: PollChoice[] } // {googleID: [PollChoice]} of answers for MC and {googleID: PollChoice[]} of upvotes for FR}
 };
 
 type PollFilter = {
@@ -264,9 +264,11 @@ export default class GroupSocket {
 */
   _currentPoll(userRole: string): ClientPoll | null {
     if (!this.current) return null; // no live poll
-    let {
-      id, createdAt, updatedAt, answers, answerChoices, correctAnswer, state, text, type, upvotes,
+    let { correctAnswer } = this.current;
+    const {
+      createdAt, updatedAt, answers, answerChoices, state, text, type, upvotes,
     } = this.current;
+    const pollID = this.current.id;
 
     let userAnswers;
     const isFreeResponse = type === constants.POLL_TYPES.MULTIPLE_CHOICE;
@@ -286,7 +288,7 @@ export default class GroupSocket {
       });
 
     return {
-      id,
+      pollID,
       createdAt,
       updatedAt,
       answerChoices: filteredChoices,
@@ -423,7 +425,7 @@ _setupAdminEvents(client: IOSocket): void {
     }
 
     const {
-      id, createdAt, updatedAt, answers, answerChoices, correctAnswer, state, text, type, upvotes,
+      createdAt, updatedAt, answers, answerChoices, correctAnswer, state, text, type, upvotes,
     } = sharedPoll;
 
     let userAnswers;
@@ -436,7 +438,7 @@ _setupAdminEvents(client: IOSocket): void {
     if (!userAnswers) userAnswers = {};
 
     this.nsp.to('users').emit('user/poll/results', {
-      id, createdAt, updatedAt, answerChoices, correctAnswer, state, text, type, userAnswers,
+      pollID, createdAt, updatedAt, answerChoices, correctAnswer, state, text, type, userAnswers,
     });
   });
 
