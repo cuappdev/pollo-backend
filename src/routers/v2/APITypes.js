@@ -15,46 +15,46 @@ export type Response<T> = {
 // ************************ POLLO OBJECT TYPES ************************
 export type APIGroup = {|
   id: id,
-  code: string,
-  isLive: boolean,
-  name: string,
-  updatedAt: string,
+    code: string,
+      isLive: boolean,
+        name: string,
+          updatedAt: string,
 |}
 
 export type APIPoll = {|
   id: id,
-  createdAt?: string,
-  updatedAt?: string,
-  text: string,
-  answerChoices: PollResult[],
-  type: PollType,
-  correctAnswer: string,
-  submittedAnswers: PollChoice[],
-  state: PollState
+    answerChoices: PollResult[],
+      correctAnswer ?: string,
+      createdAt ?: string,
+      state: PollState,
+        text: string,
+          type: PollType,
+            updatedAt ?: string,
+            userAnswers: { string: PollChoice[] },
 |}
 
 export type APIDraft = {|
   id: id,
-  createdAt: string,
-  options: string[],
-  text: string,
+    createdAt: string,
+      options: string[],
+        text: string,
 |}
 
 export type APIQuestion = {|
   id: id,
-  createdAt: string,
-  text: string,
+    createdAt: string,
+      text: string,
 |}
 
 export type APIUser = {|
   id: id,
-  name: string,
-  netID: string,
+    name: string,
+      netID: string,
 |}
 
 export type APIUserSession = {|
   accessToken: string,
-  isActive: boolean,
-  refreshToken: string,
-  sessionExpiration: string,
+    isActive: boolean,
+      refreshToken: string,
+        sessionExpiration: string,
 |}

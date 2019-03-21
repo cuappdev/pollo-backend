@@ -15,14 +15,14 @@ import type {
 
 export type PollResult = {|
   letter: ?string,
-  text: string,
-  count: ?number
-|}
+    text: string,
+      count: ?number
+        |}
 
 export type PollChoice = {|
-  letter?: string,
-  text: string
-|}
+  letter: ?string,
+    text: string
+      |}
 
 @Entity('polls')
 /**
@@ -40,7 +40,7 @@ class Poll extends Base {
 
   @Column('string')
   /** Type of question either multipleChoice or freeResponse */
-  type: PollType = 'multipleChoice';
+  type: PollType = constants.POLL_TYPES.MULTIPLE_CHOICE;
 
   @ManyToOne(type => Group, group => group.polls, {
     onDelete: 'CASCADE',
@@ -51,20 +51,28 @@ class Poll extends Base {
   @Column('json')
   /**
    * Choices for the poll
-   * count only exists when mc poll is shared
    * @example
-   * let results_mc = {letter: "A", text: "Saturn", count: 5}
-   * let results_fr = {text: "Saturn", count: 10}
+   * let answerChoices_mc = [{letter: "A", text: "Saturn", count: 5}]
+   * let answerChoices_fr = [{text: "Saturn", count: 10}]
    */
   answerChoices: PollResult[] = [];
 
   @Column('json')
   /** All the answers by students for the poll.
-   * the letter field is optional and only is returned on mc questions
+   * Letter field is optional and only is returned on mc questions
    * @example
-   * let userAnswer = {googldID: "abc123", letter: "A", text: "Saturn"}
+   * let answers_MC = {googleID: [{letter: "A", text: "Saturn"}]}
+   * let answers_FR = {googleID: [{text: "Saturn"}, {text: "Mars"}]}
    */
-  userAnswers: {[string]: PollChoice[]} = {};
+  answers: { string: PollChoice[] } = {};
+
+  @Column('json')
+  /** All the upvotes by students for the FR poll. Empty if MC.
+   * @example
+   * let upvotes_MC = {}
+   * let upvotes_FR = {googleID: [{text: "Saturn"}, {text: "Mars"}]}
+   */
+  upvotes: { string: PollChoice[] } = {};
 
   @Column('string')
   /**
@@ -80,7 +88,7 @@ class Poll extends Base {
    * The current state of the poll
    */
 
-  state: PollState = constants.POLL_STATES.LIVE;
+  state: PollState = constants.POLL_STATES.ENDED;
 }
 
 export default Poll;

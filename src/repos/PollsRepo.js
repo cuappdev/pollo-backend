@@ -16,13 +16,14 @@ const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Po
  * @param {PollResult[]} answerChoices - the answer choices for the given poll
  * @param {string} type - Type of poll, see Poll class for more info
  * @param {string} correctAnswer - Correct answer choice for MC
- * @param {Object} [userAnswers] - answers given from students
+ * @param {Object} answers - answers given from students
  * @param {PollState} state - the current state of the poll
+ * @param {Object} upvotes - upvotes given from students
  * @return {Poll} New poll created
  */
 const createPoll = async (text: string, group: ?Group, answerChoices: PollResult[],
-  type: PollType, correctAnswer: ?string, userAnswers: Object, state: PollState):
-  Promise <Poll> => {
+  type: PollType, correctAnswer: ?string, answers: ?Object, state: PollState, upvotes: ?Object):
+  Promise<Poll> => {
   try {
     const poll = new Poll();
     poll.answerChoices = answerChoices;
@@ -31,13 +32,13 @@ const createPoll = async (text: string, group: ?Group, answerChoices: PollResult
     poll.state = state;
     poll.text = text;
     poll.type = type;
-    poll.userAnswers = userAnswers;
-
+    if (answers) poll.answers = answers;
+    if (upvotes) poll.upvotes = upvotes;
     await db().persist(poll);
     return poll;
   } catch (e) {
     throw LogUtils.logErr('Problem creating poll', e, {
-      text, group, answerChoices, state, type, correctAnswer, userAnswers,
+      text, group, answerChoices, state, type, correctAnswer, answers, upvotes
     });
   }
 };
@@ -75,13 +76,14 @@ const deletePollByID = async (id: number) => {
  * @function
  * @param {number} id - id of the poll to update
  * @param {string} [text] - new text for poll
- * @param {PollResult[]} answerChoices - the answer choices for the given poll
- * @param {Object} [userAnswers] - the students answers to the poll
+ * @param {?PollResult[]} answerChoices - the answer choices for the given poll
+ * @param {Object} [answers] - the students answers to the poll
+ * @param {Object} [upvotes] - upvotes from students
  * @param {PollState} [state] - the state of the poll
  * @return {?Poll} Updated poll
  */
 const updatePollByID = async (id: number, text: ?string, answerChoices: ?PollResult[],
-  userAnswers: ?Object, state: ?PollState):
+  answers: ?Object, upvotes: ?Object, state: ?PollState):
   Promise<?Poll> => {
   try {
     const poll = await db().createQueryBuilder('polls')
@@ -92,7 +94,8 @@ const updatePollByID = async (id: number, text: ?string, answerChoices: ?PollRes
 
     if (text !== undefined && text !== null) poll.text = text;
     if (answerChoices) poll.answerChoices = answerChoices;
-    if (userAnswers) poll.userAnswers = userAnswers;
+    if (answers) poll.answers = answers;
+    if (upvotes) poll.upvotes = upvotes;
     if (state) poll.state = state;
 
     await db().persist(poll);
@@ -108,7 +111,7 @@ const updatePollByID = async (id: number, text: ?string, answerChoices: ?PollRes
  * @param {number} id - id of poll we want to find the group for
  * @return {?Group} Group that the poll belongs to
  */
-const getGroupFromPollID = async (id: number) : Promise<?Group> => {
+const getGroupFromPollID = async (id: number): Promise<?Group> => {
   try {
     const poll = await db().createQueryBuilder('polls')
       .leftJoinAndSelect('polls.group', 'group')

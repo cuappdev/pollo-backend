@@ -330,7 +330,7 @@ const getPolls = async (id: number, hideUnsharedResults: ?boolean = true):
 
     // obscure poll results if poll not shared
     return group.polls.map((poll) => {
-      if (hideUnsharedResults && poll.state !== 'shared' && poll.type === 'multipleChoice') {
+      if (hideUnsharedResults && poll.state !== constants.POLL_STATES.SHARED && poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE) {
         poll.answerChoices = poll.answerChoices.map((choice) => {
           delete choice.count;
           return choice;
