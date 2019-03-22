@@ -9,8 +9,8 @@ import lib from './utils/Lib.js';
 import PollsRepo from './repos/PollsRepo';
 import UserSessionsRepo from './repos/UserSessionsRepo';
 
-import type { PollState, PollType } from './utils/Constants';
 import type { PollChoice, PollResult } from './models/Poll';
+import type { PollState, PollType } from './utils/Constants';
 
 /** Configuration for each GroupSocket */
 export type GroupSocketConfig = {
@@ -143,13 +143,14 @@ export default class GroupSocket {
   /**
    * Sets up user events on the member side.
    * User Events:
-   * 'server/poll/tally', (answerObject: Object) (Answer without id field)
+   * 'server/poll/answer' (PollChoice)
    *  - Client answers current poll
-   *  - Adds their answer to results and remove their old answer if exists
+   *  - Adds the answer to answers
+   *  - If poll is free response, then also add to upvotes
    *
-   * 'server/poll/upvote', (answerObject: Object) (Answer without id field)
+   * 'server/poll/upvote', (PollChoice)
    *  - Client upvotes an answer or unupvotes if previously upvoted
-   *  - Increases count of answer upvoted or decreases count of answer unupvoted
+   *  - Increases count of answer upvoted or decreases count of answer unupvoted in answerChoices
    * @function
    * @param {IOSocket} client - Client's socket object
    * @param {String} googleID
@@ -172,7 +173,7 @@ export default class GroupSocket {
           // update/add response
           poll.answers[googleID] = [submittedAnswer];
           poll.answerChoices.forEach((p: PollResult) => {
-            if (p.letter && p.letter === submittedAnswer.letter) { p.count += 1; }
+            if (p.letter && p.count && p.letter === submittedAnswer.letter) { p.count += 1; }
           });
           break;
         case constants.QUESTION_TYPES.FREE_RESPONSE: { // Free Response
@@ -271,8 +272,8 @@ export default class GroupSocket {
     const pollID = this.current.id;
 
     let userAnswers;
-    const isFreeResponse = type === constants.POLL_TYPES.MULTIPLE_CHOICE;
-    if (isFreeResponse) {
+    const isMultipleChoice = type === constants.POLL_TYPES.MULTIPLE_CHOICE;
+    if (isMultipleChoice) {
       userAnswers = answers;
     } else {
       userAnswers = upvotes;
@@ -280,8 +281,8 @@ export default class GroupSocket {
     if (!userAnswers) userAnswers = {};
     if (!correctAnswer) correctAnswer = '';
 
-    const filteredChoices = userRole === 'admin' || isFreeResponse
-    || state === constants.POLL_STATES.SHARED ? answerChoices
+    const filteredChoices = userRole === 'admin' || !isMultipleChoice
+     || state === constants.POLL_STATES.SHARED ? answerChoices
       : answerChoices.map((a) => {
         a.count = null;
         return a;
@@ -307,7 +308,7 @@ export default class GroupSocket {
   _startPoll(poll: ClientPoll) {
   // start new poll
     const newPoll: SocketPoll = {
-      answerChoices: [],
+      answerChoices: poll.answerChoices,
       correctAnswer: poll.correctAnswer,
       state: constants.POLL_STATES.LIVE,
       text: poll.text,
@@ -315,14 +316,6 @@ export default class GroupSocket {
       answers: {},
       upvotes: {},
     };
-
-    // if (poll.options) {
-    //   for (let i = 0; i < poll.options.length; i += 1) {
-    //     const choice = String.fromCharCode(65 + i);
-    //     const option = poll.options[i];
-    //     newPoll.answerChoices.push({ count: 0, letter: choice, text: option });
-    //   }
-    // }
 
     this.current = newPoll;
     this.isLive = true;
@@ -379,18 +372,26 @@ _deleteLivePoll = () => {
 /**
  * Setups up events for users on admin side
  * Admin events:
- * 'server/poll/start' (pollObject: Object) (Poll object without id field)
+ * 'server/poll/start' (ClientPoll) (no id and updatedAt)
  * - Admin wants to start a poll
- * - Creates cache to store answers
- * - Notifies clients new poll has started
+ * - Notifies members new poll has started
  *
  * 'server/poll/end' (void)
  * - Admin wants to close a poll
  * - Persists recieved polls
- * - Notifies clients quesiton is now closed
+ * - Notifies members and admins that poll is now closed
  *
- * 'server/poll/results' (void)
+ * 'server/poll/results' (pollID)
  * - Shares poll results with members
+ * - Notifies members with shared poll
+ *
+ * 'server/poll/delete' (pollID)
+ * - Delete saved poll
+ * - Notifies members that poll with pollID is deleted
+ *
+ * 'server/poll/delete/live' (void)
+ * - Delete current poll
+ * - Notifies members that live poll is deleted
  * @function
  * @param {IOSocket} client - Client's socket object
  */
@@ -429,8 +430,8 @@ _setupAdminEvents(client: IOSocket): void {
     } = sharedPoll;
 
     let userAnswers;
-    const isFreeResponse = type === constants.POLL_TYPES.MULTIPLE_CHOICE;
-    if (isFreeResponse) {
+    const isMultipleChoice = type === constants.POLL_TYPES.MULTIPLE_CHOICE;
+    if (isMultipleChoice) {
       userAnswers = answers;
     } else {
       userAnswers = upvotes;

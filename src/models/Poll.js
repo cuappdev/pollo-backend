@@ -15,14 +15,14 @@ import type {
 
 export type PollResult = {|
   letter: ?string,
-    text: string,
-      count: ?number
-        |}
+  text: string,
+  count: ?number
+|}
 
 export type PollChoice = {|
   letter: ?string,
-    text: string
-      |}
+  text: string
+|}
 
 @Entity('polls')
 /**
