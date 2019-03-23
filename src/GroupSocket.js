@@ -281,8 +281,10 @@ export default class GroupSocket {
     if (!userAnswers) userAnswers = {};
     if (!correctAnswer) correctAnswer = '';
 
-    const filteredChoices = userRole === 'admin' || !isMultipleChoice
-     || state === constants.POLL_STATES.SHARED ? answerChoices
+    const filteredChoices = userRole === 'admin'
+      || !isMultipleChoice
+      || state === constants.POLL_STATES.SHARED
+      ? answerChoices
       : answerChoices.map((a) => {
         a.count = null;
         return a;
