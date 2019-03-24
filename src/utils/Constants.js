@@ -9,15 +9,14 @@ export type RequestType = 'POST' | 'GET' | 'DELETE' | 'PUT';
  * @enum {string}
  */
 const REQUEST_TYPES = {
-    POST: 'POST',
-    GET: 'GET',
-    DELETE: 'DELETE',
-    PUT: 'PUT',
+  POST: 'POST',
+  GET: 'GET',
+  DELETE: 'DELETE',
+  PUT: 'PUT',
 };
 
 /** Custom type for question types */
-export type QuestionType = 'MULTIPLE_CHOICE' | 'FREE_RESPONSE' |
-  'MULTIPLE_ANSWER' | 'RANKING'
+export type QuestionType = 'MULTIPLE_CHOICE' | 'FREE_RESPONSE'
 
 /**
 * constants for question types
@@ -25,10 +24,8 @@ export type QuestionType = 'MULTIPLE_CHOICE' | 'FREE_RESPONSE' |
 * @enum {string}
 */
 const QUESTION_TYPES = {
-    MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',
-    FREE_RESPONSE: 'FREE_RESPONSE',
-    MULTIPLE_ANSWER: 'MULTIPLE_ANSWER',
-    RANKING: 'RANKING',
+  MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',
+  FREE_RESPONSE: 'FREE_RESPONSE',
 };
 
 /**
@@ -37,12 +34,12 @@ const QUESTION_TYPES = {
 * @enum {string}
 */
 const USER_TYPES = {
-    ADMIN: 'admin',
-    MEMBER: 'member',
+  ADMIN: 'admin',
+  MEMBER: 'member',
 };
 
 export default {
-    REQUEST_TYPES,
-    QUESTION_TYPES,
-    USER_TYPES,
+  REQUEST_TYPES,
+  QUESTION_TYPES,
+  USER_TYPES,
 };

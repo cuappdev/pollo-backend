@@ -1,57 +1,56 @@
 // @flow
 
-import type { AppDevEdgesResponse } from '../../utils/AppDevEdgeRouter';
-import type { AppDevNodeResponse } from '../../utils/AppDevNodeRouter';
-
 // *********************** GENERAL RESPONSE TYPES ***********************
 
 export type id = string
 
 export type Response<T> = {
-  success: boolean,
   data: T,
-  errors?: Array<Error>
+  errors?: Array<Error>,
+  success: boolean,
 }
-
-export type NodeResponse<T> = Response<AppDevNodeResponse<T>>
-export type EdgesResponse<T> = Response<AppDevEdgesResponse<T>>
 
 // ************************ POLLO OBJECT TYPES ************************
 export type APIGroup = {|
   id: id,
+  code: string,
+  isLive: boolean,
   name: string,
-  code: string
+  updatedAt: string,
 |}
 
 export type APIPoll = {|
   id: id,
-  text: string,
+  answer: ?string,
+  correctAnswer: string,
   results: Object,
   shared: boolean,
+  text: string,
   type: string,
-  answer: ?string
 |}
 
 export type APIDraft = {|
   id: id,
+  createdAt: string,
+  options: string[],
   text: string,
-  options: string[]
 |}
 
 export type APIQuestion = {|
   id: id,
-  text: string
+  createdAt: string,
+  text: string,
 |}
 
 export type APIUser = {|
   id: id,
   name: string,
-  netID: string
+  netID: string,
 |}
 
 export type APIUserSession = {|
   accessToken: string,
+  isActive: boolean,
   refreshToken: string,
-  sessionExpiration: number,
-  isActive: boolean
+  sessionExpiration: string,
 |}

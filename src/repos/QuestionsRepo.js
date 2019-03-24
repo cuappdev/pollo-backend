@@ -17,17 +17,17 @@ const db = (): Repository<Question> => getConnectionManager().get().getRepositor
  */
 const createQuestion = async (text: string, group: Group, user: User):
   Promise<Question> => {
-    try {
-        const question = new Question();
-        question.text = text;
-        question.group = group;
-        question.user = user;
+  try {
+    const question = new Question();
+    question.text = text;
+    question.group = group;
+    question.user = user;
 
-        await db().persist(question);
-        return question;
-    } catch (e) {
-        throw LogUtils.logError('Problem creating question!');
-    }
+    await db().persist(question);
+    return question;
+  } catch (e) {
+    throw LogUtils.logErr('Problem creating question', e, { text, group, user });
+  }
 };
 
 /**
@@ -37,11 +37,11 @@ const createQuestion = async (text: string, group: Group, user: User):
  * @return {?Question} Question with specified id
  */
 const getQuestionByID = async (id: number): Promise<?Question> => {
-    try {
-        return await db().findOneById(id);
-    } catch (e) {
-        throw LogUtils.logError(`Problem getting question by id: ${id}`);
-    }
+  try {
+    return await db().findOneById(id);
+  } catch (e) {
+    throw LogUtils.logErr(`Problem getting question by id: ${id}`, e);
+  }
 };
 
 /**
@@ -50,12 +50,12 @@ const getQuestionByID = async (id: number): Promise<?Question> => {
  * @param {number} id - ID of question to delete
  */
 const deleteQuestionByID = async (id: number) => {
-    try {
-        const question = await db().findOneById(id);
-        await db().remove(question);
-    } catch (e) {
-        throw LogUtils.logError(`Problem deleting question with id: ${id}`);
-    }
+  try {
+    const question = await db().findOneById(id);
+    await db().remove(question);
+  } catch (e) {
+    throw LogUtils.logErr(`Problem deleting question by id: ${id}`, e);
+  }
 };
 
 /**
@@ -67,21 +67,21 @@ const deleteQuestionByID = async (id: number) => {
  */
 const updateQuestionByID = async (id: number, text: string):
   Promise<?Question> => {
-    try {
-        const field = {};
-        if (text !== undefined && text !== null) {
-            field.text = text;
-            await db().createQueryBuilder('questions')
-                .where('questions.id = :questionID')
-                .setParameters({ questionID: id })
-                .update(field)
-                .execute();
-        }
-
-        return await db().findOneById(id);
-    } catch (e) {
-        throw LogUtils.logError(`Problem updating question by id: ${id}`);
+  try {
+    const field = {};
+    if (text !== undefined && text !== null) {
+      field.text = text;
+      await db().createQueryBuilder('questions')
+        .where('questions.id = :questionID')
+        .setParameters({ questionID: id })
+        .update(field)
+        .execute();
     }
+
+    return await db().findOneById(id);
+  } catch (e) {
+    throw LogUtils.logErr(`Problem updating question by id: ${id}`, e, { text });
+  }
 };
 
 /**
@@ -91,15 +91,15 @@ const updateQuestionByID = async (id: number, text: string):
  * @return {?Group} Group that the question belongs to
  */
 const getGroupFromQuestionID = async (id: number) : Promise<?Group> => {
-    try {
-        const question = await db().createQueryBuilder('questions')
-            .leftJoinAndSelect('questions.group', 'group')
-            .where('questions.id = :questionID', { questionID: id })
-            .getOne();
-        return question.group;
-    } catch (e) {
-        throw LogUtils.logError(`Problem getting group from question with id: ${id}`);
-    }
+  try {
+    const question = await db().createQueryBuilder('questions')
+      .leftJoinAndSelect('questions.group', 'group')
+      .where('questions.id = :questionID', { questionID: id })
+      .getOne();
+    return question.group;
+  } catch (e) {
+    throw LogUtils.logErr(`Problem getting group from question by id: ${id}`, e);
+  }
 };
 
 /**
@@ -110,23 +110,23 @@ const getGroupFromQuestionID = async (id: number) : Promise<?Group> => {
  * @return {boolean} Whether the given user is the owner of the question
  */
 const isOwnerByID = async (id: number, user: User) : Promise<?boolean> => {
-    try {
-        const question = await db().createQueryBuilder('questions')
-            .leftJoinAndSelect('questions.user', 'user')
-            .where('questions.id = :questionID', { questionID: id })
-            .getOne();
+  try {
+    const question = await db().createQueryBuilder('questions')
+      .leftJoinAndSelect('questions.user', 'user')
+      .where('questions.id = :questionID', { questionID: id })
+      .getOne();
 
-        return user && question.user.id === user.id;
-    } catch (e) {
-        throw LogUtils.logError(`Could not verify ownership of question with id: ${id}`);
-    }
+    return user && question.user.id === user.id;
+  } catch (e) {
+    throw LogUtils.logErr(`Could not verify ownership of question by id: ${id}`, e, { user });
+  }
 };
 
 export default {
-    createQuestion,
-    deleteQuestionByID,
-    getGroupFromQuestionID,
-    getQuestionByID,
-    isOwnerByID,
-    updateQuestionByID,
+  createQuestion,
+  deleteQuestionByID,
+  getGroupFromQuestionID,
+  getQuestionByID,
+  isOwnerByID,
+  updateQuestionByID,
 };

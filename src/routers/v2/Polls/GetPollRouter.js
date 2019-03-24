@@ -1,36 +1,42 @@
 // @flow
 import { Request } from 'express';
-import AppDevNodeRouter from '../../../utils/AppDevNodeRouter';
+import AppDevRouter from '../../../utils/AppDevRouter';
+import constants from '../../../utils/Constants';
+import GroupsRepo from '../../../repos/GroupsRepo';
 import LogUtils from '../../../utils/LogUtils';
 import PollsRepo from '../../../repos/PollsRepo';
-import GroupsRepo from '../../../repos/GroupsRepo';
 
 import type { APIPoll } from '../APITypes';
 
-class GetPollRouter extends AppDevNodeRouter<APIPoll> {
-    getPath(): string {
-        return '/polls/:id/';
-    }
+class GetPollRouter extends AppDevRouter<APIPoll> {
+  constructor() {
+    super(constants.REQUEST_TYPES.GET);
+  }
 
-    async fetchWithID(id: number, req: Request) {
-        const poll = await PollsRepo.getPollByID(id);
-        if (!poll) throw LogUtils.logError(`Poll with id ${id} cannot be found`);
+  getPath(): string {
+    return '/polls/:id/';
+  }
 
-        const group = await PollsRepo.getGroupFromPollID(poll.id);
-        if (!group) throw LogUtils.logError(`Group with id ${id} cannot be found`);
+  async content(req: Request) {
+    const { id } = req.params;
+    const poll = await PollsRepo.getPollByID(id);
+    if (!poll) throw LogUtils.logErr(`Poll with id ${id} cannot be found`);
 
-        const isAdmin = await GroupsRepo.isAdmin(group.id, req.user);
+    const group = await PollsRepo.getGroupFromPollID(poll.id);
+    if (!group) throw LogUtils.logErr(`Group with id ${id} cannot be found`);
 
-        return poll && {
-            id: poll.id,
-            text: poll.text,
-            results: poll.results,
-            shared: poll.shared,
-            type: poll.type,
-            answer: isAdmin ? null : poll.userAnswers[req.user.googleID],
-            correctAnswer: poll.correctAnswer,
-        };
-    }
+    const isAdmin = await GroupsRepo.isAdmin(group.id, req.user);
+
+    return poll && {
+      id: poll.id,
+      text: poll.text,
+      results: poll.results,
+      shared: poll.shared,
+      type: poll.type,
+      answer: isAdmin ? null : poll.userAnswers[req.user.googleID],
+      correctAnswer: poll.correctAnswer,
+    };
+  }
 }
 
 export default new GetPollRouter().router;

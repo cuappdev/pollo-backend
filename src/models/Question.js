@@ -1,9 +1,9 @@
 // @flow
 import {
-    Column,
-    Entity,
-    ManyToOne,
-    PrimaryGeneratedColumn,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import Base from './Base';
 import Group from './Group';
@@ -25,7 +25,7 @@ class Question extends Base {
   text: string = '';
 
   @ManyToOne(type => Group, group => group.polls, {
-      onDelete: 'CASCADE',
+    onDelete: 'CASCADE',
   })
   /** Group that the question is being asked in */
   group: ?Group = null;

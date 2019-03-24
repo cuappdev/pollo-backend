@@ -1,10 +1,10 @@
 // @flow
 import {
-    Column,
-    Entity,
-    json,
-    ManyToOne,
-    PrimaryGeneratedColumn,
+  Column,
+  Entity,
+  json,
+  ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import Base from './Base';
 import Group from './Group';
@@ -28,7 +28,7 @@ class Poll extends Base {
   type: string = '';
 
   @ManyToOne(type => Group, group => group.polls, {
-      onDelete: 'CASCADE',
+    onDelete: 'CASCADE',
   })
   /** Group the poll belongs to */
   group: ?Group = null;

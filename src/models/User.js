@@ -1,10 +1,10 @@
 // @flow
 import {
-    Column,
-    Entity,
-    ManyToMany,
-    OneToMany,
-    PrimaryGeneratedColumn,
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import Base from './Base';
 import Draft from './Draft';
@@ -65,13 +65,13 @@ class User extends Base {
    * @return {User} a new user with supplied google id
    */
   static dummy(id: string): User {
-      const user = new User();
-      user.googleID = id;
-      user.firstName = '';
-      user.lastName = '';
-      user.email = '';
-      user.netID = '';
-      return user;
+    const user = new User();
+    user.googleID = id;
+    user.firstName = '';
+    user.lastName = '';
+    user.email = '';
+    user.netID = '';
+    return user;
   }
 
   /**
@@ -81,13 +81,13 @@ class User extends Base {
    * @return {User} a new user with info google supplied
    */
   static fromGoogleCreds(creds: Object): User {
-      const user = new User();
-      user.googleID = creds.id;
-      user.firstName = creds.name.givenName;
-      user.lastName = creds.name.familyName;
-      user.email = creds.emails[0].value;
-      user.netID = appDevUtils.netIDFromEmail(user.email);
-      return user;
+    const user = new User();
+    user.googleID = creds.id;
+    user.firstName = creds.name.givenName;
+    user.lastName = creds.name.familyName;
+    user.email = creds.emails[0].value;
+    user.netID = appDevUtils.netIDFromEmail(user.email);
+    return user;
   }
 }
 

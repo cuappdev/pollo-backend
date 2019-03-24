@@ -16,11 +16,11 @@ const db = (): Repository<User> => getConnectionManager().get().getRepository(Us
  * @return {User} New dummy user
  */
 const createDummyUser = async (id: string): Promise<User> => {
-    try {
-        return await db().persist(User.dummy(id));
-    } catch (e) {
-        throw LogUtils.logError('Problem creating user!');
-    }
+  try {
+    return await db().persist(User.dummy(id));
+  } catch (e) {
+    throw LogUtils.logErr('Problem creating user', e, { id });
+  }
 };
 
 /**
@@ -30,11 +30,11 @@ const createDummyUser = async (id: string): Promise<User> => {
  * @return {User} New user created using given credentials
  */
 const createUser = async (fields: Object): Promise<User> => {
-    try {
-        return await db().persist(User.fromGoogleCreds(fields));
-    } catch (e) {
-        throw LogUtils.logError('Problem creating user!');
-    }
+  try {
+    return await db().persist(User.fromGoogleCreds(fields));
+  } catch (e) {
+    throw LogUtils.logErr('Problem creating user from google credentials', e, { fields });
+  }
 };
 
 /**
@@ -47,20 +47,22 @@ const createUser = async (fields: Object): Promise<User> => {
  * @return {User} New user created using given params
  */
 const createUserWithFields = async (googleID: string, firstName: string,
-    lastName: string, email: string): Promise<User> => {
-    try {
-        const user = new User();
-        user.googleID = googleID;
-        user.firstName = firstName;
-        user.lastName = lastName;
-        user.email = email;
-        user.netID = appDevUtils.netIDFromEmail(email);
+  lastName: string, email: string): Promise<User> => {
+  try {
+    const user = new User();
+    user.googleID = googleID;
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.email = email;
+    user.netID = appDevUtils.netIDFromEmail(email);
 
-        await db().persist(user);
-        return user;
-    } catch (e) {
-        throw LogUtils.logError('Problem creating user!');
-    }
+    await db().persist(user);
+    return user;
+  } catch (e) {
+    throw LogUtils.logErr('Problem creating user with fields', e, {
+      googleID, firstName, lastName, email,
+    });
+  }
 };
 
 /**
@@ -70,11 +72,11 @@ const createUserWithFields = async (googleID: string, firstName: string,
  * @return {?User} User with given id
  */
 const getUserByID = async (id: number): Promise<?User> => {
-    try {
-        return await db().findOneById(id);
-    } catch (e) {
-        throw LogUtils.logError(`Problem getting user by id: ${id}!`);
-    }
+  try {
+    return await db().findOneById(id);
+  } catch (e) {
+    throw LogUtils.logErr(`Problem getting user by id: ${id}`, e);
+  }
 };
 
 /**
@@ -84,13 +86,13 @@ const getUserByID = async (id: number): Promise<?User> => {
  * @return {?User} User with given google id
  */
 const getUserByGoogleID = async (googleID: string): Promise<?User> => {
-    try {
-        return await db().createQueryBuilder('users')
-            .where('users.googleID = :googleID', { googleID })
-            .getOne();
-    } catch (e) {
-        throw LogUtils.logError('Problem getting user by google ID!');
-    }
+  try {
+    return await db().createQueryBuilder('users')
+      .where('users.googleID = :googleID', { googleID })
+      .getOne();
+  } catch (e) {
+    throw LogUtils.logErr('Problem getting user by google ID', e, { googleID });
+  }
 };
 
 /**
@@ -99,12 +101,12 @@ const getUserByGoogleID = async (googleID: string): Promise<?User> => {
  * @return {User[]} List of all users
  */
 const getUsers = async (): Promise<Array<?User>> => {
-    try {
-        return await db().createQueryBuilder('users')
-            .getMany();
-    } catch (e) {
-        throw LogUtils.logError('Problem getting users!');
-    }
+  try {
+    return await db().createQueryBuilder('users')
+      .getMany();
+  } catch (e) {
+    throw LogUtils.logErr('Problem getting users', e);
+  }
 };
 
 /**
@@ -116,19 +118,19 @@ const getUsers = async (): Promise<Array<?User>> => {
  */
 const getUsersFromIDs = async (userIDs: number[], filter: ?number[]):
 Promise<?Array<User>> => {
-    try {
-        const ids = `(${String(userIDs)})`;
-        let query = `users.id IN ${ids}`;
-        if (filter && filter.length > 0) {
-            const f = `(${String(filter)})`;
-            query += ` AND users.id not IN ${f}`;
-        }
-        return await db().createQueryBuilder('users')
-            .where(query)
-            .getMany();
-    } catch (e) {
-        throw LogUtils.logError('Problem getting users from ids!');
+  try {
+    const ids = `(${String(userIDs)})`;
+    let query = `users.id IN ${ids}`;
+    if (filter && filter.length > 0) {
+      const f = `(${String(filter)})`;
+      query += ` AND users.id not IN ${f}`;
     }
+    return await db().createQueryBuilder('users')
+      .where(query)
+      .getMany();
+  } catch (e) {
+    throw LogUtils.logErr('Problem getting users from ids', e, { userIDs, filter });
+  }
 };
 
 /**
@@ -141,18 +143,18 @@ Promise<?Array<User>> => {
  */
 const getUsersByGoogleIDs = async (googleIDs: string[], filter: ?string[]):
   Promise<?Array<User>> => {
-    try {
-        let validIDs = googleIDs;
-        if (filter && filter.length > 0) {
-            validIDs = googleIDs.filter(id => filter && !filter.includes(id));
-        }
-        const ids = `{${String(validIDs)}}`;
-        return await db().createQueryBuilder('users')
-            .where(`users.googleID = ANY('${ids}'::text[])`)
-            .getMany();
-    } catch (e) {
-        throw LogUtils.logError('Problem getting users from googleIDs!');
+  try {
+    let validIDs = googleIDs;
+    if (filter && filter.length > 0) {
+      validIDs = googleIDs.filter(id => filter && !filter.includes(id));
     }
+    const ids = `{${String(validIDs)}}`;
+    return await db().createQueryBuilder('users')
+      .where(`users.googleID = ANY('${ids}'::text[])`)
+      .getMany();
+  } catch (e) {
+    throw LogUtils.logErr('Problem getting users from googleIDs', e, { googleIDs, filter });
+  }
 };
 
 /**
@@ -161,13 +163,13 @@ const getUsersByGoogleIDs = async (googleIDs: string[], filter: ?string[]):
  * @param {number} id - ID of user to delete
  */
 const deleteUserByID = async (id: number) => {
-    try {
-        const user = await db().findOneById(id);
-        await UserSessionsRepo.deleteSessionFromUserID(id);
-        await db().remove(user);
-    } catch (e) {
-        throw LogUtils.logError(`Problem deleting user by id: ${id}!`);
-    }
+  try {
+    const user = await db().findOneById(id);
+    await UserSessionsRepo.deleteSessionFromUserID(id);
+    await db().remove(user);
+  } catch (e) {
+    throw LogUtils.logErr(`Problem deleting user by id: ${id}`, e);
+  }
 };
 
 /**
@@ -180,33 +182,33 @@ const deleteUserByID = async (id: number) => {
  */
 const getGroupsByID = async (id: number, role: ?string):
     Promise<Array<?Group>> => {
-    try {
-        const user = await db().createQueryBuilder('users')
-            .leftJoinAndSelect('users.memberGroups', 'memberGroups')
-            .leftJoinAndSelect('users.adminGroups', 'adminGroups')
-            .where('users.id = :userID')
-            .setParameters({ userID: id })
-            .getOne();
-        if (role === constants.USER_TYPES.ADMIN) {
-            return user.adminGroups;
-        } if (role === constants.USER_TYPES.MEMBER) {
-            return user.memberGroups;
-        }
-        return user.memberGroups.concat(user.adminGroups);
-    } catch (e) {
-        throw LogUtils.logError(`Problem getting member groups for user: ${id}`);
+  try {
+    const user = await db().createQueryBuilder('users')
+      .leftJoinAndSelect('users.memberGroups', 'memberGroups')
+      .leftJoinAndSelect('users.adminGroups', 'adminGroups')
+      .where('users.id = :userID')
+      .setParameters({ userID: id })
+      .getOne();
+    if (role === constants.USER_TYPES.ADMIN) {
+      return user.adminGroups;
+    } if (role === constants.USER_TYPES.MEMBER) {
+      return user.memberGroups;
     }
+    return user.memberGroups.concat(user.adminGroups);
+  } catch (e) {
+    throw LogUtils.logErr(`Problem getting member groups for user: ${id}`, e, { role });
+  }
 };
 
 export default {
-    getUsers,
-    createUser,
-    createUserWithFields,
-    createDummyUser,
-    getGroupsByID,
-    getUserByGoogleID,
-    getUserByID,
-    getUsersByGoogleIDs,
-    getUsersFromIDs,
-    deleteUserByID,
+  getUsers,
+  createUser,
+  createUserWithFields,
+  createDummyUser,
+  getGroupsByID,
+  getUserByGoogleID,
+  getUserByID,
+  getUsersByGoogleIDs,
+  getUsersFromIDs,
+  deleteUserByID,
 };

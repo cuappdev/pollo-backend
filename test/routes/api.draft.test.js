@@ -1,10 +1,10 @@
+import request from 'request-promise-native';
 import dbConnection from '../../src/db/DbConnection';
 import UsersRepo from '../../src/repos/UsersRepo';
 import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
 
-const request = require('request-promise-native');
 const {
-    get, post, del, put,
+  get, post, del, put,
 } = require('./lib');
 
 let draft1;
@@ -13,87 +13,91 @@ let userID;
 let userToken;
 
 beforeAll(async () => {
-    await dbConnection().catch((e) => {
-        // eslint-disable-next-line no-console
-        console.log('Error connecting to database');
-        process.exit();
-    });
-    const user = await UsersRepo.createDummyUser('googleID');
-    userID = user.id;
-    const session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
-    userToken = session.sessionToken;
+  await dbConnection().catch((e) => {
+    // eslint-disable-next-line no-console
+    console.log('Error connecting to database');
+    process.exit();
+  });
+  const user = await UsersRepo.createDummyUser('googleID');
+  userID = user.id;
+  const session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
+  userToken = session.sessionToken;
 });
 
 test('Create a draft', async () => {
-    const body = {
-        text: 'Test draft',
-        options: ['yes', 'no'],
-    };
-    const getstr = await request(post('/drafts/', body, userToken));
-    const getres = getstr;
-    draft1 = getres.data.node;
+  const body = {
+    text: 'Test draft',
+    options: ['yes', 'no'],
+  };
+  await request(post('/drafts/', body, userToken)).then((getres) => {
+    draft1 = getres.data;
     expect(getres.success).toBe(true);
     expect(draft1).toMatchObject(body);
+  });
 });
 
 test('Get drafts (Authorized)', async () => {
-    const getstr = await request(get('/drafts/', userToken));
-    const getres = getstr;
-    const { edges } = getres.data;
+  await request(get('/drafts/', userToken)).then((getres) => {
+    const drafts = getres.data;
     expect(getres.success).toBe(true);
-    expect(edges.length).toBe(1);
-    expect(edges[0].node).toMatchObject(draft1);
+    expect(drafts.length).toBe(1);
+    expect(drafts[0]).toMatchObject(draft1);
+  });
 });
 
 test('Get drafts (Unauthorized)', async () => {
-    const getstr = await request(get('/drafts/', 'blah'));
-    const getres = getstr;
-    expect(getres.success).toBe(false);
+  await request(get('/drafts/', 'blah'))
+    .catch((e) => {
+      expect(e.statusCode).toBe(401);
+    });
 });
 
 test('Update a draft', async () => {
-    const body = {
-        text: 'Test draft updated',
-    };
-    const getstr = await request(put(`/drafts/${draft1.id}`, body, userToken));
-    const getres = getstr;
-    const { node } = getres.data;
+  const body = {
+    text: 'Test draft updated',
+  };
+  await request(put(`/drafts/${draft1.id}`, body, userToken)).then((getres) => {
+    const draft = getres.data;
     expect(getres.success).toBe(true);
-    expect(node.text).toBe(body.text);
-    expect(node.options).toMatchObject(draft1.options);
-    expect(node.id).toBe(draft1.id);
-    draft1 = node;
+    expect(draft.text).toBe(body.text);
+    expect(draft.options).toMatchObject(draft1.options);
+    expect(draft.id).toBe(draft1.id);
+    expect(draft.createdAt).toBe(draft1.createdAt);
+    draft1 = draft;
+  });
 });
 
 test('Create another draft', async () => {
-    const body = {
-        text: 'Another One ... DJ Khaled',
-        options: ['yes'],
-    };
-    const getstr = await request(post('/drafts/', body, userToken));
-    const getres = getstr;
-    draft2 = getres.data.node;
+  const body = {
+    text: 'Another One ... DJ Khaled',
+    options: ['yes'],
+  };
+  await request(post('/drafts/', body, userToken)).then((getres) => {
+    draft2 = getres.data;
     expect(getres.success).toBe(true);
     expect(draft2).toMatchObject(body);
+  });
 });
 
 test('Get updated list of drafts (Authorized)', async () => {
-    const getstr = await request(get('/drafts/', userToken));
-    const getres = getstr;
-    const { edges } = getres.data;
+  await request(get('/drafts/', userToken)).then((getres) => {
+    const drafts = getres.data;
     expect(getres.success).toBe(true);
-    expect(edges.length).toBe(2);
-    expect(edges[0].node).toMatchObject(draft1);
-    expect(edges[1].node).toMatchObject(draft2);
+    expect(drafts.length).toBe(2);
+    expect(drafts[0]).toMatchObject(draft1);
+    expect(drafts[1]).toMatchObject(draft2);
+  });
 });
 
 test('Delete draft', async () => {
-    let result = await request(del(`/drafts/${draft1.id}`, userToken));
+  await request(del(`/drafts/${draft1.id}`, userToken)).then((result) => {
     expect(result.success).toBe(true);
-    result = await request(del(`/drafts/${draft2.id}`, userToken));
+  });
+  await request(del(`/drafts/${draft2.id}`, userToken)).then((result) => {
     expect(result.success).toBe(true);
+  });
 });
 
 afterAll(async () => {
-    UsersRepo.deleteUserByID(userID);
+  UsersRepo.deleteUserByID(userID);
 });

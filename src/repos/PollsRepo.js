@@ -19,23 +19,25 @@ const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Po
  * @return {Poll} New poll created
  */
 const createPoll = async (text: string, group: ?Group, results: json,
-    canShare: boolean, type: string, correctAnswer: string, userAnswers: ?json):
+  canShare: boolean, type: string, correctAnswer: string, userAnswers: ?json):
   Promise <Poll> => {
-    try {
-        const poll = new Poll();
-        poll.text = text;
-        poll.group = group;
-        poll.results = results;
-        poll.shared = canShare;
-        poll.type = type;
-        poll.correctAnswer = correctAnswer;
-        poll.userAnswers = userAnswers || {};
+  try {
+    const poll = new Poll();
+    poll.text = text;
+    poll.group = group;
+    poll.results = results;
+    poll.shared = canShare;
+    poll.type = type;
+    poll.correctAnswer = correctAnswer;
+    poll.userAnswers = userAnswers || {};
 
-        await db().persist(poll);
-        return poll;
-    } catch (e) {
-        throw LogUtils.logError('Problem creating poll!');
-    }
+    await db().persist(poll);
+    return poll;
+  } catch (e) {
+    throw LogUtils.logErr('Problem creating poll', e, {
+      text, group, results, canShare, type, correctAnswer, userAnswers,
+    });
+  }
 };
 
 /**
@@ -45,11 +47,11 @@ const createPoll = async (text: string, group: ?Group, results: json,
  * @return {?Poll} Poll with corresponding id
  */
 const getPollByID = async (id: number): Promise<?Poll> => {
-    try {
-        return await db().findOneById(id);
-    } catch (e) {
-        throw LogUtils.logError(`Problem getting poll by id: ${id}!`);
-    }
+  try {
+    return await db().findOneById(id);
+  } catch (e) {
+    throw LogUtils.logErr(`Problem getting poll by id: ${id}`, e);
+  }
 };
 
 /**
@@ -58,12 +60,12 @@ const getPollByID = async (id: number): Promise<?Poll> => {
  * @param {number} id - id of the poll to delete
  */
 const deletePollByID = async (id: number) => {
-    try {
-        const poll = await db().findOneById(id);
-        await db().remove(poll);
-    } catch (e) {
-        throw LogUtils.logError(`Problem deleting poll with id: ${id}!`);
-    }
+  try {
+    const poll = await db().findOneById(id);
+    await db().remove(poll);
+  } catch (e) {
+    throw LogUtils.logErr(`Problem deleting poll by id: ${id}`, e);
+  }
 };
 
 /**
@@ -77,25 +79,25 @@ const deletePollByID = async (id: number) => {
  * @return {?Poll} Updated poll
  */
 const updatePollByID = async (id: number, text: ?string, results: ?json,
-    canShare: ?boolean, userAnswers: ?json):
+  canShare: ?boolean, userAnswers: ?json):
   Promise<?Poll> => {
-    try {
-        const poll = await db().createQueryBuilder('polls')
-            .leftJoinAndSelect('polls.group', 'group')
-            .where('polls.id = :pollID')
-            .setParameters({ pollID: id })
-            .getOne();
+  try {
+    const poll = await db().createQueryBuilder('polls')
+      .leftJoinAndSelect('polls.group', 'group')
+      .where('polls.id = :pollID')
+      .setParameters({ pollID: id })
+      .getOne();
 
-        if (text !== undefined && text !== null) poll.text = text;
-        if (results) poll.results = results;
-        if (canShare !== null && canShare !== undefined) poll.shared = canShare;
-        if (userAnswers) poll.userAnswers = userAnswers;
+    if (text !== undefined && text !== null) poll.text = text;
+    if (results) poll.results = results;
+    if (canShare !== null && canShare !== undefined) poll.shared = canShare;
+    if (userAnswers) poll.userAnswers = userAnswers;
 
-        await db().persist(poll);
-        return poll;
-    } catch (e) {
-        throw LogUtils.logError(`Problem updating poll by id: ${id}!`);
-    }
+    await db().persist(poll);
+    return poll;
+  } catch (e) {
+    throw LogUtils.logErr(`Problem updating poll by id: ${id}`, e);
+  }
 };
 
 /**
@@ -105,21 +107,21 @@ const updatePollByID = async (id: number, text: ?string, results: ?json,
  * @return {?Group} Group that the poll belongs to
  */
 const getGroupFromPollID = async (id: number) : Promise<?Group> => {
-    try {
-        const poll = await db().createQueryBuilder('polls')
-            .leftJoinAndSelect('polls.group', 'group')
-            .where('polls.id = :pollID', { pollID: id })
-            .getOne();
-        return poll.group;
-    } catch (e) {
-        throw LogUtils.logError(`Problem getting group from quesiton with id: ${id}!`);
-    }
+  try {
+    const poll = await db().createQueryBuilder('polls')
+      .leftJoinAndSelect('polls.group', 'group')
+      .where('polls.id = :pollID', { pollID: id })
+      .getOne();
+    return poll.group;
+  } catch (e) {
+    throw LogUtils.logErr(`Problem getting group from question by id: ${id}`, e);
+  }
 };
 
 export default {
-    createPoll,
-    deletePollByID,
-    getGroupFromPollID,
-    getPollByID,
-    updatePollByID,
+  createPoll,
+  deletePollByID,
+  getGroupFromPollID,
+  getPollByID,
+  updatePollByID,
 };

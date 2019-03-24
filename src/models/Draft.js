@@ -1,9 +1,9 @@
 // @flow
 import {
-    Column,
-    Entity,
-    ManyToOne,
-    PrimaryGeneratedColumn,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import Base from './Base';
 import User from './User';

@@ -1,10 +1,10 @@
 // @flow
 import {
-    Column,
-    Entity,
-    JoinColumn,
-    OneToOne,
-    PrimaryGeneratedColumn,
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import crypto from 'crypto';
 import Base from './Base';
@@ -26,7 +26,7 @@ class UserSession extends Base {
 
   @Column('bigint')
   /** Timestamp of when the session expires (Unix time) */
-  expiresAt: number = -1;
+  expiresAt: string = '-1';
 
   @Column('string')
   /** Refresh token associated with session */
@@ -51,10 +51,10 @@ class UserSession extends Base {
    */
   static fromUser(user: User, accessToken: ?string, refreshToken: ?string):
     UserSession {
-      const session = new UserSession();
-      session.user = user;
-      session.update(accessToken, refreshToken);
-      return session;
+    const session = new UserSession();
+    session.user = user;
+    session.update(accessToken, refreshToken);
+    return session;
   }
 
   /**
@@ -65,13 +65,13 @@ class UserSession extends Base {
    * @return {UserSession} updated session
    */
   update(accessToken: ?string, updateToken: ?string): UserSession {
-      this.sessionToken = accessToken || crypto.randomBytes(64).toString('hex');
-      this.updateToken = updateToken || crypto.randomBytes(64).toString('hex');
+    this.sessionToken = accessToken || crypto.randomBytes(64).toString('hex');
+    this.updateToken = updateToken || crypto.randomBytes(64).toString('hex');
 
-      // Session length is 1 day
-      this.expiresAt = Math.floor(new Date().getTime() / 1000) + 60 * 60 * 24;
-      this.activate();
-      return this;
+    // Session length is 1 day
+    this.expiresAt = String(Math.floor(new Date().getTime() / 1000) + 60 * 60 * 24);
+    this.activate();
+    return this;
   }
 
   /**
@@ -80,8 +80,8 @@ class UserSession extends Base {
    * @return {UserSession} updated, active session
    */
   activate(): UserSession {
-      this.isActive = true;
-      return this;
+    this.isActive = true;
+    return this;
   }
 
   /**
@@ -90,8 +90,8 @@ class UserSession extends Base {
    * @returns {UserSession} updated, inactive session
    */
   logOut(): UserSession {
-      this.isActive = false;
-      return this;
+    this.isActive = false;
+    return this;
   }
 }
 

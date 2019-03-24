@@ -1,12 +1,21 @@
 // @flow
 // General utility functions / Objects helpful in a JS setting across
 // all AppDev projects
-import axios from 'axios';
 
-const googleAxios = axios.create({
-    baseURL: 'https://www.googleapis.com',
-    timeout: 5000,
-});
+/**
+ * Check if a string is an AppDev-formatted URL. An AppDev formatted URL is
+ * either just a '/', or begins and ends with a `/`, and must have some
+ * characters in between.
+ */
+const tryCheckAppDevURL = (path: string) => {
+  if (path !== '/' && path.length < 2) {
+    throw new Error('Invalid path');
+  } else if (path[0] !== '/') {
+    throw new Error('Path must start with a \'/\'');
+  } else if (path[path.length - 1] !== '/') {
+    throw new Error('Path must end with a \'/\'');
+  }
+};
 
 /**
  * Extracts netid from email
@@ -26,7 +35,7 @@ const randomCode = (length: number): string => Math.round(((36 ** (length + 1)) 
     * (36 ** length))).toString(36).slice(1).toUpperCase();
 
 export default {
-    googleAxios,
-    netIDFromEmail,
-    randomCode,
+  netIDFromEmail,
+  randomCode,
+  tryCheckAppDevURL,
 };
