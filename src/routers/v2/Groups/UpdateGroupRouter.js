@@ -17,11 +17,13 @@ class UpdateGroupRouter extends AppDevRouter<APIGroup> {
   }
 
   async content(req: Request) {
-    const { name } = req.body;
+    const { isRestricted, name } = req.body;
     const groupID = req.params.id;
     const { user } = req;
 
-    if (!name) throw LogUtils.logErr('No fields specified to update');
+    if (!name && (isRestricted === null || isRestricted === undefined)) {
+      throw LogUtils.logErr('No fields specified to update');
+    }
 
     let group = await GroupsRepo.getGroupByID(groupID);
     if (!group) {
@@ -34,14 +36,17 @@ class UpdateGroupRouter extends AppDevRouter<APIGroup> {
       );
     }
 
-    group = await GroupsRepo.updateGroupByID(groupID, name);
+    group = await GroupsRepo.updateGroupByID(groupID, name, null, isRestricted);
     if (!group) {
       throw LogUtils.logErr(`Group with id ${groupID} was not found`);
     }
+
     return {
       id: group.id,
       code: group.code,
       isLive: await req.app.groupManager.isLive(group.code),
+      isLocationRestricted: group.isLocationRestricted,
+      location: group.location,
       name: group.name,
       updatedAt: group.updatedAt,
     };

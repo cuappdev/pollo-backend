@@ -24,6 +24,8 @@ class GetGroupRouter extends AppDevRouter<APIGroup> {
       id: group.id,
       code: group.code,
       isLive: await req.app.groupManager.isLive(group.code),
+      isLocationRestricted: group.isLocationRestricted,
+      location: group.location,
       name: group.name,
       updatedAt: await GroupsRepo.latestActivityByGroupID(group.id),
     };

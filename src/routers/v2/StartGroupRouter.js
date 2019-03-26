@@ -17,7 +17,7 @@ class StartGroupRouter extends AppDevRouter<APIGroup> {
   }
 
   async content(req: Request) {
-    const { code } = req.body;
+    const { code, location } = req.body;
     let { name } = req.body;
 
     if (!name) name = '';
@@ -26,13 +26,15 @@ class StartGroupRouter extends AppDevRouter<APIGroup> {
       throw LogUtils.logErr('Code required');
     }
 
-    const group = await GroupsRepo.createGroup(name, code, req.user);
+    const group = await GroupsRepo.createGroup(name, code, req.user, location);
     await req.app.groupManager.startNewGroup(group);
 
     return {
       id: group.id,
       code: group.code,
       isLive: true,
+      isLocationRestricted: group.isLocationRestricted,
+      location: group.location,
       name: group.name,
       updatedAt: await GroupsRepo.latestActivityByGroupID(group.id),
     };

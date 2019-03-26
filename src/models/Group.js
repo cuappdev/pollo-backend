@@ -12,6 +12,8 @@ import Poll from './Poll';
 import Question from './Question';
 import User from './User';
 
+export type Coord = {| lat: ?number, long: ?number |}
+
 @Entity('groups')
 /**
  * Group class represents a grouping of polls.
@@ -29,6 +31,14 @@ class Group extends Base {
   @Column('string')
   /** Unique code to join group */
   code: string = '';
+
+  @Column('json')
+  /** Most recent coordinates of the admin of the group */
+  location: Coord = { lat: null, long: null };
+
+  @Column('boolean')
+  /** If joining a group requires user to be within 300m of the group location */
+  isLocationRestricted: boolean = false
 
   @ManyToMany(type => User, user => user.adminGroups)
   @JoinTable()

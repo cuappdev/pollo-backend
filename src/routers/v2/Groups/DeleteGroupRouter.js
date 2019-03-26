@@ -25,7 +25,7 @@ class DeleteGroupRouter extends AppDevRouter<NoResponse> {
 
     if (!await GroupsRepo.isAdmin(groupID, user)) {
       throw LogUtils.logErr(
-        'You are not authorized to delete this group', {}, { groupID, user },
+        `You are not authorized to delete group: ${groupID}`, {}, { user },
       );
     }
 
