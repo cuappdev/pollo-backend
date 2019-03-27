@@ -24,17 +24,21 @@ class GetGroupPollsRouter extends AppDevRouter<Object[]> {
     const datesArray = [];
     // Date mapped to list of polls
     const pollsByDate = [];
+
     polls.filter(Boolean).forEach((poll) => {
       // date is in Unix time in seconds
       const date = poll.createdAt;
       const p = {
         id: poll.id,
-        text: poll.text,
-        results: poll.results,
-        shared: poll.shared,
-        type: poll.type,
-        answer: isAdmin ? null : poll.userAnswers[req.user.googleID],
+        answerChoices: poll.answerChoices,
         correctAnswer: poll.correctAnswer,
+        createdAt: poll.createdAt,
+        state: poll.state,
+        text: poll.text,
+        type: poll.type,
+        updatedAt: poll.updatedAt,
+        userAnswers: poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
+          ? poll.answers[req.user.googleID] : poll.upvotes[req.user.googleID],
       };
       const ind = datesArray.indexOf(date);
       if (ind === -1) { // date not found

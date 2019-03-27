@@ -1,6 +1,7 @@
 import request from 'request-promise-native';
 import dbConnection from '../../src/db/DbConnection';
 import GroupsRepo from '../../src/repos/GroupsRepo';
+import PollsRepo from '../../src/repos/PollsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
 
@@ -33,27 +34,11 @@ beforeAll(async () => {
   const opts = { name: 'Test group', code: GroupsRepo.createCode() };
   const result = await request(post('/sessions/', opts, token));
   group = result.data;
+
+  poll = await PollsRepo.createPoll('Poll text', group, [{ letter: 'A', text: 'Saturn' }],
+    'multiplechoice', 'A', null, 'ended');
+
   expect(result.success).toBe(true);
-});
-
-test('create poll', async () => {
-  const opts = {
-    text: 'Poll text', shared: true, type: 'MULTIPLE_CHOICE', correctAnswer: 'B',
-  };
-  await request(post(`/sessions/${group.id}/polls`, opts, token)).then((result) => {
-    expect(result.success).toBe(true);
-    poll = result.data;
-  });
-});
-
-test('create poll with invalid token', async () => {
-  const opts = {
-    text: 'Poll text', results: {}, shared: true, correctAnswer: '',
-  };
-  await request(post(`/sessions/${group.id}/polls`, opts, 'invalid'))
-    .catch((e) => {
-      expect(e.statusCode).toBe(401);
-    });
 });
 
 test('get poll by id', async () => {
@@ -73,13 +58,14 @@ test('get polls by group', async () => {
 test('update poll', async () => {
   const opts = {
     text: 'Updated text',
-    results: { A: 1 },
-    shared: false,
+    answerChoices: { letter: 'A', text: 'Mars' },
+    state: 'ended',
   };
   await request(put(`/polls/${poll.id}`, opts, token)).then((getres) => {
     expect(getres.success).toBe(true);
     expect(getres.data.text).toBe('Updated text');
-    expect(getres.data.results).toMatchObject({ A: 1 });
+    expect(getres.data.state).toBe('ended');
+    expect(getres.data.answerChoices).toMatchObject({ letter: 'A', text: 'Mars' });
   });
 });
 

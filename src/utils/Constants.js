@@ -15,17 +15,25 @@ const REQUEST_TYPES = {
   PUT: 'PUT',
 };
 
-/** Custom type for question types */
-export type QuestionType = 'MULTIPLE_CHOICE' | 'FREE_RESPONSE'
+/**
+* constants for poll states
+* @constant
+* @enum {string}
+*/
+const POLL_STATES = {
+  LIVE: 'live',
+  ENDED: 'ended',
+  SHARED: 'shared',
+};
 
 /**
 * constants for question types
 * @constant
 * @enum {string}
 */
-const QUESTION_TYPES = {
-  MULTIPLE_CHOICE: 'MULTIPLE_CHOICE',
-  FREE_RESPONSE: 'FREE_RESPONSE',
+const POLL_TYPES = {
+  MULTIPLE_CHOICE: 'multipleChoice',
+  FREE_RESPONSE: 'freeResponse',
 };
 
 /**
@@ -38,8 +46,13 @@ const USER_TYPES = {
   MEMBER: 'member',
 };
 
+/** Custom types for Poll type */
+export type PollState = 'live' | 'ended' | 'shared'
+export type PollType = 'multipleChoice' | 'freeResponse'
+
 export default {
+  POLL_STATES,
+  POLL_TYPES,
   REQUEST_TYPES,
-  QUESTION_TYPES,
   USER_TYPES,
 };
