@@ -11,8 +11,9 @@ const {
 // Groups
 // Must be running server to test
 
-const opts = { name: 'Test group', code: GroupsRepo.createCode() };
+const opts = { name: 'Test group', code: GroupsRepo.createCode(), location: { lat: 1, long: -0.5 } };
 const opts2 = { name: 'New group' };
+const opts3 = { isRestricted: true };
 const googleID = 'usertest';
 let adminToken;
 let userToken;
@@ -123,6 +124,28 @@ test('get members of group', async () => {
     expect(members.length).toBe(1);
     expect(members[0].id).toBe(userID);
   });
+});
+
+test('get group location restriction', async () => {
+  const isRestricted = await GroupsRepo.isLocationRestricted(group.id);
+  expect(isRestricted).toBe(false);
+});
+
+test('update group location restriction', async () => {
+  await request(put(`/sessions/${group.id}/`, opts3, adminToken)).then((getres) => {
+    expect(getres.success).toBe(true);
+    expect(getres.data.isLocationRestricted).toBe(true);
+  });
+});
+
+test('update group location as admin with non-null location', async () => {
+  const updatedGroup = await GroupsRepo.updateGroupByID(group.id, null, opts.location);
+  expect(updatedGroup.location).toEqual(opts.location);
+});
+
+test('update group location as admin with null location', async () => {
+  const updatedGroup = await GroupsRepo.updateGroupByID(group.id, null, { lat: null, long: null });
+  expect(updatedGroup.location).toEqual(group.location);
 });
 
 test('leave group', async () => {

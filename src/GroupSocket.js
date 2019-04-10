@@ -107,7 +107,7 @@ export default class GroupSocket {
       return;
     }
 
-    const userType = await GroupsRepo.isAdmin(this.group.id, user) ? 'admin' : 'member';
+    const userType = (await GroupsRepo.isAdmin(this.group.id, user)) ? 'admin' : 'member';
 
     switch (userType) {
       case 'admin': {
@@ -282,8 +282,8 @@ export default class GroupSocket {
     if (!correctAnswer) correctAnswer = '';
 
     const filteredChoices = userRole === 'admin'
-      || !isMultipleChoice
-      || state === constants.POLL_STATES.SHARED
+    || !isMultipleChoice
+    || state === constants.POLL_STATES.SHARED
       ? answerChoices
       : answerChoices.map((a) => {
         a.count = null;

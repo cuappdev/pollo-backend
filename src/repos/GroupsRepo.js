@@ -9,6 +9,8 @@ import appDevUtils from '../utils/AppDevUtils';
 import constants from '../utils/Constants';
 import UsersRepo from './UsersRepo';
 
+import type { Coord } from '../models/Group';
+
 const db = (): Repository<Group> => getConnectionManager().get().getRepository(Group);
 
 /** Contains all group codes used mapped to group id */
@@ -20,14 +22,17 @@ const groupCodes = {};
  * @param {string} name - Name of group
  * @param {string} code - Unique code used to join group
  * @param {User} [user] - Admin of group
+ * @param {?Coord} location - Location of group admin
  * @return {Group} Created group
  */
-const createGroup = async (name: string, code: string, user: ?User):
+const createGroup = async (name: string, code: string, user: ?User, location: ?Coord):
   Promise<Group> => {
   try {
     const group = new Group();
     group.name = name;
     group.code = code;
+    group.location = location || { lat: null, long: null };
+    group.isLocationRestricted = false;
     group.admins = user ? [user] : [];
 
     if (groupCodes[code]) {
@@ -39,7 +44,9 @@ const createGroup = async (name: string, code: string, user: ?User):
 
     return group;
   } catch (e) {
-    throw LogUtils.logErr('Problem creating group', e, { name, code, user });
+    throw LogUtils.logErr('Problem creating group', e, {
+      name, code, user, location,
+    });
   }
 };
 
@@ -101,27 +108,49 @@ const deleteGroupByID = async (id: number) => {
 };
 
 /**
- * Update a group
+ * Update a group by group ID
  * @function
  * @param {number} id - ID of group to update
- * @param {string} name - New name of group
+ * @param {?name} name - New group name
+ * @param {?Coord} location - Most recent location of the group admin
+ * @param {boolean} isRestricted - If joining a group is restricted by location
  * @return {?Group} Updated group
  */
-const updateGroupByID = async (id: number, name: string):
+const updateGroupByID = async (id: number, name: ?string, location: ?Coord, isRestricted: ?boolean):
   Promise<?Group> => {
   try {
-    const field = {};
-    if (name !== undefined && name !== null) {
-      field.name = name;
-      await db().createQueryBuilder('groups')
-        .where('groups.id = :groupID')
-        .setParameters({ groupID: id })
-        .update(field)
-        .execute();
-    }
-    return await db().findOneById(id);
+    const group = await db().createQueryBuilder('groups')
+      .leftJoinAndSelect('groups.admins', 'admins')
+      .leftJoinAndSelect('groups.members', 'members')
+      .leftJoinAndSelect('groups.polls', 'polls')
+      .leftJoinAndSelect('groups.questions', 'questions')
+      .where('groups.id = :groupID', { groupID: id })
+      .getOne();
+
+    if (name) group.name = name;
+    if (location && location.lat && location.long) group.location = location;
+    if (isRestricted !== null || isRestricted !== undefined) group.isLocationRestricted = isRestricted;
+    await db().persist(group);
+    return group;
   } catch (e) {
-    throw LogUtils.logErr(`Problem updating group by id: ${id}`, e, { name });
+    throw LogUtils.logErr(`Problem updating group's location restriction: ${id}`, e, { isRestricted });
+  }
+};
+
+/**
+ * Check if joining a group is location restricted
+ * @param {*} id - ID of group
+ * @return {?boolean} If the group is location restricted
+ */
+const isLocationRestricted = async (id: number): Promise<?boolean> => {
+  try {
+    const group = await db().createQueryBuilder('groups')
+      .where('groups.id = :groupID')
+      .setParameters({ groupID: id })
+      .getOne();
+    return group.isLocationRestricted;
+  } catch (e) {
+    throw LogUtils.logErr(`Problem getting location restriction for group: ${id}`, e);
   }
 };
 
@@ -397,6 +426,7 @@ export default {
   getGroupByID,
   getGroupID,
   updateGroupByID,
+  isLocationRestricted,
   addUsersByGoogleIDs,
   removeUserByGroupID,
   getUsersByGroupID,
