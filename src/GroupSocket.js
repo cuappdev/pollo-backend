@@ -291,7 +291,7 @@ export default class GroupSocket {
       });
 
     return {
-      pollID,
+      id: pollID,
       createdAt,
       updatedAt,
       answerChoices: filteredChoices,
