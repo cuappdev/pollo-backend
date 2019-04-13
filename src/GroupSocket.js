@@ -419,7 +419,7 @@ _setupAdminEvents(client: IOSocket): void {
     // console.log('sharing results');
     // Update poll to 'shared'
     const sharedPoll = await PollsRepo.updatePollByID(
-      pollID, null, null, null, constants.POLL_STATES.SHARED,
+      pollID, null, null, null, null, constants.POLL_STATES.SHARED,
     );
 
     if (!sharedPoll) {

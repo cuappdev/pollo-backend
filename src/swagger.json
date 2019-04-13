@@ -1,0 +1,1447 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Find out more about Pollo at our [Github](https://github.com/cuappdev/pollo-backend).",
+    "version": "2.0.1",
+    "title": "Pollo Backend",
+    "termsOfService": "https://www.cornellappdev.com/privacy/policies/pollo/",
+    "contact": {
+      "email": "team@cornellappdev.com"
+    }
+  },
+  "host": "pollo-dev.cornellappdev.com",
+  "basePath": "/api/v2",
+  "tags": [
+    {
+      "name": "drafts"
+    },
+    {
+      "name": "groups"
+    },
+    {
+      "name": "polls"
+    },
+    {
+      "name": "questions"
+    },
+    {
+      "name": "authentication"
+    },
+    {
+      "name": "socket: group"
+    },
+    {
+      "name": "socket: to server"
+    },
+    {
+      "name": "socket: to member"
+    },
+    {
+      "name": "socket: to admin"
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/generate/code/": {
+      "get": {
+        "summary": "Generate a group code",
+        "operationId": "generateCode",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/drafts/": {
+      "post": {
+        "tags": [
+          "drafts"
+        ],
+        "summary": "Create a new draft",
+        "operationId": "createDraft",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "options": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/Draft"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "drafts"
+        ],
+        "summary": "Get all drafts for a user",
+        "operationId": "getDrafts",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Draft"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/drafts/{id}": {
+      "put": {
+        "tags": [
+          "drafts"
+        ],
+        "summary": "Update a draft",
+        "operationId": "updateDraft",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "draft id",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "options": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/Draft"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "drafts"
+        ],
+        "summary": "Delete a draft",
+        "operationId": "deleteDraft",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "draft id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "204": {
+            "type": "object",
+            "properties": {
+              "success": {
+                "type": "boolean"
+              },
+              "data": {
+                "type": null
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/sessions/": {
+      "post": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Create a new group",
+        "operationId": "createGroup",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "the group to create, group code is required",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "location": {
+                  "type": "object",
+                  "properties": {
+                    "lat": {
+                      "type": "number",
+                      "format": "float",
+                      "nullable": true
+                    },
+                    "long": {
+                      "type": "number",
+                      "format": "float",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/Group"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/sessions/{id}": {
+      "get": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Get a group",
+        "operationId": "getGroup",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "group id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/Group"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Update a group",
+        "operationId": "updateGroup",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "group id",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "the group fields to update",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "isRestricted": {
+                  "type": "boolean"
+                },
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/Group"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Delete a group",
+        "operationId": "deleteGroup",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "group id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "204": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": null
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/sessions/all/member/": {
+      "get": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Get all groups that user is a member of",
+        "operationId": "getGroupsMember",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/Group"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/sessions/all/admin/": {
+      "get": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Get all groups that user is an admin of",
+        "operationId": "getGroupsAdmin",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/Group"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/sessions/{id}/members/": {
+      "post": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Add members to group",
+        "operationId": "addMembers",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "group id",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "member ids",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": null
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Get members of a groups",
+        "operationId": "getGroupMembers",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "group id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/User"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Remove members from a group",
+        "operationId": "removeGroupMembers",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "group id",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "member ids",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": null
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Leave group",
+        "description": "can't leave group if user is an admin",
+        "operationId": "leaveGroup",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "group id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": null
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/sessions/{id}/admins/": {
+      "post": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Add admins to group",
+        "operationId": "addAdmins",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "group id",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "admin ids",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": null
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Get admins of a groups",
+        "operationId": "getGroupAdmins",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "group id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/User"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Remove admins from a group",
+        "operationId": "removeGroupAdmins",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "group id",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "admin ids",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": null
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/polls/{id}/": {
+      "get": {
+        "tags": [
+          "polls"
+        ],
+        "summary": "Get a poll",
+        "operationId": "getPoll",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "poll id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/Poll"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "polls"
+        ],
+        "summary": "Update a poll",
+        "operationId": "updatePoll",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "poll id",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "the poll fields to update",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "answerChoices": {
+                  "type": "array",
+                  "description": "poll answer choices",
+                  "items": {
+                    "$ref": "#/definitions/PollChoice"
+                  }
+                },
+                "state": {
+                  "type": "string",
+                  "description": "the current state of the poll object",
+                  "enum": [
+                    "live",
+                    "ended",
+                    "shared"
+                  ]
+                },
+                "answers": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/PollChoice"
+                    }
+                  }
+                },
+                "upvotes": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/PollChoice"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/Poll"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "polls"
+        ],
+        "summary": "Delete a poll",
+        "operationId": "deletePoll",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "poll id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "204": {
+            "type": "object",
+            "properties": {
+              "success": {
+                "type": "boolean"
+              },
+              "data": {
+                "type": null
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/sessions/{id}/polls/": {
+      "get": {
+        "tags": [
+          "polls"
+        ],
+        "summary": "Get all polls for a group sorted by date (ascending)",
+        "description": "admins wll receive all polls, members will receive all polls with poll results hidden (set to {}) if unshared",
+        "operationId": "getGroupPolls",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "group id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "date": {
+                        "type": "string",
+                        "example": "1555350950"
+                      },
+                      "polls": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/definitions/Poll"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/users/": {
+      "get": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Get me",
+        "operationId": "getMe",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/User"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/auth/mobile/": {
+      "post": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Authenticate mobile",
+        "operationId": "authMobile",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "idToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/UserSession"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh/": {
+      "post": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Refresh user session",
+        "operationId": "refreshSession",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/UserSession"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "definitions": {
+    "Draft": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "createdAt": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "options": {
+          "type": "array",
+          "description": "poll options, empty if FR",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Group": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "isLive": {
+          "type": "boolean"
+        },
+        "isLocationRestricted": {
+          "type": "boolean"
+        },
+        "location": {
+          "type": "object",
+          "properties": {
+            "lat": {
+              "type": "number",
+              "format": "float",
+              "nullable": true
+            },
+            "long": {
+              "type": "number",
+              "format": "float",
+              "nullable": true
+            }
+          }
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      }
+    },
+    "Poll": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "null when the poll is live",
+          "nullable": true
+        },
+        "answerChoices": {
+          "type": "array",
+          "description": "poll answer choices",
+          "items": {
+            "$ref": "#/definitions/PollChoice"
+          },
+          "example": [
+            {
+              "letter": "A",
+              "text": "MC example",
+              "count": 5
+            },
+            {
+              "text": "FR example",
+              "count": 16
+            }
+          ]
+        },
+        "correctAnswer": {
+          "type": "string",
+          "description": "the correct answer for multiple choice only",
+          "nullable": true,
+          "example": "A"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "timestamp (Unix time), null when poll is live",
+          "nullable": true,
+          "example": "1555350950"
+        },
+        "state": {
+          "type": "string",
+          "description": "the current state of the poll object",
+          "enum": [
+            "live",
+            "ended",
+            "shared"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "description": "the poll question",
+          "example": "Which planet is a gas giant?"
+        },
+        "type": {
+          "type": "string",
+          "description": "the poll type",
+          "enum": [
+            "multipleChoice",
+            "freeResponse"
+          ],
+          "example": "multipleChoice"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "timestamp (Unix time), null when poll is live",
+          "nullable": true,
+          "example": "1555351053"
+        },
+        "userAnswers": {
+          "type": "object",
+          "description": "mapping of googleID to the choice the user selected if MC, or the choices the user upvoted if FR",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/PollChoice"
+            }
+          },
+          "example": {
+            "googleID1": [
+              {
+                "letter": "A",
+                "text": "MC example"
+              }
+            ],
+            "googleID2": [
+              {
+                "text": "FR example"
+              },
+              {
+                "text": "The choices the user upvoted"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "PollChoice": {
+      "type": "object",
+      "properties": {
+        "letter": {
+          "type": "string",
+          "description": "the letter identifier for multiple choice only",
+          "nullable": true,
+          "example": "A"
+        },
+        "text": {
+          "type": "string",
+          "description": "the actual option to present",
+          "example": "Saturn"
+        }
+      }
+    },
+    "PollResult": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "description": "number of times choice was selected or upvoted, null when user is member & poll is MC & poll is not shared",
+          "nullable": true
+        },
+        "letter": {
+          "type": "string",
+          "description": "the letter identifier for multiple choice only",
+          "nullable": true,
+          "example": "A"
+        },
+        "text": {
+          "type": "string",
+          "description": "the string for the answer chosen",
+          "example": "Saturn"
+        }
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "netID": {
+          "type": "string"
+        }
+      }
+    },
+    "UserSession": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        },
+        "sessionExpiration": {
+          "type": "string"
+        },
+        "isActive": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

@@ -50,7 +50,7 @@ test('get single group', async () => {
 });
 
 test('get groups for admin', async () => {
-  await request(get('/sessions/all/admin', adminToken)).then((getres) => {
+  await request(get('/sessions/all/admin/', adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
     const groupRes = getres.data[0];
     expect(group.id).toBe(groupRes.id);
@@ -187,7 +187,6 @@ test('get groups for admin', async () => {
     expect(group.id).toBe(groupRes.id);
     expect(group.name).toBe(groupRes.name);
     expect(group.code).toBe(groupRes.code);
-    expect(group.updatedAt).toBe(groupRes.updatedAt);
   });
 });
 
