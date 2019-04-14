@@ -119,10 +119,10 @@ export default class GroupSocket {
         }
         break;
       }
-      case 'user': {
+      case 'member': {
         // console.log(`User with id ${client.id} connected to socket`);
         this._setupUserEvents(client, user.googleID);
-        client.join('users');
+        client.join('members');
         if (this.current) {
           client.emit('user/poll/start', this._currentPoll(constants.USER_TYPES.MEMBER));
         }
@@ -204,7 +204,7 @@ export default class GroupSocket {
       this.nsp.to('admins').emit('admin/poll/updates', this._currentPoll(constants.USER_TYPES.ADMIN));
 
       if (poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
-        this.nsp.to('users').emit('user/poll/fr/live', this._currentPoll(constants.USER_TYPES.MEMBER));
+        this.nsp.to('members').emit('user/poll/fr/live', this._currentPoll(constants.USER_TYPES.MEMBER));
       }
     });
 
@@ -243,7 +243,7 @@ export default class GroupSocket {
 
       this.nsp.to('admins').emit('admin/poll/updates', this._currentPoll(constants.USER_TYPES.ADMIN));
       if (poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
-        this.nsp.to('users').emit('user/poll/fr/live', this._currentPoll(constants.USER_TYPES.MEMBER));
+        this.nsp.to('members').emit('user/poll/fr/live', this._currentPoll(constants.USER_TYPES.MEMBER));
       }
     });
 
@@ -259,10 +259,10 @@ export default class GroupSocket {
   // *************************** Admin Side ***************************
 
   /**
-* Gives current poll
-* @param {String} userRole
-* @return {?ClientPoll} Socket poll object
-*/
+  * Gives current poll
+  * @param {String} userRole
+  * @return {?ClientPoll} Socket poll object
+  */
   _currentPoll(userRole: string): ClientPoll | null {
     if (!this.current) return null; // no live poll
     let { correctAnswer } = this.current;
@@ -304,9 +304,9 @@ export default class GroupSocket {
   }
 
   /**
-* Starts poll on the socket
-* @param {ClientPoll} poll - Poll object to start
-*/
+  * Starts poll on the socket
+  * @param {ClientPoll} poll - Poll object to start
+  */
   _startPoll(poll: ClientPoll) {
   // start new poll
     const newPoll: SocketPoll = {
@@ -322,7 +322,7 @@ export default class GroupSocket {
     this.current = newPoll;
     this.isLive = true;
 
-    this.nsp.to('users').emit('user/poll/start', this._currentPoll(constants.USER_TYPES.MEMBER));
+    this.nsp.to('members').emit('user/poll/start', this._currentPoll(constants.USER_TYPES.MEMBER));
   }
 
 /**
@@ -348,7 +348,7 @@ _endPoll = async () => {
   this.current = { ...createdPoll };
 
   this.nsp.to('admins').emit('admin/poll/ended', this._currentPoll(constants.USER_TYPES.ADMIN));
-  this.nsp.to('users').emit('user/poll/end', this._currentPoll(constants.USER_TYPES.MEMBER));
+  this.nsp.to('members').emit('user/poll/end', this._currentPoll(constants.USER_TYPES.MEMBER));
 
   this.current = null;
 };
@@ -359,7 +359,7 @@ _endPoll = async () => {
  */
 _deletePoll = async (pollID: id) => {
   await PollsRepo.deletePollByID(pollID);
-  this.nsp.to('users').emit('user/poll/delete', pollID);
+  this.nsp.to('members').emit('user/poll/delete', pollID);
 };
 
 /**
@@ -368,7 +368,7 @@ _deletePoll = async (pollID: id) => {
  */
 _deleteLivePoll = () => {
   this.current = null;
-  this.nsp.to('users').emit('user/poll/delete/live');
+  this.nsp.to('members').emit('user/poll/delete/live');
 };
 
 /**
@@ -440,7 +440,7 @@ _setupAdminEvents(client: IOSocket): void {
     }
     if (!userAnswers) userAnswers = {};
 
-    this.nsp.to('users').emit('user/poll/results', {
+    this.nsp.to('members').emit('user/poll/results', {
       pollID, createdAt, updatedAt, answerChoices, correctAnswer, state, text, type, userAnswers,
     });
   });
