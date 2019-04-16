@@ -76,7 +76,7 @@ const deletePollByID = async (id: number) => {
  * Update a poll
  * @function
  * @param {number} id - id of the poll to update
- * @param {string} [text] - new text for poll
+ * @param {?string} [text] - new text for poll
  * @param {?PollResult[]} answerChoices - the answer choices for the given poll
  * @param {string: PollChoice[]} [answers] - the students answers to the poll
  * @param {string: PollChoice[]} [upvotes] - upvotes from students
