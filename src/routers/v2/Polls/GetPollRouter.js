@@ -7,6 +7,7 @@ import LogUtils from '../../../utils/LogUtils';
 import PollsRepo from '../../../repos/PollsRepo';
 
 import type { APIPoll } from '../APITypes';
+import type { PollChoice } from '../../../utils/Constants';
 
 class GetPollRouter extends AppDevRouter<APIPoll> {
   constructor() {
@@ -35,6 +36,11 @@ class GetPollRouter extends AppDevRouter<APIPoll> {
       });
     }
 
+    const userAnswer = poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
+      ? poll.answers[req.user.googleID] : poll.upvotes[req.user.googleID];
+    const answerObject: { string: PollChoice[]} = {};
+    answerObject[req.user.googleID] = userAnswer || [];
+
     return {
       id: poll.id,
       answerChoices: poll.answerChoices,
@@ -44,8 +50,7 @@ class GetPollRouter extends AppDevRouter<APIPoll> {
       text: poll.text,
       type: poll.type,
       updatedAt: poll.updatedAt,
-      userAnswers: poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
-        ? poll.answers[req.user.googleID] : poll.upvotes[req.user.googleID],
+      userAnswers: answerObject,
     };
   }
 }
