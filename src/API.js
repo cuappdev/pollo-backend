@@ -26,10 +26,6 @@ class API {
     const registered = [];
 
     /* eslint-disable global-require */
-    // Connect doc router
-    registered.push('/api/docs/');
-    this.express.use('/api/docs/', require('./routers/DocRouter.js').default);
-
     // Connect all routers in ./routers/v2
     const opts2 = { cwd: path.join(__dirname, 'routers/v2') };
     globby.sync(['**/*Router.js'], opts2).forEach((file) => {

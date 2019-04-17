@@ -1,8 +1,8 @@
 // @flow
-import * as swaggerUI from 'swagger-ui-express';
-import * as swaggerDocument from '../swagger.json';
-import AppDevRouter from '../utils/AppDevRouter';
-import constants from '../utils/Constants';
+import swaggerUI from 'swagger-ui-express';
+import AppDevRouter from '../../utils/AppDevRouter';
+import constants from '../../utils/Constants';
+import swaggerDocument from './swagger.json';
 
 class DocRouter extends AppDevRouter<Object> {
   constructor() {
