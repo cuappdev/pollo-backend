@@ -61,19 +61,24 @@ export default class AppDevRouter<T: ResponseType> {
     // Make sure path conforms to specifications
     AppDevUtils.tryCheckAppDevURL(path);
 
+    // Attach middleware to router
+    middleware.forEach((mw) => {
+      this.router.use(path, mw);
+    });
+
     // Attach content to router
     switch (this.requestType) {
       case constants.REQUEST_TYPES.GET:
-        this.router.get(path, middleware, this.response);
+        this.router.get(path, this.response);
         break;
       case constants.REQUEST_TYPES.POST:
-        this.router.post(path, middleware, this.response);
+        this.router.post(path, this.response);
         break;
       case constants.REQUEST_TYPES.DELETE:
-        this.router.delete(path, middleware, this.response);
+        this.router.delete(path, this.response);
         break;
       case constants.REQUEST_TYPES.PUT:
-        this.router.put(path, middleware, this.response);
+        this.router.put(path, this.response);
         break;
       default:
         break;

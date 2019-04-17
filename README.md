@@ -44,7 +44,8 @@ npm start
 npm test
 ````
 
-### To generate and open docs:
-````bash
-npm run docs
+### To access docs:
+API documentation can be found at
+````
+/docs/
 ````
