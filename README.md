@@ -16,20 +16,12 @@ psql pollo
 ````
 
 ### Required variables:
-Create a .env file in the repository with the following contents:
-````bash
-export DB_HOST=localhost
-export DB_USERNAME=FILL_IN
-export DB_PASSWORD=FILL_IN
-export DB_PORT=5432
-export DB_NAME=pollo
-export GOOGLE_CLIENT_ID=FILL_IN
-export GOOGLE_CLIENT_SECRET=FILL_IN
-export GOOGLE_REDIRECT_URI=FILL_IN
-export NODE_ENV=development
-````
-Using [`autoenv`](https://github.com/kennethreitz/autoenv) to make a `.env` file with the above contents in the project directory is recommended.
-Otherwise, you need source it using `source .env`.
+Create a .env file in the repository by running the following and setting the correct values:
+```bash
+cp env.template .env
+```
+
+Using [`autoenv`](https://github.com/kennethreitz/autoenv) is recommended. Otherwise, you need source it using `source .env`.
 
 ### To run:
 Make sure you have [`Node.js`](https://nodejs.org/en/download/) installed, and then run
