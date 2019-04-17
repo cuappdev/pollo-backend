@@ -58,11 +58,6 @@ export default class AppDevRouter<T: ResponseType> {
     const path = this.getPath();
     const middleware = this.middleware();
 
-    // Attach middleware to router
-    middleware.forEach((mw) => {
-      this.router.use(mw);
-    });
-
     // Make sure path conforms to specifications
     AppDevUtils.tryCheckAppDevURL(path);
 
