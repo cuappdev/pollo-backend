@@ -176,7 +176,7 @@ export default class GroupSocket {
             if (p.letter && p.count && p.letter === submittedAnswer.letter) { p.count += 1; }
           });
           break;
-        case constants.QUESTION_TYPES.FREE_RESPONSE: { // Free Response
+        case constants.POLL_TYPES.FREE_RESPONSE: { // Free Response
           const badWords = lib.filterProfanity(submittedAnswer.text);
           if (badWords.length > 0) { // not clean text
             client.emit('user/poll/fr/filter',
@@ -203,7 +203,7 @@ export default class GroupSocket {
 
       this.nsp.to('admins').emit('admin/poll/updates', this._currentPoll(constants.USER_TYPES.ADMIN));
 
-      if (poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
+      if (poll.type === constants.POLL_TYPES.FREE_RESPONSE) {
         this.nsp.to('members').emit('user/poll/fr/live', this._currentPoll(constants.USER_TYPES.MEMBER));
       }
     });
@@ -242,7 +242,7 @@ export default class GroupSocket {
       this.current = poll;
 
       this.nsp.to('admins').emit('admin/poll/updates', this._currentPoll(constants.USER_TYPES.ADMIN));
-      if (poll.type === constants.QUESTION_TYPES.FREE_RESPONSE) {
+      if (poll.type === constants.POLL_TYPES.FREE_RESPONSE) {
         this.nsp.to('members').emit('user/poll/fr/live', this._currentPoll(constants.USER_TYPES.MEMBER));
       }
     });
