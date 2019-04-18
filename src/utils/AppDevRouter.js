@@ -57,6 +57,7 @@ export default class AppDevRouter<T: ResponseType> {
   init() {
     const path = this.getPath();
     const middleware = this.middleware();
+    const res = this.response();
 
     // Make sure path conforms to specifications
     AppDevUtils.tryCheckAppDevURL(path);
@@ -69,16 +70,16 @@ export default class AppDevRouter<T: ResponseType> {
     // Attach content to router
     switch (this.requestType) {
       case constants.REQUEST_TYPES.GET:
-        this.router.get(path, this.response);
+        this.router.get(path, res);
         break;
       case constants.REQUEST_TYPES.POST:
-        this.router.post(path, this.response);
+        this.router.post(path, res);
         break;
       case constants.REQUEST_TYPES.DELETE:
-        this.router.delete(path, this.response);
+        this.router.delete(path, res);
         break;
       case constants.REQUEST_TYPES.PUT:
-        this.router.put(path, this.response);
+        this.router.put(path, res);
         break;
       default:
         break;
@@ -93,7 +94,7 @@ export default class AppDevRouter<T: ResponseType> {
     return [lib.ensureAuthenticated];
   }
 
-  response = async (req: Request, res: Response, next: NextFunction) => {
+  defaultResponse = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const content: T = await this.content(req);
       res.json(new AppDevResponse(true, content));
@@ -104,6 +105,10 @@ export default class AppDevRouter<T: ResponseType> {
         res.json(new AppDevResponse(false, { errors: [e.message] }));
       }
     }
+  }
+
+  response(): (req: Request, res: Response, next: NextFunction) => Promise<void> {
+    return this.defaultResponse;
   }
 
   async content(req: Request): Promise<T> {
