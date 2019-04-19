@@ -281,14 +281,11 @@ export default class GroupSocket {
     if (!userAnswers) userAnswers = {};
     if (!correctAnswer) correctAnswer = '';
 
-    const filteredChoices = userRole === 'admin'
+    const filteredChoices = userRole === constants.USER_TYPES.ADMIN
     || !isMultipleChoice
     || state === constants.POLL_STATES.SHARED
       ? answerChoices
-      : answerChoices.map((a) => {
-        a.count = null;
-        return a;
-      });
+      : answerChoices.map(a => ({ ...a, count: null }));
 
     return {
       id: pollID,
