@@ -167,13 +167,13 @@ export default class GroupSocket {
         case constants.POLL_TYPES.MULTIPLE_CHOICE: // Multiple Choice
           if (poll.answers[googleID]) { // User selected something before
             poll.answerChoices.forEach((p: PollResult) => {
-              if (p.letter && p.count && p.letter === poll.answers[googleID].letter) { p.count -= 1; }
+              if (p.letter && (p.count !== null) && p.letter === poll.answers[googleID][0].letter) { p.count -= 1; }
             });
           }
           // update/add response
           poll.answers[googleID] = [submittedAnswer];
           poll.answerChoices.forEach((p: PollResult) => {
-            if (p.letter && p.count && p.letter === submittedAnswer.letter) { p.count += 1; }
+            if (p.letter && (p.count !== null) && p.letter === submittedAnswer.letter) { p.count += 1; }
           });
           break;
         case constants.POLL_TYPES.FREE_RESPONSE: { // Free Response
@@ -202,7 +202,6 @@ export default class GroupSocket {
       this.current = poll;
 
       this.nsp.to('admins').emit('admin/poll/updates', this._currentPoll(constants.USER_TYPES.ADMIN));
-
       if (poll.type === constants.POLL_TYPES.FREE_RESPONSE) {
         this.nsp.to('members').emit('user/poll/fr/live', this._currentPoll(constants.USER_TYPES.MEMBER));
       }
