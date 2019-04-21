@@ -222,17 +222,17 @@ export default class GroupSocket {
           if (userUpvotes.find((p: PollChoice) => p.text === text)) { // unupvote
             poll.upvotes[googleID] = userUpvotes.filter(p => p.text !== text);
             poll.answerChoices.forEach((p: PollResult) => {
-              if (p.count && p.text === text) { p.count -= 1; }
+              if (p.count !== null && p.text === text) { p.count -= 1; }
             });
           } else { // upvote
             poll.upvotes[googleID].push({ text });
             poll.answerChoices.forEach((p: PollResult) => {
-              if (p.count && p.text === text) { p.count += 1; }
+              if (p.count !== null && p.text === text) { p.count += 1; }
             });
           }
         } else { // init array and upvote
           poll.answerChoices.forEach((p: PollResult) => {
-            if (p.count && p.text === text) { p.count -= 1; }
+            if (p.count !== null && p.text === text) { p.count -= 1; }
           });
           poll.upvotes[googleID] = [{ text }];
         }
