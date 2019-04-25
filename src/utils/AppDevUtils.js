@@ -31,8 +31,15 @@ const netIDFromEmail = (email: string): string => email.substring(0, email.index
  * @param {number} length - Desired length of random code
  * @return {string} Randomly generated code
  */
-const randomCode = (length: number): string => Math.round(((36 ** (length + 1)) - Math.random()
-    * (36 ** length))).toString(36).slice(1).toUpperCase();
+const randomCode = (length: number): string => {
+  // Don't allow 0, O, and I to avoid confusion
+  const allowedChars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+  let result = '';
+  while (result.length < length) {
+    result += allowedChars[Math.floor(Math.random() * allowedChars.length)];
+  }
+  return result;
+};
 
 export default {
   netIDFromEmail,
