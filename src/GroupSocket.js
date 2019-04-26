@@ -314,6 +314,7 @@ export default class GroupSocket {
   _startPoll(poll: ClientPoll) {
   // start new poll
     const newPoll: SocketPoll = {
+      createdAt: String(Math.floor(new Date().getTime() / 1000)),
       answerChoices: poll.answerChoices,
       correctAnswer: poll.correctAnswer,
       state: constants.POLL_STATES.LIVE,
