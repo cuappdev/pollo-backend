@@ -31,6 +31,7 @@ class PostGroupRouter extends AppDevRouter<APIGroup> {
     return {
       id: group.id,
       code: group.code,
+      isFilterActivated: group.isFilterActivated,
       isLive: false,
       isLocationRestricted: group.isLocationRestricted,
       location: group.location,

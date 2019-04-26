@@ -159,7 +159,8 @@ export default class GroupSocket {
         });
         break;
       case constants.POLL_TYPES.FREE_RESPONSE: { // Free Response
-        const badWords = lib.filterProfanity(submittedAnswer.text);
+        const badWords = this.group.isFilterActivated
+          ? lib.filterProfanity(submittedAnswer.text) : [];
         if (badWords.length > 0) { // not clean text
           client.emit('user/poll/fr/filter',
             ({ success: false, text: submittedAnswer.text, filter: badWords }: PollFilter));

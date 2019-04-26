@@ -37,6 +37,10 @@ class Group extends Base {
   location: Coord = { lat: null, long: null };
 
   @Column('boolean')
+  /** If filter is activated for FR responses or live questions */
+  isFilterActivated: boolean = true
+
+  @Column('boolean')
   /** If joining a group requires user to be within 300m of the group location */
   isLocationRestricted: boolean = false
 

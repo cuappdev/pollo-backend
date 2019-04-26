@@ -32,6 +32,7 @@ class StartGroupRouter extends AppDevRouter<APIGroup> {
     return {
       id: group.id,
       code: group.code,
+      isFilterActivated: group.isFilterActivated,
       isLive: true,
       isLocationRestricted: group.isLocationRestricted,
       location: group.location,

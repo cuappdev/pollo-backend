@@ -148,6 +148,11 @@ test('update group location as admin with null location', async () => {
   expect(updatedGroup.location).toEqual(group.location);
 });
 
+test('update profanity filter group control', async () => {
+  const updatedGroup = await GroupsRepo.updateGroupByID(group.id, null, null, false);
+  expect(updatedGroup.isFilterActivated).toEqual(group.isFilterActivated);
+});
+
 test('leave group', async () => {
   await request(del(`/sessions/${group.id}/members/`, userToken),
     (error, res, body) => {

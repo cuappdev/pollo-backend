@@ -76,6 +76,7 @@ class JoinGroupRouter extends AppDevRouter<APIGroup> {
     return {
       id: group.id,
       code: group.code,
+      isFilterActivated: group.isFilterActivated,
       isLive: await req.app.groupManager.isLive(group.code),
       isLocationRestricted: group.isLocationRestricted,
       location: group.location,
