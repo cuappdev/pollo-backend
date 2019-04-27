@@ -138,6 +138,96 @@ export default class GroupSocket {
     }
   };
 
+  _answerPoll(client: IOSocket, googleID: string, submittedAnswer: PollChoice): void {
+    const poll = this.current;
+    if (!poll) {
+      // console.log(`Client ${client.id} tried to answer with no active poll`);
+      return;
+    }
+
+    switch (poll.type) {
+      case constants.POLL_TYPES.MULTIPLE_CHOICE: // Multiple Choice
+        if (poll.answers[googleID]) { // User selected something before
+          poll.answerChoices.forEach((p: PollResult) => {
+            if (p.letter && (p.count !== null) && p.letter === poll.answers[googleID][0].letter) { p.count -= 1; }
+          });
+        }
+        // update/add response
+        poll.answers[googleID] = [submittedAnswer];
+        poll.answerChoices.forEach((p: PollResult) => {
+          if (p.letter && (p.count !== null) && p.letter === submittedAnswer.letter) { p.count += 1; }
+        });
+        break;
+      case constants.POLL_TYPES.FREE_RESPONSE: { // Free Response
+        const badWords = lib.filterProfanity(submittedAnswer.text);
+        if (badWords.length > 0) { // not clean text
+          client.emit('user/poll/fr/filter',
+            ({ success: false, text: submittedAnswer.text, filter: badWords }: PollFilter));
+          return;
+        }
+        if (poll.answers[googleID]) { // User submitted another FR answer
+          poll.answers[googleID].push(submittedAnswer);
+          poll.upvotes[googleID].push(submittedAnswer);
+        } else { // User submitted first FR answer
+          poll.answers[googleID] = [submittedAnswer];
+          poll.upvotes[googleID] = [submittedAnswer];
+        }
+
+        poll.answerChoices.push({ count: 1, text: submittedAnswer.text, letter: null });
+        client.emit('user/poll/fr/filter', ({ success: true }: PollFilter));
+        break;
+      }
+      default:
+        throw new Error('Unimplemented question type');
+    }
+
+    this.current = poll;
+
+    this.nsp.to('admins').emit('admin/poll/updates', this._currentPoll(constants.USER_TYPES.ADMIN));
+    if (poll.type === constants.POLL_TYPES.FREE_RESPONSE) {
+      this.nsp.to('members').emit('user/poll/fr/live', this._currentPoll(constants.USER_TYPES.MEMBER));
+    }
+  }
+
+  _upvoteAnswer(client: IOSocket, googleID: string, upvoteObject: PollChoice): void {
+    const { text } = upvoteObject;
+    const poll = this.current;
+    if (!poll || !text) {
+      // console.log(`Client with googleID ${googleID} tried to answer with no active poll`);
+      return;
+    }
+
+    const currAnswer: ?PollResult = poll.answerChoices.find((p: PollResult) => p.text === text);
+    if (currAnswer) { // User selected a valid answer
+      const userUpvotes = poll.upvotes[googleID];
+      if (userUpvotes) { // User upvoted something before
+        if (userUpvotes.find((p: PollChoice) => p.text === text)) { // unupvote
+          poll.upvotes[googleID] = userUpvotes.filter(p => p.text !== text);
+          poll.answerChoices.forEach((p: PollResult) => {
+            if (p.count !== null && p.text === text) { p.count -= 1; }
+          });
+        } else { // upvote
+          poll.upvotes[googleID].push({ text });
+          poll.answerChoices.forEach((p: PollResult) => {
+            if (p.count !== null && p.text === text) { p.count += 1; }
+          });
+        }
+      } else { // init array and upvote
+        poll.answerChoices.forEach((p: PollResult) => {
+          if (p.count !== null && p.text === text) { p.count += 1; }
+        });
+        poll.upvotes[googleID] = [{ text }];
+      }
+    }
+
+    this.current = poll;
+
+    this.nsp.to('admins').emit('admin/poll/updates', this._currentPoll(constants.USER_TYPES.ADMIN));
+    if (poll.type === constants.POLL_TYPES.FREE_RESPONSE) {
+      this.nsp.to('members').emit('user/poll/fr/live', this._currentPoll(constants.USER_TYPES.MEMBER));
+    }
+  }
+
   // ***************************** User Side ***************************
   // i.e. the server hears 'server/poll/respond
   /**
@@ -157,93 +247,11 @@ export default class GroupSocket {
    */
   _setupUserEvents(client: IOSocket, googleID: string): void {
     client.on('server/poll/answer', (submittedAnswer: PollChoice) => {
-      const poll = this.current;
-      if (!poll) {
-        // console.log(`Client ${client.id} tried to answer with no active poll`);
-        return;
-      }
-
-      switch (poll.type) {
-        case constants.POLL_TYPES.MULTIPLE_CHOICE: // Multiple Choice
-          if (poll.answers[googleID]) { // User selected something before
-            poll.answerChoices.forEach((p: PollResult) => {
-              if (p.letter && (p.count !== null) && p.letter === poll.answers[googleID][0].letter) { p.count -= 1; }
-            });
-          }
-          // update/add response
-          poll.answers[googleID] = [submittedAnswer];
-          poll.answerChoices.forEach((p: PollResult) => {
-            if (p.letter && (p.count !== null) && p.letter === submittedAnswer.letter) { p.count += 1; }
-          });
-          break;
-        case constants.POLL_TYPES.FREE_RESPONSE: { // Free Response
-          const badWords = lib.filterProfanity(submittedAnswer.text);
-          if (badWords.length > 0) { // not clean text
-            client.emit('user/poll/fr/filter',
-              ({ success: false, text: submittedAnswer.text, filter: badWords }: PollFilter));
-            return;
-          }
-          if (poll.answers[googleID]) { // User submitted another FR answer
-            poll.answers[googleID].push(submittedAnswer);
-            poll.upvotes[googleID].push(submittedAnswer);
-          } else { // User submitted first FR answer
-            poll.answers[googleID] = [submittedAnswer];
-            poll.upvotes[googleID] = [submittedAnswer];
-          }
-
-          poll.answerChoices.push({ count: 1, text: submittedAnswer.text, letter: null });
-          client.emit('user/poll/fr/filter', ({ success: true }: PollFilter));
-          break;
-        }
-        default:
-          throw new Error('Unimplemented question type');
-      }
-
-      this.current = poll;
-
-      this.nsp.to('admins').emit('admin/poll/updates', this._currentPoll(constants.USER_TYPES.ADMIN));
-      if (poll.type === constants.POLL_TYPES.FREE_RESPONSE) {
-        this.nsp.to('members').emit('user/poll/fr/live', this._currentPoll(constants.USER_TYPES.MEMBER));
-      }
+      this._answerPoll(client, googleID, submittedAnswer);
     });
 
     client.on('server/poll/upvote', (upvoteObject: PollChoice) => {
-      const { text } = upvoteObject;
-      const poll = this.current;
-      if (!poll || !text) {
-        // console.log(`Client with googleID ${googleID} tried to answer with no active poll`);
-        return;
-      }
-
-      const currAnswer: ?PollResult = poll.answerChoices.find((p: PollResult) => p.text === text);
-      if (currAnswer) { // User selected a valid answer
-        const userUpvotes = poll.upvotes[googleID];
-        if (userUpvotes) { // User upvoted something before
-          if (userUpvotes.find((p: PollChoice) => p.text === text)) { // unupvote
-            poll.upvotes[googleID] = userUpvotes.filter(p => p.text !== text);
-            poll.answerChoices.forEach((p: PollResult) => {
-              if (p.count !== null && p.text === text) { p.count -= 1; }
-            });
-          } else { // upvote
-            poll.upvotes[googleID].push({ text });
-            poll.answerChoices.forEach((p: PollResult) => {
-              if (p.count !== null && p.text === text) { p.count += 1; }
-            });
-          }
-        } else { // init array and upvote
-          poll.answerChoices.forEach((p: PollResult) => {
-            if (p.count !== null && p.text === text) { p.count -= 1; }
-          });
-          poll.upvotes[googleID] = [{ text }];
-        }
-      }
-
-      this.current = poll;
-
-      this.nsp.to('admins').emit('admin/poll/updates', this._currentPoll(constants.USER_TYPES.ADMIN));
-      if (poll.type === constants.POLL_TYPES.FREE_RESPONSE) {
-        this.nsp.to('members').emit('user/poll/fr/live', this._currentPoll(constants.USER_TYPES.MEMBER));
-      }
+      this._upvoteAnswer(client, googleID, upvoteObject);
     });
 
     client.on('disconnect', async () => {
