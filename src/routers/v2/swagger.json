@@ -405,6 +405,9 @@
                 },
                 "name": {
                   "type": "string"
+                },
+                "isActivated": {
+                  "type": "boolean"
                 }
               }
             }
@@ -1253,6 +1256,9 @@
         },
         "name": {
           "type": "string"
+        },
+        "isFilterActivated": {
+          "type": "boolean"
         },
         "isLive": {
           "type": "boolean"

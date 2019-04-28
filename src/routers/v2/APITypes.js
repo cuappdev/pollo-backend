@@ -17,6 +17,7 @@ export type Response<T> = {
 export type APIGroup = {|
   id: id,
   code: string,
+  isFilterActivated: boolean,
   isLive: boolean,
   isLocationRestricted: boolean,
   location: Coord,

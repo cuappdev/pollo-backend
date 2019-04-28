@@ -41,21 +41,21 @@ beforeAll(async () => {
   expect(result.success).toBe(true);
 });
 
-test('get poll by id', async () => {
+test('Get poll by id', async () => {
   await request(get(`/polls/${poll.id}`, token)).then((getres) => {
     expect(getres.success).toBe(true);
     expect(poll.id).toBe(getres.data.id);
   });
 });
 
-test('get polls by group', async () => {
+test('Get polls by group', async () => {
   await request(get(`/sessions/${group.id}/polls`, token)).then((getres) => {
     expect(getres.success).toBe(true);
     expect(poll.id).toBe(getres.data[0].polls[0].id);
   });
 });
 
-test('update poll', async () => {
+test('Update poll', async () => {
   const opts = {
     text: 'Updated text',
     answerChoices: { letter: 'A', text: 'Mars' },
@@ -69,7 +69,7 @@ test('update poll', async () => {
   });
 });
 
-test('update poll with invalid token', async () => {
+test('Update poll with invalid token', async () => {
   const opts = {
     text: 'Updated text',
     results: { A: 1 },
@@ -80,14 +80,14 @@ test('update poll with invalid token', async () => {
     });
 });
 
-test('delete poll with invalid token', async () => {
+test('Delete poll with invalid token', async () => {
   await request(del(`/polls/${poll.id}`, 'invalid'))
     .catch((e) => {
       expect(e.statusCode).toBe(401);
     });
 });
 
-test('delete poll', async () => {
+test('Delete poll', async () => {
   await request(del(`/polls/${poll.id}`, token)).then((result) => {
     expect(result.success).toBe(true);
   });

@@ -159,7 +159,8 @@ export default class GroupSocket {
         });
         break;
       case constants.POLL_TYPES.FREE_RESPONSE: { // Free Response
-        const badWords = lib.filterProfanity(submittedAnswer.text);
+        const badWords = this.group.isFilterActivated
+          ? lib.filterProfanity(submittedAnswer.text) : [];
         if (badWords.length > 0) { // not clean text
           client.emit('user/poll/fr/filter',
             ({ success: false, text: submittedAnswer.text, filter: badWords }: PollFilter));
@@ -314,6 +315,7 @@ export default class GroupSocket {
   _startPoll(poll: ClientPoll) {
   // start new poll
     const newPoll: SocketPoll = {
+      createdAt: String(Math.floor(new Date().getTime() / 1000)),
       answerChoices: poll.answerChoices,
       correctAnswer: poll.correctAnswer,
       state: constants.POLL_STATES.LIVE,

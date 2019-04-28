@@ -36,7 +36,7 @@ beforeAll(async () => {
   await GroupsRepo.addUsersByGoogleIDs(group.id, ['member'], 'member');
 });
 
-test('create question', async () => {
+test('Create question', async () => {
   const opts = {
     text: 'Why do we have to test s***? (PG-13)',
   };
@@ -46,7 +46,7 @@ test('create question', async () => {
   });
 });
 
-test('create question with invalid token', async () => {
+test('Create question with invalid token', async () => {
   const opts = {
     text: 'Why do we have to test s***? (PG-13)',
   };
@@ -56,7 +56,7 @@ test('create question with invalid token', async () => {
     });
 });
 
-test('get question by id', async () => {
+test('Get question by id', async () => {
   await request(get(`/questions/${question.id}`, memberToken)).then((getres) => {
     expect(getres.success).toBe(true);
     expect(question.id).toBe(getres.data.id);
@@ -65,7 +65,7 @@ test('get question by id', async () => {
   });
 });
 
-test('get questions by group', async () => {
+test('Get questions by group', async () => {
   await request(get(`/sessions/${group.id}/questions`, adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
     expect(question.id).toBe(getres.data[0].id);
@@ -74,7 +74,7 @@ test('get questions by group', async () => {
   });
 });
 
-test('update question', async () => {
+test('Update question', async () => {
   const opts = {
     text: 'Why do we have to test stuff? (PG)',
   };
@@ -85,7 +85,7 @@ test('update question', async () => {
   });
 });
 
-test('update question with invalid token', async () => {
+test('Update question with invalid token', async () => {
   const opts = {
     text: 'Why do we have to test stuff? (PG)',
   };
@@ -95,7 +95,7 @@ test('update question with invalid token', async () => {
     });
 });
 
-test('delete question', async () => {
+test('Delete question', async () => {
   await request(del(`/questions/${question.id}`, memberToken)).then((result) => {
     expect(result.success).toBe(true);
   });

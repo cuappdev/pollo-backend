@@ -32,6 +32,7 @@ const createGroup = async (name: string, code: string, user: ?User, location: ?C
     group.name = name;
     group.code = code;
     group.location = location || { lat: null, long: null };
+    group.isFilterActivated = true;
     group.isLocationRestricted = false;
     group.admins = user ? [user] : [];
 
@@ -114,9 +115,11 @@ const deleteGroupByID = async (id: number) => {
  * @param {?name} name - New group name
  * @param {?Coord} location - Most recent location of the group admin
  * @param {boolean} isRestricted - If joining a group is restricted by location
+ * @param {boolean} isActivated - If profanity filter is on
  * @return {?Group} Updated group
  */
-const updateGroupByID = async (id: number, name: ?string, location: ?Coord, isRestricted: ?boolean):
+const updateGroupByID = async (id: number, name: ?string, location: ?Coord,
+  isRestricted: ?boolean, isActivated: ?boolean):
   Promise<?Group> => {
   try {
     const group = await db().createQueryBuilder('groups')
@@ -129,7 +132,8 @@ const updateGroupByID = async (id: number, name: ?string, location: ?Coord, isRe
 
     if (name) group.name = name;
     if (location && location.lat && location.long) group.location = location;
-    if (isRestricted !== null || isRestricted !== undefined) group.isLocationRestricted = isRestricted;
+    if (isRestricted !== null && isRestricted !== undefined) group.isLocationRestricted = isRestricted;
+    if (isActivated !== null && isActivated !== undefined) group.isFilterActivated = isActivated;
     await db().persist(group);
     return group;
   } catch (e) {
