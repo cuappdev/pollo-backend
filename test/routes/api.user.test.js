@@ -24,7 +24,7 @@ beforeAll(async () => {
   token = session.sessionToken;
 });
 
-test('get user', async () => {
+test('Get user', async () => {
   await request(get('/users/', token)).then((getres) => {
     expect(getres.success).toBe(true);
     expect(user.id).toBe(getres.data.id);

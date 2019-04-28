@@ -35,21 +35,21 @@ beforeAll(async () => {
   adminToken = session.sessionToken;
 });
 
-test('create group', async () => {
+test('Create group', async () => {
   await request(post('/sessions/', opts, adminToken)).then((result) => {
     expect(result.success).toBe(true);
     group = result.data;
   });
 });
 
-test('get single group', async () => {
+test('Get single group', async () => {
   await request(get(`/sessions/${group.id}`, adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
     expect(group).toMatchObject(getres.data);
   });
 });
 
-test('get groups for admin', async () => {
+test('Get groups for admin', async () => {
   await request(get('/sessions/all/admin/', adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
     const groupRes = getres.data[0];
@@ -60,7 +60,7 @@ test('get groups for admin', async () => {
   });
 });
 
-test('add admins to group', async () => {
+test('Add admins to group', async () => {
   const user = await UsersRepo.createDummyUser('dummy');
   userID = user.id;
   const body = {
@@ -72,7 +72,7 @@ test('add admins to group', async () => {
   });
 });
 
-test('get admins for group', async () => {
+test('Get admins for group', async () => {
   await request(get(`/sessions/${group.id}/admins/`, adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
     const admins = getres.data;
@@ -82,7 +82,7 @@ test('get admins for group', async () => {
   });
 });
 
-test('remove admin from group', async () => {
+test('Remove admin from group', async () => {
   const body = {
     adminIDs: [userID],
   };
@@ -93,7 +93,7 @@ test('remove admin from group', async () => {
   });
 });
 
-test('add members to group', async () => {
+test('Add members to group', async () => {
   const user = await UsersRepo.createDummyUser('dummy');
   userID = user.id;
   userToken = (await UserSessionsRepo.createOrUpdateSession(user, null, null)).sessionToken;
@@ -106,7 +106,7 @@ test('add members to group', async () => {
   });
 });
 
-test('get groups as member', async () => {
+test('Get groups as member', async () => {
   await request(get('/sessions/all/member/', userToken)).then((getres) => {
     expect(getres.success).toBe(true);
     const groupRes = getres.data[0];
@@ -117,7 +117,7 @@ test('get groups as member', async () => {
   });
 });
 
-test('get members of group', async () => {
+test('Get members of group', async () => {
   await request(get(`/sessions/${group.id}/members/`, adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
     const members = getres.data;
@@ -126,34 +126,34 @@ test('get members of group', async () => {
   });
 });
 
-test('get group location restriction', async () => {
+test('Get group location restriction', async () => {
   const isRestricted = await GroupsRepo.isLocationRestricted(group.id);
   expect(isRestricted).toBe(false);
 });
 
-test('update group location restriction', async () => {
+test('Update group location restriction', async () => {
   await request(put(`/sessions/${group.id}/`, opts3, adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
     expect(getres.data.isLocationRestricted).toBe(true);
   });
 });
 
-test('update group location as admin with non-null location', async () => {
+test('Update group location as admin with non-null location', async () => {
   const updatedGroup = await GroupsRepo.updateGroupByID(group.id, null, opts.location);
   expect(updatedGroup.location).toEqual(opts.location);
 });
 
-test('update group location as admin with null location', async () => {
+test('Update group location as admin with null location', async () => {
   const updatedGroup = await GroupsRepo.updateGroupByID(group.id, null, { lat: null, long: null });
   expect(updatedGroup.location).toEqual(group.location);
 });
 
-test('update profanity filter group control', async () => {
+test('Update profanity filter group control', async () => {
   const updatedGroup = await GroupsRepo.updateGroupByID(group.id, null, null, false);
   expect(updatedGroup.isFilterActivated).toEqual(group.isFilterActivated);
 });
 
-test('leave group', async () => {
+test('Leave group', async () => {
   await request(del(`/sessions/${group.id}/members/`, userToken),
     (error, res, body) => {
       expect(body.success).toBe(true);
@@ -174,7 +174,7 @@ test('leave group', async () => {
     });
 });
 
-test('remove member from group', async () => {
+test('Remove member from group', async () => {
   const body = {
     memberIDs: [userID],
   };
@@ -185,7 +185,7 @@ test('remove member from group', async () => {
   await UsersRepo.deleteUserByID(userID);
 });
 
-test('get groups for admin', async () => {
+test('Get groups for admin', async () => {
   await request(get('/sessions/all/admin/', adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
     const groupRes = getres.data[0];
@@ -195,28 +195,28 @@ test('get groups for admin', async () => {
   });
 });
 
-test('update group', async () => {
+test('Update group', async () => {
   await request(put(`/sessions/${group.id}`, opts2, adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
     expect(getres.data.name).toBe('New group');
   });
 });
 
-test('update group with invalid adminToken', async () => {
+test('Update group with invalid adminToken', async () => {
   await request(put(`/sessions/${group.id}`, opts2, 'invalid'))
     .catch((e) => {
       expect(e.statusCode).toBe(401);
     });
 });
 
-test('delete group with invalid adminToken', async () => {
+test('Delete group with invalid adminToken', async () => {
   await request(del(`/sessions/${group.id}`, 'invalid'))
     .catch((e) => {
       expect(e.statusCode).toBe(401);
     });
 });
 
-test('delete group', async () => {
+test('Delete group', async () => {
   const result = await request(del(`/sessions/${group.id}`, adminToken));
   expect(result.success).toBe(true);
 });
