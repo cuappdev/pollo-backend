@@ -19,7 +19,7 @@ class DeleteMembersRouter extends AppDevRouter<NoResponse> {
   async content(req: Request) {
     const groupID = req.params.id;
     const { user } = req;
-    const memberIDs = JSON.parse(req.body.memberIDs);
+    const { memberIDs } = req.body;
 
     if (!memberIDs) throw LogUtils.logErr('List of member ids missing');
 
