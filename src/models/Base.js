@@ -16,6 +16,10 @@ class Base {
   /** Updated at timestamp (Unix time) */
   updatedAt: string = '-1';
 
+  @Column({ type: 'uuid', unique: true, nullable: true })
+  /** Universally unique identifier */
+  uuid: ?string = null;
+
   @BeforeInsert()
   /** Set the timestamps to current time
   * @function
