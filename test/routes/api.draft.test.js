@@ -19,7 +19,7 @@ beforeAll(async () => {
     process.exit();
   });
   const user = await UsersRepo.createDummyUser('googleID');
-  userID = user.id;
+  userID = user.uuid;
   const session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
   userToken = session.sessionToken;
 });
@@ -56,7 +56,7 @@ test('Update a draft', async () => {
   const body = {
     text: 'Test draft updated',
   };
-  await request(put(`/drafts/${draft1.id}`, body, userToken)).then((getres) => {
+  await request(put(`/drafts/${draft1.id}/`, body, userToken)).then((getres) => {
     const draft = getres.data;
     expect(getres.success).toBe(true);
     expect(draft.text).toBe(body.text);

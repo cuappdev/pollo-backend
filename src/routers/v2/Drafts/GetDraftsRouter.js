@@ -16,16 +16,11 @@ class GetDraftsRouter extends AppDevRouter<APIDraft[]> {
   }
 
   async content(req: Request) {
-    const drafts = await DraftsRepo.getDraftsByUser(req.user.id);
+    const drafts = await DraftsRepo.getDraftsByUser(req.user.uuid);
 
     return drafts
       .filter(Boolean)
-      .map(draft => ({
-        id: draft.id,
-        createdAt: draft.createdAt,
-        text: draft.text,
-        options: draft.options,
-      }));
+      .map(draft => draft.serialize());
   }
 }
 

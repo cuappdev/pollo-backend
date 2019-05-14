@@ -9,9 +9,8 @@ import Base from './Base';
 import constants from '../utils/Constants';
 import Group from './Group';
 
-import type {
-  PollType, PollState,
-} from '../utils/Constants';
+import type { APIPoll } from '../routers/v2/APITypes';
+import type { PollType, PollState } from '../utils/Constants';
 
 export type PollResult = {|
   letter: ?string,
@@ -89,6 +88,18 @@ class Poll extends Base {
    */
 
   state: PollState = constants.POLL_STATES.ENDED;
+
+  serialize(): APIPoll {
+    return {
+      ...super.serialize(),
+      answerChoices: this.answerChoices,
+      correctAnswer: this.correctAnswer,
+      state: this.state,
+      text: this.text,
+      type: this.type,
+      userAnswers: this.answers,
+    };
+  }
 }
 
 export default Poll;

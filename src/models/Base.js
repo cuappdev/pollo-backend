@@ -2,6 +2,7 @@
 import {
   AbstractEntity, BeforeInsert, BeforeUpdate, Column,
 } from 'typeorm';
+import uuidv4 from 'uuid/v4';
 
 @AbstractEntity()
 /**
@@ -16,9 +17,9 @@ class Base {
   /** Updated at timestamp (Unix time) */
   updatedAt: string = '-1';
 
-  @Column({ type: 'uuid', unique: true, nullable: true })
+  @Column({ type: 'uuid', unique: true })
   /** Universally unique identifier */
-  uuid: ?string = null;
+  uuid: string = uuidv4();
 
   @BeforeInsert()
   /** Set the timestamps to current time
@@ -36,6 +37,14 @@ class Base {
   */
   updateTimestamps(): void {
     this.updatedAt = String(Math.floor(new Date().getTime() / 1000));
+  }
+
+  serialize() {
+    return {
+      id: this.uuid,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    };
   }
 }
 

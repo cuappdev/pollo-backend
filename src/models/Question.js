@@ -9,6 +9,8 @@ import Base from './Base';
 import Group from './Group';
 import User from './User';
 
+import type { APIQuestion } from '../routers/v2/APITypes';
+
 @Entity('questions')
 /**
  * Question class represents questions a member can ask an admin
@@ -33,6 +35,13 @@ class Question extends Base {
   @ManyToOne(type => User, user => user.questions)
   /** User who asked the question */
   user: ?User = null;
+
+  serialize(): APIQuestion {
+    return {
+      ...super.serialize(),
+      text: this.text,
+    };
+  }
 }
 
 export default Question;

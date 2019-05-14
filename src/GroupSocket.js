@@ -19,7 +19,7 @@ export type GroupSocketConfig = {
   onClose: void => void
 };
 
-type id = number;
+type id = string;
 type IOSocket = Object;
 
 /** Poll object used in GroupSockets

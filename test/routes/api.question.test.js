@@ -105,9 +105,9 @@ afterAll(async () => {
   await request(del(`/sessions/${group.id}`, adminToken)).then((result) => {
     expect(result.success).toBe(true);
   });
-  await UsersRepo.deleteUserByID(admin.id);
-  await UsersRepo.deleteUserByID(member.id);
-  await UserSessionsRepo.deleteSession(session.id);
+  await UsersRepo.deleteUserByID(admin.uuid);
+  await UsersRepo.deleteUserByID(member.uuid);
+  await UserSessionsRepo.deleteSession(session.uuid);
   // eslint-disable-next-line no-console
   console.log('Passed all question route tests');
 });

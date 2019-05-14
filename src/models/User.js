@@ -12,6 +12,8 @@ import Question from './Question';
 import Group from './Group';
 import appDevUtils from '../utils/AppDevUtils';
 
+import type { APIUser } from '../routers/v2/APITypes';
+
 @Entity('users')
 /**
  * User class represents a user on the application.
@@ -88,6 +90,14 @@ class User extends Base {
     user.email = creds.emails[0].value;
     user.netID = appDevUtils.netIDFromEmail(user.email);
     return user;
+  }
+
+  serialize(): APIUser {
+    return {
+      ...super.serialize(),
+      name: `${this.firstName} ${this.lastName}`,
+      netID: this.netID,
+    };
   }
 }
 

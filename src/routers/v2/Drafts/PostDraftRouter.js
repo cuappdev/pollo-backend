@@ -24,12 +24,7 @@ class PostDraftRouter extends AppDevRouter<APIDraft> {
 
     const draft = await DraftsRepo.createDraft(text, options, user);
 
-    return {
-      id: draft.id,
-      createdAt: draft.createdAt,
-      text: draft.text,
-      options: draft.options,
-    };
+    return draft.serialize();
   }
 }
 

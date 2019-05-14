@@ -30,7 +30,7 @@ beforeAll(async () => {
   });
 
   const user = await UsersRepo.createDummyUser(googleID);
-  adminID = user.id;
+  adminID = user.uuid;
   session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
   adminToken = session.sessionToken;
 });
@@ -43,7 +43,7 @@ test('Create group', async () => {
 });
 
 test('Get single group', async () => {
-  await request(get(`/sessions/${group.id}`, adminToken)).then((getres) => {
+  await request(get(`/sessions/${group.id}/`, adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
     expect(group).toMatchObject(getres.data);
   });
@@ -62,7 +62,7 @@ test('Get groups for admin', async () => {
 
 test('Add admins to group', async () => {
   const user = await UsersRepo.createDummyUser('dummy');
-  userID = user.id;
+  userID = user.uuid;
   const body = {
     adminIDs: [userID],
   };
@@ -95,7 +95,7 @@ test('Remove admin from group', async () => {
 
 test('Add members to group', async () => {
   const user = await UsersRepo.createDummyUser('dummy');
-  userID = user.id;
+  userID = user.uuid;
   userToken = (await UserSessionsRepo.createOrUpdateSession(user, null, null)).sessionToken;
   const body = {
     memberIDs: [userID],

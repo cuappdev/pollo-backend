@@ -23,10 +23,10 @@ class GetPollRouter extends AppDevRouter<APIPoll> {
     const poll = await PollsRepo.getPollByID(id);
     if (!poll) throw LogUtils.logErr(`Poll with id ${id} cannot be found`);
 
-    const group = await PollsRepo.getGroupFromPollID(poll.id);
+    const group = await PollsRepo.getGroupFromPollID(poll.uuid);
     if (!group) throw LogUtils.logErr(`Group with id ${id} cannot be found`);
 
-    const isAdmin = await GroupsRepo.isAdmin(group.id, req.user);
+    const isAdmin = await GroupsRepo.isAdmin(group.uuid, req.user);
 
     if (!isAdmin && poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
       && poll.state !== constants.POLL_STATES.SHARED) {
@@ -42,14 +42,7 @@ class GetPollRouter extends AppDevRouter<APIPoll> {
     answerObject[req.user.googleID] = userAnswer || [];
 
     return {
-      id: poll.id,
-      answerChoices: poll.answerChoices,
-      correctAnswer: poll.correctAnswer,
-      createdAt: poll.createdAt,
-      state: poll.state,
-      text: poll.text,
-      type: poll.type,
-      updatedAt: poll.updatedAt,
+      ...poll.serialize(),
       userAnswers: answerObject,
     };
   }

@@ -8,6 +8,8 @@ import {
 import Base from './Base';
 import User from './User';
 
+import type { APIDraft } from '../routers/v2/APITypes';
+
 @Entity('drafts')
 /**
  * Draft class, represents drafts of polls
@@ -29,6 +31,14 @@ class Draft extends Base {
   @ManyToOne(type => User, user => user.drafts)
   /** User the draft belongs to */
   user: ?User = null;
+
+  serialize(): APIDraft {
+    return {
+      ...super.serialize(),
+      options: this.options,
+      text: this.text,
+    };
+  }
 }
 
 export default Draft;

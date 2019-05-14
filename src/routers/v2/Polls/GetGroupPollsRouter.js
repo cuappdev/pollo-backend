@@ -34,14 +34,7 @@ class GetGroupPollsRouter extends AppDevRouter<Object[]> {
       answerObject[req.user.googleID] = userAnswer || [];
 
       const p = {
-        id: poll.id,
-        answerChoices: poll.answerChoices,
-        correctAnswer: poll.correctAnswer,
-        createdAt: poll.createdAt,
-        state: poll.state,
-        text: poll.text,
-        type: poll.type,
-        updatedAt: poll.updatedAt,
+        ...poll.serialize(),
         userAnswers: answerObject,
       };
       const ind = datesArray.indexOf(date);

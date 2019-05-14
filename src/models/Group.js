@@ -12,6 +12,8 @@ import Poll from './Poll';
 import Question from './Question';
 import User from './User';
 
+import type { APIGroup } from '../routers/v2/APITypes';
+
 export type Coord = {| lat: ?number, long: ?number |}
 
 @Entity('groups')
@@ -65,6 +67,18 @@ class Group extends Base {
   @JoinTable()
   /** Member of the group */
   members: ?User[] = [];
+
+  serialize(): APIGroup {
+    return {
+      ...super.serialize(),
+      code: this.code,
+      isFilterActivated: this.isFilterActivated,
+      isLive: false,
+      isLocationRestricted: this.isLocationRestricted,
+      location: this.location,
+      name: this.name,
+    };
+  }
 }
 
 export default Group;

@@ -35,18 +35,18 @@ test('Create Question', async () => {
 });
 
 test('Get Question', async () => {
-  const question = await QuestionsRepo.getQuestionByID(question1.id);
+  const question = await QuestionsRepo.getQuestionByID(question1.uuid);
   expect(question.id).toBe(question1.id);
   expect(question.text).toBe(question1.text);
 
-  const questionThree = await QuestionsRepo.getQuestionByID(question3.id);
+  const questionThree = await QuestionsRepo.getQuestionByID(question3.uuid);
   expect(questionThree.id).toBe(question3.id);
   expect(questionThree.text).toBe(question3.text);
 });
 
 test('Update Question', async () => {
   const text = 'Why do we have to test stuff? (PG)';
-  const question = await QuestionsRepo.updateQuestionByID(question1.id, text);
+  const question = await QuestionsRepo.updateQuestionByID(question1.uuid, text);
   expect(question.id).toBe(question1.id);
   expect(question.text).toBe(text);
   question1.text = question.text;
@@ -61,33 +61,33 @@ test('Create A New Question', async () => {
 });
 
 test('Get Group from Both Questions', async () => {
-  let temp = await QuestionsRepo.getGroupFromQuestionID(question1.id);
+  let temp = await QuestionsRepo.getGroupFromQuestionID(question1.uuid);
   expect(temp.id).toBe(group.id);
-  temp = await QuestionsRepo.getGroupFromQuestionID(question2.id);
+  temp = await QuestionsRepo.getGroupFromQuestionID(question2.uuid);
   expect(temp.id).toBe(group.id);
 });
 
 test('Verify Ownership', async () => {
   const tempUser = await UsersRepo.createDummyUser('wastemon');
-  expect(await QuestionsRepo.isOwnerByID(question1.id, user)).toBe(true);
-  expect(await QuestionsRepo.isOwnerByID(question2.id, user)).toBe(true);
-  expect(await QuestionsRepo.isOwnerByID(question1.id, tempUser)).toBe(false);
-  await UsersRepo.deleteUserByID(tempUser.id);
+  expect(await QuestionsRepo.isOwnerByID(question1.uuid, user)).toBe(true);
+  expect(await QuestionsRepo.isOwnerByID(question2.uuid, user)).toBe(true);
+  expect(await QuestionsRepo.isOwnerByID(question1.uuid, tempUser)).toBe(false);
+  await UsersRepo.deleteUserByID(tempUser.uuid);
 });
 
 test('Delete Question', async () => {
-  await QuestionsRepo.deleteQuestionByID(question1.id);
-  await QuestionsRepo.deleteQuestionByID(question2.id);
-  await QuestionsRepo.deleteQuestionByID(question3.id);
-  expect(await QuestionsRepo.getQuestionByID(question1.id)).not.toBeDefined();
-  expect(await QuestionsRepo.getQuestionByID(question2.id)).not.toBeDefined();
-  expect(await QuestionsRepo.getQuestionByID(question3.id)).not.toBeDefined();
+  await QuestionsRepo.deleteQuestionByID(question1.uuid);
+  await QuestionsRepo.deleteQuestionByID(question2.uuid);
+  await QuestionsRepo.deleteQuestionByID(question3.uuid);
+  expect(await QuestionsRepo.getQuestionByID(question1.uuid)).not.toBeDefined();
+  expect(await QuestionsRepo.getQuestionByID(question2.uuid)).not.toBeDefined();
+  expect(await QuestionsRepo.getQuestionByID(question3.uuid)).not.toBeDefined();
 });
 
 afterAll(async () => {
-  await UsersRepo.deleteUserByID(user.id);
-  await GroupsRepo.deleteGroupByID(group.id);
-  await GroupsRepo.deleteGroupByID(group2.id);
+  await UsersRepo.deleteUserByID(user.uuid);
+  await GroupsRepo.deleteGroupByID(group.uuid);
+  await GroupsRepo.deleteGroupByID(group2.uuid);
   // eslint-disable-next-line no-console
   console.log('Passed all question tests');
 });

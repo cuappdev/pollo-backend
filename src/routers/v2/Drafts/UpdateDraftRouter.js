@@ -36,12 +36,7 @@ class UpdateDraftRouter extends AppDevRouter<APIDraft> {
       throw LogUtils.logErr(`Draft with id ${draftID} was not found`);
     }
 
-    return {
-      id: draft.id,
-      createdAt: draft.createdAt,
-      text: draft.text,
-      options: draft.options,
-    };
+    return draft.serialize();
   }
 }
 

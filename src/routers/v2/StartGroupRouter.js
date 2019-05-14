@@ -30,13 +30,8 @@ class StartGroupRouter extends AppDevRouter<APIGroup> {
     await req.app.groupManager.startNewGroup(group);
 
     return {
-      id: group.id,
-      code: group.code,
-      isFilterActivated: group.isFilterActivated,
+      ...group.serialize(),
       isLive: true,
-      isLocationRestricted: group.isLocationRestricted,
-      location: group.location,
-      name: group.name,
       updatedAt: await GroupsRepo.latestActivityByGroupID(group.id),
     };
   }

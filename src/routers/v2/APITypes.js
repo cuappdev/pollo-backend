@@ -14,51 +14,57 @@ export type Response<T> = {
 }
 
 // ************************ POLLO OBJECT TYPES ************************
-export type APIGroup = {|
-  id: id,
+
+export type APIGroup = {
+  id: string,
+  createdAt: string,
+  updatedAt: string,
   code: string,
   isFilterActivated: boolean,
   isLive: boolean,
   isLocationRestricted: boolean,
   location: Coord,
   name: string,
-  updatedAt: string,
-|}
+}
 
-export type APIPoll = {|
-  id: id,
+export type APIPoll = {
+  id: string,
+  createdAt: string,
+  updatedAt: string,
   answerChoices: PollResult[],
-  correctAnswer ?: string,
-  createdAt ?: string,
+  correctAnswer: string,
   state: PollState,
   text: string,
   type: PollType,
-  updatedAt ?: string,
   userAnswers: { string: PollChoice[] },
-|}
+}
 
-export type APIDraft = {|
-  id: id,
+export type APIDraft = {
+  id: string,
   createdAt: string,
+  updatedAt: string,
   options: string[],
   text: string,
-|}
+}
 
-export type APIQuestion = {|
-  id: id,
+export type APIQuestion = {
+  id: string,
   createdAt: string,
+  updatedAt: string,
   text: string,
-|}
+}
 
-export type APIUser = {|
-  id: id,
+export type APIUser = {
+  id: string,
+  createdAt: string,
+  updatedAt: string,
   name: string,
   netID: string,
-|}
+}
 
-export type APIUserSession = {|
+export type APIUserSession = {
   accessToken: string,
   isActive: boolean,
   refreshToken: string,
   sessionExpiration: string,
-|}
+}

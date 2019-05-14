@@ -10,6 +10,8 @@ import crypto from 'crypto';
 import Base from './Base';
 import User from './User';
 
+import type { APIUserSession } from '../routers/v2/APITypes';
+
 @Entity('usersessions')
 /**
  * UserSession class represents the sessions used for authentication.
@@ -92,6 +94,15 @@ class UserSession extends Base {
   logOut(): UserSession {
     this.isActive = false;
     return this;
+  }
+
+  serialize(): APIUserSession {
+    return {
+      accessToken: this.sessionToken,
+      isActive: this.isActive,
+      refreshToken: this.updateToken,
+      sessionExpiration: this.expiresAt,
+    };
   }
 }
 

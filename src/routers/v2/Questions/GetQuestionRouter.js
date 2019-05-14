@@ -21,11 +21,7 @@ class GetQuestionRouter extends AppDevRouter<APIQuestion> {
     const question = await QuestionsRepo.getQuestionByID(id);
     if (!question) throw LogUtils.logErr(`Question with id ${id} cannot be found`);
 
-    return question && {
-      id: question.id,
-      createdAt: question.createdAt,
-      text: question.text,
-    };
+    return question.serialize();
   }
 }
 

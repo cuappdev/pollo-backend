@@ -32,7 +32,7 @@ class UpdatePollRouter extends AppDevRouter<APIPoll> {
     const group = await PollsRepo.getGroupFromPollID(pollID);
     if (!group) throw LogUtils.logErr(`Poll with id ${pollID} has no group`);
 
-    if (!await GroupsRepo.isAdmin(group.id, user)) {
+    if (!await GroupsRepo.isAdmin(group.uuid, user)) {
       throw LogUtils.logErr(
         'You are not authorized to update this poll', {}, { pollID, user },
       );
@@ -50,14 +50,7 @@ class UpdatePollRouter extends AppDevRouter<APIPoll> {
     answerObject[req.user.googleID] = userAnswer || [];
 
     return {
-      id: poll.id,
-      answerChoices: poll.answerChoices,
-      correctAnswer: poll.correctAnswer,
-      createdAt: poll.createdAt,
-      state: poll.state,
-      text: poll.text,
-      type: poll.type,
-      updatedAt: poll.updatedAt,
+      ...poll.serialize(),
       userAnswers: answerObject,
     };
   }

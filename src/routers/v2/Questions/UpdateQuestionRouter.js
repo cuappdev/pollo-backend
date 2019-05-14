@@ -34,11 +34,7 @@ class UpdateQuestionRouter extends AppDevRouter<APIQuestion> {
       throw LogUtils.logErr(`Question with id ${questionID} was not found`);
     }
 
-    return {
-      id: question.id,
-      createdAt: question.createdAt,
-      text: question.text,
-    };
+    return question.serialize();
   }
 }
 

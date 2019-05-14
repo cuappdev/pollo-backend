@@ -25,7 +25,7 @@ class DeleteQuestionRouter extends AppDevRouter<NoResponse> {
     if (!group) {
       throw LogUtils.logErr(`Couldn't find group with question ${questionID}`);
     }
-    if (!await GroupsRepo.isAdmin(group.id, user)
+    if (!await GroupsRepo.isAdmin(group.uuid, user)
           && !await QuestionsRepo.isOwnerByID(questionID, user)) {
       throw LogUtils.logErr(
         'You are not authorized to delete this question', {}, { questionID, user },

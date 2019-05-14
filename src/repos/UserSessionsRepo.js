@@ -91,12 +91,15 @@ const verifySession = async (accessToken: string): Promise<boolean> => {
 /**
  * Delete a session
  * @function
- * @param {number} id - ID of session to delete
+ * @param {string} id - ID of session to delete
  */
-const deleteSession = async (id: number) => {
+const deleteSession = async (id: string) => {
   try {
-    const session = await db().findOneById(id);
-    await db().remove(session);
+    const session = await db().createQueryBuilder('usersessions')
+      .where('usersessions.uuid = :sessionID')
+      .setParameters({ sessionID: id })
+      .getOne();
+    if (session) await db().remove(session);
   } catch (e) {
     throw LogUtils.logErr(`Problem deleting session by id: ${id}`, e);
   }
@@ -105,15 +108,15 @@ const deleteSession = async (id: number) => {
 /**
  * Delete the session for a user
  * @function
- * @param {number} userID - ID of use to delete the session for
+ * @param {string} userID - ID of use to delete the session for
  */
-const deleteSessionFromUserID = async (userID: number) => {
+const deleteSessionFromUserID = async (userID: string) => {
   try {
     const session = await db().createQueryBuilder('usersessions')
-      .innerJoin('usersessions.user', 'user', 'user.id = :userID')
+      .innerJoin('usersessions.user', 'user', 'user.uuid = :userID')
       .setParameters({ userID })
       .getOne();
-    if (session) db().remove(session);
+    if (session) await db().remove(session);
   } catch (e) {
     throw LogUtils.logErr(`Problem deleting session by user: ${userID}`, e);
   }
@@ -138,12 +141,7 @@ const createUserAndInitializeSession = async (login: LoginTicket): Promise<Objec
   }
 
   const session = await createOrUpdateSession(user, null, null);
-  return {
-    accessToken: session.sessionToken,
-    refreshToken: session.updateToken,
-    sessionExpiration: session.expiresAt,
-    isActive: session.isActive,
-  };
+  return session.serialize();
 };
 
 export default {

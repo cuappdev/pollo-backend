@@ -33,11 +33,7 @@ class PostQuestionRouter extends AppDevRouter<APIQuestion> {
 
     const question = await QuestionsRepo.createQuestion(text, group, user);
 
-    return {
-      id: question.id,
-      createdAt: question.createdAt,
-      text: question.text,
-    };
+    return question.serialize();
   }
 }
 

@@ -21,11 +21,7 @@ class GetQuestionsRouter extends AppDevRouter<APIQuestion[]> {
 
     return questions
       .filter(Boolean)
-      .map(question => ({
-        id: question.id,
-        createdAt: question.createdAt,
-        text: question.text,
-      }));
+      .map(question => question.serialize());
   }
 }
 

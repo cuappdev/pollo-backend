@@ -28,16 +28,7 @@ class PostGroupRouter extends AppDevRouter<APIGroup> {
 
     const group = await GroupsRepo.createGroup(name, code, user, location);
 
-    return {
-      id: group.id,
-      code: group.code,
-      isFilterActivated: group.isFilterActivated,
-      isLive: false,
-      isLocationRestricted: group.isLocationRestricted,
-      location: group.location,
-      name: group.name,
-      updatedAt: group.updatedAt,
-    };
+    return group.serialize();
   }
 }
 

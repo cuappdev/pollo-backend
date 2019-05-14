@@ -38,6 +38,7 @@ const createPoll = async (text: string, group: ?Group, answerChoices: PollResult
     await db().persist(poll);
     return poll;
   } catch (e) {
+    console.log(e);
     throw LogUtils.logErr('Problem creating poll', e, {
       text, group, answerChoices, type, correctAnswer, answers, state, upvotes,
     });
@@ -47,12 +48,15 @@ const createPoll = async (text: string, group: ?Group, answerChoices: PollResult
 /**
  * Get a poll by id
  * @function
- * @param {number} id - id of the poll we want
+ * @param {string} id - id of the poll we want
  * @return {?Poll} Poll with corresponding id
  */
-const getPollByID = async (id: number): Promise<?Poll> => {
+const getPollByID = async (id: string): Promise<?Poll> => {
   try {
-    return await db().findOneById(id);
+    return await db().createQueryBuilder('polls')
+      .where('polls.uuid = :pollID')
+      .setParameters({ pollID: id })
+      .getOne();
   } catch (e) {
     throw LogUtils.logErr(`Problem getting poll by id: ${id}`, e);
   }
@@ -61,11 +65,11 @@ const getPollByID = async (id: number): Promise<?Poll> => {
 /**
  * Delete a poll
  * @function
- * @param {number} id - id of the poll to delete
+ * @param {string} id - id of the poll to delete
  */
-const deletePollByID = async (id: number) => {
+const deletePollByID = async (id: string) => {
   try {
-    const poll = await db().findOneById(id);
+    const poll = await getPollByID(id);
     await db().remove(poll);
   } catch (e) {
     throw LogUtils.logErr(`Problem deleting poll by id: ${id}`, e);
@@ -75,7 +79,7 @@ const deletePollByID = async (id: number) => {
 /**
  * Update a poll
  * @function
- * @param {number} id - id of the poll to update
+ * @param {string} id - id of the poll to update
  * @param {?string} [text] - new text for poll
  * @param {?PollResult[]} answerChoices - the answer choices for the given poll
  * @param {string: PollChoice[]} [answers] - the students answers to the poll
@@ -83,13 +87,13 @@ const deletePollByID = async (id: number) => {
  * @param {PollState} [state] - the state of the poll
  * @return {?Poll} Updated poll
  */
-const updatePollByID = async (id: number, text: ?string, answerChoices: ?PollResult[],
+const updatePollByID = async (id: string, text: ?string, answerChoices: ?PollResult[],
   answers: ?{string: PollChoice[]}, upvotes: ?{string: PollChoice[]}, state: ?PollState):
   Promise<?Poll> => {
   try {
     const poll = await db().createQueryBuilder('polls')
       .leftJoinAndSelect('polls.group', 'group')
-      .where('polls.id = :pollID')
+      .where('polls.uuid = :pollID')
       .setParameters({ pollID: id })
       .getOne();
 
@@ -109,14 +113,14 @@ const updatePollByID = async (id: number, text: ?string, answerChoices: ?PollRes
 /**
  * Get group that a poll belongs to
  * @function
- * @param {number} id - id of poll we want to find the group for
+ * @param {string} id - id of poll we want to find the group for
  * @return {?Group} Group that the poll belongs to
  */
-const getGroupFromPollID = async (id: number): Promise<?Group> => {
+const getGroupFromPollID = async (id: string): Promise<?Group> => {
   try {
     const poll = await db().createQueryBuilder('polls')
       .leftJoinAndSelect('polls.group', 'group')
-      .where('polls.id = :pollID', { pollID: id })
+      .where('polls.uuid = :pollID', { pollID: id })
       .getOne();
     return poll.group;
   } catch (e) {
