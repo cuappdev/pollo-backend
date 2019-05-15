@@ -25,7 +25,7 @@ class PostQuestionRouter extends AppDevRouter<APIQuestion> {
     if (!text) throw LogUtils.logErr('Cannot post empty question');
 
     const group = await GroupsRepo.getGroupByID(groupID);
-    if (!group) throw LogUtils.logErr(`Couldn't find group with id ${groupID}`);
+    if (!group) throw LogUtils.logErr(`Couldn't find group with UUID ${groupID}`);
 
     if (!await GroupsRepo.isMember(groupID, user)) {
       throw LogUtils.logErr('You are not authorized to post a poll', {}, { groupID, user });

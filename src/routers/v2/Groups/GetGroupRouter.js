@@ -17,8 +17,9 @@ class GetGroupRouter extends AppDevRouter<APIGroup> {
   }
 
   async content(req: Request) {
-    const group = await GroupsRepo.getGroupByID(req.params.id);
-    if (!group) throw LogUtils.logErr(`Group with id ${req.params.id} not found!`);
+    const { id } = req.params;
+    const group = await GroupsRepo.getGroupByID(id);
+    if (!group) throw LogUtils.logErr(`Group with UUID ${id} not found!`);
     
     return {
       ...group.serialize(),

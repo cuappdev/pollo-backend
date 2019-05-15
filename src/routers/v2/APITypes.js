@@ -5,8 +5,6 @@ import type { PollResult } from '../../models/Poll';
 
 // *********************** GENERAL RESPONSE TYPES ***********************
 
-export type id = string
-
 export type Response<T> = {
   data: T,
   errors?: Array<Error>,
@@ -15,7 +13,7 @@ export type Response<T> = {
 
 // ************************ POLLO OBJECT TYPES ************************
 
-export type APIGroup = {
+export type APIGroup = {|
   id: string,
   createdAt: string,
   updatedAt: string,
@@ -25,9 +23,9 @@ export type APIGroup = {
   isLocationRestricted: boolean,
   location: Coord,
   name: string,
-}
+|}
 
-export type APIPoll = {
+export type APIPoll = {|
   id: string,
   createdAt: string,
   updatedAt: string,
@@ -37,34 +35,34 @@ export type APIPoll = {
   text: string,
   type: PollType,
   userAnswers: { string: PollChoice[] },
-}
+|}
 
-export type APIDraft = {
+export type APIDraft = {|
   id: string,
   createdAt: string,
   updatedAt: string,
   options: string[],
   text: string,
-}
+|}
 
-export type APIQuestion = {
+export type APIQuestion = {|
   id: string,
   createdAt: string,
   updatedAt: string,
   text: string,
-}
+|}
 
-export type APIUser = {
+export type APIUser = {|
   id: string,
   createdAt: string,
   updatedAt: string,
   name: string,
   netID: string,
-}
+|}
 
-export type APIUserSession = {
+export type APIUserSession = {|
   accessToken: string,
   isActive: boolean,
   refreshToken: string,
   sessionExpiration: string,
-}
+|}

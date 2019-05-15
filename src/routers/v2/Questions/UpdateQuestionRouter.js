@@ -24,14 +24,14 @@ class UpdateQuestionRouter extends AppDevRouter<APIQuestion> {
     if (!text) throw LogUtils.logErr('No fields specified to update');
 
     const group = await QuestionsRepo.getGroupFromQuestionID(questionID);
-    if (!group) throw LogUtils.logErr(`Question with id ${questionID} has no group`);
+    if (!group) throw LogUtils.logErr(`Question with UUID ${questionID} has no group`);
 
     if (!await QuestionsRepo.isOwnerByID(questionID, user)) {
       throw LogUtils.logErr('You are not authorized to update this question', {}, { questionID, user });
     }
     const question = await QuestionsRepo.updateQuestionByID(questionID, text);
     if (!question) {
-      throw LogUtils.logErr(`Question with id ${questionID} was not found`);
+      throw LogUtils.logErr(`Question with UUID ${questionID} was not found`);
     }
 
     return question.serialize();

@@ -21,7 +21,7 @@ class DeleteGroupRouter extends AppDevRouter<NoResponse> {
     const { user } = req;
 
     const group = await GroupsRepo.getGroupByID(groupID);
-    if (!group) throw LogUtils.logErr(`Group with id ${groupID} not found`);
+    if (!group) throw LogUtils.logErr(`Group with UUID ${groupID} not found`);
 
     if (!await GroupsRepo.isAdmin(groupID, user)) {
       throw LogUtils.logErr(

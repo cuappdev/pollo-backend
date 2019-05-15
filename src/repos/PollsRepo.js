@@ -46,10 +46,10 @@ const createPoll = async (text: string, group: ?Group, answerChoices: PollResult
 };
 
 /**
- * Get a poll by id
+ * Get a poll by UUID
  * @function
- * @param {string} id - id of the poll we want
- * @return {?Poll} Poll with corresponding id
+ * @param {string} id - UUID of the poll we want
+ * @return {?Poll} Poll with corresponding UUID
  */
 const getPollByID = async (id: string): Promise<?Poll> => {
   try {
@@ -58,28 +58,28 @@ const getPollByID = async (id: string): Promise<?Poll> => {
       .setParameters({ pollID: id })
       .getOne();
   } catch (e) {
-    throw LogUtils.logErr(`Problem getting poll by id: ${id}`, e);
+    throw LogUtils.logErr(`Problem getting poll by UUID: ${id}`, e);
   }
 };
 
 /**
  * Delete a poll
  * @function
- * @param {string} id - id of the poll to delete
+ * @param {string} id - UUID of the poll to delete
  */
 const deletePollByID = async (id: string) => {
   try {
     const poll = await getPollByID(id);
     await db().remove(poll);
   } catch (e) {
-    throw LogUtils.logErr(`Problem deleting poll by id: ${id}`, e);
+    throw LogUtils.logErr(`Problem deleting poll by UUID: ${id}`, e);
   }
 };
 
 /**
  * Update a poll
  * @function
- * @param {string} id - id of the poll to update
+ * @param {string} id - UUID of the poll to update
  * @param {?string} [text] - new text for poll
  * @param {?PollResult[]} answerChoices - the answer choices for the given poll
  * @param {string: PollChoice[]} [answers] - the students answers to the poll
@@ -106,14 +106,14 @@ const updatePollByID = async (id: string, text: ?string, answerChoices: ?PollRes
     await db().persist(poll);
     return poll;
   } catch (e) {
-    throw LogUtils.logErr(`Problem updating poll by id: ${id}`, e);
+    throw LogUtils.logErr(`Problem updating poll by UUID: ${id}`, e);
   }
 };
 
 /**
  * Get group that a poll belongs to
  * @function
- * @param {string} id - id of poll we want to find the group for
+ * @param {string} id - UUID of poll we want to find the group for
  * @return {?Group} Group that the poll belongs to
  */
 const getGroupFromPollID = async (id: string): Promise<?Group> => {
@@ -124,7 +124,7 @@ const getGroupFromPollID = async (id: string): Promise<?Group> => {
       .getOne();
     return poll.group;
   } catch (e) {
-    throw LogUtils.logErr(`Problem getting group from question by id: ${id}`, e);
+    throw LogUtils.logErr(`Problem getting group from question by UUID: ${id}`, e);
   }
 };
 

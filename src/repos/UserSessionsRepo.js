@@ -20,8 +20,8 @@ const createOrUpdateSession = async (
   user: User, accessToken: ?string, refreshToken: ?string,
 ): Promise<UserSession> => {
   const optionalSession = await db().createQueryBuilder('usersessions')
-    .where('usersessions.user = :userID', { userID: user.id })
-    .innerJoinAndSelect('usersessions.user', 'users')
+    .innerJoin('usersessions.user', 'user', 'user.uuid = :userID')
+    .setParameters({ userID: user.uuid })
     .getOne();
 
   let session;
@@ -91,7 +91,7 @@ const verifySession = async (accessToken: string): Promise<boolean> => {
 /**
  * Delete a session
  * @function
- * @param {string} id - ID of session to delete
+ * @param {string} id - UUID of session to delete
  */
 const deleteSession = async (id: string) => {
   try {
@@ -101,14 +101,14 @@ const deleteSession = async (id: string) => {
       .getOne();
     if (session) await db().remove(session);
   } catch (e) {
-    throw LogUtils.logErr(`Problem deleting session by id: ${id}`, e);
+    throw LogUtils.logErr(`Problem deleting session by UUID: ${id}`, e);
   }
 };
 
 /**
  * Delete the session for a user
  * @function
- * @param {string} userID - ID of use to delete the session for
+ * @param {string} userID - UUID of user to delete the session for
  */
 const deleteSessionFromUserID = async (userID: string) => {
   try {

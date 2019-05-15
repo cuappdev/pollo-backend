@@ -21,7 +21,7 @@ class DeleteMembersRouter extends AppDevRouter<NoResponse> {
     const { user } = req;
     const { memberIDs } = req.body;
 
-    if (!memberIDs) throw LogUtils.logErr('List of member ids missing');
+    if (!memberIDs) throw LogUtils.logErr('List of member UUIDs missing');
 
     if (!await GroupsRepo.isAdmin(groupID, user)) {
       throw LogUtils.logErr(

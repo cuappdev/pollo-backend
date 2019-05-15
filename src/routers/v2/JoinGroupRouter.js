@@ -37,7 +37,7 @@ class JoinGroupRouter extends AppDevRouter<APIGroup> {
 
     let group = await GroupsRepo.getGroupByID(id);
     if (!group) {
-      throw LogUtils.logErr(`No group with id ${id} found`);
+      throw LogUtils.logErr(`No group with UUID ${id} found`);
     }
 
     // add user as member if not in group in database
@@ -70,7 +70,7 @@ class JoinGroupRouter extends AppDevRouter<APIGroup> {
     }
 
     if (!isAdmin && !isMember) {
-      await GroupsRepo.addUsersByIDs(id, [user.id], 'member');
+      await GroupsRepo.addUsersByIDs(id, [user.uuid], 'member');
     }
 
     return {

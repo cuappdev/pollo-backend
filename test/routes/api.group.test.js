@@ -223,7 +223,7 @@ test('Delete group', async () => {
 
 afterAll(async () => {
   await UsersRepo.deleteUserByID(adminID);
-  await UserSessionsRepo.deleteSession(session.id);
+  await UserSessionsRepo.deleteSession(session.uuid);
   // eslint-disable-next-line no-console
   console.log('Passed all group route tests');
 });

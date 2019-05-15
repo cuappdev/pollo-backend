@@ -30,10 +30,10 @@ const createDraft = async (text: string, options: string[], user: User):
 };
 
 /**
-* Gets draft by id
+* Gets draft by UUID
 * @function
-* @param {string} id - ID of draft we want to fetch
-* @return {Draft} Draft with given id
+* @param {string} id - UUID of draft we want to fetch
+* @return {Draft} Draft with given UUID
 */
 const getDraft = async (id: string): Promise<Draft> => {
   try {
@@ -43,14 +43,14 @@ const getDraft = async (id: string): Promise<Draft> => {
       .setParameters({ draftID: id })
       .getOne();
   } catch (e) {
-    throw LogUtils.logErr(`Problem getting draft by id: ${id}`, e);
+    throw LogUtils.logErr(`Problem getting draft by UUID: ${id}`, e);
   }
 };
 
 /**
-* Gets draft by user id
+* Gets draft by user UUID
 * @function
-* @param {string} id - ID of user we want to fetch drafts for
+* @param {string} id - UUID of user we want to fetch drafts for
 * @return {Draft[]} Drafts belonging to the user specified
 */
 const getDraftsByUser = async (id: string): Promise<Array<?Draft>> => {
@@ -60,14 +60,14 @@ const getDraftsByUser = async (id: string): Promise<Array<?Draft>> => {
       .setParameters({ userID: id })
       .getMany();
   } catch (e) {
-    throw LogUtils.logErr(`Problem getting drafts for user by id: ${id}`, e);
+    throw LogUtils.logErr(`Problem getting drafts for user by UUID: ${id}`, e);
   }
 };
 
 /**
 * Updates draft
 * @function
-* @param {string} id - ID of draft to update
+* @param {string} id - UUID of draft to update
 * @param {string} [text] - New text of draft
 * @param {string[]} [options] - New options of draft
 * @return {?Draft} Updated draft
@@ -87,14 +87,14 @@ const updateDraft = async (id: string, text: ?string, options: ?string[]):
     await db().persist(draft);
     return draft;
   } catch (e) {
-    throw LogUtils.logErr(`Problem updating draft by id: ${id}`, e);
+    throw LogUtils.logErr(`Problem updating draft by UUID: ${id}`, e);
   }
 };
 
 /**
 * Deletes draft
 * @function
-* @param {string} id - ID of draft to delete
+* @param {string} id - UUID of draft to delete
 */
 const deleteDraft = async (id: string) => {
   try {
@@ -104,14 +104,14 @@ const deleteDraft = async (id: string) => {
       .getOne();
     await db().remove(draft);
   } catch (e) {
-    throw LogUtils.logErr(`Problem deleting draft by id: ${id}`, e);
+    throw LogUtils.logErr(`Problem deleting draft by UUID: ${id}`, e);
   }
 };
 
 /**
 * Get owner of a draft
 * @function
-* @param {string} id - ID of draft to get owner of
+* @param {string} id - UUID of draft to get owner of
 * @return {?User} owner of draft
 */
 const getOwnerByID = async (id: string): Promise<?User> => {
@@ -124,7 +124,7 @@ const getOwnerByID = async (id: string): Promise<?User> => {
 
     return draft.user;
   } catch (e) {
-    throw LogUtils.logErr(`Problem getting owner of draft by id: ${id}`, e);
+    throw LogUtils.logErr(`Problem getting owner of draft by UUID: ${id}`, e);
   }
 };
 

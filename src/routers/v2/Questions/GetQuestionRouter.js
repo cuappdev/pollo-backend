@@ -19,7 +19,7 @@ class GetQuestionRouter extends AppDevRouter<APIQuestion> {
   async content(req: Request) {
     const { id } = req.params;
     const question = await QuestionsRepo.getQuestionByID(id);
-    if (!question) throw LogUtils.logErr(`Question with id ${id} cannot be found`);
+    if (!question) throw LogUtils.logErr(`Question with UUID ${id} cannot be found`);
 
     return question.serialize();
   }

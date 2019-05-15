@@ -21,10 +21,10 @@ class GetPollRouter extends AppDevRouter<APIPoll> {
   async content(req: Request) {
     const { id } = req.params;
     const poll = await PollsRepo.getPollByID(id);
-    if (!poll) throw LogUtils.logErr(`Poll with id ${id} cannot be found`);
+    if (!poll) throw LogUtils.logErr(`Poll with UUID ${id} cannot be found`);
 
     const group = await PollsRepo.getGroupFromPollID(poll.uuid);
-    if (!group) throw LogUtils.logErr(`Group with id ${id} cannot be found`);
+    if (!group) throw LogUtils.logErr(`Group with UUID ${id} cannot be found`);
 
     const isAdmin = await GroupsRepo.isAdmin(group.uuid, req.user);
 

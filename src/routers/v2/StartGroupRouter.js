@@ -32,7 +32,7 @@ class StartGroupRouter extends AppDevRouter<APIGroup> {
     return {
       ...group.serialize(),
       isLive: true,
-      updatedAt: await GroupsRepo.latestActivityByGroupID(group.id),
+      updatedAt: await GroupsRepo.latestActivityByGroupID(group.uuid),
     };
   }
 }

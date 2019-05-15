@@ -20,7 +20,7 @@ class UpdateDraftRouter extends AppDevRouter<APIDraft> {
     const draftID = req.params.id;
     const { text, options } = req.body;
     const admin = await DraftsRepo.getOwnerByID(draftID);
-    if (!admin) throw LogUtils.logErr(`Draft with id ${draftID} was not found`);
+    if (!admin) throw LogUtils.logErr(`Draft with UUID ${draftID} was not found`);
 
     if (!options && !text) {
       throw LogUtils.logErr('No fields specified to update', {}, { options, text });
@@ -28,12 +28,12 @@ class UpdateDraftRouter extends AppDevRouter<APIDraft> {
 
     if (admin.id !== req.user.id) {
       throw LogUtils.logErr('Not authorized to update draft', {},
-        { admin: admin.id, id: req.user.id });
+        { admin: admin.uuid, id: req.user.uuid });
     }
 
     const draft = await DraftsRepo.updateDraft(draftID, text, options);
     if (!draft) {
-      throw LogUtils.logErr(`Draft with id ${draftID} was not found`);
+      throw LogUtils.logErr(`Draft with UUID ${draftID} was not found`);
     }
 
     return draft.serialize();
