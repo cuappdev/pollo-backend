@@ -16,12 +16,12 @@ psql pollo
 ````
 
 ### Required variables:
-Create a .env file in the repository by running the following and setting the correct values:
+Create a .envrc file in the repository by running the following and setting the correct values:
 ```bash
-cp env.template .env
+cp envrc.template .envrc
 ```
 
-Using [`autoenv`](https://github.com/kennethreitz/autoenv) is recommended. Otherwise, you need source it using `source .env`.
+Using [`direnv`](https://direnv.net) is recommended. Otherwise, you need to source it using `source .env`.
 
 ### To run:
 Make sure you have [`Node.js`](https://nodejs.org/en/download/) installed, and then run
