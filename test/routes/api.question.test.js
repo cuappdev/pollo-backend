@@ -9,7 +9,6 @@ const {
 } = require('./lib');
 
 let group;
-let session;
 let question;
 let admin;
 let member;
@@ -107,7 +106,6 @@ afterAll(async () => {
   });
   await UsersRepo.deleteUserByID(admin.uuid);
   await UsersRepo.deleteUserByID(member.uuid);
-  await UserSessionsRepo.deleteSession(session.uuid);
   // eslint-disable-next-line no-console
   console.log('Passed all question route tests');
 });
