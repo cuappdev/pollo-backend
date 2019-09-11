@@ -1,8 +1,8 @@
 // @flow
 import { Request } from 'express';
+import DraftsRepo from '../../../repos/DraftsRepo';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';
-import DraftsRepo from '../../../repos/DraftsRepo';
 import LogUtils from '../../../utils/LogUtils';
 
 import type { APIDraft } from '../APITypes';
@@ -27,8 +27,11 @@ class UpdateDraftRouter extends AppDevRouter<APIDraft> {
     }
 
     if (admin.id !== req.user.id) {
-      throw LogUtils.logErr('Not authorized to update draft', {},
-        { admin: admin.id, id: req.user.id });
+      throw LogUtils.logErr(
+        'Not authorized to update draft',
+        {},
+        { admin: admin.id, id: req.user.id },
+      );
     }
 
     const draft = await DraftsRepo.updateDraft(draftID, text, options);

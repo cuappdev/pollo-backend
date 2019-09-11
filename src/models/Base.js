@@ -1,35 +1,38 @@
 // @flow
 import {
-  AbstractEntity, BeforeInsert, BeforeUpdate, Column,
+  AbstractEntity,
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
 } from 'typeorm';
 
+/** Base class, contains all fields that other classes have */
 @AbstractEntity()
-/**
- * Base class, contains all fields that other classes have
- */
 class Base {
-  @Column('bigint')
   /** Created at timestamp (Unix time) */
+  @Column('bigint')
   createdAt: string = '-1';
 
-  @Column('bigint')
   /** Updated at timestamp (Unix time) */
+  @Column('bigint')
   updatedAt: string = '-1';
 
+  /**
+   * Set the timestamps to current time
+   * @function
+   */
   @BeforeInsert()
-  /** Set the timestamps to current time
-  * @function
-  */
   setTimestamps(): void {
     const time = String(Math.floor(new Date().getTime() / 1000));
     this.createdAt = time;
     this.updatedAt = time;
   }
 
+  /**
+   * Set updatedAt timestamp to current time
+   * @function
+   */
   @BeforeUpdate()
-  /** Set updatedAt timestamp to current time
-  * @function
-  */
   updateTimestamps(): void {
     this.updatedAt = String(Math.floor(new Date().getTime() / 1000));
   }

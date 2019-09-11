@@ -1,8 +1,8 @@
 // @flow
 import { Request } from 'express';
+import DraftsRepo from '../../../repos/DraftsRepo';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';
-import DraftsRepo from '../../../repos/DraftsRepo';
 
 import type { APIDraft } from '../APITypes';
 
@@ -23,7 +23,6 @@ class PostDraftRouter extends AppDevRouter<APIDraft> {
     if (!options) options = [];
 
     const draft = await DraftsRepo.createDraft(text, options, user);
-
     return {
       id: draft.id,
       createdAt: draft.createdAt,

@@ -1,8 +1,8 @@
 // @flow
 import { Request } from 'express';
+import DraftsRepo from '../../../repos/DraftsRepo';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';
-import DraftsRepo from '../../../repos/DraftsRepo';
 
 import type { APIDraft } from '../APITypes';
 
@@ -17,7 +17,6 @@ class GetDraftsRouter extends AppDevRouter<APIDraft[]> {
 
   async content(req: Request) {
     const drafts = await DraftsRepo.getDraftsByUser(req.user.id);
-
     return drafts
       .filter(Boolean)
       .map(draft => ({

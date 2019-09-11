@@ -8,26 +8,26 @@ import {
 import Base from './Base';
 import User from './User';
 
-@Entity('drafts')
 /**
  * Draft class, represents drafts of polls
  * @extends {Base}
  */
+@Entity('drafts')
 class Draft extends Base {
-  @PrimaryGeneratedColumn()
   /** Unique identifier */
+  @PrimaryGeneratedColumn()
   id: any = null;
 
-  @Column('string')
   /** Text of question */
+  @Column('string')
   text: string = '';
 
-  @Column('json')
   /** Options of question, empty for FR */
+  @Column('json')
   options: string[] = [];
 
-  @ManyToOne(type => User, user => user.drafts)
   /** User the draft belongs to */
+  @ManyToOne(type => User, user => user.drafts)
   user: ?User = null;
 }
 
