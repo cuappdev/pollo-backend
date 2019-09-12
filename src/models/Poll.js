@@ -6,88 +6,85 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import Base from './Base';
-import constants from '../utils/Constants';
 import Group from './Group';
-
+import constants from '../utils/Constants';
 import type {
-  PollType, PollState,
+  PollType,
+  PollState,
 } from '../utils/Constants';
 
 export type PollResult = {|
   letter: ?string,
   text: string,
-  count: ?number
+  count: ?number,
 |}
 
 export type PollChoice = {|
   letter: ?string,
-  text: string
+  text: string,
 |}
 
-@Entity('polls')
 /**
  * Poll class represents a single question
  * @extends {Base}
  */
+@Entity('polls')
 class Poll extends Base {
-  @PrimaryGeneratedColumn()
   /** Unique identifier */
+  @PrimaryGeneratedColumn()
   id: any = null;
 
-  @Column('string')
   /** Text of question */
+  @Column('string')
   text: string = '';
 
-  @Column('string')
   /** Type of question either multipleChoice or freeResponse */
+  @Column('string')
   type: PollType = constants.POLL_TYPES.MULTIPLE_CHOICE;
 
-  @ManyToOne(type => Group, group => group.polls, {
-    onDelete: 'CASCADE',
-  })
   /** Group the poll belongs to */
+  @ManyToOne(type => Group, group => group.polls, { onDelete: 'CASCADE' })
   group: ?Group = null;
 
-  @Column('json')
   /**
    * Choices for the poll
    * @example
    * let answerChoices_mc = [{letter: "A", text: "Saturn", count: 5}]
    * let answerChoices_fr = [{text: "Saturn", count: 10}]
    */
+  @Column('json')
   answerChoices: PollResult[] = [];
 
-  @Column('json')
-  /** All the answers by students for the poll.
+  /**
+   * All the answers by students for the poll.
    * Letter field is optional and only is returned on mc questions
    * @example
    * let answers_MC = {googleID: [{letter: "A", text: "Saturn"}]}
    * let answers_FR = {googleID: [{text: "Saturn"}, {text: "Mars"}]}
    */
+  @Column('json')
   answers: { string: PollChoice[] } = {};
 
-  @Column('json')
-  /** All the upvotes by students for the FR poll. Empty if MC.
+  /**
+   * All the upvotes by students for the FR poll. Empty if MC.
    * @example
    * let upvotes_MC = {}
    * let upvotes_FR = {googleID: [{text: "Saturn"}, {text: "Mars"}]}
    */
+  @Column('json')
   upvotes: { string: PollChoice[] } = {};
 
-  @Column('string')
   /**
    * Correct answer choice for MC.
    * Empty string if FR or no correct answer chosen for MC.
    * @example
    * let correctAnswer = 'A'
   */
+  @Column('string')
   correctAnswer: string = '';
 
+  /** The current state of the poll */
   @Column('string')
-  /**
-   * The current state of the poll
-   */
-
   state: PollState = constants.POLL_STATES.ENDED;
 }
 

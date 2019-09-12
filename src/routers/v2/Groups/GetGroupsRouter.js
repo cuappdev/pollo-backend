@@ -32,7 +32,7 @@ class GetGroupsRouter extends AppDevRouter<APIGroup[]> {
         isLocationRestricted: group.isLocationRestricted,
         location: group.location,
       }));
-    return Promise.all(nodes).then(n => n);
+    return Promise.all(nodes);
   }
 }
 

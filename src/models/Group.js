@@ -14,56 +14,52 @@ import User from './User';
 
 export type Coord = {| lat: ?number, long: ?number |}
 
-@Entity('groups')
 /**
  * Group class represents a grouping of polls.
  * @extends {Base}
  */
+@Entity('groups')
 class Group extends Base {
-  @PrimaryGeneratedColumn()
   /** Unique identifier */
+  @PrimaryGeneratedColumn()
   id: any = null;
 
-  @Column('string')
   /** Name of group */
+  @Column('string')
   name: string = '';
 
-  @Column('string')
   /** Unique code to join group */
+  @Column('string')
   code: string = '';
 
-  @Column('json')
   /** Most recent coordinates of the admin of the group */
+  @Column('json')
   location: Coord = { lat: null, long: null };
 
-  @Column('boolean')
   /** If filter is activated for FR responses or live questions */
+  @Column('boolean')
   isFilterActivated: boolean = true
 
-  @Column('boolean')
   /** If joining a group requires user to be within 300m of the group location */
+  @Column('boolean')
   isLocationRestricted: boolean = false
 
+  /** Admins of the group */
   @ManyToMany(type => User, user => user.adminGroups)
   @JoinTable()
-  /** Admins of the group */
   admins: ?User[] = [];
 
-  @OneToMany(type => Poll, poll => poll.group, {
-    cascadeRemove: true,
-  })
   /** Polls belonging to the group */
+  @OneToMany(type => Poll, poll => poll.group, { cascadeRemove: true })
   polls: ?Poll[] = [];
 
-  @OneToMany(type => Question, question => question.group, {
-    cascadeRemove: true,
-  })
   /** Questions belonging to the group */
+  @OneToMany(type => Question, question => question.group, { cascadeRemove: true })
   questions: ?Question[] = [];
 
+  /** Member of the group */
   @ManyToMany(type => User, user => user.memberGroups)
   @JoinTable()
-  /** Member of the group */
   members: ?User[] = [];
 }
 

@@ -1,11 +1,11 @@
 // @flow
 import { getConnectionManager, Repository } from 'typeorm';
-import LogUtils from '../utils/LogUtils';
+import UserSessionsRepo from './UserSessionsRepo';
 import Group from '../models/Group';
 import User from '../models/User';
-import UserSessionsRepo from './UserSessionsRepo';
 import appDevUtils from '../utils/AppDevUtils';
 import constants from '../utils/Constants';
+import LogUtils from '../utils/LogUtils';
 
 const db = (): Repository<User> => getConnectionManager().get().getRepository(User);
 
@@ -46,8 +46,12 @@ const createUser = async (fields: Object): Promise<User> => {
  * @param {string} email - Email of user
  * @return {User} New user created using given params
  */
-const createUserWithFields = async (googleID: string, firstName: string,
-  lastName: string, email: string): Promise<User> => {
+const createUserWithFields = async (
+  googleID: string,
+  firstName: string,
+  lastName: string,
+  email: string,
+): Promise<User> => {
   try {
     const user = new User();
     user.googleID = googleID;
@@ -55,12 +59,14 @@ const createUserWithFields = async (googleID: string, firstName: string,
     user.lastName = lastName;
     user.email = email;
     user.netID = appDevUtils.netIDFromEmail(email);
-
     await db().persist(user);
     return user;
   } catch (e) {
     throw LogUtils.logErr('Problem creating user with fields', e, {
-      googleID, firstName, lastName, email,
+      googleID,
+      firstName,
+      lastName,
+      email,
     });
   }
 };
@@ -102,8 +108,7 @@ const getUserByGoogleID = async (googleID: string): Promise<?User> => {
  */
 const getUsers = async (): Promise<Array<?User>> => {
   try {
-    return await db().createQueryBuilder('users')
-      .getMany();
+    return await db().createQueryBuilder('users').getMany();
   } catch (e) {
     throw LogUtils.logErr('Problem getting users', e);
   }
@@ -116,8 +121,10 @@ const getUsers = async (): Promise<Array<?User>> => {
  * @param {?number[]} filter - List of ids to filter out
  * @return {User[]} List of users resulting from given params
  */
-const getUsersFromIDs = async (userIDs: number[], filter: ?number[]):
-Promise<?Array<User>> => {
+const getUsersFromIDs = async (
+  userIDs: number[],
+  filter: ?number[],
+): Promise<?Array<User>> => {
   try {
     const ids = `(${String(userIDs)})`;
     let query = `users.id IN ${ids}`;
@@ -141,8 +148,10 @@ Promise<?Array<User>> => {
  * @param {?number[]} filter - List of ids to filter out
  * @return {User[]} List of users resulting from given params
  */
-const getUsersByGoogleIDs = async (googleIDs: string[], filter: ?string[]):
-  Promise<?Array<User>> => {
+const getUsersByGoogleIDs = async (
+  googleIDs: string[],
+  filter: ?string[],
+): Promise<?Array<User>> => {
   try {
     let validIDs = googleIDs;
     if (filter && filter.length > 0) {
@@ -180,8 +189,10 @@ const deleteUserByID = async (id: number) => {
  * Ex. If role is admin, we fetch all groups the user is an admin of.
  * @return {Session[]} List of groups for given user
  */
-const getGroupsByID = async (id: number, role: ?string):
-    Promise<Array<?Group>> => {
+const getGroupsByID = async (
+  id: number,
+  role: ?string,
+): Promise<Array<?Group>> => {
   try {
     const user = await db().createQueryBuilder('users')
       .leftJoinAndSelect('users.memberGroups', 'memberGroups')
@@ -191,7 +202,8 @@ const getGroupsByID = async (id: number, role: ?string):
       .getOne();
     if (role === constants.USER_TYPES.ADMIN) {
       return user.adminGroups;
-    } if (role === constants.USER_TYPES.MEMBER) {
+    }
+    if (role === constants.USER_TYPES.MEMBER) {
       return user.memberGroups;
     }
     return user.memberGroups.concat(user.adminGroups);
