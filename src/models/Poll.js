@@ -15,14 +15,14 @@ import type {
 
 export type PollResult = {|
   letter: ?string,
-  text: string,
-  count: ?number
-|}
+    text: string,
+      count: ?number
+        |}
 
 export type PollChoice = {|
   letter: ?string,
-  text: string
-|}
+    text: string
+      |}
 
 @Entity('polls')
 /**
@@ -34,11 +34,11 @@ class Poll extends Base {
   /** Unique identifier */
   id: any = null;
 
-  @Column('string')
+  @Column('character varying')
   /** Text of question */
   text: string = '';
 
-  @Column('string')
+  @Column('character varying')
   /** Type of question either multipleChoice or freeResponse */
   type: PollType = constants.POLL_TYPES.MULTIPLE_CHOICE;
 
@@ -55,7 +55,7 @@ class Poll extends Base {
    * let answerChoices_mc = [{letter: "A", text: "Saturn", count: 5}]
    * let answerChoices_fr = [{text: "Saturn", count: 10}]
    */
-  answerChoices: PollResult[] = [];
+  answerChoices: PollResult[];
 
   @Column('json')
   /** All the answers by students for the poll.
@@ -74,7 +74,7 @@ class Poll extends Base {
    */
   upvotes: { string: PollChoice[] } = {};
 
-  @Column('string')
+  @Column('character varying')
   /**
    * Correct answer choice for MC.
    * Empty string if FR or no correct answer chosen for MC.
@@ -83,7 +83,7 @@ class Poll extends Base {
   */
   correctAnswer: string = '';
 
-  @Column('string')
+  @Column('character varying')
   /**
    * The current state of the poll
    */

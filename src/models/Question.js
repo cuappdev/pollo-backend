@@ -20,7 +20,7 @@ class Question extends Base {
   /** Unique identifier */
   id: any = null;
 
-  @Column('string')
+  @Column('character varying')
   /** Text of question user is asking */
   text: string = '';
 

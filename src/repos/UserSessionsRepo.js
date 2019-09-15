@@ -1,12 +1,12 @@
 // @flow
-import { getConnectionManager, Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import { LoginTicket } from 'google-auth-library/build/src/auth/loginticket';
 import LogUtils from '../utils/LogUtils';
 import User from '../models/User';
 import UserSession from '../models/UserSession';
 import UsersRepo from './UsersRepo';
 
-const db = (): Repository<UserSession> => getConnectionManager().get().getRepository(UserSession);
+const db = (): Repository<UserSession> => getRepository(UserSession);
 
 /**
  * Create or update session for a user
@@ -27,11 +27,11 @@ const createOrUpdateSession = async (
   let session;
   if (optionalSession) {
     session = await
-    db().persist(optionalSession.update(accessToken, refreshToken));
+    db().save(optionalSession.update(accessToken, refreshToken));
     return session;
   }
   session = await
-  db().persist(UserSession.fromUser(user, accessToken, refreshToken));
+  db().save(UserSession.fromUser(user, accessToken, refreshToken));
   return session;
 };
 
@@ -63,7 +63,7 @@ const updateSession = async (refreshToken: string): Promise<?Object> => {
     .getOne();
   if (!session) return null;
   session = session.update();
-  await db().persist(session);
+  await db().save(session);
   return {
     accessToken: session.sessionToken,
     refreshToken: session.updateToken,

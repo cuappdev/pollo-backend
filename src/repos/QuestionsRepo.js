@@ -1,11 +1,11 @@
 // @flow
-import { getConnectionManager, Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import Group from '../models/Group';
 import User from '../models/User';
 import Question from '../models/Question';
 import LogUtils from '../utils/LogUtils';
 
-const db = (): Repository<Question> => getConnectionManager().get().getRepository(Question);
+const db = (): Repository<Question> => getRepository(Question);
 
 /**
  * Create question and save it to the db
@@ -23,7 +23,7 @@ const createQuestion = async (text: string, group: Group, user: User):
     question.group = group;
     question.user = user;
 
-    await db().persist(question);
+    await db().save(question);
     return question;
   } catch (e) {
     throw LogUtils.logErr('Problem creating question', e, { text, group, user });

@@ -20,7 +20,7 @@ class UserSession extends Base {
   /** Unique identifier */
   id: any = null;
 
-  @Column('string')
+  @Column('character varying')
   /** Access token associated with session */
   sessionToken: string = '';
 
@@ -28,7 +28,7 @@ class UserSession extends Base {
   /** Timestamp of when the session expires (Unix time) */
   expiresAt: string = '-1';
 
-  @Column('string')
+  @Column('character varying')
   /** Refresh token associated with session */
   updateToken: string = '';
 

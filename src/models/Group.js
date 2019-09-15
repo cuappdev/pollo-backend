@@ -24,11 +24,11 @@ class Group extends Base {
   /** Unique identifier */
   id: any = null;
 
-  @Column('string')
+  @Column('character varying')
   /** Name of group */
   name: string = '';
 
-  @Column('string')
+  @Column('character varying')
   /** Unique code to join group */
   code: string = '';
 
@@ -47,24 +47,24 @@ class Group extends Base {
   @ManyToMany(type => User, user => user.adminGroups)
   @JoinTable()
   /** Admins of the group */
-  admins: ?User[] = [];
+  admins: ?User[] = undefined;
 
   @OneToMany(type => Poll, poll => poll.group, {
     cascadeRemove: true,
   })
   /** Polls belonging to the group */
-  polls: ?Poll[] = [];
+  polls: ?Poll[];
 
   @OneToMany(type => Question, question => question.group, {
     cascadeRemove: true,
   })
   /** Questions belonging to the group */
-  questions: ?Question[] = [];
+  questions: ?Question[];
 
   @ManyToMany(type => User, user => user.memberGroups)
   @JoinTable()
   /** Member of the group */
-  members: ?User[] = [];
+  members: ?User[];
 }
 
 export default Group;

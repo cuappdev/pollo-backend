@@ -1,5 +1,5 @@
 // @flow
-import { getConnectionManager, Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import LogUtils from '../utils/LogUtils';
 import Group from '../models/Group';
 import User from '../models/User';
@@ -7,7 +7,7 @@ import UserSessionsRepo from './UserSessionsRepo';
 import appDevUtils from '../utils/AppDevUtils';
 import constants from '../utils/Constants';
 
-const db = (): Repository<User> => getConnectionManager().get().getRepository(User);
+const db = (): Repository<User> => getRepository(User);
 
 /**
  * Creates a dummy user and saves it to the db (Testing purposes)
@@ -17,7 +17,7 @@ const db = (): Repository<User> => getConnectionManager().get().getRepository(Us
  */
 const createDummyUser = async (id: string): Promise<User> => {
   try {
-    return await db().persist(User.dummy(id));
+    return await db().save(User.dummy(id));
   } catch (e) {
     throw LogUtils.logErr('Problem creating user', e, { id });
   }
@@ -31,7 +31,7 @@ const createDummyUser = async (id: string): Promise<User> => {
  */
 const createUser = async (fields: Object): Promise<User> => {
   try {
-    return await db().persist(User.fromGoogleCreds(fields));
+    return await db().save(User.fromGoogleCreds(fields));
   } catch (e) {
     throw LogUtils.logErr('Problem creating user from google credentials', e, { fields });
   }
@@ -56,7 +56,7 @@ const createUserWithFields = async (googleID: string, firstName: string,
     user.email = email;
     user.netID = appDevUtils.netIDFromEmail(email);
 
-    await db().persist(user);
+    await db().save(user);
     return user;
   } catch (e) {
     throw LogUtils.logErr('Problem creating user with fields', e, {

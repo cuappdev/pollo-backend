@@ -18,13 +18,13 @@ class Draft extends Base {
   /** Unique identifier */
   id: any = null;
 
-  @Column('string')
+  @Column('character varying')
   /** Text of question */
   text: string = '';
 
   @Column('json')
   /** Options of question, empty for FR */
-  options: string[] = [];
+  options: string[];
 
   @ManyToOne(type => User, user => user.drafts)
   /** User the draft belongs to */

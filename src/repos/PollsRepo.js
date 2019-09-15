@@ -1,12 +1,12 @@
 // @flow
-import { getConnectionManager, Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import LogUtils from '../utils/LogUtils';
 import Poll from '../models/Poll';
 import type { PollChoice, PollResult } from '../models/Poll';
 import type { PollType, PollState } from '../utils/Constants';
 import Group from '../models/Group';
 
-const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Poll);
+const db = (): Repository<Poll> => getRepository(Poll);
 
 /**
  * Create a poll and saves it to the db

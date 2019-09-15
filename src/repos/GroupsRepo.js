@@ -1,5 +1,5 @@
 // @flow
-import { getConnectionManager, Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import LogUtils from '../utils/LogUtils';
 import Poll from '../models/Poll';
 import Question from '../models/Question';
@@ -11,7 +11,7 @@ import UsersRepo from './UsersRepo';
 
 import type { Coord } from '../models/Group';
 
-const db = (): Repository<Group> => getConnectionManager().get().getRepository(Group);
+const db = (): Repository<Group> => getRepository(Group);
 
 /** Contains all group codes used mapped to group id */
 const groupCodes = {};
@@ -40,7 +40,7 @@ const createGroup = async (name: string, code: string, user: ?User, location: ?C
       throw LogUtils.logErr(`Group code is already in use: ${code}`);
     }
 
-    await db().persist(group);
+    await db().save(group);
     groupCodes[group.code] = group.id;
 
     return group;
@@ -134,7 +134,7 @@ const updateGroupByID = async (id: number, name: ?string, location: ?Coord,
     if (location && location.lat && location.long) group.location = location;
     if (isRestricted !== null && isRestricted !== undefined) group.isLocationRestricted = isRestricted;
     if (isActivated !== null && isActivated !== undefined) group.isFilterActivated = isActivated;
-    await db().persist(group);
+    await db().save(group);
     return group;
   } catch (e) {
     throw LogUtils.logErr(`Problem updating group's location restriction: ${id}`, e, { isRestricted });
@@ -190,7 +190,7 @@ const addUsersByGoogleIDs = async (id: number, googleIDs: string[],
         group.members = group.members.concat(users);
       }
     }
-    await db().persist(group);
+    await db().save(group);
     return group;
   } catch (e) {
     throw LogUtils.logErr(`Problem adding users to group ${id} by google ids`, e, { googleIDs, role });
@@ -227,7 +227,7 @@ const addUsersByIDs = async (id: number, userIDs: number[],
         group.members = group.members.concat(members);
       }
     }
-    await db().persist(group);
+    await db().save(group);
     return group;
   } catch (e) {
     throw LogUtils.logErr(`Problem adding users to group ${id} by ids`, e, { userIDs, role });
@@ -260,7 +260,7 @@ const removeUserByGroupID = async (id: number, user: User, role: ?string):
         group.members = group.members
           .filter(member => member.googleID !== user.googleID);
       }
-      await db().persist(group);
+      await db().save(group);
     }
 
     return group;

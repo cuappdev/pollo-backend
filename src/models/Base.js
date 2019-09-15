@@ -1,9 +1,8 @@
 // @flow
 import {
-  AbstractEntity, BeforeInsert, BeforeUpdate, Column,
+  BeforeInsert, BeforeUpdate, Column,
 } from 'typeorm';
 
-@AbstractEntity()
 /**
  * Base class, contains all fields that other classes have
  */
