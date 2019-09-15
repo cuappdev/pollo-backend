@@ -29,7 +29,7 @@ const entities = [
 
 // Setup options
 const connectionOptions: ConnectionOptions = {
-  autoSchemaSync: !isProduction,
+  synchronize: !isProduction,
   type: 'postgres',
   host: process.env.DB_HOST,
   port: isProduction ? process.env.DB_PORT : 5432,

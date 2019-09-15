@@ -95,7 +95,7 @@ const verifySession = async (accessToken: string): Promise<boolean> => {
  */
 const deleteSession = async (id: number) => {
   try {
-    const session = await db().findOneById(id);
+    const session = await db().findOne(id);
     await db().remove(session);
   } catch (e) {
     throw LogUtils.logErr(`Problem deleting session by id: ${id}`, e);

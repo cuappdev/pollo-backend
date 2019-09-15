@@ -53,18 +53,18 @@ class Group extends Base {
     cascadeRemove: true,
   })
   /** Polls belonging to the group */
-  polls: ?Poll[];
+  polls: ?Poll[] = undefined;
 
   @OneToMany(type => Question, question => question.group, {
     cascadeRemove: true,
   })
   /** Questions belonging to the group */
-  questions: ?Question[];
+  questions: ?Question[] = undefined;
 
   @ManyToMany(type => User, user => user.memberGroups)
   @JoinTable()
   /** Member of the group */
-  members: ?User[];
+  members: ?User[] = undefined;
 }
 
 export default Group;

@@ -38,7 +38,7 @@ const createQuestion = async (text: string, group: Group, user: User):
  */
 const getQuestionByID = async (id: number): Promise<?Question> => {
   try {
-    return await db().findOneById(id);
+    return await db().findOne(id);
   } catch (e) {
     throw LogUtils.logErr(`Problem getting question by id: ${id}`, e);
   }
@@ -51,7 +51,7 @@ const getQuestionByID = async (id: number): Promise<?Question> => {
  */
 const deleteQuestionByID = async (id: number) => {
   try {
-    const question = await db().findOneById(id);
+    const question = await db().findOne(id);
     await db().remove(question);
   } catch (e) {
     throw LogUtils.logErr(`Problem deleting question by id: ${id}`, e);
@@ -78,7 +78,7 @@ const updateQuestionByID = async (id: number, text: string):
         .execute();
     }
 
-    return await db().findOneById(id);
+    return await db().findOne(id);
   } catch (e) {
     throw LogUtils.logErr(`Problem updating question by id: ${id}`, e, { text });
   }

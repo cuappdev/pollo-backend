@@ -24,7 +24,7 @@ class Draft extends Base {
 
   @Column('json')
   /** Options of question, empty for FR */
-  options: string[];
+  options: string[] = undefined;
 
   @ManyToOne(type => User, user => user.drafts)
   /** User the draft belongs to */

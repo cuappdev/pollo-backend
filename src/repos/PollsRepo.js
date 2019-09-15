@@ -35,7 +35,7 @@ const createPoll = async (text: string, group: ?Group, answerChoices: PollResult
     poll.type = type;
     if (answers) poll.answers = answers;
     if (upvotes) poll.upvotes = upvotes;
-    await db().persist(poll);
+    await db().save(poll);
     return poll;
   } catch (e) {
     throw LogUtils.logErr('Problem creating poll', e, {
@@ -52,7 +52,7 @@ const createPoll = async (text: string, group: ?Group, answerChoices: PollResult
  */
 const getPollByID = async (id: number): Promise<?Poll> => {
   try {
-    return await db().findOneById(id);
+    return await db().findOne(id);
   } catch (e) {
     throw LogUtils.logErr(`Problem getting poll by id: ${id}`, e);
   }
@@ -65,7 +65,7 @@ const getPollByID = async (id: number): Promise<?Poll> => {
  */
 const deletePollByID = async (id: number) => {
   try {
-    const poll = await db().findOneById(id);
+    const poll = await db().findOne(id);
     await db().remove(poll);
   } catch (e) {
     throw LogUtils.logErr(`Problem deleting poll by id: ${id}`, e);
@@ -99,7 +99,7 @@ const updatePollByID = async (id: number, text: ?string, answerChoices: ?PollRes
     if (upvotes) poll.upvotes = upvotes;
     if (state) poll.state = state;
 
-    await db().persist(poll);
+    await db().save(poll);
     return poll;
   } catch (e) {
     throw LogUtils.logErr(`Problem updating poll by id: ${id}`, e);

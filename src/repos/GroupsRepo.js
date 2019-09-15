@@ -35,6 +35,9 @@ const createGroup = async (name: string, code: string, user: ?User, location: ?C
     group.isFilterActivated = true;
     group.isLocationRestricted = false;
     group.admins = user ? [user] : [];
+    group.polls = [];
+    group.questions = [];
+    group.members = [];
 
     if (groupCodes[code]) {
       throw LogUtils.logErr(`Group code is already in use: ${code}`);
@@ -73,7 +76,7 @@ const createCode = (): string => {
  */
 const getGroupByID = async (id: number): Promise<?Group> => {
   try {
-    return await db().findOneById(id);
+    return await db().findOne(id);
   } catch (e) {
     throw LogUtils.logErr(`Problem getting group by id: ${id}`, e);
   }
@@ -100,7 +103,7 @@ const getGroupID = async (code: string) => {
  */
 const deleteGroupByID = async (id: number) => {
   try {
-    const group = await db().findOneById(id);
+    const group = await db().findOne(id);
     delete groupCodes[group.code];
     await db().remove(group);
   } catch (e) {
@@ -405,7 +408,7 @@ const getQuestions = async (id: number): Promise<Array<?Question>> => {
  */
 const latestActivityByGroupID = async (id: number): Promise<string> => {
   try {
-    const group = await db().findOneById(id);
+    const group = await db().findOne(id);
     if (!group) throw LogUtils.logErr(`Can't find group by id: ${id}`);
 
     return await getPolls(id).then((polls: Array<?Poll>) => {

@@ -55,7 +55,7 @@ class Poll extends Base {
    * let answerChoices_mc = [{letter: "A", text: "Saturn", count: 5}]
    * let answerChoices_fr = [{text: "Saturn", count: 10}]
    */
-  answerChoices: PollResult[];
+  answerChoices: PollResult[] = undefined;
 
   @Column('json')
   /** All the answers by students for the poll.

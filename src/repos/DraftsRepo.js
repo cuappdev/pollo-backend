@@ -98,7 +98,7 @@ const updateDraft = async (id: number, text: ?string, options: ?string[]):
 */
 const deleteDraft = async (id: number) => {
   try {
-    const draft = await db().findOneById(id);
+    const draft = await db().findOne(id);
     await db().remove(draft);
   } catch (e) {
     throw LogUtils.logErr(`Problem deleting draft by id: ${id}`, e);

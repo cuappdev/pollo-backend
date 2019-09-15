@@ -44,19 +44,19 @@ class User extends Base {
 
   @ManyToMany(type => Group, group => group.admins)
   /** Groups that the user is an admin of */
-  adminGroups: ?Group[];
+  adminGroups: ?Group[] = undefined;
 
   @ManyToMany(type => Group, group => group.members)
   /** Groups that the user is a member of */
-  memberGroups: ?Group[];
+  memberGroups: ?Group[] = undefined;
 
   @OneToMany(type => Question, question => question.user)
   /** Questions that a user has asked */
-  questions: ?Question[];
+  questions: ?Question[] = undefined;
 
   @OneToMany(type => Draft, draft => draft.user)
   /** Drafts that a user has created */
-  drafts: ?Draft[];
+  drafts: ?Draft[] = undefined;
 
   /**
    * Method to create a dummy user. (For testing purposes)

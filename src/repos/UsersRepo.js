@@ -29,6 +29,7 @@ const createDummyUser = async (id: string): Promise<User> => {
  * @param {Object} fields - Object containing user info returned by google
  * @return {User} New user created using given credentials
  */
+// TODO maybe add initialization for arrays
 const createUser = async (fields: Object): Promise<User> => {
   try {
     return await db().save(User.fromGoogleCreds(fields));
@@ -55,6 +56,10 @@ const createUserWithFields = async (googleID: string, firstName: string,
     user.lastName = lastName;
     user.email = email;
     user.netID = appDevUtils.netIDFromEmail(email);
+    user.adminGroups = [];
+    user.memberGroups = [];
+    user.questions = [];
+    user.drafts = [];
 
     await db().save(user);
     return user;
@@ -73,7 +78,7 @@ const createUserWithFields = async (googleID: string, firstName: string,
  */
 const getUserByID = async (id: number): Promise<?User> => {
   try {
-    return await db().findOneById(id);
+    return await db().findOne(id);
   } catch (e) {
     throw LogUtils.logErr(`Problem getting user by id: ${id}`, e);
   }
@@ -164,7 +169,7 @@ const getUsersByGoogleIDs = async (googleIDs: string[], filter: ?string[]):
  */
 const deleteUserByID = async (id: number) => {
   try {
-    const user = await db().findOneById(id);
+    const user = await db().findOne(id);
     await UserSessionsRepo.deleteSessionFromUserID(id);
     await db().remove(user);
   } catch (e) {
