@@ -15,14 +15,12 @@ const db = (): Repository<Question> => getRepository(Question);
  * @param {User} user - User that asked the question
  * @return {Question} New question created
  */
-const createQuestion = async (text: string, group: Group, user: User):
-  Promise<Question> => {
+const createQuestion = async (text: string, group: Group, user: User): Promise<Question> => {
   try {
     const question = new Question();
     question.text = text;
     question.group = group;
     question.user = user;
-
     await db().save(question);
     return question;
   } catch (e) {
@@ -65,8 +63,7 @@ const deleteQuestionByID = async (id: number) => {
  * @param {string} text - New text of question
  * @return {?Question} Updated question
  */
-const updateQuestionByID = async (id: number, text: string):
-  Promise<?Question> => {
+const updateQuestionByID = async (id: number, text: string): Promise<?Question> => {
   try {
     const field = {};
     if (text !== undefined && text !== null) {
@@ -77,7 +74,6 @@ const updateQuestionByID = async (id: number, text: string):
         .update(field)
         .execute();
     }
-
     return await db().findOne(id);
   } catch (e) {
     throw LogUtils.logErr(`Problem updating question by id: ${id}`, e, { text });
@@ -90,7 +86,7 @@ const updateQuestionByID = async (id: number, text: string):
  * @param {number} id - ID of question we want to get the group for
  * @return {?Group} Group that the question belongs to
  */
-const getGroupFromQuestionID = async (id: number) : Promise<?Group> => {
+const getGroupFromQuestionID = async (id: number): Promise<?Group> => {
   try {
     const question = await db().createQueryBuilder('questions')
       .leftJoinAndSelect('questions.group', 'group')
@@ -115,7 +111,6 @@ const isOwnerByID = async (id: number, user: User) : Promise<?boolean> => {
       .leftJoinAndSelect('questions.user', 'user')
       .where('questions.id = :questionID', { questionID: id })
       .getOne();
-
     return user && question.user.id === user.id;
   } catch (e) {
     throw LogUtils.logErr(`Could not verify ownership of question by id: ${id}`, e, { user });

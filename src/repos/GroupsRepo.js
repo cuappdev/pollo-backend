@@ -1,13 +1,18 @@
 // @flow
+<<<<<<< HEAD
 import { getRepository, Repository } from 'typeorm';
 import LogUtils from '../utils/LogUtils';
+=======
+import { getConnectionManager, Repository } from 'typeorm';
+import UsersRepo from './UsersRepo';
+import Group from '../models/Group';
+>>>>>>> master
 import Poll from '../models/Poll';
 import Question from '../models/Question';
-import Group from '../models/Group';
 import User from '../models/User';
 import appDevUtils from '../utils/AppDevUtils';
 import constants from '../utils/Constants';
-import UsersRepo from './UsersRepo';
+import LogUtils from '../utils/LogUtils';
 
 import type { Coord } from '../models/Group';
 
@@ -25,8 +30,12 @@ const groupCodes = {};
  * @param {?Coord} location - Location of group admin
  * @return {Group} Created group
  */
-const createGroup = async (name: string, code: string, user: ?User, location: ?Coord):
-  Promise<Group> => {
+const createGroup = async (
+  name: string,
+  code: string,
+  user: ?User,
+  location: ?Coord,
+): Promise<Group> => {
   try {
     const group = new Group();
     group.name = name;
@@ -42,10 +51,8 @@ const createGroup = async (name: string, code: string, user: ?User, location: ?C
     if (groupCodes[code]) {
       throw LogUtils.logErr(`Group code is already in use: ${code}`);
     }
-
     await db().save(group);
     groupCodes[group.code] = group.id;
-
     return group;
   } catch (e) {
     throw LogUtils.logErr('Problem creating group', e, {
@@ -64,7 +71,6 @@ const createCode = (): string => {
   do {
     code = appDevUtils.randomCode(6);
   } while (groupCodes[code]);
-
   return code;
 };
 
@@ -135,12 +141,18 @@ const updateGroupByID = async (id: number, name: ?string, location: ?Coord,
 
     if (name) group.name = name;
     if (location && location.lat && location.long) group.location = location;
-    if (isRestricted !== null && isRestricted !== undefined) group.isLocationRestricted = isRestricted;
+    if (isRestricted !== null && isRestricted !== undefined) {
+      group.isLocationRestricted = isRestricted;
+    }
     if (isActivated !== null && isActivated !== undefined) group.isFilterActivated = isActivated;
     await db().save(group);
     return group;
   } catch (e) {
-    throw LogUtils.logErr(`Problem updating group's location restriction: ${id}`, e, { isRestricted });
+    throw LogUtils.logErr(
+      `Problem updating group's location restriction: ${id}`,
+      e,
+      { isRestricted },
+    );
   }
 };
 
@@ -169,8 +181,11 @@ const isLocationRestricted = async (id: number): Promise<?boolean> => {
  * @param {string} [role] - Specifies whether to add the users as members or admins
  * @return {?Group} Group that users were added to
  */
-const addUsersByGoogleIDs = async (id: number, googleIDs: string[],
-  role: ?string): Promise<?Group> => {
+const addUsersByGoogleIDs = async (
+  id: number,
+  googleIDs: string[],
+  role: ?string,
+): Promise<?Group> => {
   try {
     const group = await db().createQueryBuilder('groups')
       .leftJoinAndSelect('groups.admins', 'admins')
@@ -196,7 +211,11 @@ const addUsersByGoogleIDs = async (id: number, googleIDs: string[],
     await db().save(group);
     return group;
   } catch (e) {
-    throw LogUtils.logErr(`Problem adding users to group ${id} by google ids`, e, { googleIDs, role });
+    throw LogUtils.logErr(
+      `Problem adding users to group ${id} by google ids`,
+      e,
+      { googleIDs, role },
+    );
   }
 };
 
@@ -208,8 +227,11 @@ const addUsersByGoogleIDs = async (id: number, googleIDs: string[],
  * @param {string} [role] - Specifies whether to add the users as members or admins
  * @return {?Group} Group that users were added to
  */
-const addUsersByIDs = async (id: number, userIDs: number[],
-  role: ?string): Promise<?Group> => {
+const addUsersByIDs = async (
+  id: number,
+  userIDs: number[],
+  role: ?string,
+): Promise<?Group> => {
   try {
     const group = await db().createQueryBuilder('groups')
       .leftJoinAndSelect('groups.admins', 'admins')
@@ -245,8 +267,11 @@ const addUsersByIDs = async (id: number, userIDs: number[],
  * @param {string} [role] - Role to remove user from
  * @return {?Group} Group without specified user
  */
-const removeUserByGroupID = async (id: number, user: User, role: ?string):
-  Promise<?Group> => {
+const removeUserByGroupID = async (
+  id: number,
+  user: User,
+  role: ?string,
+): Promise<?Group> => {
   try {
     const group = await db().createQueryBuilder('groups')
       .leftJoinAndSelect('groups.admins', 'admins')
@@ -260,12 +285,10 @@ const removeUserByGroupID = async (id: number, user: User, role: ?string):
       if (role === constants.USER_TYPES.ADMIN) {
         group.admins = group.admins.filter(admin => admin.googleID !== user.googleID);
       } else {
-        group.members = group.members
-          .filter(member => member.googleID !== user.googleID);
+        group.members = group.members.filter(member => member.googleID !== user.googleID);
       }
       await db().save(group);
     }
-
     return group;
   } catch (e) {
     throw LogUtils.logErr(`Problem removing user from group by id: ${id}`, e, { user, role });
@@ -279,15 +302,13 @@ const removeUserByGroupID = async (id: number, user: User, role: ?string):
  * @param {User} user - User that we want to check if they're an admin
  * @return {?boolean} Whether the given user is an admin of the given group
  */
-const isAdmin = async (id: number, user: User):
-  Promise<?boolean> => {
+const isAdmin = async (id: number, user: User): Promise<?boolean> => {
   try {
     const group = await db().createQueryBuilder('groups')
       .leftJoinAndSelect('groups.admins', 'admins')
       .where('groups.id = :groupID')
       .setParameters({ groupID: id })
       .getOne();
-
     const admin = group.admins.find(x => x.googleID === user.googleID);
     return admin !== undefined;
   } catch (e) {
@@ -302,15 +323,13 @@ const isAdmin = async (id: number, user: User):
  * @param {User} user - User that we want to check if they're a member
  * @return {?boolean} Whether the given user is a member of the given group
  */
-const isMember = async (id: number, user: User):
-  Promise<?boolean> => {
+const isMember = async (id: number, user: User): Promise<?boolean> => {
   try {
     const group = await db().createQueryBuilder('groups')
       .leftJoinAndSelect('groups.members', 'members')
       .where('groups.id = :groupID')
       .setParameters({ groupID: id })
       .getOne();
-
     const member = group.members.find(x => x.googleID === user.googleID);
     return member !== undefined;
   } catch (e) {
@@ -325,8 +344,7 @@ const isMember = async (id: number, user: User):
  * @param {string} [role] - Specifies if we only want users of a certain role
  * @return {User[]} List of specified user from group
  */
-const getUsersByGroupID = async (id: number, role: ?string):
-  Promise<Array<?User>> => {
+const getUsersByGroupID = async (id: number, role: ?string): Promise<Array<?User>> => {
   try {
     const group = await db().createQueryBuilder('groups')
       .leftJoinAndSelect('groups.admins', 'admins')
@@ -354,8 +372,10 @@ const getUsersByGroupID = async (id: number, role: ?string):
  * @param {boolean} hideUnsharedResults - Whether to return unaltered poll results for admins
  * @return {Poll[]} List of polls from group
  */
-const getPolls = async (id: number, hideUnsharedResults: ?boolean = true):
-  Promise<Array<?Poll>> => {
+const getPolls = async (
+  id: number,
+  hideUnsharedResults: ?boolean = true,
+): Promise<Array<?Poll>> => {
   try {
     const group = await db().createQueryBuilder('groups')
       .leftJoinAndSelect('groups.polls', 'polls')
@@ -363,11 +383,12 @@ const getPolls = async (id: number, hideUnsharedResults: ?boolean = true):
       .setParameters({ groupID: id })
       .orderBy('polls.createdAt', 'ASC')
       .getOne();
-
     // obscure poll results if poll not shared
     return group.polls.map((poll) => {
-      if (hideUnsharedResults && poll.state !== constants.POLL_STATES.SHARED
-        && poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE) {
+      if (
+        hideUnsharedResults && poll.state !== constants.POLL_STATES.SHARED
+        && poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
+      ) {
         poll.answerChoices = poll.answerChoices.map((choice) => {
           delete choice.count;
           return choice;
@@ -410,7 +431,6 @@ const latestActivityByGroupID = async (id: number): Promise<string> => {
   try {
     const group = await db().findOne(id);
     if (!group) throw LogUtils.logErr(`Can't find group by id: ${id}`);
-
     return await getPolls(id).then((polls: Array<?Poll>) => {
       const latestPoll = polls.slice(-1).pop();
       if (polls.length === 0 || !latestPoll) {

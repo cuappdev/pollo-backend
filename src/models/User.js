@@ -8,54 +8,54 @@ import {
 } from 'typeorm';
 import Base from './Base';
 import Draft from './Draft';
-import Question from './Question';
 import Group from './Group';
+import Question from './Question';
 import appDevUtils from '../utils/AppDevUtils';
 
-@Entity('users')
 /**
  * User class represents a user on the application.
  * @extends {Base}
  */
+@Entity('users')
 class User extends Base {
-  @PrimaryGeneratedColumn()
   /** Unique identifier */
+  @PrimaryGeneratedColumn()
   id: any = null;
 
-  @Column('character varying')
   /** Google ID of user */
+  @Column('character varying')
   googleID: string = '';
 
-  @Column('character varying')
   /** Net ID of user */
+  @Column('character varying')
   netID: string = '';
 
-  @Column('character varying')
   /** Email of user */
+  @Column('character varying')
   email: string = '';
 
-  @Column('character varying')
   /** User first name */
+  @Column('character varying')
   firstName: string = '';
 
-  @Column('character varying')
   /** User last name */
+  @Column('character varying')
   lastName: string = '';
 
-  @ManyToMany(type => Group, group => group.admins)
   /** Groups that the user is an admin of */
+  @ManyToMany(type => Group, group => group.admins)
   adminGroups: ?Group[] = undefined;
 
-  @ManyToMany(type => Group, group => group.members)
   /** Groups that the user is a member of */
+  @ManyToMany(type => Group, group => group.members)
   memberGroups: ?Group[] = undefined;
 
-  @OneToMany(type => Question, question => question.user)
   /** Questions that a user has asked */
+  @OneToMany(type => Question, question => question.user)
   questions: ?Question[] = undefined;
 
-  @OneToMany(type => Draft, draft => draft.user)
   /** Drafts that a user has created */
+  @OneToMany(type => Draft, draft => draft.user)
   drafts: ?Draft[] = undefined;
 
   /**
