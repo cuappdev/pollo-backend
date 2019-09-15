@@ -3,9 +3,7 @@ import {
   BeforeInsert, BeforeUpdate, Column,
 } from 'typeorm';
 
-/**
- * Base class, contains all fields that other classes have
- */
+/** Base class, contains all fields that other classes have */
 class Base {
   /** Created at timestamp (Unix time) */
   @Column('bigint')

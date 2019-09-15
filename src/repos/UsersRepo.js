@@ -1,11 +1,6 @@
 // @flow
-<<<<<<< HEAD
 import { getRepository, Repository } from 'typeorm';
-import LogUtils from '../utils/LogUtils';
-=======
-import { getConnectionManager, Repository } from 'typeorm';
 import UserSessionsRepo from './UserSessionsRepo';
->>>>>>> master
 import Group from '../models/Group';
 import User from '../models/User';
 import appDevUtils from '../utils/AppDevUtils';
@@ -34,7 +29,6 @@ const createDummyUser = async (id: string): Promise<User> => {
  * @param {Object} fields - Object containing user info returned by google
  * @return {User} New user created using given credentials
  */
-// TODO maybe add initialization for arrays
 const createUser = async (fields: Object): Promise<User> => {
   try {
     return await db().save(User.fromGoogleCreds(fields));

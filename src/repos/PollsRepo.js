@@ -1,11 +1,6 @@
 // @flow
-<<<<<<< HEAD
 import { getRepository, Repository } from 'typeorm';
-import LogUtils from '../utils/LogUtils';
-=======
-import { getConnectionManager, Repository } from 'typeorm';
 import Group from '../models/Group';
->>>>>>> master
 import Poll from '../models/Poll';
 import LogUtils from '../utils/LogUtils';
 
