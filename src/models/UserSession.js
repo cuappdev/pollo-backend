@@ -21,7 +21,7 @@ class UserSession extends Base {
   id: any = null;
 
   /** Access token associated with session */
-  @Column('string')
+  @Column('character varying')
   sessionToken: string = '';
 
   /** Timestamp of when the session expires (Unix time) */
@@ -29,7 +29,7 @@ class UserSession extends Base {
   expiresAt: string = '-1';
 
   /** Refresh token associated with session */
-  @Column('string')
+  @Column('character varying')
   updateToken: string = '';
 
   /** Whether the session is active or not */

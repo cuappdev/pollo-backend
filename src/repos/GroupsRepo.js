@@ -1,5 +1,5 @@
 // @flow
-import { getConnectionManager, Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import UsersRepo from './UsersRepo';
 import Group from '../models/Group';
 import Poll from '../models/Poll';
@@ -11,7 +11,7 @@ import LogUtils from '../utils/LogUtils';
 
 import type { Coord } from '../models/Group';
 
-const db = (): Repository<Group> => getConnectionManager().get().getRepository(Group);
+const db = (): Repository<Group> => getRepository(Group);
 
 /** Contains all group codes used mapped to group id */
 const groupCodes = {};
@@ -39,10 +39,14 @@ const createGroup = async (
     group.isFilterActivated = true;
     group.isLocationRestricted = false;
     group.admins = user ? [user] : [];
+    group.polls = [];
+    group.questions = [];
+    group.members = [];
+
     if (groupCodes[code]) {
       throw LogUtils.logErr(`Group code is already in use: ${code}`);
     }
-    await db().persist(group);
+    await db().save(group);
     groupCodes[group.code] = group.id;
     return group;
   } catch (e) {
@@ -73,7 +77,7 @@ const createCode = (): string => {
  */
 const getGroupByID = async (id: number): Promise<?Group> => {
   try {
-    return await db().findOneById(id);
+    return await db().findOne(id);
   } catch (e) {
     throw LogUtils.logErr(`Problem getting group by id: ${id}`, e);
   }
@@ -100,7 +104,7 @@ const getGroupID = async (code: string) => {
  */
 const deleteGroupByID = async (id: number) => {
   try {
-    const group = await db().findOneById(id);
+    const group = await db().findOne(id);
     delete groupCodes[group.code];
     await db().remove(group);
   } catch (e) {
@@ -136,7 +140,7 @@ const updateGroupByID = async (id: number, name: ?string, location: ?Coord,
       group.isLocationRestricted = isRestricted;
     }
     if (isActivated !== null && isActivated !== undefined) group.isFilterActivated = isActivated;
-    await db().persist(group);
+    await db().save(group);
     return group;
   } catch (e) {
     throw LogUtils.logErr(
@@ -199,7 +203,7 @@ const addUsersByGoogleIDs = async (
         group.members = group.members.concat(users);
       }
     }
-    await db().persist(group);
+    await db().save(group);
     return group;
   } catch (e) {
     throw LogUtils.logErr(
@@ -243,7 +247,7 @@ const addUsersByIDs = async (
         group.members = group.members.concat(members);
       }
     }
-    await db().persist(group);
+    await db().save(group);
     return group;
   } catch (e) {
     throw LogUtils.logErr(`Problem adding users to group ${id} by ids`, e, { userIDs, role });
@@ -278,7 +282,7 @@ const removeUserByGroupID = async (
       } else {
         group.members = group.members.filter(member => member.googleID !== user.googleID);
       }
-      await db().persist(group);
+      await db().save(group);
     }
     return group;
   } catch (e) {
@@ -420,7 +424,7 @@ const getQuestions = async (id: number): Promise<Array<?Question>> => {
  */
 const latestActivityByGroupID = async (id: number): Promise<string> => {
   try {
-    const group = await db().findOneById(id);
+    const group = await db().findOne(id);
     if (!group) throw LogUtils.logErr(`Can't find group by id: ${id}`);
     return await getPolls(id).then((polls: Array<?Poll>) => {
       const latestPoll = polls.slice(-1).pop();

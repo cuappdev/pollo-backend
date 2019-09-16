@@ -25,11 +25,11 @@ class Group extends Base {
   id: any = null;
 
   /** Name of group */
-  @Column('string')
+  @Column('character varying')
   name: string = '';
 
   /** Unique code to join group */
-  @Column('string')
+  @Column('character varying')
   code: string = '';
 
   /** Most recent coordinates of the admin of the group */
@@ -47,20 +47,20 @@ class Group extends Base {
   /** Admins of the group */
   @ManyToMany(type => User, user => user.adminGroups)
   @JoinTable()
-  admins: ?User[] = [];
+  admins: ?User[] = undefined;
 
   /** Polls belonging to the group */
   @OneToMany(type => Poll, poll => poll.group, { cascadeRemove: true })
-  polls: ?Poll[] = [];
+  polls: ?Poll[] = undefined;
 
   /** Questions belonging to the group */
   @OneToMany(type => Question, question => question.group, { cascadeRemove: true })
-  questions: ?Question[] = [];
+  questions: ?Question[] = undefined;
 
   /** Member of the group */
   @ManyToMany(type => User, user => user.memberGroups)
   @JoinTable()
-  members: ?User[] = [];
+  members: ?User[] = undefined;
 }
 
 export default Group;

@@ -17,18 +17,6 @@ import UserSession from '../models/UserSession';
 dotenv.config(); // establish env variables
 const isProduction = process.env.NODE_ENV === 'production';
 
-const driver = {
-  type: 'postgres',
-  host: process.env.DB_HOST,
-  port: isProduction ? process.env.DB_PORT : 5432,
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  extra: {
-    ssl: isProduction,
-  },
-};
-
 const entities = [
   Base,
   Draft,
@@ -41,8 +29,16 @@ const entities = [
 
 // Setup options
 const connectionOptions: ConnectionOptions = {
-  autoSchemaSync: !isProduction,
-  driver,
+  synchronize: !isProduction,
+  type: 'postgres',
+  host: process.env.DB_HOST,
+  port: isProduction ? process.env.DB_PORT : 5432,
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  extra: {
+    ssl: isProduction,
+  },
   entities,
   migrations: [],
   cli: {

@@ -1,13 +1,9 @@
 // @flow
 import {
-  AbstractEntity,
-  BeforeInsert,
-  BeforeUpdate,
-  Column,
+  BeforeInsert, BeforeUpdate, Column,
 } from 'typeorm';
 
 /** Base class, contains all fields that other classes have */
-@AbstractEntity()
 class Base {
   /** Created at timestamp (Unix time) */
   @Column('bigint')

@@ -19,12 +19,12 @@ class Draft extends Base {
   id: any = null;
 
   /** Text of question */
-  @Column('string')
+  @Column('character varying')
   text: string = '';
 
   /** Options of question, empty for FR */
   @Column('json')
-  options: string[] = [];
+  options: string[] = undefined;
 
   /** User the draft belongs to */
   @ManyToOne(type => User, user => user.drafts)

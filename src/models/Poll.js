@@ -35,11 +35,11 @@ class Poll extends Base {
   id: any = null;
 
   /** Text of question */
-  @Column('string')
+  @Column('character varying')
   text: string = '';
 
   /** Type of question either multipleChoice or freeResponse */
-  @Column('string')
+  @Column('character varying')
   type: PollType = constants.POLL_TYPES.MULTIPLE_CHOICE;
 
   /** Group the poll belongs to */
@@ -53,7 +53,7 @@ class Poll extends Base {
    * let answerChoices_fr = [{text: "Saturn", count: 10}]
    */
   @Column('json')
-  answerChoices: PollResult[] = [];
+  answerChoices: PollResult[] = undefined;
 
   /**
    * All the answers by students for the poll.
@@ -80,11 +80,11 @@ class Poll extends Base {
    * @example
    * let correctAnswer = 'A'
   */
-  @Column('string')
+  @Column('character varying')
   correctAnswer: string = '';
 
   /** The current state of the poll */
-  @Column('string')
+  @Column('character varying')
   state: PollState = constants.POLL_STATES.ENDED;
 }
 

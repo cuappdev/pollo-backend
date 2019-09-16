@@ -23,40 +23,40 @@ class User extends Base {
   id: any = null;
 
   /** Google ID of user */
-  @Column('string')
+  @Column('character varying')
   googleID: string = '';
 
   /** Net ID of user */
-  @Column('string')
+  @Column('character varying')
   netID: string = '';
 
   /** Email of user */
-  @Column('string')
+  @Column('character varying')
   email: string = '';
 
   /** User first name */
-  @Column('string')
+  @Column('character varying')
   firstName: string = '';
 
   /** User last name */
-  @Column('string')
+  @Column('character varying')
   lastName: string = '';
 
   /** Groups that the user is an admin of */
   @ManyToMany(type => Group, group => group.admins)
-  adminGroups: ?Group[] = [];
+  adminGroups: ?Group[] = undefined;
 
   /** Groups that the user is a member of */
   @ManyToMany(type => Group, group => group.members)
-  memberGroups: ?Group[] = [];
+  memberGroups: ?Group[] = undefined;
 
   /** Questions that a user has asked */
   @OneToMany(type => Question, question => question.user)
-  questions: ?Question[] = [];
+  questions: ?Question[] = undefined;
 
   /** Drafts that a user has created */
   @OneToMany(type => Draft, draft => draft.user)
-  drafts: ?Draft[] = [];
+  drafts: ?Draft[] = undefined;
 
   /**
    * Method to create a dummy user. (For testing purposes)

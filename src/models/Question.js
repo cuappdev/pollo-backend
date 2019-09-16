@@ -21,7 +21,7 @@ class Question extends Base {
   id: any = null;
 
   /** Text of question user is asking */
-  @Column('string')
+  @Column('character varying')
   text: string = '';
 
   /** Group that the question is being asked in */

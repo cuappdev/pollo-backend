@@ -1,12 +1,12 @@
 // @flow
-import { getConnectionManager, Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import { LoginTicket } from 'google-auth-library/build/src/auth/loginticket';
 import UsersRepo from './UsersRepo';
 import User from '../models/User';
 import UserSession from '../models/UserSession';
 import LogUtils from '../utils/LogUtils';
 
-const db = (): Repository<UserSession> => getConnectionManager().get().getRepository(UserSession);
+const db = (): Repository<UserSession> => getRepository(UserSession);
 
 /**
  * Create or update session for a user
@@ -25,7 +25,7 @@ const createOrUpdateSession = async (
     .where('usersessions.user = :userID', { userID: user.id })
     .innerJoinAndSelect('usersessions.user', 'users')
     .getOne();
-  return db().persist(
+  return db().save(
     optionalSession
       ? optionalSession.update(accessToken, refreshToken)
       : UserSession.fromUser(user, accessToken, refreshToken),
@@ -59,7 +59,7 @@ const updateSession = async (refreshToken: string): Promise<?Object> => {
     .getOne();
   if (!session) return null;
   session = session.update();
-  await db().persist(session);
+  await db().save(session);
   return {
     accessToken: session.sessionToken,
     refreshToken: session.updateToken,
@@ -90,7 +90,7 @@ const verifySession = async (accessToken: string): Promise<boolean> => {
  */
 const deleteSession = async (id: number) => {
   try {
-    const session = await db().findOneById(id);
+    const session = await db().findOne(id);
     await db().remove(session);
   } catch (e) {
     throw LogUtils.logErr(`Problem deleting session by id: ${id}`, e);

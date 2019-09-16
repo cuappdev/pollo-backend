@@ -1,5 +1,5 @@
 // @flow
-import { getConnectionManager, Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import Group from '../models/Group';
 import Poll from '../models/Poll';
 import LogUtils from '../utils/LogUtils';
@@ -7,7 +7,7 @@ import LogUtils from '../utils/LogUtils';
 import type { PollChoice, PollResult } from '../models/Poll';
 import type { PollType, PollState } from '../utils/Constants';
 
-const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Poll);
+const db = (): Repository<Poll> => getRepository(Poll);
 
 /**
  * Create a poll and saves it to the db
@@ -42,7 +42,7 @@ const createPoll = async (
     if (group) poll.group = group;
     if (answers) poll.answers = answers;
     if (upvotes) poll.upvotes = upvotes;
-    await db().persist(poll);
+    await db().save(poll);
     return poll;
   } catch (e) {
     throw LogUtils.logErr('Problem creating poll', e, {
@@ -66,7 +66,7 @@ const createPoll = async (
  */
 const getPollByID = async (id: number): Promise<?Poll> => {
   try {
-    return await db().findOneById(id);
+    return await db().findOne(id);
   } catch (e) {
     throw LogUtils.logErr(`Problem getting poll by id: ${id}`, e);
   }
@@ -79,7 +79,7 @@ const getPollByID = async (id: number): Promise<?Poll> => {
  */
 const deletePollByID = async (id: number) => {
   try {
-    const poll = await db().findOneById(id);
+    const poll = await db().findOne(id);
     await db().remove(poll);
   } catch (e) {
     throw LogUtils.logErr(`Problem deleting poll by id: ${id}`, e);
@@ -116,7 +116,7 @@ const updatePollByID = async (
     if (answers) poll.answers = answers;
     if (upvotes) poll.upvotes = upvotes;
     if (state) poll.state = state;
-    await db().persist(poll);
+    await db().save(poll);
     return poll;
   } catch (e) {
     throw LogUtils.logErr(`Problem updating poll by id: ${id}`, e);

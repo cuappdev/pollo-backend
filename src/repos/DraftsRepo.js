@@ -1,10 +1,10 @@
 // @flow
-import { getConnectionManager, Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import Draft from '../models/Draft';
 import User from '../models/User';
 import LogUtils from '../utils/LogUtils';
 
-const db = (): Repository<Draft> => getConnectionManager().get().getRepository(Draft);
+const db = (): Repository<Draft> => getRepository(Draft);
 
 /**
  * Creates a draft and saves it to the db
@@ -24,7 +24,7 @@ const createDraft = async (
     draft.text = text;
     draft.options = options;
     draft.user = user;
-    await db().persist(draft);
+    await db().save(draft);
     return draft;
   } catch (e) {
     throw LogUtils.logErr('Problem creating draft', e, { text, options, user });
@@ -87,7 +87,7 @@ const updateDraft = async (
       .getOne();
     if (options) draft.options = options;
     if (text !== undefined && text !== null) draft.text = text;
-    await db().persist(draft);
+    await db().save(draft);
     return draft;
   } catch (e) {
     throw LogUtils.logErr(`Problem updating draft by id: ${id}`, e);
@@ -101,7 +101,7 @@ const updateDraft = async (
  */
 const deleteDraft = async (id: number) => {
   try {
-    const draft = await db().findOneById(id);
+    const draft = await db().findOne(id);
     await db().remove(draft);
   } catch (e) {
     throw LogUtils.logErr(`Problem deleting draft by id: ${id}`, e);

@@ -1,5 +1,5 @@
 // @flow
-import { getConnectionManager, Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import UserSessionsRepo from './UserSessionsRepo';
 import Group from '../models/Group';
 import User from '../models/User';
@@ -7,7 +7,7 @@ import appDevUtils from '../utils/AppDevUtils';
 import constants from '../utils/Constants';
 import LogUtils from '../utils/LogUtils';
 
-const db = (): Repository<User> => getConnectionManager().get().getRepository(User);
+const db = (): Repository<User> => getRepository(User);
 
 /**
  * Creates a dummy user and saves it to the db (Testing purposes)
@@ -17,7 +17,7 @@ const db = (): Repository<User> => getConnectionManager().get().getRepository(Us
  */
 const createDummyUser = async (id: string): Promise<User> => {
   try {
-    return await db().persist(User.dummy(id));
+    return await db().save(User.dummy(id));
   } catch (e) {
     throw LogUtils.logErr('Problem creating user', e, { id });
   }
@@ -31,7 +31,7 @@ const createDummyUser = async (id: string): Promise<User> => {
  */
 const createUser = async (fields: Object): Promise<User> => {
   try {
-    return await db().persist(User.fromGoogleCreds(fields));
+    return await db().save(User.fromGoogleCreds(fields));
   } catch (e) {
     throw LogUtils.logErr('Problem creating user from google credentials', e, { fields });
   }
@@ -59,7 +59,11 @@ const createUserWithFields = async (
     user.lastName = lastName;
     user.email = email;
     user.netID = appDevUtils.netIDFromEmail(email);
-    await db().persist(user);
+    user.adminGroups = [];
+    user.memberGroups = [];
+    user.questions = [];
+    user.drafts = [];
+    await db().save(user);
     return user;
   } catch (e) {
     throw LogUtils.logErr('Problem creating user with fields', e, {
@@ -79,7 +83,7 @@ const createUserWithFields = async (
  */
 const getUserByID = async (id: number): Promise<?User> => {
   try {
-    return await db().findOneById(id);
+    return await db().findOne(id);
   } catch (e) {
     throw LogUtils.logErr(`Problem getting user by id: ${id}`, e);
   }
@@ -173,7 +177,7 @@ const getUsersByGoogleIDs = async (
  */
 const deleteUserByID = async (id: number) => {
   try {
-    const user = await db().findOneById(id);
+    const user = await db().findOne(id);
     await UserSessionsRepo.deleteSessionFromUserID(id);
     await db().remove(user);
   } catch (e) {

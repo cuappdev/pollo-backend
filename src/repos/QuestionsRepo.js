@@ -1,11 +1,11 @@
 // @flow
-import { getConnectionManager, Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import Group from '../models/Group';
 import User from '../models/User';
 import Question from '../models/Question';
 import LogUtils from '../utils/LogUtils';
 
-const db = (): Repository<Question> => getConnectionManager().get().getRepository(Question);
+const db = (): Repository<Question> => getRepository(Question);
 
 /**
  * Create question and save it to the db
@@ -21,7 +21,7 @@ const createQuestion = async (text: string, group: Group, user: User): Promise<Q
     question.text = text;
     question.group = group;
     question.user = user;
-    await db().persist(question);
+    await db().save(question);
     return question;
   } catch (e) {
     throw LogUtils.logErr('Problem creating question', e, { text, group, user });
@@ -36,7 +36,7 @@ const createQuestion = async (text: string, group: Group, user: User): Promise<Q
  */
 const getQuestionByID = async (id: number): Promise<?Question> => {
   try {
-    return await db().findOneById(id);
+    return await db().findOne(id);
   } catch (e) {
     throw LogUtils.logErr(`Problem getting question by id: ${id}`, e);
   }
@@ -49,7 +49,7 @@ const getQuestionByID = async (id: number): Promise<?Question> => {
  */
 const deleteQuestionByID = async (id: number) => {
   try {
-    const question = await db().findOneById(id);
+    const question = await db().findOne(id);
     await db().remove(question);
   } catch (e) {
     throw LogUtils.logErr(`Problem deleting question by id: ${id}`, e);
@@ -74,7 +74,7 @@ const updateQuestionByID = async (id: number, text: string): Promise<?Question> 
         .update(field)
         .execute();
     }
-    return await db().findOneById(id);
+    return await db().findOne(id);
   } catch (e) {
     throw LogUtils.logErr(`Problem updating question by id: ${id}`, e, { text });
   }
