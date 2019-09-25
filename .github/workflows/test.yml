@@ -1,0 +1,43 @@
+name: test
+
+on:
+  push:
+    branches:
+    - master
+    - release/*
+  pull_request:
+    branches:
+    - master
+    - release/*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:9.6
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pollo
+        ports:
+        - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+    - name: npm install, build, and test
+      run: |
+        npm install
+        npm start &
+        sleep 10
+        npm test
+      env:
+        DB_HOST: localhost
+        DB_USERNAME: postgres
+        DB_PASSWORD: postgres
+        DB_NAME: pollo
+        
+        
