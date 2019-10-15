@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 import Base from './Base';
 import Poll from './Poll';
-import Question from './Question';
 import User from './User';
 
 export type Coord = {| lat: ?number, long: ?number |}
@@ -52,10 +51,6 @@ class Group extends Base {
   /** Polls belonging to the group */
   @OneToMany(type => Poll, poll => poll.group, { cascadeRemove: true })
   polls: ?Poll[] = undefined;
-
-  /** Questions belonging to the group */
-  @OneToMany(type => Question, question => question.group, { cascadeRemove: true })
-  questions: ?Question[] = undefined;
 
   /** Member of the group */
   @ManyToMany(type => User, user => user.memberGroups)

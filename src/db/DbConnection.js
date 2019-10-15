@@ -9,7 +9,6 @@ import {
 import Base from '../models/Base';
 import Draft from '../models/Draft';
 import Poll from '../models/Poll';
-import Question from '../models/Question';
 import Group from '../models/Group';
 import User from '../models/User';
 import UserSession from '../models/UserSession';
@@ -21,7 +20,6 @@ const entities = [
   Base,
   Draft,
   Poll,
-  Question,
   Group,
   User,
   UserSession,

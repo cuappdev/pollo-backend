@@ -3,7 +3,6 @@ import { getRepository, Repository } from 'typeorm';
 import UsersRepo from './UsersRepo';
 import Group from '../models/Group';
 import Poll from '../models/Poll';
-import Question from '../models/Question';
 import User from '../models/User';
 import appDevUtils from '../utils/AppDevUtils';
 import constants from '../utils/Constants';
@@ -40,7 +39,6 @@ const createGroup = async (
     group.isLocationRestricted = false;
     group.admins = user ? [user] : [];
     group.polls = [];
-    group.questions = [];
     group.members = [];
 
     if (groupCodes[code]) {
@@ -130,7 +128,6 @@ const updateGroupByID = async (id: number, name: ?string, location: ?Coord,
       .leftJoinAndSelect('groups.admins', 'admins')
       .leftJoinAndSelect('groups.members', 'members')
       .leftJoinAndSelect('groups.polls', 'polls')
-      .leftJoinAndSelect('groups.questions', 'questions')
       .where('groups.id = :groupID', { groupID: id })
       .getOne();
 
@@ -186,7 +183,6 @@ const addUsersByGoogleIDs = async (
       .leftJoinAndSelect('groups.admins', 'admins')
       .leftJoinAndSelect('groups.members', 'members')
       .leftJoinAndSelect('groups.polls', 'polls')
-      .leftJoinAndSelect('groups.questions', 'questions')
       .where('groups.id = :groupID')
       .setParameters({ groupID: id })
       .getOne();
@@ -232,7 +228,6 @@ const addUsersByIDs = async (
       .leftJoinAndSelect('groups.admins', 'admins')
       .leftJoinAndSelect('groups.members', 'members')
       .leftJoinAndSelect('groups.polls', 'polls')
-      .leftJoinAndSelect('groups.questions', 'questions')
       .where('groups.id = :groupID')
       .setParameters({ groupID: id })
       .getOne();
@@ -272,7 +267,6 @@ const removeUserByGroupID = async (
       .leftJoinAndSelect('groups.admins', 'admins')
       .leftJoinAndSelect('groups.members', 'members')
       .leftJoinAndSelect('groups.polls', 'polls')
-      .leftJoinAndSelect('groups.questions', 'questions')
       .where('groups.id = :groupID')
       .setParameters({ groupID: id })
       .getOne();
@@ -397,26 +391,6 @@ const getPolls = async (
 };
 
 /**
- * Get questions from a group sorted by creation date in ascending order.
- * @function
- * @param {number} id - ID of group to fetch questions from
- * @return {Question[]} List of questions rom group
- */
-const getQuestions = async (id: number): Promise<Array<?Question>> => {
-  try {
-    const group = await db().createQueryBuilder('groups')
-      .leftJoinAndSelect('groups.questions', 'questions')
-      .where('groups.id = :groupID')
-      .setParameters({ groupID: id })
-      .orderBy('questions.createdAt', 'ASC')
-      .getOne();
-    return group.questions;
-  } catch (e) {
-    throw LogUtils.logErr(`Problem getting questions from group: ${id}`, e);
-  }
-};
-
-/**
  * Get time of latest activity of a group
  * @function
  * @param {number} id - ID of group to get latest activity
@@ -455,7 +429,6 @@ export default {
   isAdmin,
   isMember,
   getPolls,
-  getQuestions,
   addUsersByIDs,
   latestActivityByGroupID,
 };

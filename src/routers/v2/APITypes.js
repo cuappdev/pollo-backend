@@ -44,12 +44,6 @@ export type APIDraft = {|
   text: string,
 |}
 
-export type APIQuestion = {|
-  id: id,
-  createdAt: string,
-  text: string,
-|}
-
 export type APIUser = {|
   id: id,
   name: string,

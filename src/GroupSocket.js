@@ -40,7 +40,7 @@ type SocketPoll = {
 
 type ClientPoll = {
   id?: id,
-  answerChoices: PollResult[], // count is null if user is 'member' and MC question is live or ended
+  answerChoices: PollResult[], // count is null if user is 'member' and MC poll is live or ended
   correctAnswer?: string,
   createdAt?: string,
   state: PollState,
@@ -179,7 +179,7 @@ export default class GroupSocket {
         break;
       }
       default:
-        throw new Error('Unimplemented question type');
+        throw new Error('Unimplemented poll type');
     }
 
     this.current = poll;

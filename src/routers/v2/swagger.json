@@ -28,9 +28,6 @@
       "name": "Polls"
     },
     {
-      "name": "Questions"
-    },
-    {
       "name": "Socket: group"
     },
     {
@@ -1357,7 +1354,7 @@
           "Socket: to server"
         ],
         "summary": "Answer a poll",
-        "description": "User sends this to answer a multiple choice question or submit a FR answer",
+        "description": "User sends this to answer a multiple choice poll or submit a FR answer",
         "parameters": [
           {
             "name": "submittedAnswer",
@@ -1857,7 +1854,7 @@
         },
         "answerChoices": {
           "type": "array",
-          "description": "All answers for the poll; count is null if user is `member` and MC question is `live` or `ended`",
+          "description": "All answers for the poll; count is null if user is `member` and MC poll is `live` or `ended`",
           "items": {
             "$ref": "#/definitions/PollResult"
           }
