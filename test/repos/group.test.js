@@ -1,7 +1,6 @@
 import GroupsRepo from '../../src/repos/GroupsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import PollsRepo from '../../src/repos/PollsRepo';
-import QuestionsRepo from '../../src/repos/QuestionsRepo';
 import dbConnection from '../../src/db/DbConnection';
 
 let code;
@@ -202,20 +201,6 @@ test('Get Polls from Group', async () => {
 
   await PollsRepo.deletePollByID(poll.id);
   await PollsRepo.deletePollByID(poll2.id);
-});
-
-test('Get Questions from Group', async () => {
-  const group = await GroupsRepo.getGroupByID(id);
-  let questions = await GroupsRepo.getQuestions(id);
-  expect(questions.length).toEqual(0);
-
-  const question1 = await QuestionsRepo.createQuestion('Question1', group, user);
-  const question2 = await QuestionsRepo.createQuestion('Question2', group, user2);
-  questions = await GroupsRepo.getQuestions(id);
-  expect(questions.length).toEqual(2);
-
-  await QuestionsRepo.deleteQuestionByID(question1.id);
-  await QuestionsRepo.deleteQuestionByID(question2.id);
 });
 
 test('Delete Group', async () => {
