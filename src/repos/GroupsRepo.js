@@ -8,8 +8,6 @@ import appDevUtils from '../utils/AppDevUtils';
 import constants from '../utils/Constants';
 import LogUtils from '../utils/LogUtils';
 
-import type { Coord } from '../models/Group';
-
 const db = (): Repository<Group> => getRepository(Group);
 
 /** Contains all group codes used mapped to group id */
@@ -21,22 +19,17 @@ const groupCodes = {};
  * @param {string} name - Name of group
  * @param {string} code - Unique code used to join group
  * @param {User} [user] - Admin of group
- * @param {?Coord} location - Location of group admin
  * @return {Group} Created group
  */
 const createGroup = async (
   name: string,
   code: string,
   user: ?User,
-  location: ?Coord,
 ): Promise<Group> => {
   try {
     const group = new Group();
     group.name = name;
     group.code = code;
-    group.location = location || { lat: null, long: null };
-    group.isFilterActivated = true;
-    group.isLocationRestricted = false;
     group.admins = user ? [user] : [];
     group.polls = [];
     group.members = [];
@@ -49,7 +42,7 @@ const createGroup = async (
     return group;
   } catch (e) {
     throw LogUtils.logErr('Problem creating group', e, {
-      name, code, user, location,
+      name, code, user,
     });
   }
 };
@@ -115,13 +108,9 @@ const deleteGroupByID = async (id: number) => {
  * @function
  * @param {number} id - ID of group to update
  * @param {?name} name - New group name
- * @param {?Coord} location - Most recent location of the group admin
- * @param {boolean} isRestricted - If joining a group is restricted by location
- * @param {boolean} isActivated - If profanity filter is on
  * @return {?Group} Updated group
  */
-const updateGroupByID = async (id: number, name: ?string, location: ?Coord,
-  isRestricted: ?boolean, isActivated: ?boolean):
+const updateGroupByID = async (id: number, name: ?string):
   Promise<?Group> => {
   try {
     const group = await db().createQueryBuilder('groups')
@@ -132,36 +121,10 @@ const updateGroupByID = async (id: number, name: ?string, location: ?Coord,
       .getOne();
 
     if (name) group.name = name;
-    if (location && location.lat && location.long) group.location = location;
-    if (isRestricted !== null && isRestricted !== undefined) {
-      group.isLocationRestricted = isRestricted;
-    }
-    if (isActivated !== null && isActivated !== undefined) group.isFilterActivated = isActivated;
     await db().save(group);
     return group;
   } catch (e) {
-    throw LogUtils.logErr(
-      `Problem updating group's location restriction: ${id}`,
-      e,
-      { isRestricted },
-    );
-  }
-};
-
-/**
- * Check if joining a group is location restricted
- * @param {*} id - ID of group
- * @return {?boolean} If the group is location restricted
- */
-const isLocationRestricted = async (id: number): Promise<?boolean> => {
-  try {
-    const group = await db().createQueryBuilder('groups')
-      .where('groups.id = :groupID')
-      .setParameters({ groupID: id })
-      .getOne();
-    return group.isLocationRestricted;
-  } catch (e) {
-    throw LogUtils.logErr(`Problem getting location restriction for group: ${id}`, e);
+    throw LogUtils.logErr(`Problem updating group's name: ${id}`, e);
   }
 };
 
@@ -422,7 +385,6 @@ export default {
   getGroupByID,
   getGroupID,
   updateGroupByID,
-  isLocationRestricted,
   addUsersByGoogleIDs,
   removeUserByGroupID,
   getUsersByGroupID,

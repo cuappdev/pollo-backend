@@ -56,11 +56,9 @@ test('Get Group by Code', async () => {
 });
 
 test('Update Group', async () => {
-  const group = await GroupsRepo.updateGroupByID(id, 'Update Group', null, true, false);
+  const group = await GroupsRepo.updateGroupByID(id, 'Update Group');
   expect(group.id).toBe(id);
   expect(group.name).toBe('Update Group');
-  expect(group.isLocationRestricted).toBe(true);
-  expect(group.isFilterActivated).toBe(false);
 });
 
 test('Get Admins from Group', async () => {
