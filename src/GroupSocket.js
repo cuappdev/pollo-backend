@@ -447,7 +447,7 @@ _setupAdminEvents(client: IOSocket): void {
     if (!userAnswers) userAnswers = {};
 
     this.nsp.to('members').emit('user/poll/results', ({
-      pollID, createdAt, updatedAt, answerChoices, correctAnswer, state, text, type, userAnswers,
+      id: pollID, createdAt, updatedAt, answerChoices, correctAnswer, state, text, type, userAnswers,
     } : ClientPoll));
   });
 
