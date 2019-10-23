@@ -277,7 +277,7 @@ export default class GroupSocket {
 
     const filteredChoices = userRole === constants.USER_TYPES.ADMIN
     || !isMultipleChoice
-    || state === constants.POLL_STATES.SHARED
+    || state !== constants.POLL_STATES.LIVE
       ? answerChoices
       : answerChoices.map(a => ({ ...a, count: null }));
 

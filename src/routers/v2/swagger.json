@@ -1732,7 +1732,7 @@
       "properties": {
         "count": {
           "type": "integer",
-          "description": "Number of times choice was selected or upvoted<br/>`Null` when user is member & poll is MC & poll is not shared"
+          "description": "Number of times choice was selected or upvoted<br/>`Null` when user is member & poll is MC & poll is live"
         },
         "letter": {
           "type": "string",
@@ -1767,7 +1767,7 @@
         },
         "answerChoices": {
           "type": "array",
-          "description": "All answers for the poll; count is null if user is `member` and MC poll is `live` or `ended`",
+          "description": "All answers for the poll; count is null if user is `member` and MC poll is `live`",
           "items": {
             "$ref": "#/definitions/PollResult"
           }
