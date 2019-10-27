@@ -32,7 +32,7 @@ class GetCSVRouter extends AppDevRouter {
         // .filter((poll: ?Poll): boolean => poll != null)
         .forEach((poll: Poll) => {
           Object.entries(poll.answers).forEach(([key: string, value: PollChoice[]]) => {
-            if (!Object.prototype.hasOwnProperty.call(userResponses, key)) userResponses[key] = Array(5).fill('none');
+            if (!Object.prototype.hasOwnProperty.call(userResponses, key)) userResponses[key] = [];
             while (userResponses[key].length < headers.length) userResponses[key].push('none');
             userResponses[key].push(value[0].letter);
           });

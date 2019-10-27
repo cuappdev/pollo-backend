@@ -4,9 +4,6 @@ import UsersRepo from '../../src/repos/UsersRepo';
 import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
 import GroupsRepo from '../../src/repos/GroupsRepo';
 import PollsRepo from '../../src/repos/PollsRepo';
-import type { PollResult } from '../../src/models/Poll';
-import Poll from '../../src/models/Poll';
-import User from '../../src/models/User';
 
 const {
   get, post, del, put,
@@ -214,16 +211,16 @@ test('Update group with invalid adminToken', async () => {
 });
 
 test('Download csv', async () => {
-  let p1 = await PollsRepo.createPoll('Poll text', group, [{ letter: 'A', text: 'Saturn' },
+  const p1 = await PollsRepo.createPoll('Poll text', group, [{ letter: 'A', text: 'Saturn' },
     { letter: 'B', text: 'Mars' }], 'multiplechoice', 'A', { u1: [{ letter: 'A', text: 'Saturn' }], u2: [{ letter: 'B', text: 'Mars' }] }, 'ended');
-  let p2 = await PollsRepo.createPoll('Poll text', group, [{ letter: 'A', text: 'Earth' },
+  const p2 = await PollsRepo.createPoll('Poll text', group, [{ letter: 'A', text: 'Earth' },
     { letter: 'B', text: 'Venus' }], 'multiplechoice', 'B', { u1: [{ letter: 'B', text: 'Venus' }], u2: [{ letter: 'A', text: 'Earth' }] }, 'ended');
 
   const result = await request(get(`/sessions/${group.id}/csv`, adminToken));
   console.log(result);
 
-  PollsRepo.deletePollByID(p1.id);
-  PollsRepo.deletePollByID(p2.id);
+  await PollsRepo.deletePollByID(p1.id);
+  await PollsRepo.deletePollByID(p2.id);
 });
 
 test('Delete group with invalid adminToken', async () => {
