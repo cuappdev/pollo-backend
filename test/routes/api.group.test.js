@@ -9,6 +9,8 @@ const {
   get, post, del, put,
 } = require('./lib');
 
+const axios = require('axios').default;
+
 // Groups
 // Must be running server to test
 
@@ -210,14 +212,31 @@ test('Update group with invalid adminToken', async () => {
     });
 });
 
-test('Download csv', async () => {
-  const p1 = await PollsRepo.createPoll('Poll text', group, [{ letter: 'A', text: 'Saturn' },
-    { letter: 'B', text: 'Mars' }], 'multiplechoice', 'A', { u1: [{ letter: 'A', text: 'Saturn' }], u2: [{ letter: 'B', text: 'Mars' }] }, 'ended');
-  const p2 = await PollsRepo.createPoll('Poll text', group, [{ letter: 'A', text: 'Earth' },
-    { letter: 'B', text: 'Venus' }], 'multiplechoice', 'B', { u1: [{ letter: 'B', text: 'Venus' }], u2: [{ letter: 'A', text: 'Earth' }] }, 'ended');
 
-  const result = await request(get(`/sessions/${group.id}/csv`, adminToken));
+test('Download csv', async () => {
+  const p1 = await PollsRepo.createPoll(
+    'Poll text', group, [{ letter: 'A', text: 'Saturn' }, { letter: 'B', text: 'Mars' }],
+    'multiplechoice', 'A',
+    { u1: [{ letter: 'A', text: 'Saturn' }], u2: [{ letter: 'B', text: 'Mars' }] }, 'ended',
+  );
+  const p2 = await PollsRepo.createPoll(
+    'Poll text', group, [{ letter: 'A', text: 'Earth' }, { letter: 'B', text: 'Venus' }],
+    'multiplechoice', 'B',
+    { u1: [{ letter: 'B', text: 'Venus' }], u2: [{ letter: 'A', text: 'Earth' }] }, 'ended',
+  );
+
+  const result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  }).catch((e) => {
+    console.log(e);
+    expect(e).toBe(null);
+  });
   console.log(result);
+
+  expect(result.status).toBe(200);
+  expect(result.data).toBe('userid,Poll text,Poll text\nu1,A,B\nu2,B,A\n');
 
   await PollsRepo.deletePollByID(p1.id);
   await PollsRepo.deletePollByID(p2.id);
