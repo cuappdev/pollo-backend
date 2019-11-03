@@ -20,15 +20,10 @@ class UpdateGroupRouter extends AppDevRouter<APIGroup> {
     const {
       user,
       params: { id: groupID },
-      body: {
-        isActivated,
-        isRestricted,
-        name,
-      },
+      body: { name },
     } = req;
 
-    if (!name && (isRestricted === null || isRestricted === undefined)
-     && (isActivated === null || isActivated === undefined)) {
+    if (!name) {
       throw LogUtils.logErr('No fields specified to update');
     }
 
@@ -43,7 +38,7 @@ class UpdateGroupRouter extends AppDevRouter<APIGroup> {
       );
     }
 
-    group = await GroupsRepo.updateGroupByID(groupID, name, null, isRestricted, isActivated);
+    group = await GroupsRepo.updateGroupByID(groupID, name);
     if (!group) {
       throw LogUtils.logErr(`Group with id ${groupID} was not found`);
     }
@@ -51,10 +46,7 @@ class UpdateGroupRouter extends AppDevRouter<APIGroup> {
     return {
       id: group.id,
       code: group.code,
-      isFilterActivated: group.isFilterActivated,
       isLive: await req.app.groupManager.isLive(group.code),
-      isLocationRestricted: group.isLocationRestricted,
-      location: group.location,
       name: group.name,
       updatedAt: group.updatedAt,
     };

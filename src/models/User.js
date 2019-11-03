@@ -9,7 +9,6 @@ import {
 import Base from './Base';
 import Draft from './Draft';
 import Group from './Group';
-import Question from './Question';
 import appDevUtils from '../utils/AppDevUtils';
 
 /**
@@ -49,10 +48,6 @@ class User extends Base {
   /** Groups that the user is a member of */
   @ManyToMany(type => Group, group => group.members)
   memberGroups: ?Group[] = undefined;
-
-  /** Questions that a user has asked */
-  @OneToMany(type => Question, question => question.user)
-  questions: ?Question[] = undefined;
 
   /** Drafts that a user has created */
   @OneToMany(type => Draft, draft => draft.user)

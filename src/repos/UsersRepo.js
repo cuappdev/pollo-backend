@@ -61,7 +61,6 @@ const createUserWithFields = async (
     user.netID = appDevUtils.netIDFromEmail(email);
     user.adminGroups = [];
     user.memberGroups = [];
-    user.questions = [];
     user.drafts = [];
     await db().save(user);
     return user;

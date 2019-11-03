@@ -40,7 +40,7 @@ type SocketPoll = {
 
 type ClientPoll = {
   id?: id,
-  answerChoices: PollResult[], // count is null if user is 'member' and MC question is live or ended
+  answerChoices: PollResult[], // count is null if user is 'member' and MC poll is live or ended
   correctAnswer?: string,
   createdAt?: string,
   state: PollState,
@@ -48,12 +48,6 @@ type ClientPoll = {
   type: PollType,
   updatedAt?: string,
   userAnswers: { string: PollChoice[] } // {googleID: PollChoice[]} of answers for MC and upvotes for FR}
-};
-
-type PollFilter = {
-  success: boolean,
-  text?: string,
-  filter?: String[]
 };
 
 /**
@@ -159,13 +153,6 @@ export default class GroupSocket {
         });
         break;
       case constants.POLL_TYPES.FREE_RESPONSE: { // Free Response
-        const badWords = this.group.isFilterActivated
-          ? lib.filterProfanity(submittedAnswer.text) : [];
-        if (badWords.length > 0) { // not clean text
-          client.emit('user/poll/fr/filter',
-            ({ success: false, text: submittedAnswer.text, filter: badWords }: PollFilter));
-          return;
-        }
         if (poll.answers[googleID]) { // User submitted another FR answer
           poll.answers[googleID].push(submittedAnswer);
           poll.upvotes[googleID].push(submittedAnswer);
@@ -175,11 +162,10 @@ export default class GroupSocket {
         }
 
         poll.answerChoices.push({ count: 1, text: submittedAnswer.text, letter: null });
-        client.emit('user/poll/fr/filter', ({ success: true }: PollFilter));
         break;
       }
       default:
-        throw new Error('Unimplemented question type');
+        throw new Error('Unimplemented poll type');
     }
 
     this.current = poll;
