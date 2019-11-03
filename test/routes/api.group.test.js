@@ -215,17 +215,22 @@ test('Update group with invalid adminToken', async () => {
 
 test('Download csv', async () => {
   const p1 = await PollsRepo.createPoll(
-    'Poll text', group, [{ letter: 'A', text: 'Saturn' }, { letter: 'B', text: 'Mars' }],
+    'Poll 1', group, [{ letter: 'A', text: 'Saturn' }, { letter: 'B', text: 'Mars' }],
     'multiplechoice', 'A',
     { u1: [{ letter: 'A', text: 'Saturn' }], u2: [{ letter: 'B', text: 'Mars' }] }, 'ended',
   );
   const p2 = await PollsRepo.createPoll(
-    'Poll text', group, [{ letter: 'A', text: 'Earth' }, { letter: 'B', text: 'Venus' }],
+    'Poll 2', group, [{ letter: 'A', text: 'Earth' }, { letter: 'B', text: 'Venus' }],
     'multiplechoice', 'B',
     { u1: [{ letter: 'B', text: 'Venus' }], u2: [{ letter: 'A', text: 'Earth' }] }, 'ended',
   );
 
-  const result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+  const u1 = await UsersRepo.createDummyUser('u1');
+  const u2 = await UsersRepo.createDummyUser('u2');
+
+  await GroupsRepo.addUsersByIDs(group.id, [u1.id, u2.id]);
+
+  let result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
     headers: {
       Authorization: `Bearer ${adminToken}`,
     },
@@ -233,13 +238,54 @@ test('Download csv', async () => {
     console.log(e);
     expect(e).toBe(null);
   });
-  console.log(result);
 
   expect(result.status).toBe(200);
-  expect(result.data).toBe('userid,Poll text,Poll text\nu1,A,B\nu2,B,A\n');
+  expect(result.data).toBe('userid,Poll 1,Poll 2\nu1,A,B\nu2,B,A\n');
+
+  const u3 = await UsersRepo.createDummyUser('u3');
+  await GroupsRepo.addUsersByIDs(group.id, [u3.id]);
+
+  result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  }).catch((e) => {
+    console.log(e);
+    expect(e).toBe(null);
+  });
+
+  expect(result.status).toBe(200);
+  expect(result.data).toBe('userid,Poll 1,Poll 2\nu1,A,B\nu2,B,A\nu3,,\n');
+
+  const p3 = await PollsRepo.createPoll(
+    'Poll 3', group, [{ letter: 'A', text: 'Earth' }, { letter: 'B', text: 'Venus' }],
+    'multiplechoice', 'B',
+    { u3: [{ letter: 'A', text: 'Earth' }] }, 'ended',
+  );
+
+  result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  }).catch((e) => {
+    console.log(e);
+    expect(e).toBe(null);
+  });
+
+  expect(result.status).toBe(200);
+  expect(result.data).toBe('userid,Poll 1,Poll 2,Poll 3\nu1,A,B,\nu2,B,A,\nu3,,,A\n');
 
   await PollsRepo.deletePollByID(p1.id);
   await PollsRepo.deletePollByID(p2.id);
+  await PollsRepo.deletePollByID(p3.id);
+
+  await GroupsRepo.removeUserByGroupID(group.id, u1.id);
+  await GroupsRepo.removeUserByGroupID(group.id, u2.id);
+  await GroupsRepo.removeUserByGroupID(group.id, u3.id);
+
+  await UsersRepo.deleteUserByID(u1.id);
+  await UsersRepo.deleteUserByID(u2.id);
+  await UsersRepo.deleteUserByID(u3.id);
 });
 
 test('Delete group with invalid adminToken', async () => {

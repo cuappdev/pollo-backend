@@ -12,6 +12,8 @@ import GroupsRepo from '../../../repos/GroupsRepo';
 import type { ExpressCallback } from '../../../utils/AppDevRouter';
 import Poll from '../../../models/Poll';
 import type { PollChoice } from '../../../models/Poll';
+import UsersRepo from '../../../repos/UsersRepo';
+import User from '../../../models/User';
 
 class GetCSVRouter extends AppDevRouter {
   constructor() {
@@ -28,19 +30,22 @@ class GetCSVRouter extends AppDevRouter {
       const polls: Array<?Poll> = await GroupsRepo.getPolls(id);
       const headers: Array<string> = [];
       const userResponses: { string: Array<string> } = {};
+      const users: Array<User> = await GroupsRepo.getUsersByGroupID(id, constants.USER_TYPES.MEMBER);
+      users.forEach((user: User) => {
+        userResponses[user.googleID] = [];
+      });
+
       polls
-        // .filter((poll: ?Poll): boolean => poll != null)
         .forEach((poll: Poll) => {
-          Object.entries(poll.answers).forEach(([key: string, value: PollChoice[]]) => {
-            if (!Object.prototype.hasOwnProperty.call(userResponses, key)) userResponses[key] = [];
-            while (userResponses[key].length < headers.length) userResponses[key].push('none');
-            userResponses[key].push(value[0].letter);
+          Object.entries(userResponses).forEach(([user: string, answers: Array<string>]) => {
+            if (Object.prototype.hasOwnProperty.call(poll.answers, user)) {
+              answers.push(poll.answers[user][0].letter);
+            } else {
+              answers.push('');
+            }
           });
           headers.push(poll.text);
         });
-      Object.values(userResponses).forEach((arr) => {
-        while (arr.length < headers.length) arr.push('none');
-      });
 
       res.type('csv');
       res.set('Content-disposition', `attachment; filename=pollo_group_${id}.csv`);
