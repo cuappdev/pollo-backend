@@ -28,9 +28,6 @@
       "name": "Polls"
     },
     {
-      "name": "Questions"
-    },
-    {
       "name": "Socket: group"
     },
     {
@@ -403,21 +400,6 @@
                 },
                 "code": {
                   "type": "string"
-                },
-                "location": {
-                  "type": "object",
-                  "properties": {
-                    "lat": {
-                      "type": "number",
-                      "format": "float",
-                      "nullable": true
-                    },
-                    "long": {
-                      "type": "number",
-                      "format": "float",
-                      "nullable": true
-                    }
-                  }
                 }
               }
             }
@@ -1231,21 +1213,6 @@
                 "code": {
                   "type": "string",
                   "description": "Group code"
-                },
-                "location": {
-                  "type": "object",
-                  "properties": {
-                    "lat": {
-                      "type": "number",
-                      "format": "float",
-                      "nullable": true
-                    },
-                    "long": {
-                      "type": "number",
-                      "format": "float",
-                      "nullable": true
-                    }
-                  }
                 }
               },
               "required": [
@@ -1300,21 +1267,6 @@
                 "code": {
                   "type": "string",
                   "description": "Group code"
-                },
-                "location": {
-                  "type": "object",
-                  "properties": {
-                    "lat": {
-                      "type": "number",
-                      "format": "float",
-                      "nullable": true
-                    },
-                    "long": {
-                      "type": "number",
-                      "format": "float",
-                      "nullable": true
-                    }
-                  }
                 }
               }
             }
@@ -1357,7 +1309,7 @@
           "Socket: to server"
         ],
         "summary": "Answer a poll",
-        "description": "User sends this to answer a multiple choice question or submit a FR answer",
+        "description": "User sends this to answer a multiple choice poll or submit a FR answer",
         "parameters": [
           {
             "name": "submittedAnswer",
@@ -1464,22 +1416,6 @@
             "name": "currentPoll",
             "schema": {
               "$ref": "#/definitions/Socket - ClientPoll"
-            }
-          }
-        ]
-      }
-    },
-    "user/poll/fr/filter": {
-      "get": {
-        "tags": [
-          "Socket: to member"
-        ],
-        "summary": "User receives when FR answer is registered, if doesn’t pass profanity filter then sends user answer and array of bad words found",
-        "responses": [
-          {
-            "name": "response",
-            "schema": {
-              "$ref": "#/definitions/Socket - PollFilter"
             }
           }
         ]
@@ -1647,7 +1583,6 @@
     },
     "Group": {
       "type": "object",
-      "description": "By default, `isFilterActivated = true` `isLocationRestricted = false`",
       "properties": {
         "id": {
           "type": "integer"
@@ -1655,30 +1590,8 @@
         "code": {
           "type": "string"
         },
-        "isFilterActivated": {
-          "description": "Indicate if profanity filter is on",
-          "type": "boolean"
-        },
         "isLive": {
           "type": "boolean"
-        },
-        "isLocationRestricted": {
-          "type": "boolean"
-        },
-        "location": {
-          "type": "object",
-          "properties": {
-            "lat": {
-              "type": "number",
-              "format": "float",
-              "nullable": true
-            },
-            "long": {
-              "type": "number",
-              "format": "float",
-              "nullable": true
-            }
-          }
         },
         "name": {
           "type": "string"
@@ -1692,10 +1605,7 @@
       "required": [
         "id",
         "code",
-        "isFilterActivated",
         "isLive",
-        "isLocationRestricted",
-        "location",
         "name",
         "updatedAt"
       ]
@@ -1822,7 +1732,7 @@
       "properties": {
         "count": {
           "type": "integer",
-          "description": "Number of times choice was selected or upvoted<br/>`Null` when user is member & poll is MC & poll is not shared"
+          "description": "Number of times choice was selected or upvoted<br/>`Null` when user is member & poll is MC & poll is live"
         },
         "letter": {
           "type": "string",
@@ -1857,7 +1767,7 @@
         },
         "answerChoices": {
           "type": "array",
-          "description": "All answers for the poll; count is null if user is `member` and MC question is `live` or `ended`",
+          "description": "All answers for the poll; count is null if user is `member` and MC poll is `live`",
           "items": {
             "$ref": "#/definitions/PollResult"
           }
@@ -1921,29 +1831,6 @@
         "text",
         "type",
         "userAnswers"
-      ]
-    },
-    "Socket - PollFilter": {
-      "type": "object",
-      "description": "NOTE: `text` and `filter` fields passed in when `success=false`",
-      "properties": {
-        "success": {
-          "type": "boolean"
-        },
-        "text": {
-          "description": "Text of answer submitted",
-          "type": "string"
-        },
-        "filter": {
-          "description": "Words that are considered inappropriate",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "success"
       ]
     },
     "User": {

@@ -18,7 +18,7 @@ class JoinGroupRouter extends AppDevRouter<APIGroup> {
   }
 
   async content(req: Request) {
-    const { code, location } = req.body;
+    const { code } = req.body;
     let { id } = req.body;
     const { user } = req;
 
@@ -35,7 +35,7 @@ class JoinGroupRouter extends AppDevRouter<APIGroup> {
       }
     }
 
-    let group = await GroupsRepo.getGroupByID(id);
+    const group = await GroupsRepo.getGroupByID(id);
     if (!group) {
       throw LogUtils.logErr(`No group with id ${id} found`);
     }
@@ -44,26 +44,6 @@ class JoinGroupRouter extends AppDevRouter<APIGroup> {
     const [isAdmin, isMember] = await Promise.all(
       [GroupsRepo.isAdmin(id, user), GroupsRepo.isMember(id, user)],
     );
-
-    // if admin, update group's location if the location is non-null
-    if (isAdmin) {
-      const updatedGroup = await GroupsRepo.updateGroupByID(id, null, location);
-      if (updatedGroup) group = updatedGroup;
-    }
-
-    // handle location restriction constraints for members
-    if (isMember && group.isLocationRestricted) {
-      if (!location || !location.lat || !location.long) {
-        throw LogUtils.logErr('User with no location tried to join a location restricted group');
-      }
-
-      if (!group.location.lat || !group.location.long) {
-        throw LogUtils.logErr('Location restricted group has a null location');
-      } else {
-        const withinRadius = lib.isWithin300m(location, group.location);
-        if (!withinRadius) throw LogUtils.logErr('Out of range user tried to join group');
-      }
-    }
 
     if (req.app.groupManager.findSocket(code, id) === undefined) {
       await req.app.groupManager.startNewGroup(group);
@@ -76,10 +56,7 @@ class JoinGroupRouter extends AppDevRouter<APIGroup> {
     return {
       id: group.id,
       code: group.code,
-      isFilterActivated: group.isFilterActivated,
       isLive: await req.app.groupManager.isLive(group.code),
-      isLocationRestricted: group.isLocationRestricted,
-      location: group.location,
       name: group.name,
       updatedAt: group.updatedAt,
     };

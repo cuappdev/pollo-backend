@@ -25,7 +25,7 @@ export type PollChoice = {|
 |}
 
 /**
- * Poll class represents a single question
+ * Poll class represents a single poll
  * @extends {Base}
  */
 @Entity('polls')
@@ -34,11 +34,11 @@ class Poll extends Base {
   @PrimaryGeneratedColumn()
   id: any = null;
 
-  /** Text of question */
+  /** Text of poll */
   @Column('character varying')
   text: string = '';
 
-  /** Type of question either multipleChoice or freeResponse */
+  /** Type of poll either multipleChoice or freeResponse */
   @Column('character varying')
   type: PollType = constants.POLL_TYPES.MULTIPLE_CHOICE;
 
@@ -57,7 +57,7 @@ class Poll extends Base {
 
   /**
    * All the answers by students for the poll.
-   * Letter field is optional and only is returned on mc questions
+   * Letter field is optional and only is returned on MC polls.
    * @example
    * let answers_MC = {googleID: [{letter: "A", text: "Saturn"}]}
    * let answers_FR = {googleID: [{text: "Saturn"}, {text: "Mars"}]}

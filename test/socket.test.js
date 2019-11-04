@@ -235,20 +235,6 @@ test('Get current FR poll (admin/member)', () => {
   expect(currPoll.userAnswers[googleID]).toEqual([{ text: 'POST' }]);
 });
 
-test('Explicit answer (FR)', () => {
-  const badAnswer = { text: 'poop' };
-  // eslint-disable-next-line no-underscore-dangle
-  groupSocket._answerPoll(mockClient, googleID, badAnswer);
-
-  const userAnswers = groupSocket.current.answers[googleID3];
-  const userUpvotes = groupSocket.current.upvotes[googleID3];
-  expect(userAnswers).toBeUndefined();
-  expect(userUpvotes).toBeUndefined();
-
-  const pollChoice = groupSocket.current.answerChoices.find(p => p.text === badAnswer.text);
-  expect(pollChoice).toBeUndefined();
-});
-
 test('End poll (FR)', async () => {
   const socketPoll = groupSocket.current;
   // eslint-disable-next-line no-underscore-dangle
