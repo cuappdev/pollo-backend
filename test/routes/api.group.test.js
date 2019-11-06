@@ -1,15 +1,15 @@
 import request from 'request-promise-native';
+import axios from 'axios';
 import dbConnection from '../../src/db/DbConnection';
 import UsersRepo from '../../src/repos/UsersRepo';
 import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
 import GroupsRepo from '../../src/repos/GroupsRepo';
 import PollsRepo from '../../src/repos/PollsRepo';
 
+
 const {
   get, post, del, put,
 } = require('./lib');
-
-const axios = require('axios').default;
 
 // Groups
 // Must be running server to test
@@ -197,8 +197,8 @@ test('Download csv', async () => {
     { u1: [{ letter: 'B', text: 'Venus' }], u2: [{ letter: 'A', text: 'Earth' }] }, 'ended',
   );
 
-  const u1 = await UsersRepo.createDummyUser('u1');
-  const u2 = await UsersRepo.createDummyUser('u2');
+  const u1 = await UsersRepo.createUserWithFields('u1', 'u', '1', 'u1@example.com');
+  const u2 = await UsersRepo.createUserWithFields('u2', 'u', '2', 'u2@example.com');
 
   await GroupsRepo.addUsersByIDs(group.id, [u1.id, u2.id]);
 
@@ -214,7 +214,7 @@ test('Download csv', async () => {
   expect(result.status).toBe(200);
   expect(result.data).toBe('userid,Poll 1,Poll 2\nu1,A,B\nu2,B,A\n');
 
-  const u3 = await UsersRepo.createDummyUser('u3');
+  const u3 = await UsersRepo.createUserWithFields('u3', 'u', '3', 'u3@example.com');
   await GroupsRepo.addUsersByIDs(group.id, [u3.id]);
 
   result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
