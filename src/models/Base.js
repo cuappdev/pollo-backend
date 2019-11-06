@@ -32,6 +32,13 @@ class Base {
   updateTimestamps(): void {
     this.updatedAt = String(Math.floor(new Date().getTime() / 1000));
   }
+
+  serialize() {
+    return {
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    };
+  }
 }
 
 export default Base;

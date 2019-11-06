@@ -29,7 +29,7 @@ class UpdateGroupRouter extends AppDevRouter<APIGroup> {
 
     let group = await GroupsRepo.getGroupByID(groupID);
     if (!group) {
-      throw LogUtils.logErr(`Group with id ${groupID} was not found`);
+      throw LogUtils.logErr(`Group with UUID ${groupID} was not found`);
     }
 
     if (!await GroupsRepo.isAdmin(groupID, user)) {
@@ -40,15 +40,12 @@ class UpdateGroupRouter extends AppDevRouter<APIGroup> {
 
     group = await GroupsRepo.updateGroupByID(groupID, name);
     if (!group) {
-      throw LogUtils.logErr(`Group with id ${groupID} was not found`);
+      throw LogUtils.logErr(`Group with UUID ${groupID} was not found`);
     }
 
     return {
-      id: group.id,
-      code: group.code,
+      ...group.serialize(),
       isLive: await req.app.groupManager.isLive(group.code),
-      name: group.name,
-      updatedAt: group.updatedAt,
     };
   }
 }

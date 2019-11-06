@@ -12,6 +12,7 @@ import Poll from '../models/Poll';
 import Group from '../models/Group';
 import User from '../models/User';
 import UserSession from '../models/UserSession';
+import { ChangeID1557207656455 } from './migrations/1557207656455-ChangeID.js';
 
 dotenv.config(); // establish env variables
 const isProduction = process.env.NODE_ENV === 'production';
@@ -38,7 +39,7 @@ const connectionOptions: ConnectionOptions = {
     ssl: isProduction,
   },
   entities,
-  migrations: [],
+  migrations: [ChangeID1557207656455],
   cli: {
     entitiesDir: 'src/models',
     migrationsDir: 'src/db/migrations',

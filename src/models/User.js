@@ -6,10 +6,13 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import uuidv4 from 'uuid/v4';
 import Base from './Base';
 import Draft from './Draft';
 import Group from './Group';
 import appDevUtils from '../utils/AppDevUtils';
+
+import type { APIUser } from '../routers/v2/APITypes';
 
 /**
  * User class represents a user on the application.
@@ -17,9 +20,9 @@ import appDevUtils from '../utils/AppDevUtils';
  */
 @Entity('users')
 class User extends Base {
-  /** Unique identifier */
-  @PrimaryGeneratedColumn()
-  id: any = null;
+  /** Universally unique identifier */
+  @PrimaryGeneratedColumn('uuid')
+  uuid: string = uuidv4();
 
   /** Google ID of user */
   @Column('character varying')
@@ -83,6 +86,15 @@ class User extends Base {
     user.email = creds.emails[0].value;
     user.netID = appDevUtils.netIDFromEmail(user.email);
     return user;
+  }
+
+  serialize(): APIUser {
+    return {
+      ...super.serialize(),
+      id: this.uuid,
+      name: `${this.firstName} ${this.lastName}`,
+      netID: this.netID,
+    };
   }
 }
 

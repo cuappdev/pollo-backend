@@ -7,9 +7,12 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import uuidv4 from 'uuid/v4';
 import Base from './Base';
 import Poll from './Poll';
 import User from './User';
+
+import type { APIGroup } from '../routers/v2/APITypes';
 
 /**
  * Group class represents a grouping of polls.
@@ -17,9 +20,9 @@ import User from './User';
  */
 @Entity('groups')
 class Group extends Base {
-  /** Unique identifier */
-  @PrimaryGeneratedColumn()
-  id: any = null;
+  /** Universally unique identifier */
+  @PrimaryGeneratedColumn('uuid')
+  uuid: string = uuidv4();
 
   /** Name of group */
   @Column('character varying')
@@ -41,7 +44,18 @@ class Group extends Base {
   /** Member of the group */
   @ManyToMany(type => User, user => user.memberGroups)
   @JoinTable()
+  /** Member of the group */
   members: ?User[] = undefined;
+
+  serialize(): APIGroup {
+    return {
+      ...super.serialize(),
+      id: this.uuid,
+      code: this.code,
+      isLive: false,
+      name: this.name,
+    };
+  }
 }
 
 export default Group;

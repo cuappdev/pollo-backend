@@ -25,13 +25,8 @@ class PostGroupRouter extends AppDevRouter<APIGroup> {
     if (!code) throw LogUtils.logErr('Group code missing');
 
     const group = await GroupsRepo.createGroup(name, code, user);
-    return {
-      id: group.id,
-      code: group.code,
-      isLive: false,
-      name: group.name,
-      updatedAt: group.updatedAt,
-    };
+
+    return group.serialize();
   }
 }
 

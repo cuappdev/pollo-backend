@@ -19,6 +19,7 @@ const createDummyUser = async (id: string): Promise<User> => {
   try {
     return await db().save(User.dummy(id));
   } catch (e) {
+    console.log(e);
     throw LogUtils.logErr('Problem creating user', e, { id });
   }
 };
@@ -40,7 +41,7 @@ const createUser = async (fields: Object): Promise<User> => {
 /**
  * Creates a user
  * @function
- * @param {string} googleID - Google id of user
+ * @param {string} googleID - GoogleID of user
  * @param {string} firstName - First name of user
  * @param {string} lastName - Last name of user
  * @param {string} email - Email of user
@@ -75,24 +76,27 @@ const createUserWithFields = async (
 };
 
 /**
- * Get a user by id
+ * Get a user by UUID
  * @function
- * @param {number} id - ID of user to fetch
+ * @param {string} id - UUID of user to fetch
  * @return {?User} User with given id
  */
-const getUserByID = async (id: number): Promise<?User> => {
+const getUserByID = async (id: string): Promise<?User> => {
   try {
-    return await db().findOne(id);
+    return await db().createQueryBuilder('users')
+      .where('users.uuid = :userID')
+      .setParameters({ userID: id })
+      .getOne();
   } catch (e) {
-    throw LogUtils.logErr(`Problem getting user by id: ${id}`, e);
+    throw LogUtils.logErr(`Problem getting user by UUID: ${id}`, e);
   }
 };
 
 /**
- * Get a user by google id
+ * Get a user by googleID
  * @function
- * @param {string} googleID - Google id of user to fetch
- * @return {?User} User with given google id
+ * @param {string} googleID - GoogleID of user to fetch
+ * @return {?User} User with given googleID
  */
 const getUserByGoogleID = async (googleID: string): Promise<?User> => {
   try {
@@ -118,37 +122,35 @@ const getUsers = async (): Promise<Array<?User>> => {
 };
 
 /**
- * Gets all users from list of ids but also filters out using another list of ids
+ * Gets all users from list of UUIDs but also filters out using another list of UUIDs
  * @function
- * @param {number[]} userIDs - List of ids to fetch users from
- * @param {?number[]} filter - List of ids to filter out
+ * @param {string[]} userIDs - List of UUIDs to fetch users from
+ * @param {?string[]} filter - List of UUIDs to filter out
  * @return {User[]} List of users resulting from given params
  */
-const getUsersFromIDs = async (
-  userIDs: number[],
-  filter: ?number[],
-): Promise<?Array<User>> => {
+const getUsersFromIDs = async (userIDs: string[], filter: ?string[]):
+Promise<?Array<User>> => {
   try {
-    const ids = `(${String(userIDs)})`;
-    let query = `users.id IN ${ids}`;
+    const strIDs = userIDs.map(str => `'${str}'`).join(',');
+    let query = `users.uuid IN (${strIDs})`;
     if (filter && filter.length > 0) {
-      const f = `(${String(filter)})`;
-      query += ` AND users.id not IN ${f}`;
+      const strFilter = filter.map(str => `'${str}'`).join(',');
+      query += ` AND users.uuid not IN (${strFilter})`;
     }
     return await db().createQueryBuilder('users')
       .where(query)
       .getMany();
   } catch (e) {
-    throw LogUtils.logErr('Problem getting users from ids', e, { userIDs, filter });
+    throw LogUtils.logErr('Problem getting users from UUIDs', e, { userIDs, filter });
   }
 };
 
 /**
- * Gets all users from list of google ids but also filters out using another
+ * Gets all users from list of googleIDs but also filters out using another
  * list of google ids
  * @function
- * @param {number[]} googleIDs - List of google ids to fetch users from
- * @param {?number[]} filter - List of ids to filter out
+ * @param {string[]} googleIDs - List of googleIDs to fetch users from
+ * @param {?string[]} filter - List of googlleIDs to filter out
  * @return {User[]} List of users resulting from given params
  */
 const getUsersByGoogleIDs = async (
@@ -170,37 +172,35 @@ const getUsersByGoogleIDs = async (
 };
 
 /**
- * Delete a user
+ * Delete a user by UUID
  * @function
- * @param {number} id - ID of user to delete
+ * @param {string} id - UUID of user to delete
  */
-const deleteUserByID = async (id: number) => {
+const deleteUserByID = async (id: string) => {
   try {
-    const user = await db().findOne(id);
+    const user = await getUserByID(id);
     await UserSessionsRepo.deleteSessionFromUserID(id);
     await db().remove(user);
   } catch (e) {
-    throw LogUtils.logErr(`Problem deleting user by id: ${id}`, e);
+    throw LogUtils.logErr(`Problem deleting user by UUID: ${id}`, e);
   }
 };
 
 /**
  * Gets all groups that a user is in
  * @function
- * @param {number} id - ID of user to fetch groups for
+ * @param {string} id - UUID of user to fetch groups for
  * @param {?string} role - Specifies role which we want to fetch groups for
  * Ex. If role is admin, we fetch all groups the user is an admin of.
  * @return {Session[]} List of groups for given user
  */
-const getGroupsByID = async (
-  id: number,
-  role: ?string,
-): Promise<Array<?Group>> => {
+const getGroupsByID = async (id: string, role: ?string):
+    Promise<Array<?Group>> => {
   try {
     const user = await db().createQueryBuilder('users')
       .leftJoinAndSelect('users.memberGroups', 'memberGroups')
       .leftJoinAndSelect('users.adminGroups', 'adminGroups')
-      .where('users.id = :userID')
+      .where('users.uuid = :userID')
       .setParameters({ userID: id })
       .getOne();
     if (role === constants.USER_TYPES.ADMIN) {

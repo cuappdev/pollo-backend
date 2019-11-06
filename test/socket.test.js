@@ -58,7 +58,7 @@ beforeAll(async () => {
   const server: http.Server = http.createServer(express());
   const io = SocketIO(server);
   group = await GroupsRepo.createGroup('Group 1', 'ABC123', null, null);
-  groupSocket = new GroupSocket({ group, nsp: io.of(`/${group.id}`), onClose: null });
+  groupSocket = new GroupSocket({ group, nsp: io.of(`/${group.uuid}`), onClose: null });
   mockClient = groupSocket.nsp.to('members');
 });
 
@@ -242,9 +242,9 @@ test('End poll (FR)', async () => {
 
   expect(groupSocket.current).toBeNull();
 
-  const polls = await GroupsRepo.getPolls(group.id);
+  const polls = await GroupsRepo.getPolls(group.uuid);
   const createdPoll = polls[0];
-  createdPollID = createdPoll.id;
+  createdPollID = createdPoll.uuid;
 
   expect(createdPoll.text).toBe(pollFR.text);
   expect(createdPoll.type).toBe(pollFR.type);
@@ -259,13 +259,13 @@ test('Delete poll', async () => {
   // eslint-disable-next-line no-underscore-dangle
   await groupSocket._deletePoll(createdPollID);
 
-  const polls = await GroupsRepo.getPolls(group.id);
+  const polls = await GroupsRepo.getPolls(group.uuid);
   expect(polls.length).toBe(0);
 });
 
 // Teardown
 afterAll(async () => {
-  await GroupsRepo.deleteGroupByID(group.id);
+  await GroupsRepo.deleteGroupByID(group.uuid);
   // eslint-disable-next-line no-console
   console.log('Passed all socket tests');
 });

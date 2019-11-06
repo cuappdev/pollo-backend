@@ -254,9 +254,9 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Draft ID",
+            "description": "Draft UUID",
             "required": true,
-            "type": "integer"
+            "type": "string"
           },
           {
             "name": "body",
@@ -312,9 +312,9 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Draft ID",
+            "description": "Draft UUID",
             "required": true,
-            "type": "integer"
+            "type": "string"
           }
         ],
         "responses": {
@@ -441,9 +441,9 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Group ID",
+            "description": "Group UUID",
             "required": true,
-            "type": "integer"
+            "type": "string"
           }
         ],
         "responses": {
@@ -483,9 +483,9 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Group ID",
+            "description": "Group UUID",
             "required": true,
-            "type": "integer"
+            "type": "string"
           },
           {
             "in": "body",
@@ -541,9 +541,9 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Group ID",
+            "description": "Group UUID",
             "required": true,
-            "type": "integer"
+            "type": "string"
           }
         ],
         "responses": {
@@ -648,9 +648,9 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Group ID",
+            "description": "Group UUID",
             "required": true,
-            "type": "integer"
+            "type": "string"
           }
         ],
         "responses": {
@@ -693,14 +693,14 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Group ID",
+            "description": "Group UUID",
             "required": true,
-            "type": "integer"
+            "type": "string"
           },
           {
             "name": "body",
             "in": "body",
-            "description": "Member IDs",
+            "description": "Member UUIDs",
             "required": true,
             "schema": {
               "type": "object",
@@ -708,7 +708,7 @@
                 "memberIDs": {
                   "type": "array",
                   "items": {
-                    "type": "integer"
+                    "type": "string"
                   }
                 }
               }
@@ -752,14 +752,14 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Group ID",
+            "description": "Group UUID",
             "required": true,
-            "type": "integer"
+            "type": "string"
           },
           {
             "name": "body",
             "in": "body",
-            "description": "Member IDs",
+            "description": "Member UUIDs",
             "required": true,
             "schema": {
               "type": "object",
@@ -767,7 +767,7 @@
                 "memberIDs": {
                   "type": "array",
                   "items": {
-                    "type": "integer"
+                    "type": "string"
                   }
                 }
               }
@@ -809,9 +809,9 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Group ID",
+            "description": "Group UUID",
             "required": true,
-            "type": "integer"
+            "type": "string"
           }
         ],
         "responses": {
@@ -850,9 +850,9 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Group ID",
+            "description": "Group UUID",
             "required": true,
-            "type": "integer"
+            "type": "string"
           }
         ],
         "responses": {
@@ -895,14 +895,14 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Group ID",
+            "description": "Group UUID",
             "required": true,
-            "type": "integer"
+            "type": "string"
           },
           {
             "name": "body",
             "in": "body",
-            "description": "Admin IDs",
+            "description": "Admin UUIDs",
             "required": true,
             "schema": {
               "type": "object",
@@ -910,7 +910,7 @@
                 "adminIDs": {
                   "type": "array",
                   "items": {
-                    "type": "integer"
+                    "type": "string"
                   }
                 }
               }
@@ -951,14 +951,14 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Group ID",
+            "description": "Group UUID",
             "required": true,
-            "type": "integer"
+            "type": "string"
           },
           {
             "name": "body",
             "in": "body",
-            "description": "Admin IDs",
+            "description": "Admin UUIDs",
             "required": true,
             "schema": {
               "type": "object",
@@ -966,7 +966,7 @@
                 "adminIDs": {
                   "type": "array",
                   "items": {
-                    "type": "integer"
+                    "type": "string"
                   }
                 }
               }
@@ -1010,9 +1010,9 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Poll ID",
+            "description": "Poll UUID",
             "required": true,
-            "type": "integer"
+            "type": "string"
           }
         ],
         "responses": {
@@ -1052,9 +1052,9 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Poll ID",
+            "description": "Poll UUID",
             "required": true,
-            "type": "integer"
+            "type": "string"
           },
           {
             "name": "body",
@@ -1107,9 +1107,9 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Poll ID",
+            "description": "Poll UUID",
             "required": true,
-            "type": "integer"
+            "type": "string"
           }
         ],
         "responses": {
@@ -1147,9 +1147,9 @@
           {
             "name": "id",
             "in": "path",
-            "description": "Group ID",
+            "description": "Group UUID",
             "required": true,
-            "type": "integer"
+            "type": "string"
           }
         ],
         "responses": {
@@ -1375,8 +1375,9 @@
         "parameters": [
           {
             "name": "pollID",
+            "description": "poll UUID",
             "in": "body",
-            "type": "integer"
+            "type": "string"
           }
         ]
       }
@@ -1390,8 +1391,9 @@
         "parameters": [
           {
             "name": "pollID",
+            "description": "poll UUID",
             "in": "body",
-            "type": "integer"
+            "type": "string"
           }
         ]
       }
@@ -1463,8 +1465,9 @@
         "parameters": [
           {
             "name": "pollID",
+            "description": "poll UUID",
             "in": "body",
-            "type": "integer"
+            "type": "string"
           }
         ]
       }
@@ -1556,7 +1559,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "integer"
+          "type": "string"
         },
         "createdAt": {
           "type": "string",
@@ -1572,20 +1575,31 @@
         },
         "text": {
           "type": "string"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp (Unix time)",
+          "example": "1555351053"
         }
       },
       "required": [
         "id",
         "createdAt",
         "options",
-        "text"
+        "text",
+        "updatedAt"
       ]
     },
     "Group": {
       "type": "object",
       "properties": {
         "id": {
-          "type": "integer"
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp (Unix time)",
+          "example": "1555351053"
         },
         "code": {
           "type": "string"
@@ -1604,6 +1618,7 @@
       },
       "required": [
         "id",
+        "createdAt",
         "code",
         "isLive",
         "name",
@@ -1615,7 +1630,7 @@
       "description": "NOTE: A poll in socket is saved to database when poll ends",
       "properties": {
         "id": {
-          "type": "integer"
+          "type": "string"
         },
         "answerChoices": {
           "type": "array",
@@ -1703,9 +1718,12 @@
       "required": [
         "id",
         "answerChoices",
+        "correctAnswer",
+        "createdAt",
         "state",
         "text",
         "type",
+        "updatedAt",
         "userAnswers"
       ]
     },
@@ -1715,7 +1733,8 @@
         "letter": {
           "type": "string",
           "description": "Letter identifier of answer choice (MC only)",
-          "example": "A"
+          "example": "A",
+          "nullable": true
         },
         "text": {
           "type": "string",
@@ -1724,6 +1743,7 @@
         }
       },
       "required": [
+        "letter",
         "text"
       ]
     },
@@ -1732,12 +1752,14 @@
       "properties": {
         "count": {
           "type": "integer",
-          "description": "Number of times choice was selected or upvoted<br/>`Null` when user is member & poll is MC & poll is live"
+          "description": "Number of times choice was selected or upvoted<br/>`Null` when user is member & poll is MC & poll is live",
+          "nullable": true
         },
         "letter": {
           "type": "string",
           "description": "Letter identifier of answer choice (MC only)",
-          "example": "A"
+          "example": "A",
+          "nullable": true
         },
         "text": {
           "type": "string",
@@ -1746,6 +1768,8 @@
         }
       },
       "required": [
+        "count",
+        "letter",
         "text"
       ]
     },
@@ -1753,17 +1777,7 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "integer"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp (Unix time)",
-          "example": "1555351053"
-        },
-        "updatedAt": {
-          "type": "string",
-          "description": "Timestamp (Unix time)",
-          "example": "1555351053"
+          "type": "string"
         },
         "answerChoices": {
           "type": "array",
@@ -1776,6 +1790,11 @@
           "type": "string",
           "example": "A",
           "description": "Letter of correct answer choice (MC only)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp (Unix time)",
+          "example": "1555351053"
         },
         "state": {
           "type": "string",
@@ -1797,6 +1816,11 @@
             "multipleChoice",
             "freeResponse"
           ]
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp (Unix time)",
+          "example": "1555351053"
         },
         "userAnswers": {
           "type": "object",
@@ -1837,7 +1861,17 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "integer"
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp (Unix time)",
+          "example": "1555351053"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp (Unix time)",
+          "example": "1555351053"
         },
         "name": {
           "type": "string"
@@ -1848,6 +1882,8 @@
       },
       "required": [
         "id",
+        "createdAt",
+        "updatedAt",
         "name",
         "netID"
       ]
@@ -1861,18 +1897,18 @@
         "refreshToken": {
           "type": "string"
         },
-        "sessionExpiration": {
-          "type": "string"
-        },
         "isActive": {
           "type": "boolean"
+        },
+        "sessionExpiration": {
+          "type": "string"
         }
       },
       "required": [
         "accessToken",
         "refreshToken",
-        "sessionExpiration",
-        "isActive"
+        "isActive",
+        "sessionExpiration"
       ]
     }
   }

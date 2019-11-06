@@ -27,14 +27,14 @@ beforeAll(async () => {
 test('Get user', async () => {
   await request(get('/users/', token)).then((getres) => {
     expect(getres.success).toBe(true);
-    expect(user.id).toBe(getres.data.id);
+    expect(user.uuid).toBe(getres.data.id);
     expect(user.netID).toBe(getres.data.netID);
   });
 });
 
 afterAll(async () => {
-  await UsersRepo.deleteUserByID(user.id);
-  await UserSessionsRepo.deleteSession(session.id);
+  await UsersRepo.deleteUserByID(user.uuid);
+  await UserSessionsRepo.deleteSession(session.uuid);
   // eslint-disable-next-line no-console
   console.log('Passed all user route tests');
 });

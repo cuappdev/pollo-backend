@@ -7,8 +7,11 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import uuidv4 from 'uuid/v4';
 import Base from './Base';
 import User from './User';
+
+import type { APIUserSession } from '../routers/v2/APITypes';
 
 /**
  * UserSession class represents the sessions used for authentication.
@@ -16,9 +19,9 @@ import User from './User';
  */
 @Entity('usersessions')
 class UserSession extends Base {
-  /** Unique identifier */
-  @PrimaryGeneratedColumn()
-  id: any = null;
+  /** Universally unique identifier */
+  @PrimaryGeneratedColumn('uuid')
+  uuid: string = uuidv4();
 
   /** Access token associated with session */
   @Column('character varying')
@@ -95,6 +98,15 @@ class UserSession extends Base {
   logOut(): UserSession {
     this.isActive = false;
     return this;
+  }
+
+  serialize(): APIUserSession {
+    return {
+      accessToken: this.sessionToken,
+      isActive: this.isActive,
+      refreshToken: this.updateToken,
+      sessionExpiration: this.expiresAt,
+    };
   }
 }
 

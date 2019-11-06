@@ -23,7 +23,8 @@ class DeleteMembersRouter extends AppDevRouter<NoResponse> {
       body: { memberIDs },
     } = req;
 
-    if (!memberIDs) throw LogUtils.logErr('List of member ids missing');
+    if (!memberIDs) throw LogUtils.logErr('List of member UUIDs missing');
+
     if (!await GroupsRepo.isAdmin(groupID, user)) {
       throw LogUtils.logErr(
         'You are not authorized to remove members from this group', {}, { groupID, user },

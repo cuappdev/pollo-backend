@@ -19,7 +19,7 @@ export type GroupSocketConfig = {
   onClose: void => void
 };
 
-type id = number;
+type id = string;
 type IOSocket = Object;
 
 /** Poll object used in GroupSockets
@@ -347,7 +347,7 @@ _endPoll = async () => {
 
 /**
  * Deletes a poll that is already saved to database
- * @param {id} pollID - Poll ID to delete
+ * @param {id} pollID - Poll UUID to delete
  */
 _deletePoll = async (pollID: id) => {
   await PollsRepo.deletePollByID(pollID);
