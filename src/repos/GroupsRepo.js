@@ -1,17 +1,14 @@
 // @flow
-import { getConnectionManager, Repository } from 'typeorm';
-import LogUtils from '../utils/LogUtils';
-import Poll from '../models/Poll';
-import Question from '../models/Question';
+import { getRepository, Repository } from 'typeorm';
+import UsersRepo from './UsersRepo';
 import Group from '../models/Group';
+import Poll from '../models/Poll';
 import User from '../models/User';
 import appDevUtils from '../utils/AppDevUtils';
 import constants from '../utils/Constants';
-import UsersRepo from './UsersRepo';
+import LogUtils from '../utils/LogUtils';
 
-import type { Coord } from '../models/Group';
-
-const db = (): Repository<Group> => getConnectionManager().get().getRepository(Group);
+const db = (): Repository<Group> => getRepository(Group);
 
 /** Contains all group codes used mapped to group id */
 const groupCodes = {};
@@ -22,31 +19,30 @@ const groupCodes = {};
  * @param {string} name - Name of group
  * @param {string} code - Unique code used to join group
  * @param {User} [user] - Admin of group
- * @param {?Coord} location - Location of group admin
  * @return {Group} Created group
  */
-const createGroup = async (name: string, code: string, user: ?User, location: ?Coord):
-  Promise<Group> => {
+const createGroup = async (
+  name: string,
+  code: string,
+  user: ?User,
+): Promise<Group> => {
   try {
     const group = new Group();
     group.name = name;
     group.code = code;
-    group.location = location || { lat: null, long: null };
-    group.isFilterActivated = true;
-    group.isLocationRestricted = false;
     group.admins = user ? [user] : [];
+    group.polls = [];
+    group.members = [];
 
     if (groupCodes[code]) {
       throw LogUtils.logErr(`Group code is already in use: ${code}`);
     }
-
-    await db().persist(group);
+    await db().save(group);
     groupCodes[group.code] = group.uuid;
-
     return group;
   } catch (e) {
     throw LogUtils.logErr('Problem creating group', e, {
-      name, code, user, location,
+      name, code, user,
     });
   }
 };
@@ -61,7 +57,6 @@ const createCode = (): string => {
   do {
     code = appDevUtils.randomCode(6);
   } while (groupCodes[code]);
-
   return code;
 };
 
@@ -119,48 +114,23 @@ const deleteGroupByID = async (id: string) => {
  * @function
  * @param {string} id - UUID of group to update
  * @param {?name} name - New group name
- * @param {?Coord} location - Most recent location of the group admin
- * @param {boolean} isRestricted - If joining a group is restricted by location
- * @param {boolean} isActivated - If profanity filter is on
  * @return {?Group} Updated group
  */
-const updateGroupByID = async (id: string, name: ?string, location: ?Coord,
-  isRestricted: ?boolean, isActivated: ?boolean):
+const updateGroupByID = async (id: string, name: ?string):
   Promise<?Group> => {
   try {
     const group = await db().createQueryBuilder('groups')
       .leftJoinAndSelect('groups.admins', 'admins')
       .leftJoinAndSelect('groups.members', 'members')
       .leftJoinAndSelect('groups.polls', 'polls')
-      .leftJoinAndSelect('groups.questions', 'questions')
       .where('groups.uuid = :groupID', { groupID: id })
       .getOne();
 
     if (name) group.name = name;
-    if (location && location.lat && location.long) group.location = location;
-    if (isRestricted !== null && isRestricted !== undefined) group.isLocationRestricted = isRestricted;
-    if (isActivated !== null && isActivated !== undefined) group.isFilterActivated = isActivated;
-    await db().persist(group);
+    await db().save(group);
     return group;
   } catch (e) {
-    throw LogUtils.logErr(`Problem updating group's location restriction: ${id}`, e, { isRestricted });
-  }
-};
-
-/**
- * Check if joining a group is location restricted
- * @param {string} id - UUID of group
- * @return {?boolean} If the group is location restricted
- */
-const isLocationRestricted = async (id: string): Promise<?boolean> => {
-  try {
-    const group = await db().createQueryBuilder('groups')
-      .where('groups.uuid = :groupID')
-      .setParameters({ groupID: id })
-      .getOne();
-    return group.isLocationRestricted;
-  } catch (e) {
-    throw LogUtils.logErr(`Problem getting location restriction for group: ${id}`, e);
+    throw LogUtils.logErr(`Problem updating group's name: ${id}`, e);
   }
 };
 
@@ -179,7 +149,6 @@ const addUsersByGoogleIDs = async (id: string, googleIDs: string[],
       .leftJoinAndSelect('groups.admins', 'admins')
       .leftJoinAndSelect('groups.members', 'members')
       .leftJoinAndSelect('groups.polls', 'polls')
-      .leftJoinAndSelect('groups.questions', 'questions')
       .where('groups.uuid = :groupID')
       .setParameters({ groupID: id })
       .getOne();
@@ -196,10 +165,14 @@ const addUsersByGoogleIDs = async (id: string, googleIDs: string[],
         group.members = group.members.concat(users);
       }
     }
-    await db().persist(group);
+    await db().save(group);
     return group;
   } catch (e) {
-    throw LogUtils.logErr(`Problem adding users to group ${id} by google ids`, e, { googleIDs, role });
+    throw LogUtils.logErr(
+      `Problem adding users to group ${id} by google ids`,
+      e,
+      { googleIDs, role },
+    );
   }
 };
 
@@ -218,7 +191,6 @@ const addUsersByIDs = async (id: string, userIDs: string[],
       .leftJoinAndSelect('groups.admins', 'admins')
       .leftJoinAndSelect('groups.members', 'members')
       .leftJoinAndSelect('groups.polls', 'polls')
-      .leftJoinAndSelect('groups.questions', 'questions')
       .where('groups.uuid = :groupID')
       .setParameters({ groupID: id })
       .getOne();
@@ -233,7 +205,7 @@ const addUsersByIDs = async (id: string, userIDs: string[],
         group.members = group.members.concat(members);
       }
     }
-    await db().persist(group);
+    await db().save(group);
     return group;
   } catch (e) {
     console.log(e);
@@ -256,7 +228,6 @@ const removeUserByGroupID = async (id: string, userIDs: string[], role: ?string)
       .leftJoinAndSelect('groups.admins', 'admins')
       .leftJoinAndSelect('groups.members', 'members')
       .leftJoinAndSelect('groups.polls', 'polls')
-      .leftJoinAndSelect('groups.questions', 'questions')
       .where('groups.uuid = :groupID')
       .setParameters({ groupID: id })
       .getOne();
@@ -267,7 +238,7 @@ const removeUserByGroupID = async (id: string, userIDs: string[], role: ?string)
       } else {
         group.members = group.members.filter(member => !userIDs.includes(member.uuid));
       }
-      await db().persist(group);
+      await db().save(group);
     }
     return group;
   } catch (e) {
@@ -290,7 +261,6 @@ const isAdmin = async (id: string, user: User):
       .where('groups.uuid = :groupID')
       .setParameters({ groupID: id })
       .getOne();
-
     const admin = group.admins.find(x => x.googleID === user.googleID);
     return admin !== undefined;
   } catch (e) {
@@ -313,7 +283,6 @@ const isMember = async (id: string, user: User):
       .where('groups.uuid = :groupID')
       .setParameters({ groupID: id })
       .getOne();
-
     const member = group.members.find(x => x.googleID === user.googleID);
     return member !== undefined;
   } catch (e) {
@@ -367,11 +336,12 @@ const getPolls = async (id: string, hideUnsharedResults: ?boolean = true):
       .setParameters({ groupID: id })
       .orderBy('polls.createdAt', 'ASC')
       .getOne();
-
     // obscure poll results if poll not shared
     return group.polls.map((poll) => {
-      if (hideUnsharedResults && poll.state !== constants.POLL_STATES.SHARED
-        && poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE) {
+      if (
+        hideUnsharedResults && poll.state !== constants.POLL_STATES.SHARED
+        && poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
+      ) {
         poll.answerChoices = poll.answerChoices.map((choice) => {
           delete choice.count;
           return choice;
@@ -385,26 +355,6 @@ const getPolls = async (id: string, hideUnsharedResults: ?boolean = true):
 };
 
 /**
- * Get questions from a group sorted by creation date in ascending order.
- * @function
- * @param {string} id - UUID of group to fetch questions from
- * @return {Question[]} List of questions rom group
- */
-const getQuestions = async (id: string): Promise<Array<?Question>> => {
-  try {
-    const group = await db().createQueryBuilder('groups')
-      .leftJoinAndSelect('groups.questions', 'questions')
-      .where('groups.uuid = :groupID')
-      .setParameters({ groupID: id })
-      .orderBy('questions.createdAt', 'ASC')
-      .getOne();
-    return group.questions;
-  } catch (e) {
-    throw LogUtils.logErr(`Problem getting questions from group: ${id}`, e);
-  }
-};
-
-/**
  * Get time of latest activity of a group
  * @function
  * @param {string} id - UUID of group to get latest activity
@@ -414,7 +364,6 @@ const latestActivityByGroupID = async (id: string): Promise<string> => {
   try {
     const group = await getGroupByID(id);
     if (!group) throw LogUtils.logErr(`Can't find group by id: ${id}`);
-
     return await getPolls(id).then((polls: Array<?Poll>) => {
       const latestPoll = polls.slice(-1).pop();
       if (polls.length === 0 || !latestPoll) {
@@ -437,14 +386,12 @@ export default {
   getGroupByID,
   getGroupID,
   updateGroupByID,
-  isLocationRestricted,
   addUsersByGoogleIDs,
   removeUserByGroupID,
   getUsersByGroupID,
   isAdmin,
   isMember,
   getPolls,
-  getQuestions,
   addUsersByIDs,
   latestActivityByGroupID,
 };

@@ -18,10 +18,6 @@ export class ChangeID1557207656455 implements MigrationInterface {
     await queryRunner
       .query('ALTER TABLE "polls" ADD CONSTRAINT "polls_uuid" UNIQUE ("uuid")');
     await queryRunner
-      .query('ALTER TABLE "questions" ADD COLUMN "uuid" uuid default uuid_generate_v4()');
-    await queryRunner
-      .query('ALTER TABLE "questions" ADD CONSTRAINT "questions_uuid" UNIQUE ("uuid")');
-    await queryRunner
       .query('ALTER TABLE "users" ADD COLUMN "uuid" uuid default uuid_generate_v4()');
     await queryRunner
       .query('ALTER TABLE "users" ADD CONSTRAINT "users_uuid" UNIQUE ("uuid")');
@@ -38,8 +34,6 @@ export class ChangeID1557207656455 implements MigrationInterface {
       .query('ALTER TABLE "groups" DROP COLUMN "uuid"');
     await queryRunner
       .query('ALTER TABLE "polls" DROP COLUMN "uuid"');
-    await queryRunner
-      .query('ALTER TABLE "questions" DROP COLUMN "uuid"');
     await queryRunner
       .query('ALTER TABLE "users" DROP COLUMN "uuid"');
     await queryRunner

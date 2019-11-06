@@ -1,8 +1,8 @@
 // @flow
 import { Request } from 'express';
+import GroupsRepo from '../../repos/GroupsRepo';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/Constants';
-import GroupsRepo from '../../repos/GroupsRepo';
 import LogUtils from '../../utils/LogUtils';
 
 import type { APIGroup } from './APITypes';
@@ -17,18 +17,16 @@ class StartGroupRouter extends AppDevRouter<APIGroup> {
   }
 
   async content(req: Request) {
-    const { code, location } = req.body;
+    const { code } = req.body;
     let { name } = req.body;
 
     if (!name) name = '';
-
     if (!code) {
       throw LogUtils.logErr('Code required');
     }
 
-    const group = await GroupsRepo.createGroup(name, code, req.user, location);
+    const group = await GroupsRepo.createGroup(name, code, req.user);
     await req.app.groupManager.startNewGroup(group);
-
     return {
       ...group.serialize(),
       isLive: true,

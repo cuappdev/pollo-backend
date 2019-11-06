@@ -1,8 +1,8 @@
 // @flow
 import { Request } from 'express';
+import DraftsRepo from '../../../repos/DraftsRepo';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';
-import DraftsRepo from '../../../repos/DraftsRepo';
 import LogUtils from '../../../utils/LogUtils';
 
 import type { APIDraft } from '../APITypes';
@@ -26,7 +26,7 @@ class UpdateDraftRouter extends AppDevRouter<APIDraft> {
       throw LogUtils.logErr('No fields specified to update', {}, { options, text });
     }
 
-    if (admin.id !== req.user.id) {
+    if (admin.uuid !== req.user.uuid) {
       throw LogUtils.logErr('Not authorized to update draft', {},
         { admin: admin.uuid, id: req.user.uuid });
     }

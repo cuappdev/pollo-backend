@@ -11,9 +11,8 @@ const {
 // Groups
 // Must be running server to test
 
-const opts = { name: 'Test group', code: GroupsRepo.createCode(), location: { lat: 1, long: -0.5 } };
+const opts = { name: 'Test group', code: GroupsRepo.createCode() };
 const opts2 = { name: 'New group' };
-const opts3 = { isRestricted: true };
 const googleID = 'usertest';
 let adminToken;
 let userToken;
@@ -124,33 +123,6 @@ test('Get members of group', async () => {
     expect(members.length).toBe(1);
     expect(members[0].id).toBe(userID);
   });
-});
-
-test('Get group location restriction', async () => {
-  const isRestricted = await GroupsRepo.isLocationRestricted(group.id);
-  expect(isRestricted).toBe(false);
-});
-
-test('Update group location restriction', async () => {
-  await request(put(`/sessions/${group.id}/`, opts3, adminToken)).then((getres) => {
-    expect(getres.success).toBe(true);
-    expect(getres.data.isLocationRestricted).toBe(true);
-  });
-});
-
-test('Update group location as admin with non-null location', async () => {
-  const updatedGroup = await GroupsRepo.updateGroupByID(group.id, null, opts.location);
-  expect(updatedGroup.location).toEqual(opts.location);
-});
-
-test('Update group location as admin with null location', async () => {
-  const updatedGroup = await GroupsRepo.updateGroupByID(group.id, null, { lat: null, long: null });
-  expect(updatedGroup.location).toEqual(group.location);
-});
-
-test('Update profanity filter group control', async () => {
-  const updatedGroup = await GroupsRepo.updateGroupByID(group.id, null, null, false);
-  expect(updatedGroup.isFilterActivated).toEqual(group.isFilterActivated);
 });
 
 test('Leave group', async () => {

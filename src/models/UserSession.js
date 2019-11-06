@@ -1,4 +1,5 @@
 // @flow
+import crypto from 'crypto';
 import {
   Column,
   Entity,
@@ -6,41 +7,41 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import crypto from 'crypto';
+import uuidv4 from 'uuid/v4';
 import Base from './Base';
 import User from './User';
 
 import type { APIUserSession } from '../routers/v2/APITypes';
 
-@Entity('usersessions')
 /**
  * UserSession class represents the sessions used for authentication.
  * @extends {Base}
  */
+@Entity('usersessions')
 class UserSession extends Base {
-  @PrimaryGeneratedColumn()
-  /** Unique identifier */
-  id: any = null;
+  /** Universally unique identifier */
+  @PrimaryGeneratedColumn('uuid')
+  uuid: string = uuidv4();
 
-  @Column('string')
   /** Access token associated with session */
+  @Column('character varying')
   sessionToken: string = '';
 
-  @Column('bigint')
   /** Timestamp of when the session expires (Unix time) */
+  @Column('bigint')
   expiresAt: string = '-1';
 
-  @Column('string')
   /** Refresh token associated with session */
+  @Column('character varying')
   updateToken: string = '';
 
-  @Column('boolean')
   /** Whether the session is active or not */
+  @Column('boolean')
   isActive: boolean = true;
 
+  /** User that the session belongs to */
   @OneToOne(type => User)
   @JoinColumn()
-  /** User that the session belongs to */
   user: ?User = null;
 
   /**
@@ -51,8 +52,11 @@ class UserSession extends Base {
    * @param {string} [refreshToken] - update token for session
    * @return {UserSession} session created using parameters
    */
-  static fromUser(user: User, accessToken: ?string, refreshToken: ?string):
-    UserSession {
+  static fromUser(
+    user: User,
+    accessToken: ?string,
+    refreshToken: ?string,
+  ): UserSession {
     const session = new UserSession();
     session.user = user;
     session.update(accessToken, refreshToken);

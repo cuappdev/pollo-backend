@@ -1,12 +1,13 @@
 // @flow
-import { getConnectionManager, Repository } from 'typeorm';
-import LogUtils from '../utils/LogUtils';
+import { getRepository, Repository } from 'typeorm';
+import Group from '../models/Group';
 import Poll from '../models/Poll';
+import LogUtils from '../utils/LogUtils';
+
 import type { PollChoice, PollResult } from '../models/Poll';
 import type { PollType, PollState } from '../utils/Constants';
-import Group from '../models/Group';
 
-const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Poll);
+const db = (): Repository<Poll> => getRepository(Poll);
 
 /**
  * Create a poll and saves it to the db
@@ -21,26 +22,39 @@ const db = (): Repository<Poll> => getConnectionManager().get().getRepository(Po
  * @param {string: PollChoice[]} upvotes - upvotes given from students
  * @return {Poll} New poll created
  */
-const createPoll = async (text: string, group: ?Group, answerChoices: PollResult[],
-  type: PollType, correctAnswer: ?string, answers: ?{ string: PollChoice[] },
-  state: PollState, upvotes: ?{ string: PollChoice[] }):
-  Promise<Poll> => {
+const createPoll = async (
+  text: string,
+  group: ?Group,
+  answerChoices: PollResult[],
+  type: PollType,
+  correctAnswer: ?string,
+  answers: ?{ string: PollChoice[] },
+  state: PollState,
+  upvotes: ?{ string: PollChoice[] },
+): Promise<Poll> => {
   try {
     const poll = new Poll();
     poll.answerChoices = answerChoices;
     poll.correctAnswer = correctAnswer || '';
-    if (group) poll.group = group;
     poll.state = state;
     poll.text = text;
     poll.type = type;
+    if (group) poll.group = group;
     if (answers) poll.answers = answers;
     if (upvotes) poll.upvotes = upvotes;
-    await db().persist(poll);
+    await db().save(poll);
     return poll;
   } catch (e) {
     console.log(e);
     throw LogUtils.logErr('Problem creating poll', e, {
-      text, group, answerChoices, type, correctAnswer, answers, state, upvotes,
+      text,
+      group,
+      answerChoices,
+      type,
+      correctAnswer,
+      answers,
+      state,
+      upvotes,
     });
   }
 };
@@ -96,14 +110,12 @@ const updatePollByID = async (id: string, text: ?string, answerChoices: ?PollRes
       .where('polls.uuid = :pollID')
       .setParameters({ pollID: id })
       .getOne();
-
     if (text !== undefined && text !== null) poll.text = text;
     if (answerChoices) poll.answerChoices = answerChoices;
     if (answers) poll.answers = answers;
     if (upvotes) poll.upvotes = upvotes;
     if (state) poll.state = state;
-
-    await db().persist(poll);
+    await db().save(poll);
     return poll;
   } catch (e) {
     throw LogUtils.logErr(`Problem updating poll by UUID: ${id}`, e);

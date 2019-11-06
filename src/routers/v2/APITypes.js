@@ -1,5 +1,4 @@
 // @flow
-import type { Coord } from '../../models/Group';
 import type { PollChoice, PollState, PollType } from '../../utils/Constants';
 import type { PollResult } from '../../models/Poll';
 
@@ -18,10 +17,7 @@ export type APIGroup = {|
   createdAt: string,
   updatedAt: string,
   code: string,
-  isFilterActivated: boolean,
   isLive: boolean,
-  isLocationRestricted: boolean,
-  location: Coord,
   name: string,
 |}
 
@@ -42,13 +38,6 @@ export type APIDraft = {|
   createdAt: string,
   updatedAt: string,
   options: string[],
-  text: string,
-|}
-
-export type APIQuestion = {|
-  id: string,
-  createdAt: string,
-  updatedAt: string,
   text: string,
 |}
 

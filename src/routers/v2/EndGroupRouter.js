@@ -1,8 +1,8 @@
 // @flow
 import { Request } from 'express';
+import GroupsRepo from '../../repos/GroupsRepo';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/Constants';
-import GroupsRepo from '../../repos/GroupsRepo';
 import LogUtils from '../../utils/LogUtils';
 
 import type { NoResponse } from '../../utils/AppDevRouter';
@@ -18,7 +18,6 @@ class EndGroupRouter extends AppDevRouter<NoResponse> {
 
   async content(req: Request) {
     const { id, save } = req.params;
-
     const group = await GroupsRepo.getGroupByID(id);
     if (!group) {
       throw LogUtils.logErr(`No group with UUID ${id} found`);

@@ -1,7 +1,6 @@
 import GroupsRepo from '../../src/repos/GroupsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import PollsRepo from '../../src/repos/PollsRepo';
-import QuestionsRepo from '../../src/repos/QuestionsRepo';
 import dbConnection from '../../src/db/DbConnection';
 
 let code;
@@ -57,11 +56,9 @@ test('Get Group by Code', async () => {
 });
 
 test('Update Group', async () => {
-  const group = await GroupsRepo.updateGroupByID(uuid, 'Update Group', null, true, false);
+  const group = await GroupsRepo.updateGroupByID(uuid, 'Update Group');
   expect(group.uuid).toBe(uuid);
   expect(group.name).toBe('Update Group');
-  expect(group.isLocationRestricted).toBe(true);
-  expect(group.isFilterActivated).toBe(false);
 });
 
 test('Get Admins from Group', async () => {
@@ -203,20 +200,6 @@ test('Get Polls from Group', async () => {
 
   await PollsRepo.deletePollByID(poll.uuid);
   await PollsRepo.deletePollByID(poll2.uuid);
-});
-
-test('Get Questions from Group', async () => {
-  const group = await GroupsRepo.getGroupByID(uuid);
-  let questions = await GroupsRepo.getQuestions(uuid);
-  expect(questions.length).toEqual(0);
-
-  const question1 = await QuestionsRepo.createQuestion('Question1', group, user);
-  const question2 = await QuestionsRepo.createQuestion('Question2', group, user2);
-  questions = await GroupsRepo.getQuestions(uuid);
-  expect(questions.length).toEqual(2);
-
-  await QuestionsRepo.deleteQuestionByID(question1.uuid);
-  await QuestionsRepo.deleteQuestionByID(question2.uuid);
 });
 
 test('Delete Group', async () => {

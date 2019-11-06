@@ -5,93 +5,93 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import uuidv4 from 'uuid/v4';
 import Base from './Base';
-import constants from '../utils/Constants';
 import Group from './Group';
 
 import type { APIPoll } from '../routers/v2/APITypes';
 import type { PollType, PollState } from '../utils/Constants';
 
+import constants from '../utils/Constants';
+
 export type PollResult = {|
   letter: ?string,
   text: string,
-  count: ?number
+  count: ?number,
 |}
 
 export type PollChoice = {|
   letter: ?string,
-  text: string
+  text: string,
 |}
 
-@Entity('polls')
 /**
- * Poll class represents a single question
+ * Poll class represents a single poll
  * @extends {Base}
  */
+@Entity('polls')
 class Poll extends Base {
-  @PrimaryGeneratedColumn()
-  /** Unique identifier */
-  id: any = null;
+  /** Universally unique identifier */
+  @PrimaryGeneratedColumn('uuid')
+  uuid: string = uuidv4();
 
-  @Column('string')
-  /** Text of question */
+  /** Text of poll */
+  @Column('character varying')
   text: string = '';
 
-  @Column('string')
-  /** Type of question either multipleChoice or freeResponse */
+  /** Type of poll either multipleChoice or freeResponse */
+  @Column('character varying')
   type: PollType = constants.POLL_TYPES.MULTIPLE_CHOICE;
 
-  @ManyToOne(type => Group, group => group.polls, {
-    onDelete: 'CASCADE',
-  })
   /** Group the poll belongs to */
+  @ManyToOne(type => Group, group => group.polls, { onDelete: 'CASCADE' })
   group: ?Group = null;
 
-  @Column('json')
   /**
    * Choices for the poll
    * @example
    * let answerChoices_mc = [{letter: "A", text: "Saturn", count: 5}]
    * let answerChoices_fr = [{text: "Saturn", count: 10}]
    */
-  answerChoices: PollResult[] = [];
-
   @Column('json')
-  /** All the answers by students for the poll.
-   * Letter field is optional and only is returned on mc questions
+  answerChoices: PollResult[] = undefined;
+
+  /**
+   * All the answers by students for the poll.
+   * Letter field is optional and only is returned on MC polls.
    * @example
    * let answers_MC = {googleID: [{letter: "A", text: "Saturn"}]}
    * let answers_FR = {googleID: [{text: "Saturn"}, {text: "Mars"}]}
    */
+  @Column('json')
   answers: { string: PollChoice[] } = {};
 
-  @Column('json')
-  /** All the upvotes by students for the FR poll. Empty if MC.
+  /**
+   * All the upvotes by students for the FR poll. Empty if MC.
    * @example
    * let upvotes_MC = {}
    * let upvotes_FR = {googleID: [{text: "Saturn"}, {text: "Mars"}]}
    */
+  @Column('json')
   upvotes: { string: PollChoice[] } = {};
 
-  @Column('string')
   /**
    * Correct answer choice for MC.
    * Empty string if FR or no correct answer chosen for MC.
    * @example
    * let correctAnswer = 'A'
   */
+  @Column('character varying')
   correctAnswer: string = '';
 
-  @Column('string')
-  /**
-   * The current state of the poll
-   */
-
+  /** The current state of the poll */
+  @Column('character varying')
   state: PollState = constants.POLL_STATES.ENDED;
 
   serialize(): APIPoll {
     return {
       ...super.serialize(),
+      id: this.uuid,
       answerChoices: this.answerChoices,
       correctAnswer: this.correctAnswer,
       state: this.state,

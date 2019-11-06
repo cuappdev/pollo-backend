@@ -1,28 +1,30 @@
 // @flow
-import { getConnectionManager, Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import Draft from '../models/Draft';
-import LogUtils from '../utils/LogUtils';
 import User from '../models/User';
+import LogUtils from '../utils/LogUtils';
 
-const db = (): Repository<Draft> => getConnectionManager().get().getRepository(Draft);
+const db = (): Repository<Draft> => getRepository(Draft);
 
 /**
-* Creates a draft and saves it to the db
-* @function
-* @param {string} text - Text of question
-* @param {string[]} options - Options of question
-* @param {User} user - User that wants to create draft
-* @return {Draft} new created draft
-*/
-const createDraft = async (text: string, options: string[], user: User):
-  Promise<Draft> => {
+ * Creates a draft and saves it to the db
+ * @function
+ * @param {string} text - Text of question
+ * @param {string[]} options - Options of question
+ * @param {User} user - User that wants to create draft
+ * @return {Draft} new created draft
+ */
+const createDraft = async (
+  text: string,
+  options: string[],
+  user: User,
+): Promise<Draft> => {
   try {
     const draft = new Draft();
     draft.text = text;
     draft.options = options;
     draft.user = user;
-
-    await db().persist(draft);
+    await db().save(draft);
     return draft;
   } catch (e) {
     throw LogUtils.logErr('Problem creating draft', e, { text, options, user });
@@ -80,11 +82,9 @@ const updateDraft = async (id: string, text: ?string, options: ?string[]):
       .where('drafts.uuid = :draftID')
       .setParameters({ draftID: id })
       .getOne();
-
     if (options) draft.options = options;
     if (text !== undefined && text !== null) draft.text = text;
-
-    await db().persist(draft);
+    await db().save(draft);
     return draft;
   } catch (e) {
     throw LogUtils.logErr(`Problem updating draft by UUID: ${id}`, e);
@@ -121,7 +121,6 @@ const getOwnerByID = async (id: string): Promise<?User> => {
       .where('drafts.uuid = :draftID')
       .setParameters({ draftID: id })
       .getOne();
-
     return draft.user;
   } catch (e) {
     throw LogUtils.logErr(`Problem getting owner of draft by UUID: ${id}`, e);

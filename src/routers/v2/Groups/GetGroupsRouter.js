@@ -27,7 +27,7 @@ class GetGroupsRouter extends AppDevRouter<APIGroup[]> {
         updatedAt: await GroupsRepo.latestActivityByGroupID(group.uuid),
         isLive: await req.app.groupManager.isLive(group.code),
       }));
-    return Promise.all(nodes).then(n => n);
+    return Promise.all(nodes);
   }
 }
 
