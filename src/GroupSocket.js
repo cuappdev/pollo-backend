@@ -5,7 +5,6 @@ import SocketIO from 'socket.io';
 import constants from './utils/Constants';
 import Group from './models/Group';
 import GroupsRepo from './repos/GroupsRepo';
-import lib from './utils/Lib.js';
 import PollsRepo from './repos/PollsRepo';
 import UserSessionsRepo from './repos/UserSessionsRepo';
 
@@ -101,7 +100,7 @@ export default class GroupSocket {
       return;
     }
 
-    const userType = (await GroupsRepo.isAdmin(this.group.id, user)) ? 'admin' : 'member';
+    const userType = (await GroupsRepo.isAdmin(this.group.uuid, user)) ? 'admin' : 'member';
 
     switch (userType) {
       case 'admin': {
