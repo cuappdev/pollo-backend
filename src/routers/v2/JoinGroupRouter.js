@@ -21,7 +21,7 @@ class JoinGroupRouter extends AppDevRouter<APIGroup> {
     let { id } = req.body;
     const { user } = req;
 
-    if (!user.id) throw LogUtils.logErr('User id missing');
+    if (!user.uuid) throw LogUtils.logErr('User id missing');
 
     if (!id && !code) {
       throw LogUtils.logErr('Group id or code required');
