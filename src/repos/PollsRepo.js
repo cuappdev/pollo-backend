@@ -136,7 +136,7 @@ const getGroupFromPollID = async (id: string): Promise<?Group> => {
       .getOne();
     return poll.group;
   } catch (e) {
-    throw LogUtils.logErr(`Problem getting group from question by UUID: ${id}`, e);
+    throw LogUtils.logErr(`Problem getting group from poll by UUID: ${id}`, e);
   }
 };
 
