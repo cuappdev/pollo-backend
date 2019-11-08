@@ -3,7 +3,6 @@ import { Request } from 'express';
 import GroupsRepo from '../../repos/GroupsRepo';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/Constants';
-import lib from '../../utils/Lib';
 import LogUtils from '../../utils/LogUtils';
 
 import type { APIGroup } from './APITypes';
