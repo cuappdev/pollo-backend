@@ -25,7 +25,7 @@ class DeletePollRouter extends AppDevRouter<NoResponse> {
     if (!group) {
       throw LogUtils.logErr(`Couldn't find group with poll ${pollID}`);
     }
-    if (!await GroupsRepo.isAdmin(group.id, user)) {
+    if (!await GroupsRepo.isAdmin(group.uuid, user)) {
       throw LogUtils.logErr(
         'You are not authorized to delete this poll', {}, { pollID, user },
       );

@@ -5,7 +5,6 @@ import SocketIO from 'socket.io';
 import constants from './utils/Constants';
 import Group from './models/Group';
 import GroupsRepo from './repos/GroupsRepo';
-import lib from './utils/Lib.js';
 import PollsRepo from './repos/PollsRepo';
 import UserSessionsRepo from './repos/UserSessionsRepo';
 
@@ -19,7 +18,7 @@ export type GroupSocketConfig = {
   onClose: void => void
 };
 
-type id = number;
+type id = string;
 type IOSocket = Object;
 
 /** Poll object used in GroupSockets
@@ -101,7 +100,7 @@ export default class GroupSocket {
       return;
     }
 
-    const userType = (await GroupsRepo.isAdmin(this.group.id, user)) ? 'admin' : 'member';
+    const userType = (await GroupsRepo.isAdmin(this.group.uuid, user)) ? 'admin' : 'member';
 
     switch (userType) {
       case 'admin': {
@@ -347,7 +346,7 @@ _endPoll = async () => {
 
 /**
  * Deletes a poll that is already saved to database
- * @param {id} pollID - Poll ID to delete
+ * @param {id} pollID - Poll UUID to delete
  */
 _deletePoll = async (pollID: id) => {
   await PollsRepo.deletePollByID(pollID);

@@ -20,11 +20,11 @@ class EndGroupRouter extends AppDevRouter<NoResponse> {
     const { id, save } = req.params;
     const group = await GroupsRepo.getGroupByID(id);
     if (!group) {
-      throw LogUtils.logErr(`No group with id ${id} found`);
+      throw LogUtils.logErr(`No group with UUID ${id} found`);
     }
 
     if (!(await GroupsRepo.isAdmin(id, req.user))) {
-      throw LogUtils.logErr(`Not authorized to end group with id ${id}`);
+      throw LogUtils.logErr(`Not authorized to end group with UUID ${id}`);
     }
 
     if (save === 'false' || save === '0') {

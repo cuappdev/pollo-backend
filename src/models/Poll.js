@@ -5,13 +5,14 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import uuidv4 from 'uuid/v4';
 import Base from './Base';
 import Group from './Group';
+
+import type { APIPoll } from '../routers/v2/APITypes';
+import type { PollType, PollState } from '../utils/Constants';
+
 import constants from '../utils/Constants';
-import type {
-  PollType,
-  PollState,
-} from '../utils/Constants';
 
 export type PollResult = {|
   letter: ?string,
@@ -30,9 +31,9 @@ export type PollChoice = {|
  */
 @Entity('polls')
 class Poll extends Base {
-  /** Unique identifier */
-  @PrimaryGeneratedColumn()
-  id: any = null;
+  /** Universally unique identifier */
+  @PrimaryGeneratedColumn('uuid')
+  uuid: string = uuidv4();
 
   /** Text of poll */
   @Column('character varying')
@@ -86,6 +87,19 @@ class Poll extends Base {
   /** The current state of the poll */
   @Column('character varying')
   state: PollState = constants.POLL_STATES.ENDED;
+
+  serialize(): APIPoll {
+    return {
+      ...super.serialize(),
+      id: this.uuid,
+      answerChoices: this.answerChoices,
+      correctAnswer: this.correctAnswer,
+      state: this.state,
+      text: this.text,
+      type: this.type,
+      userAnswers: this.answers,
+    };
+  }
 }
 
 export default Poll;

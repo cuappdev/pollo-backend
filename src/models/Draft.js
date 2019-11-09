@@ -5,8 +5,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import uuidv4 from 'uuid/v4';
 import Base from './Base';
 import User from './User';
+
+import type { APIDraft } from '../routers/v2/APITypes';
 
 /**
  * Draft class, represents drafts of polls
@@ -14,9 +17,9 @@ import User from './User';
  */
 @Entity('drafts')
 class Draft extends Base {
-  /** Unique identifier */
-  @PrimaryGeneratedColumn()
-  id: any = null;
+  /** Universally unique identifier */
+  @PrimaryGeneratedColumn('uuid')
+  uuid: string = uuidv4();
 
   /** Text of question */
   @Column('character varying')
@@ -29,6 +32,15 @@ class Draft extends Base {
   /** User the draft belongs to */
   @ManyToOne(type => User, user => user.drafts)
   user: ?User = null;
+
+  serialize(): APIDraft {
+    return {
+      ...super.serialize(),
+      id: this.uuid,
+      options: this.options,
+      text: this.text,
+    };
+  }
 }
 
 export default Draft;

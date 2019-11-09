@@ -37,41 +37,41 @@ test('Create Draft', async () => {
 });
 
 test('Get Draft', async () => {
-  const temp = await DraftsRepo.getDraft(draft1.id);
+  const temp = await DraftsRepo.getDraft(draft1.uuid);
   expect(temp.text).toBe(draft1.text);
   expect(temp.options).toEqual(draft1.options);
   expect(temp.user.id).toEqual(draft1.user.id);
 
-  const temp2 = await DraftsRepo.getDraft(draft2.id);
+  const temp2 = await DraftsRepo.getDraft(draft2.uuid);
   expect(temp2.text).toBe(draft2.text);
   expect(temp2.options).toEqual(draft2.options);
   expect(temp2.user.id).toEqual(draft2.user.id);
 
-  const temp3 = await DraftsRepo.getDraft(draft3.id);
+  const temp3 = await DraftsRepo.getDraft(draft3.uuid);
   expect(temp3.text).toBe(draft3.text);
   expect(temp3.options).toEqual(draft3.options);
   expect(temp3.user.id).toEqual(draft3.user.id);
 });
 
 test('Get Drafts from User', async () => {
-  const drafts = await DraftsRepo.getDraftsByUser(user1.id);
+  const drafts = await DraftsRepo.getDraftsByUser(user1.uuid);
   expect(drafts.length).toBe(3);
   expect(drafts[0].id).toBe(draft1.id);
   expect(drafts[1].id).toBe(draft2.id);
   expect(drafts[2].id).toBe(draft3.id);
 
-  const drafts2 = await DraftsRepo.getDraftsByUser(user2.id);
+  const drafts2 = await DraftsRepo.getDraftsByUser(user2.uuid);
   expect(drafts2.length).toBe(0);
 });
 
 test('Update Draft', async () => {
-  const newDraft = await DraftsRepo.updateDraft(draft1.id, 'New Question', []);
+  const newDraft = await DraftsRepo.updateDraft(draft1.uuid, 'New Question', []);
   expect(newDraft.text).toBe('New Question');
   expect(newDraft.options).toEqual([]);
   expect(newDraft.id).toBe(draft1.id);
   draft1 = newDraft;
 
-  const newDraft2 = await DraftsRepo.updateDraft(draft2.id, '', ['hi', 'hello']);
+  const newDraft2 = await DraftsRepo.updateDraft(draft2.uuid, '', ['hi', 'hello']);
   expect(newDraft2.text).toBe('');
   expect(newDraft2.options).toEqual(['hi', 'hello']);
   expect(newDraft2.id).toBe(draft2.id);
@@ -79,23 +79,23 @@ test('Update Draft', async () => {
 });
 
 test('Get Owner of Draft', async () => {
-  const user = await DraftsRepo.getOwnerByID(draft1.id);
+  const user = await DraftsRepo.getOwnerByID(draft1.uuid);
   expect(user.id).toBe(user1.id);
 });
 
 test('Delete Draft', async () => {
-  await DraftsRepo.deleteDraft(draft1.id);
-  await DraftsRepo.deleteDraft(draft2.id);
-  await DraftsRepo.deleteDraft(draft3.id);
-  expect(await DraftsRepo.getDraft(draft1.id)).toBeFalsy();
-  expect(await DraftsRepo.getDraft(draft2.id)).toBeFalsy();
-  expect(await DraftsRepo.getDraft(draft3.id)).toBeFalsy();
+  await DraftsRepo.deleteDraft(draft1.uuid);
+  await DraftsRepo.deleteDraft(draft2.uuid);
+  await DraftsRepo.deleteDraft(draft3.uuid);
+  expect(await DraftsRepo.getDraft(draft1.uuid)).toBeFalsy();
+  expect(await DraftsRepo.getDraft(draft2.uuid)).toBeFalsy();
+  expect(await DraftsRepo.getDraft(draft3.uuid)).toBeFalsy();
 });
 
 // Teardown
 afterAll(async () => {
-  await UsersRepo.deleteUserByID(user1.id);
-  await UsersRepo.deleteUserByID(user2.id);
+  await UsersRepo.deleteUserByID(user1.uuid);
+  await UsersRepo.deleteUserByID(user2.uuid);
   // eslint-disable-next-line no-console
   console.log('Passed all draft tests');
 });

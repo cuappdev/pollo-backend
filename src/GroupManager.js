@@ -23,7 +23,7 @@ class GroupManager {
    * @param {Group} group - Group to start
    */
   async startNewGroup(group: Group) {
-    const nsp = this.io.of(`/${group.id}`);
+    const nsp = this.io.of(`/${group.uuid}`);
     this.groupSockets.push(new GroupSocket({
       group, nsp, onClose: () => { this.endGroup(group, true); },
     }));
@@ -38,7 +38,7 @@ class GroupManager {
   endGroup(group: Group, save: bool): void {
     const index = this.groupSockets.findIndex((x) => {
       const groupUndefined = !x || !x.group;
-      return groupUndefined ? false : x.group.id === group.id;
+      return groupUndefined ? false : x.group.uuid === group.uuid;
     });
 
     if (index === -1) return;
@@ -55,7 +55,7 @@ class GroupManager {
     socket.nsp.removeAllListeners();
 
     this.groupSockets.splice(index, 1);
-    delete this.io.nsps[`/${group.id}`];
+    delete this.io.nsps[`/${group.uuid}`];
   }
 
   /**
@@ -78,12 +78,12 @@ class GroupManager {
    * Find the group's socket
    * @function
    * @param {string} [groupCode] - Code of group to find
-   * @param {number} [id] - ID of sesssion to find
+   * @param {number} [id] - UUID of sesssion to find
    * @return {socket} Socket of the group
    */
-  findSocket(groupCode: ?string, id: ?number): SocketIO.socket {
+  findSocket(groupCode: ?string, id: ?string): SocketIO.socket {
     return this.groupSockets.find((x) => {
-      if (x && x.group) return x.group.code === groupCode || x.group.id === id;
+      if (x && x.group) return x.group.code === groupCode || x.group.uuid === id;
       return false;
     });
   }
@@ -92,10 +92,10 @@ class GroupManager {
    * Determines if a group is live
    * @function
    * @param {string} [groupCode] - Code of group to check
-   * @param {number} [id] - ID of sesssion to check
+   * @param {number} [id] - UUID of sesssion to check
    * @return {boolean} Whether the group is live
    */
-  isLive(groupCode: ?string, id: ?number): boolean {
+  isLive(groupCode: ?string, id: ?string): boolean {
     const socket = this.findSocket(groupCode, id);
     return socket !== undefined ? socket.isLive : false;
   }
