@@ -24,27 +24,22 @@ beforeAll(async () => {
 });
 
 test('Create Poll', async () => {
-  const poll = await PollsRepo
-    .createPoll('Poll', group, [], 'multipleChoice', 'A', null, 'shared', {});
+  const poll = await PollsRepo.createPoll('Poll', group, [], 'A', null, 'shared');
   expect(poll.text).toBe('Poll');
   expect(poll.group.id).toBe(group.id);
   expect(poll.answerChoices).toEqual([]);
-  expect(poll.type).toBe('multipleChoice');
   expect(poll.correctAnswer).toBe('A');
   expect(poll.state).toBe('shared');
   expect(poll.answers).toEqual({});
-  expect(poll.upvotes).toEqual({});
   ({ uuid } = poll);
 
-  const poll2 = await PollsRepo.createPoll('', group, [], 'freeResponse', null, {}, 'ended', {});
+  const poll2 = await PollsRepo.createPoll('', group, [], '', null, 'ended');
   expect(poll2.text).toBe('');
   expect(poll2.group.id).toBe(group.id);
   expect(poll2.answerChoices).toEqual([]);
-  expect(poll2.type).toBe('freeResponse');
   expect(poll2.correctAnswer).toBe('');
   expect(poll2.state).toBe('ended');
   expect(poll2.answers).toEqual({});
-  expect(poll2.upvotes).toEqual({});
   uuid2 = poll2.uuid;
 });
 
@@ -52,16 +47,14 @@ test('Get Poll', async () => {
   const poll = await PollsRepo.getPollByID(uuid);
   expect(poll.text).toBe('Poll');
   expect(poll.state).toBe('shared');
-  expect(poll.type).toBe('multipleChoice');
 
   const poll2 = await PollsRepo.getPollByID(uuid2);
   expect(poll2.text).toBe('');
   expect(poll2.state).toBe('ended');
-  expect(poll2.type).toBe('freeResponse');
 });
 
 test('Update Poll', async () => {
-  const poll = await PollsRepo.updatePollByID(uuid, 'New Poll', null, null, null, 'ended');
+  const poll = await PollsRepo.updatePollByID(uuid, 'New Poll', null, null, 'ended');
   expect(poll.text).toBe('New Poll');
   expect(poll.state).toBe('ended');
 
@@ -77,7 +70,7 @@ test('Get Group from Poll', async () => {
 
 test('Get Polls from Group', async () => {
   await PollsRepo
-    .createPoll('Another poll', group, [], 'freeResponse', null, null, 'ended', null);
+    .createPoll('Another poll', group, [], null, null, 'ended');
   const polls = await GroupsRepo.getPolls(group.uuid);
   expect(polls.length).toBe(3);
 });

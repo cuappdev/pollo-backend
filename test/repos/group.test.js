@@ -183,17 +183,18 @@ test('Get Polls from Group', async () => {
   expect(polls.length).toEqual(0);
 
   const answerChoices1 = [{ letter: 'A', text: 'blue', count: 1 }];
-  const answerChoices2 = [{ text: 'blue', count: 0 }, { text: 'red', count: 2 }];
+  const answerChoices2 = [{ letter: 'A', text: 'blue', count: 0 }, { letter: 'B', text: 'red', count: 2 }];
   const answerChoices1WithoutCounts = [{ letter: 'A', text: 'blue' }];
+  const answerChoices2WithoutCounts = [{ letter: 'A', text: 'blue' }, { letter: 'B', text: 'red' }];
 
-  const poll = await PollsRepo.createPoll('Poll', group, answerChoices1, 'multipleChoice', '', null, 'ended');
-  const poll2 = await PollsRepo.createPoll('', group, answerChoices2, 'freeResponse', '', null, 'ended');
-  polls = await GroupsRepo.getPolls(uuid);
+  const poll = await PollsRepo.createPoll('Poll', group, answerChoices1, '', null, 'live');
+  const poll2 = await PollsRepo.createPoll('', group, answerChoices2, '', null, 'live');
+  polls = await GroupsRepo.getPolls(uuid, true);
   expect(polls.length).toEqual(2);
   expect(polls[0].uuid).toBe(poll.uuid);
   expect(polls[1].uuid).toBe(poll2.uuid);
   expect(polls[0].answerChoices).toEqual(answerChoices1WithoutCounts);// if member, hide results
-  expect(polls[1].answerChoices).toEqual(answerChoices2);
+  expect(polls[1].answerChoices).toEqual(answerChoices2WithoutCounts);
   polls = await GroupsRepo.getPolls(uuid, false); // if admin, don't hide results
   expect(polls[0].answerChoices).toEqual(answerChoices1);
   expect(polls[1].answerChoices).toEqual(answerChoices2);

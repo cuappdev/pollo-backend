@@ -5,7 +5,7 @@ import Poll from '../models/Poll';
 import LogUtils from '../utils/LogUtils';
 
 import type { PollChoice, PollResult } from '../models/Poll';
-import type { PollType, PollState } from '../utils/Constants';
+import type { PollState } from '../utils/Constants';
 
 const db = (): Repository<Poll> => getRepository(Poll);
 
@@ -15,22 +15,18 @@ const db = (): Repository<Poll> => getRepository(Poll);
  * @param {string} text - Text of poll
  * @param {Group} group - Group that the poll belongs to
  * @param {PollResult[]} answerChoices - the answer choices for the given poll
- * @param {string} type - Type of poll, see Poll class for more info
  * @param {string} correctAnswer - Correct answer choice for MC
  * @param {string: PollChoice[]} answers - answers given from students
  * @param {PollState} state - the current state of the poll
- * @param {string: PollChoice[]} upvotes - upvotes given from students
  * @return {Poll} New poll created
  */
 const createPoll = async (
   text: string,
   group: ?Group,
   answerChoices: PollResult[],
-  type: PollType,
   correctAnswer: ?string,
   answers: ?{ string: PollChoice[] },
   state: PollState,
-  upvotes: ?{ string: PollChoice[] },
 ): Promise<Poll> => {
   try {
     const poll = new Poll();
@@ -38,10 +34,8 @@ const createPoll = async (
     poll.correctAnswer = correctAnswer || '';
     poll.state = state;
     poll.text = text;
-    poll.type = type;
     if (group) poll.group = group;
     if (answers) poll.answers = answers;
-    if (upvotes) poll.upvotes = upvotes;
     await db().save(poll);
     return poll;
   } catch (e) {
@@ -50,11 +44,9 @@ const createPoll = async (
       text,
       group,
       answerChoices,
-      type,
       correctAnswer,
       answers,
       state,
-      upvotes,
     });
   }
 };
@@ -97,12 +89,11 @@ const deletePollByID = async (id: string) => {
  * @param {?string} [text] - new text for poll
  * @param {?PollResult[]} answerChoices - the answer choices for the given poll
  * @param {string: PollChoice[]} [answers] - the students answers to the poll
- * @param {string: PollChoice[]} [upvotes] - upvotes from students
  * @param {PollState} [state] - the state of the poll
  * @return {?Poll} Updated poll
  */
 const updatePollByID = async (id: string, text: ?string, answerChoices: ?PollResult[],
-  answers: ?{string: PollChoice[]}, upvotes: ?{string: PollChoice[]}, state: ?PollState):
+  answers: ?{string: PollChoice[]}, state: ?PollState):
   Promise<?Poll> => {
   try {
     const poll = await db().createQueryBuilder('polls')
@@ -113,7 +104,6 @@ const updatePollByID = async (id: string, text: ?string, answerChoices: ?PollRes
     if (text !== undefined && text !== null) poll.text = text;
     if (answerChoices) poll.answerChoices = answerChoices;
     if (answers) poll.answers = answers;
-    if (upvotes) poll.upvotes = upvotes;
     if (state) poll.state = state;
     await db().save(poll);
     return poll;

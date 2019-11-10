@@ -25,7 +25,7 @@ class Draft extends Base {
   @Column('character varying')
   text: string = '';
 
-  /** Options of question, empty for FR */
+  /** Options of question */
   @Column('json')
   options: string[] = undefined;
 

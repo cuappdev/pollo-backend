@@ -1309,28 +1309,10 @@
           "Socket: to server"
         ],
         "summary": "Answer a poll",
-        "description": "User sends this to answer a multiple choice poll or submit a FR answer",
+        "description": "User sends this to answer a poll",
         "parameters": [
           {
             "name": "submittedAnswer",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/PollChoice"
-            }
-          }
-        ]
-      }
-    },
-    "server/poll/upvote": {
-      "get": {
-        "tags": [
-          "Socket: to server"
-        ],
-        "summary": "Upvote a FR answer",
-        "description": "User sends this to upvote an answer in free response",
-        "parameters": [
-          {
-            "name": "upvotedAnswer",
             "in": "body",
             "schema": {
               "$ref": "#/definitions/PollChoice"
@@ -1413,22 +1395,6 @@
         ],
         "summary": "User receives to display a poll",
         "description": "State should be “live”",
-        "responses": [
-          {
-            "name": "currentPoll",
-            "schema": {
-              "$ref": "#/definitions/Socket - ClientPoll"
-            }
-          }
-        ]
-      }
-    },
-    "user/poll/fr/live": {
-      "get": {
-        "tags": [
-          "Socket: to member"
-        ],
-        "summary": "User receives an updated poll to reflect the current changes (only FR)",
         "responses": [
           {
             "name": "currentPoll",
@@ -1568,7 +1534,7 @@
         },
         "options": {
           "type": "array",
-          "description": "Poll options, empty if FR",
+          "description": "Poll options",
           "items": {
             "type": "string"
           }
@@ -1641,18 +1607,14 @@
           "example": [
             {
               "letter": "A",
-              "text": "MC example",
+              "text": "example",
               "count": 5
-            },
-            {
-              "text": "FR example",
-              "count": 16
             }
           ]
         },
         "correctAnswer": {
           "type": "string",
-          "description": "Letter of correct answer choice (MC only)",
+          "description": "Letter of correct answer choice",
           "example": "A"
         },
         "createdAt": {
@@ -1674,15 +1636,6 @@
           "description": "Poll question",
           "example": "Which planet is a gas giant?"
         },
-        "type": {
-          "type": "string",
-          "description": "Poll type",
-          "enum": [
-            "multipleChoice",
-            "freeResponse"
-          ],
-          "example": "multipleChoice"
-        },
         "updatedAt": {
           "type": "string",
           "description": "Timestamp (Unix time)",
@@ -1690,7 +1643,7 @@
         },
         "userAnswers": {
           "type": "object",
-          "description": "Mapping of googleID to the choice the user selected if MC, or the choices the user upvoted if FR",
+          "description": "Mapping of googleID to the choice the user selected",
           "properties": {
             "googleID(string)": {
               "type": "array",
@@ -1700,16 +1653,8 @@
               "example": {
                 "googleID1": {
                   "letter": "A",
-                  "text": "selected MC answer"
-                },
-                "googleID2": [
-                  {
-                    "text": "upvoted FR answer1"
-                  },
-                  {
-                    "text": "upvoted FR answer2"
-                  }
-                ]
+                  "text": "selected answer"
+                }
               }
             }
           }
@@ -1722,7 +1667,6 @@
         "createdAt",
         "state",
         "text",
-        "type",
         "updatedAt",
         "userAnswers"
       ]
@@ -1732,7 +1676,7 @@
       "properties": {
         "letter": {
           "type": "string",
-          "description": "Letter identifier of answer choice (MC only)",
+          "description": "Letter identifier of answer choice",
           "example": "A",
           "nullable": true
         },
@@ -1752,14 +1696,13 @@
       "properties": {
         "count": {
           "type": "integer",
-          "description": "Number of times choice was selected or upvoted<br/>`Null` when user is member & poll is MC & poll is live",
+          "description": "Number of times choice was selected <br/>`Null` when user is member & poll is live",
           "nullable": true
         },
         "letter": {
           "type": "string",
-          "description": "Letter identifier of answer choice (MC only)",
-          "example": "A",
-          "nullable": true
+          "description": "Letter identifier of answer choice",
+          "example": "A"
         },
         "text": {
           "type": "string",
@@ -1781,7 +1724,7 @@
         },
         "answerChoices": {
           "type": "array",
-          "description": "All answers for the poll; count is null if user is `member` and MC poll is `live`",
+          "description": "All answers for the poll; count is null if user is `member` and poll is `live`",
           "items": {
             "$ref": "#/definitions/PollResult"
           }
@@ -1789,7 +1732,7 @@
         "correctAnswer": {
           "type": "string",
           "example": "A",
-          "description": "Letter of correct answer choice (MC only)"
+          "description": "Letter of correct answer choice"
         },
         "createdAt": {
           "type": "string",
@@ -1809,14 +1752,6 @@
           "type": "string",
           "description": "Poll question"
         },
-        "type": {
-          "type": "string",
-          "description": "Poll type",
-          "enum": [
-            "multipleChoice",
-            "freeResponse"
-          ]
-        },
         "updatedAt": {
           "type": "string",
           "description": "Timestamp (Unix time)",
@@ -1824,7 +1759,7 @@
         },
         "userAnswers": {
           "type": "object",
-          "description": "Mapping of googleID to user answers for MC and upvotes for FR",
+          "description": "Mapping of googleID to user answers",
           "properties": {
             "googleID(string)": {
               "type": "array",
@@ -1834,16 +1769,8 @@
               "example": {
                 "googleID1": {
                   "letter": "A",
-                  "text": "selected MC answer"
-                },
-                "googleID2": [
-                  {
-                    "text": "upvoted FR answer1"
-                  },
-                  {
-                    "text": "upvoted FR answer2"
-                  }
-                ]
+                  "text": "selected answer"
+                }
               }
             }
           }

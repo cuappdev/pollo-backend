@@ -21,11 +21,11 @@ class UpdatePollRouter extends AppDevRouter<APIPoll> {
   async content(req: Request) {
     const pollID = req.params.id;
     const {
-      text, answerChoices, state, answers, upvotes,
+      text, answerChoices, state, answers,
     } = req.body;
     const { user } = req;
 
-    if (!answerChoices && !text && !state && !answers && !upvotes) {
+    if (!answerChoices && !text && !state && !answers) {
       throw LogUtils.logErr('No fields specified to update');
     }
 
@@ -38,14 +38,12 @@ class UpdatePollRouter extends AppDevRouter<APIPoll> {
       );
     }
 
-    const poll = await PollsRepo.updatePollByID(pollID, text,
-      answerChoices, answers, upvotes, state);
+    const poll = await PollsRepo.updatePollByID(pollID, text, answerChoices, answers, state);
     if (!poll) {
       throw LogUtils.logErr(`Poll with UUID ${pollID} was not found`);
     }
 
-    const userAnswer = poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
-      ? poll.answers[req.user.googleID] : poll.upvotes[req.user.googleID];
+    const userAnswer = poll.answers[req.user.googleID];
     const answerObject: { string: PollChoice[]} = {};
     answerObject[req.user.googleID] = userAnswer || [];
 

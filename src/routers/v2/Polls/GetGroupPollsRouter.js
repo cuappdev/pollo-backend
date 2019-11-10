@@ -28,8 +28,7 @@ class GetGroupPollsRouter extends AppDevRouter<Object[]> {
     polls.filter(Boolean).forEach((poll) => {
       // date is in Unix time in seconds
       const date = poll.createdAt;
-      const userAnswer = poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
-        ? poll.answers[req.user.googleID] : poll.upvotes[req.user.googleID];
+      const userAnswer = poll.answers[req.user.googleID];
       const answerObject = {};
       answerObject[req.user.googleID] = userAnswer || [];
 

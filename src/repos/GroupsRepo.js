@@ -321,7 +321,7 @@ const getUsersByGroupID = async (id: string, role: ?string):
 
 /**
  * Gets polls from a group sorted by creation date in ascending order.
- * By default will hide poll results if poll is not shared.
+ * By default will hide poll results if poll is live.
  * @function
  * @param {string} id - UUID of group to fetch polls from
  * @param {boolean} hideUnsharedResults - Whether to return unaltered poll results for admins
@@ -336,11 +336,10 @@ const getPolls = async (id: string, hideUnsharedResults: ?boolean = true):
       .setParameters({ groupID: id })
       .orderBy('polls.createdAt', 'ASC')
       .getOne();
-    // obscure poll results if poll not shared
+    // obscure poll results if poll is live
     return group.polls.map((poll) => {
       if (
-        hideUnsharedResults && poll.state !== constants.POLL_STATES.SHARED
-        && poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
+        hideUnsharedResults && poll.state === constants.POLL_STATES.LIVE
       ) {
         poll.answerChoices = poll.answerChoices.map((choice) => {
           delete choice.count;
