@@ -111,9 +111,9 @@ test('Get Groups', async () => {
   const memberGroups2 = await UsersRepo.getGroupsByID(uuid, 'member');
   expect(allGroups.length).toEqual(2);
   expect(adminGroups2.length).toEqual(1);
-  expect(adminGroups2[0].id).toBe(group2.id);
+  expect(adminGroups2[0].uuid).toBe(group2.uuid);
   expect(memberGroups2.length).toEqual(1);
-  expect(memberGroups2[0].id).toBe(group.id);
+  expect(memberGroups2[0].uuid).toBe(group.uuid);
 
   await GroupsRepo.deleteGroupByID(group.uuid);
   await GroupsRepo.deleteGroupByID(group2.uuid);
