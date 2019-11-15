@@ -336,7 +336,7 @@ _endPoll = async () => {
     poll.state,
     poll.upvotes,
   );
-  this.current = { ...createdPoll };
+  this.current = { ...createdPoll, id: createdPoll.uuid };
 
   this.nsp.to('admins').emit('admin/poll/ended', this._currentPoll(constants.USER_TYPES.ADMIN));
   this.nsp.to('members').emit('user/poll/end', this._currentPoll(constants.USER_TYPES.MEMBER));
@@ -407,7 +407,6 @@ _setupAdminEvents(client: IOSocket): void {
 
   // share results
   client.on('server/poll/results', async (pollID: id) => {
-    // console.log('sharing results');
     // Update poll to 'shared'
     const sharedPoll = await PollsRepo.updatePollByID(
       pollID, null, null, null, null, constants.POLL_STATES.SHARED,
@@ -419,7 +418,7 @@ _setupAdminEvents(client: IOSocket): void {
     }
 
     const {
-      createdAt, updatedAt, answers, answerChoices, correctAnswer, state, text, type, upvotes,
+      uuid, createdAt, updatedAt, answers, answerChoices, correctAnswer, state, text, type, upvotes,
     } = sharedPoll;
 
     let userAnswers;
@@ -432,7 +431,7 @@ _setupAdminEvents(client: IOSocket): void {
     if (!userAnswers) userAnswers = {};
 
     this.nsp.to('members').emit('user/poll/results', ({
-      id: pollID, createdAt, updatedAt, answerChoices, correctAnswer, state, text, type, userAnswers,
+      id: uuid, createdAt, updatedAt, answerChoices, correctAnswer, state, text, type, userAnswers,
     } : ClientPoll));
   });
 
