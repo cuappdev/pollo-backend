@@ -25,7 +25,8 @@ class GetCSVRouter extends AppDevRouter {
   middleware(): ExpressCallback[] {
     return [super.middleware(), async (req: Request, res: Response, next: NextFunction) => {
       const { id } = req.params;
-      const polls: Array<?Poll> = await GroupsRepo.getPolls(id);
+      const polls: Array<?Poll> = (await GroupsRepo.getPolls(id))
+        .sort((a: Poll, b: Poll) => Number.parseInt(a.createdAt) - Number.parseInt(b.createdAt));
       const headers: Array<string> = [];
       const userResponses: Map<User, Array<string>> = new Map();
       const users: Array<User> = await GroupsRepo.getUsersByGroupID(id, constants.USER_TYPES.MEMBER);
@@ -34,7 +35,7 @@ class GetCSVRouter extends AppDevRouter {
       });
 
       polls.forEach((poll: Poll) => {
-        userResponses.forEach((answers: Array<string>, user: User, ) => {
+        userResponses.forEach((answers: Array<string>, user: User) => {
           if (Object.prototype.hasOwnProperty.call(poll.answers, user.googleID)) {
             answers.push(poll.answers[user.googleID][0].letter);
           } else {
