@@ -21,15 +21,17 @@ const createOrUpdateSession = async (
   accessToken: ?string,
   refreshToken: ?string,
 ): Promise<UserSession> => {
-  const optionalSession = await db().createQueryBuilder('usersessions')
+  let session = await db().createQueryBuilder('usersessions')
     .innerJoin('usersessions.user', 'user', 'user.uuid = :userID')
     .setParameters({ userID: user.uuid })
     .getOne();
-  return db().save(
-    optionalSession
-      ? optionalSession.update(accessToken, refreshToken)
-      : UserSession.fromUser(user, accessToken, refreshToken),
-  );
+  if (session) {
+    session.update(accessToken, refreshToken);
+    session.user = user;
+  } else {
+    session = UserSession.fromUser(user, accessToken, refreshToken);
+  }
+  return db().save(session);
 };
 
 /**
