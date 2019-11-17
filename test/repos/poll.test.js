@@ -27,7 +27,7 @@ test('Create Poll', async () => {
   const poll = await PollsRepo
     .createPoll('Poll', group, [], 'multipleChoice', 'A', null, 'shared', {});
   expect(poll.text).toBe('Poll');
-  expect(poll.group.id).toBe(group.id);
+  expect(poll.group.uuid).toBe(group.uuid);
   expect(poll.answerChoices).toEqual([]);
   expect(poll.type).toBe('multipleChoice');
   expect(poll.correctAnswer).toBe('A');
@@ -38,7 +38,7 @@ test('Create Poll', async () => {
 
   const poll2 = await PollsRepo.createPoll('', group, [], 'freeResponse', null, {}, 'ended', {});
   expect(poll2.text).toBe('');
-  expect(poll2.group.id).toBe(group.id);
+  expect(poll2.group.uuid).toBe(group.uuid);
   expect(poll2.answerChoices).toEqual([]);
   expect(poll2.type).toBe('freeResponse');
   expect(poll2.correctAnswer).toBe('');
@@ -72,7 +72,7 @@ test('Update Poll', async () => {
 
 test('Get Group from Poll', async () => {
   const p = await PollsRepo.getGroupFromPollID(uuid);
-  expect(p.id).toBe(group.id);
+  expect(p.uuid).toBe(group.uuid);
 });
 
 test('Get Polls from Group', async () => {

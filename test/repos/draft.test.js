@@ -40,25 +40,25 @@ test('Get Draft', async () => {
   const temp = await DraftsRepo.getDraft(draft1.uuid);
   expect(temp.text).toBe(draft1.text);
   expect(temp.options).toEqual(draft1.options);
-  expect(temp.user.id).toEqual(draft1.user.id);
+  expect(temp.user.uuid).toEqual(draft1.user.uuid);
 
   const temp2 = await DraftsRepo.getDraft(draft2.uuid);
   expect(temp2.text).toBe(draft2.text);
   expect(temp2.options).toEqual(draft2.options);
-  expect(temp2.user.id).toEqual(draft2.user.id);
+  expect(temp2.user.uuid).toEqual(draft2.user.uuid);
 
   const temp3 = await DraftsRepo.getDraft(draft3.uuid);
   expect(temp3.text).toBe(draft3.text);
   expect(temp3.options).toEqual(draft3.options);
-  expect(temp3.user.id).toEqual(draft3.user.id);
+  expect(temp3.user.uuid).toEqual(draft3.user.uuid);
 });
 
 test('Get Drafts from User', async () => {
   const drafts = await DraftsRepo.getDraftsByUser(user1.uuid);
   expect(drafts.length).toBe(3);
-  expect(drafts[0].id).toBe(draft1.id);
-  expect(drafts[1].id).toBe(draft2.id);
-  expect(drafts[2].id).toBe(draft3.id);
+  expect(drafts[0].uuid).toBe(draft1.uuid);
+  expect(drafts[1].uuid).toBe(draft2.uuid);
+  expect(drafts[2].uuid).toBe(draft3.uuid);
 
   const drafts2 = await DraftsRepo.getDraftsByUser(user2.uuid);
   expect(drafts2.length).toBe(0);
@@ -68,19 +68,19 @@ test('Update Draft', async () => {
   const newDraft = await DraftsRepo.updateDraft(draft1.uuid, 'New Question', []);
   expect(newDraft.text).toBe('New Question');
   expect(newDraft.options).toEqual([]);
-  expect(newDraft.id).toBe(draft1.id);
+  expect(newDraft.uuid).toBe(draft1.uuid);
   draft1 = newDraft;
 
   const newDraft2 = await DraftsRepo.updateDraft(draft2.uuid, '', ['hi', 'hello']);
   expect(newDraft2.text).toBe('');
   expect(newDraft2.options).toEqual(['hi', 'hello']);
-  expect(newDraft2.id).toBe(draft2.id);
+  expect(newDraft2.uuid).toBe(draft2.uuid);
   draft2 = newDraft2;
 });
 
 test('Get Owner of Draft', async () => {
   const user = await DraftsRepo.getOwnerByID(draft1.uuid);
-  expect(user.id).toBe(user1.id);
+  expect(user.uuid).toBe(user1.uuid);
 });
 
 test('Delete Draft', async () => {
