@@ -1,8 +1,11 @@
 import request from 'request-promise-native';
+import axios from 'axios';
 import dbConnection from '../../src/db/DbConnection';
 import UsersRepo from '../../src/repos/UsersRepo';
 import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
 import GroupsRepo from '../../src/repos/GroupsRepo';
+import PollsRepo from '../../src/repos/PollsRepo';
+import Poll from '../../src/models/Poll';
 
 const {
   get, post, del, put,
@@ -179,6 +182,89 @@ test('Update group with invalid adminToken', async () => {
     .catch((e) => {
       expect(e.statusCode).toBe(401);
     });
+});
+
+test('Download csv', async () => {
+  const g = await GroupsRepo.getGroupByID(group.id);
+  let polls: Array<?Poll> = await GroupsRepo.getPolls(group.id);
+  console.log(`found ${polls.length} polls`);
+  const p1 = await PollsRepo.createPoll(
+    'Poll 1', g, [{ letter: 'A', text: 'Saturn' }, { letter: 'B', text: 'Mars' }],
+    'multiplechoice', 'A',
+    { u1: [{ letter: 'A', text: 'Saturn' }], u2: [{ letter: 'B', text: 'Mars' }] }, 'ended',
+  );
+  polls = await GroupsRepo.getPolls(group.id);
+  console.log(`found ${polls.length} polls`);
+  const p2 = await PollsRepo.createPoll(
+    'Poll 2', g, [{ letter: 'A', text: 'Earth' }, { letter: 'B', text: 'Venus' }],
+    'multiplechoice', 'B',
+    { u1: [{ letter: 'B', text: 'Venus' }], u2: [{ letter: 'A', text: 'Earth' }] }, 'ended',
+  );
+
+  const u1 = await UsersRepo.createUserWithFields('u1', 'u', '1', 'u1@example.com');
+  const u2 = await UsersRepo.createUserWithFields('u2', 'u', '2', 'u2@example.com');
+
+  await GroupsRepo.addUsersByIDs(group.id, [u1.uuid, u2.uuid]);
+
+  polls = await GroupsRepo.getPolls(group.id);
+  console.log(`found ${polls.length} polls`);
+
+  let result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  }).catch((e) => {
+    console.log(e);
+    expect(e).toBe(null);
+  });
+
+  expect(result.status).toBe(200);
+  expect(result.data).toBe('userid,Poll 1,Poll 2\nu1,A,B\nu2,B,A\n');
+
+  const u3 = await UsersRepo.createUserWithFields('u3', 'u', '3', 'u3@example.com');
+  await GroupsRepo.addUsersByIDs(group.id, [u3.uuid]);
+
+  result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  }).catch((e) => {
+    console.log(e);
+    expect(e).toBe(null);
+  });
+
+  expect(result.status).toBe(200);
+  expect(result.data).toBe('userid,Poll 1,Poll 2\nu1,A,B\nu2,B,A\nu3,,\n');
+
+  const p3 = await PollsRepo.createPoll(
+    'Poll 3', g, [{ letter: 'A', text: 'Earth' }, { letter: 'B', text: 'Venus' }],
+    'multiplechoice', 'B',
+    { u3: [{ letter: 'A', text: 'Earth' }] }, 'ended',
+  );
+
+  result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+  }).catch((e) => {
+    console.log(e);
+    expect(e).toBe(null);
+  });
+
+  expect(result.status).toBe(200);
+  expect(result.data).toBe('userid,Poll 1,Poll 2,Poll 3\nu1,A,B,\nu2,B,A,\nu3,,,A\n');
+
+  await PollsRepo.deletePollByID(p1.uuid);
+  await PollsRepo.deletePollByID(p2.uuid);
+  await PollsRepo.deletePollByID(p3.uuid);
+
+  await GroupsRepo.removeUserByGroupID(group.id, u1.uuid);
+  await GroupsRepo.removeUserByGroupID(group.id, u2.uuid);
+  await GroupsRepo.removeUserByGroupID(group.id, u3.uuid);
+
+  await UsersRepo.deleteUserByID(u1.uuid);
+  await UsersRepo.deleteUserByID(u2.uuid);
+  await UsersRepo.deleteUserByID(u3.uuid);
 });
 
 test('Delete group with invalid adminToken', async () => {
