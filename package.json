@@ -37,6 +37,7 @@
     "flow-bin": "^0.50.0",
     "form-urlencoded": "^2.0.4",
     "jest": "^21.2.1",
+    "nodemon": "^2.0.1",
     "request-promise-native": "^1.0.5",
     "serve-favicon": "^2.4.3",
     "webpack": "^3.3.0"
