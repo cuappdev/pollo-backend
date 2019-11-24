@@ -11,7 +11,7 @@ fs.readdirSync('node_modules')
 
 module.exports = {
     devtool: 'eval',
-    entry: ['babel-polyfill', path.join(__dirname, 'src/server.js')],
+    entry: ['@babel/polyfill', path.join(__dirname, 'src/server.js')],
     context: __dirname,
     node: {
         __filename: true,
