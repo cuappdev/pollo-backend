@@ -10,12 +10,14 @@ addons:
   ssh_known_hosts: 
   - pollo-backend.cornellappdev.com
   - pollo-dev.cornellappdev.com
-before_install:
-- openssl aes-256-cbc -K $encrypted_b9db1102fcfa_key -iv $encrypted_b9db1102fcfa_iv
-  -in server.pem.enc -out server.pem -d
-- psql --host=localhost -c 'CREATE DATABASE clicker;' -U postgres
 jobs:
   include:
+  - stage: test
+    before_install:
+    - psql --host=localhost -c 'CREATE DATABASE clicker;' -U postgres
+    script:
+    - npm run start &
+    - sleep 10; npm run test
   - if: branch = master
     env:
     - NODE_IMAGE="pollo-dev"
@@ -38,6 +40,3 @@ deploy:
   on:
     all_branches: true
     condition: $TRAVIS_BRANCH =~ ^master|release$
-script:
-- npm run start &
-- sleep 10; npm run test

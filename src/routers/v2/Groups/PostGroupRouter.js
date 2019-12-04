@@ -18,8 +18,7 @@ class PostGroupRouter extends AppDevRouter<APIGroup> {
 
   async content(req: Request) {
     let { name } = req.body;
-    const { code } = req.body;
-    const { user } = req;
+    const { user, body: { code } } = req;
 
     if (!name) name = '';
     if (!user) throw LogUtils.logErr('User missing');
@@ -27,13 +26,7 @@ class PostGroupRouter extends AppDevRouter<APIGroup> {
 
     const group = await GroupsRepo.createGroup(name, code, user);
 
-    return {
-      id: group.id,
-      code: group.code,
-      isLive: false,
-      name: group.name,
-      updatedAt: group.updatedAt,
-    };
+    return group.serialize();
   }
 }
 

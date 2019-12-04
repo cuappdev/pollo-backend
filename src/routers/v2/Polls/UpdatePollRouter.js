@@ -7,6 +7,7 @@ import LogUtils from '../../../utils/LogUtils';
 import PollsRepo from '../../../repos/PollsRepo';
 
 import type { APIPoll } from '../APITypes';
+import type { PollChoice } from '../../../utils/Constants';
 
 class UpdatePollRouter extends AppDevRouter<APIPoll> {
   constructor() {
@@ -19,35 +20,38 @@ class UpdatePollRouter extends AppDevRouter<APIPoll> {
 
   async content(req: Request) {
     const pollID = req.params.id;
-    const { text, results, shared } = req.body;
+    const {
+      text, answerChoices, state, answers, upvotes,
+    } = req.body;
     const { user } = req;
 
-    if (!results && !text && shared === null) {
+    if (!answerChoices && !text && !state && !answers && !upvotes) {
       throw LogUtils.logErr('No fields specified to update');
     }
 
     const group = await PollsRepo.getGroupFromPollID(pollID);
-    if (!group) throw LogUtils.logErr(`Poll with id ${pollID} has no group`);
+    if (!group) throw LogUtils.logErr(`Poll with UUID ${pollID} has no group`);
 
-    if (!await GroupsRepo.isAdmin(group.id, user)) {
+    if (!await GroupsRepo.isAdmin(group.uuid, user)) {
       throw LogUtils.logErr(
         'You are not authorized to update this poll', {}, { pollID, user },
       );
     }
+
     const poll = await PollsRepo.updatePollByID(pollID, text,
-      results, shared);
+      answerChoices, answers, upvotes, state);
     if (!poll) {
-      throw LogUtils.logErr(`Poll with id ${pollID} was not found`);
+      throw LogUtils.logErr(`Poll with UUID ${pollID} was not found`);
     }
 
+    const userAnswer = poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
+      ? poll.answers[req.user.googleID] : poll.upvotes[req.user.googleID];
+    const answerObject: { string: PollChoice[]} = {};
+    answerObject[req.user.googleID] = userAnswer || [];
+
     return {
-      id: poll.id,
-      text: poll.text,
-      results: poll.results,
-      shared: poll.shared,
-      type: poll.type,
-      answer: null,
-      correctAnswer: poll.correctAnswer,
+      ...poll.serialize(),
+      userAnswers: answerObject,
     };
   }
 }

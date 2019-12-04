@@ -1,12 +1,12 @@
 // @flow
-import { getConnectionManager, Repository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import { LoginTicket } from 'google-auth-library/build/src/auth/loginticket';
-import LogUtils from '../utils/LogUtils';
+import UsersRepo from './UsersRepo';
 import User from '../models/User';
 import UserSession from '../models/UserSession';
-import UsersRepo from './UsersRepo';
+import LogUtils from '../utils/LogUtils';
 
-const db = (): Repository<UserSession> => getConnectionManager().get().getRepository(UserSession);
+const db = (): Repository<UserSession> => getRepository(UserSession);
 
 /**
  * Create or update session for a user
@@ -17,22 +17,21 @@ const db = (): Repository<UserSession> => getConnectionManager().get().getReposi
  * @return {UserSession} New or updated session
  */
 const createOrUpdateSession = async (
-  user: User, accessToken: ?string, refreshToken: ?string,
+  user: User,
+  accessToken: ?string,
+  refreshToken: ?string,
 ): Promise<UserSession> => {
-  const optionalSession = await db().createQueryBuilder('usersessions')
-    .where('usersessions.user = :userID', { userID: user.id })
-    .innerJoinAndSelect('usersessions.user', 'users')
+  let session = await db().createQueryBuilder('usersessions')
+    .innerJoin('usersessions.user', 'user', 'user.uuid = :userID')
+    .setParameters({ userID: user.uuid })
     .getOne();
-
-  let session;
-  if (optionalSession) {
-    session = await
-    db().persist(optionalSession.update(accessToken, refreshToken));
-    return session;
+  if (session) {
+    session.update(accessToken, refreshToken);
+    session.user = user;
+  } else {
+    session = UserSession.fromUser(user, accessToken, refreshToken);
   }
-  session = await
-  db().persist(UserSession.fromUser(user, accessToken, refreshToken));
-  return session;
+  return db().save(session);
 };
 
 /**
@@ -44,8 +43,7 @@ const createOrUpdateSession = async (
 const getUserFromToken = async (accessToken: string): Promise<?User> => {
   const session = await db().createQueryBuilder('usersessions')
     .leftJoinAndSelect('usersessions.user', 'user')
-    .where('usersessions.sessionToken = :accessToken',
-      { accessToken })
+    .where('usersessions.sessionToken = :accessToken', { accessToken })
     .getOne();
   return session ? session.user : null;
 };
@@ -63,7 +61,7 @@ const updateSession = async (refreshToken: string): Promise<?Object> => {
     .getOne();
   if (!session) return null;
   session = session.update();
-  await db().persist(session);
+  await db().save(session);
   return {
     accessToken: session.sessionToken,
     refreshToken: session.updateToken,
@@ -80,40 +78,42 @@ const updateSession = async (refreshToken: string): Promise<?Object> => {
  */
 const verifySession = async (accessToken: string): Promise<boolean> => {
   const session = await db().createQueryBuilder('usersessions')
-    .where('usersessions.sessionToken = :accessToken',
-      { accessToken })
+    .where('usersessions.sessionToken = :accessToken', { accessToken })
     .getOne();
-  if (!session) return false;
-  return session.isActive
-    && session.expiresAt > Math.floor(new Date().getTime() / 1000);
+  return session
+    ? session.isActive && session.expiresAt > Math.floor(new Date().getTime() / 1000)
+    : false;
 };
 
 /**
  * Delete a session
  * @function
- * @param {number} id - ID of session to delete
+ * @param {string} id - UUID of session to delete
  */
-const deleteSession = async (id: number) => {
+const deleteSession = async (id: string) => {
   try {
-    const session = await db().findOneById(id);
-    await db().remove(session);
+    const session = await db().createQueryBuilder('usersessions')
+      .where('usersessions.uuid = :sessionID')
+      .setParameters({ sessionID: id })
+      .getOne();
+    if (session) await db().remove(session);
   } catch (e) {
-    throw LogUtils.logErr(`Problem deleting session by id: ${id}`, e);
+    throw LogUtils.logErr(`Problem deleting session by UUID: ${id}`, e);
   }
 };
 
 /**
  * Delete the session for a user
  * @function
- * @param {number} userID - ID of use to delete the session for
+ * @param {string} userID - UUID of user to delete the session for
  */
-const deleteSessionFromUserID = async (userID: number) => {
+const deleteSessionFromUserID = async (userID: string) => {
   try {
     const session = await db().createQueryBuilder('usersessions')
-      .innerJoin('usersessions.user', 'user', 'user.id = :userID')
+      .innerJoin('usersessions.user', 'user', 'user.uuid = :userID')
       .setParameters({ userID })
       .getOne();
-    if (session) db().remove(session);
+    if (session) await db().remove(session);
   } catch (e) {
     throw LogUtils.logErr(`Problem deleting session by user: ${userID}`, e);
   }
@@ -126,24 +126,18 @@ const deleteSessionFromUserID = async (userID: number) => {
  * @return {Object} Object containing session information for the user.
  */
 const createUserAndInitializeSession = async (login: LoginTicket): Promise<Object> => {
-  const payload = login.getPayload();
-  const googleID = payload.sub;
-  const first = payload.given_name;
-  const last = payload.family_name;
-  const { email } = payload;
-
+  const {
+    sub: googleID,
+    given_name: first,
+    family_name: last,
+    email,
+  } = login.getPayload();
   let user = await UsersRepo.getUserByGoogleID(googleID);
   if (!user) {
     user = await UsersRepo.createUserWithFields(googleID, first, last, email);
   }
-
   const session = await createOrUpdateSession(user, null, null);
-  return {
-    accessToken: session.sessionToken,
-    refreshToken: session.updateToken,
-    sessionExpiration: session.expiresAt,
-    isActive: session.isActive,
-  };
+  return session.serialize();
 };
 
 export default {

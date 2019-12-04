@@ -19,7 +19,7 @@ beforeAll(async () => {
 
 test('Create Session', async () => {
   const session = await UserSessionsRepo.createOrUpdateSession(user, 'access', 'refresh');
-  sessionID = session.id;
+  sessionID = session.uuid;
   expect(session.isActive).toBe(true);
   expect(session.sessionToken).toBe('access');
   expect(session.updateToken).toBe('refresh');
@@ -49,7 +49,7 @@ test('Update Session', async () => {
 // Teardown
 afterAll(async () => {
   await UserSessionsRepo.deleteSession(sessionID);
-  await UsersRepo.deleteUserByID(user.id);
+  await UsersRepo.deleteUserByID(user.uuid);
   // eslint-disable-next-line no-console
   console.log('Passed all session tests');
 });

@@ -3,8 +3,8 @@ import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
 import AppDevUtils from '../../src/utils/AppDevUtils';
 
-let id;
-let id2;
+let uuid;
+let uuid2;
 const googleID = AppDevUtils.randomCode(6);
 const googleID2 = AppDevUtils.randomCode(6);
 let group;
@@ -23,7 +23,7 @@ test('Create User', async () => {
   const user = await UsersRepo.createDummyUser(googleID);
   expect(user.googleID).toBe(googleID);
   expect(user.netID).toBe('');
-  ({ id } = user);
+  ({ uuid } = user);
 });
 
 test('Create User with Fields', async () => {
@@ -34,48 +34,48 @@ test('Create User with Fields', async () => {
   expect(user.lastName).toBe('Last');
   expect(user.email).toBe(netID);
   expect(user.netID).toBe('aa000');
-  id2 = user.id;
+  uuid2 = user.uuid;
 });
 
 test('Get User by ID', async () => {
-  const user = await UsersRepo.getUserByID(id);
-  expect(user.id).toEqual(id);
+  const user = await UsersRepo.getUserByID(uuid);
+  expect(user.uuid).toEqual(uuid);
   expect(user.googleID).toBe(googleID);
 
-  const user2 = await UsersRepo.getUserByID(id2);
-  expect(user2.id).toEqual(id2);
+  const user2 = await UsersRepo.getUserByID(uuid2);
+  expect(user2.uuid).toEqual(uuid2);
   expect(user2.googleID).toBe(googleID2);
 });
 
 test('Get User by googleID', async () => {
   const user = await UsersRepo.getUserByGoogleID(googleID);
-  expect(user.id).toEqual(id);
+  expect(user.uuid).toEqual(uuid);
   expect(user.googleID).toBe(googleID);
 
   const user2 = await UsersRepo.getUserByGoogleID(googleID2);
-  expect(user2.id).toEqual(id2);
+  expect(user2.uuid).toEqual(uuid2);
   expect(user2.googleID).toBe(googleID2);
 });
 
 test('Get Users', async () => {
   const users = await UsersRepo.getUsers();
-  const user = users.find(u => u.id === id);
+  const user = users.find(u => u.uuid === uuid);
   expect(user).toBeDefined();
 });
 
 test('Get Users from IDs', async () => {
-  let users = await UsersRepo.getUsersFromIDs([id]);
+  let users = await UsersRepo.getUsersFromIDs([uuid]);
   expect(users.length).toEqual(1);
-  expect(users[0].id).toBe(id);
+  expect(users[0].uuid).toBe(uuid);
 
-  users = await UsersRepo.getUsersFromIDs([id, id2]);
+  users = await UsersRepo.getUsersFromIDs([uuid, uuid2]);
   expect(users.length).toEqual(2);
 
-  users = await UsersRepo.getUsersFromIDs([id, id2], [id2]);
+  users = await UsersRepo.getUsersFromIDs([uuid, uuid2], [uuid2]);
   expect(users.length).toEqual(1);
-  expect(users[0].id).toBe(id);
+  expect(users[0].uuid).toBe(uuid);
 
-  users = await UsersRepo.getUsersFromIDs([id, id2], [id, id2]);
+  users = await UsersRepo.getUsersFromIDs([uuid, uuid2], [uuid, uuid2]);
   expect(users.length).toEqual(0);
 });
 
@@ -96,34 +96,34 @@ test('Get Users by googleID', async () => {
 });
 
 test('Get Groups', async () => {
-  const user = await UsersRepo.getUserByID(id);
+  const user = await UsersRepo.getUserByID(uuid);
   const code = await GroupsRepo.createCode();
   group = await GroupsRepo.createGroup('name', code);
-  const adminGroups1 = await UsersRepo.getGroupsByID(id, 'admin');
-  const memberGroups1 = await UsersRepo.getGroupsByID(id, 'member');
+  const adminGroups1 = await UsersRepo.getGroupsByID(uuid, 'admin');
+  const memberGroups1 = await UsersRepo.getGroupsByID(uuid, 'member');
   expect(adminGroups1.length).toEqual(0);
   expect(memberGroups1.length).toEqual(0);
 
-  await GroupsRepo.addUsersByIDs(group.id, id, 'member');
+  await GroupsRepo.addUsersByIDs(group.uuid, [uuid], 'member');
   group2 = await GroupsRepo.createGroup('group2', GroupsRepo.createCode(), user);
-  const allGroups = await UsersRepo.getGroupsByID(id);
-  const adminGroups2 = await UsersRepo.getGroupsByID(id, 'admin');
-  const memberGroups2 = await UsersRepo.getGroupsByID(id, 'member');
+  const allGroups = await UsersRepo.getGroupsByID(uuid);
+  const adminGroups2 = await UsersRepo.getGroupsByID(uuid, 'admin');
+  const memberGroups2 = await UsersRepo.getGroupsByID(uuid, 'member');
   expect(allGroups.length).toEqual(2);
   expect(adminGroups2.length).toEqual(1);
-  expect(adminGroups2[0].id).toBe(group2.id);
+  expect(adminGroups2[0].uuid).toBe(group2.uuid);
   expect(memberGroups2.length).toEqual(1);
-  expect(memberGroups2[0].id).toBe(group.id);
+  expect(memberGroups2[0].uuid).toBe(group.uuid);
 
-  await GroupsRepo.deleteGroupByID(group.id);
-  await GroupsRepo.deleteGroupByID(group2.id);
+  await GroupsRepo.deleteGroupByID(group.uuid);
+  await GroupsRepo.deleteGroupByID(group2.uuid);
 });
 
 test('Delete User', async () => {
-  await UsersRepo.deleteUserByID(id);
-  await UsersRepo.deleteUserByID(id2);
-  expect(await UsersRepo.getUserByID(id)).not.toBeDefined();
-  expect(await UsersRepo.getUserByID(id2)).not.toBeDefined();
+  await UsersRepo.deleteUserByID(uuid);
+  await UsersRepo.deleteUserByID(uuid2);
+  expect(await UsersRepo.getUserByID(uuid)).not.toBeDefined();
+  expect(await UsersRepo.getUserByID(uuid2)).not.toBeDefined();
 });
 
 // Teardown

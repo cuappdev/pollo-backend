@@ -6,57 +6,55 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import uuidv4 from 'uuid/v4';
 import Base from './Base';
 import Draft from './Draft';
-import Question from './Question';
 import Group from './Group';
 import appDevUtils from '../utils/AppDevUtils';
 
-@Entity('users')
+import type { APIUser } from '../routers/v2/APITypes';
+
 /**
  * User class represents a user on the application.
  * @extends {Base}
  */
+@Entity('users')
 class User extends Base {
-  @PrimaryGeneratedColumn()
-  /** Unique identifier */
-  id: any = null;
+  /** Universally unique identifier */
+  @PrimaryGeneratedColumn('uuid')
+  uuid: string = uuidv4();
 
-  @Column('string')
   /** Google ID of user */
+  @Column('character varying')
   googleID: string = '';
 
-  @Column('string')
   /** Net ID of user */
+  @Column('character varying')
   netID: string = '';
 
-  @Column('string')
   /** Email of user */
+  @Column('character varying')
   email: string = '';
 
-  @Column('string')
   /** User first name */
+  @Column('character varying')
   firstName: string = '';
 
-  @Column('string')
   /** User last name */
+  @Column('character varying')
   lastName: string = '';
 
-  @ManyToMany(type => Group, group => group.admins)
   /** Groups that the user is an admin of */
-  adminGroups: ?Group[] = [];
+  @ManyToMany(type => Group, group => group.admins)
+  adminGroups: ?Group[] = undefined;
 
-  @ManyToMany(type => Group, group => group.members)
   /** Groups that the user is a member of */
-  memberGroups: ?Group[] = [];
+  @ManyToMany(type => Group, group => group.members)
+  memberGroups: ?Group[] = undefined;
 
-  @OneToMany(type => Question, question => question.user)
-  /** Questions that a user has asked */
-  questions: ?Question[] = [];
-
-  @OneToMany(type => Draft, draft => draft.user)
   /** Drafts that a user has created */
-  drafts: ?Draft[] = [];
+  @OneToMany(type => Draft, draft => draft.user)
+  drafts: ?Draft[] = undefined;
 
   /**
    * Method to create a dummy user. (For testing purposes)
@@ -88,6 +86,15 @@ class User extends Base {
     user.email = creds.emails[0].value;
     user.netID = appDevUtils.netIDFromEmail(user.email);
     return user;
+  }
+
+  serialize(): APIUser {
+    return {
+      ...super.serialize(),
+      id: this.uuid,
+      name: `${this.firstName} ${this.lastName}`,
+      netID: this.netID,
+    };
   }
 }
 

@@ -20,11 +20,7 @@ class GetMembersRouter extends AppDevRouter<APIUser[]> {
     const users = await GroupsRepo.getUsersByGroupID(id, 'member');
     return users
       .filter(Boolean)
-      .map(user => ({
-        id: user.id,
-        name: `${user.firstName} ${user.lastName}`,
-        netID: user.netID,
-      }));
+      .map(user => user.serialize());
   }
 }
 
