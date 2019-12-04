@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
+const NodemonPlugin = require('nodemon-webpack-plugin');
+const ExtraWatchWebpackPlugin = require('extra-watch-webpack-plugin');
 
 const nodeModules = {};
 fs.readdirSync('node_modules')
@@ -34,5 +36,16 @@ module.exports = {
     },
     plugins: [
         new webpack.IgnorePlugin(/\.(css|less)$/),
+        new NodemonPlugin({
+            watch: ['./build', './src/server.js'],
+            events: {
+                start: 'cls || clear'
+            },
+            verbose: false,
+            restartable: 'rs',
+        }),
+        new ExtraWatchWebpackPlugin({
+            dirs: ['./'],
+        }),
     ],
 };
