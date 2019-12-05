@@ -39,7 +39,7 @@ module.exports = {
         new NodemonPlugin({
             watch: ['./build', './src/server.js'],
             events: {
-                start: 'cls || clear'
+                start: 'cls || clear && node scripts/notify.js',
             },
             verbose: false,
             restartable: 'rs',

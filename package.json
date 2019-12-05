@@ -45,6 +45,7 @@
     "flow-bin": "^0.50.0",
     "form-urlencoded": "^2.0.4",
     "jest": "^24.9.0",
+    "node-notifier": "^6.0.0",
     "nodemon": "^2.0.1",
     "nodemon-webpack-plugin": "^4.2.1",
     "request-promise-native": "^1.0.5",
