@@ -5,7 +5,6 @@ import {
   Request,
 } from 'express';
 import AppDevResponse from './AppDevResponse';
-import LogUtils from './LogUtils';
 import UserSessionsRepo from '../repos/UserSessionsRepo';
 
 /**

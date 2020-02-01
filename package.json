@@ -4,8 +4,8 @@
   "description": "",
   "main": "build/bundle.js",
   "scripts": {
-    "start": "webpack && node build/bundle.js",
-    "prod": "webpack -p && node build/bundle.js",
+    "start": "./node_modules/.bin/webpack --watch --mode=development && node build/bundle.js",
+    "prod": "./mode_modules/.bin/webpack -p --mode=production && node build/bundle.js",
     "test": "jest --forceExit -i",
     "flow": "node_modules/.bin/flow",
     "flow-stop": "node_modules/.bin/flow stop"
@@ -41,12 +41,17 @@
     "eslint-plugin-jest": "^21.22.0",
     "eslint-plugin-jsx-a11y": "^6.1.1",
     "eslint-plugin-react": "^7.11.1",
+    "extra-watch-webpack-plugin": "^1.0.3",
     "flow-bin": "^0.50.0",
     "form-urlencoded": "^2.0.4",
     "jest": "^24.9.0",
+    "node-notifier": "^6.0.0",
+    "nodemon": "^2.0.1",
+    "nodemon-webpack-plugin": "^4.2.1",
     "request-promise-native": "^1.0.5",
     "serve-favicon": "^2.4.3",
-    "webpack": "^3.3.0"
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
   },
   "dependencies": {
     "acorn": "^6.1.1",
@@ -62,6 +67,7 @@
     "express": "^4.15.3",
     "globby": "^6.1.0",
     "google-auth-library": "^2.0.0",
+    "i": "^0.3.6",
     "merge": "^1.2.1",
     "pg": "^7.4.1",
     "reflect-metadata": "^0.1.12",
