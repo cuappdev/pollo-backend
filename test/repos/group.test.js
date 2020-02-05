@@ -154,7 +154,7 @@ test('Get Members of Group', async () => {
 });
 
 test('Get All Users of Group', async () => {
-  await GroupsRepo.addUsersByGoogleIDs(uuid, [user2.googleID], 'admin');
+  await GroupsRepo.addUsersByGoogleIDs(uuid, [user.googleID], 'admin');
   await GroupsRepo.addUsersByGoogleIDs(uuid, [user2.googleID], 'member');
 
   const users = await GroupsRepo.getUsersByGroupID(uuid);
@@ -188,8 +188,9 @@ test('Add Members to Group by ID', async () => {
   expect(members.length).toEqual(3);
 
   let g = await GroupsRepo.removeUserByGroupID(uuid, [user3.uuid], 'member');
+  expect(g.uuid).toEqual(group.uuid);
+
   g = await GroupsRepo.removeUserByGroupID(uuid, [user4.uuid], 'member');
-  // ({ uuid } = group);
   expect(g.uuid).toEqual(group.uuid);
 });
 
@@ -233,6 +234,9 @@ afterEach(async () => {
 
   await GroupsRepo.deleteGroupByID(uuid);
   await GroupsRepo.deleteGroupByID(uuid2);
-  // // eslint-disable-next-line no-console
-  // console.log('Passed all group tests');
+});
+
+afterAll(() => {
+  // eslint-disable-next-line no-console
+  console.log('Passed all group tests');
 });
