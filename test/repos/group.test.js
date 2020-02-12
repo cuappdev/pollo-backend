@@ -36,7 +36,7 @@ beforeEach(async () => {
   group = await GroupsRepo.createGroup('Group', code, user);
   group2 = await GroupsRepo.createGroup('NewGroup', code2);
 
-  ({ uuid } = group);
+  uuid = group.uuid;
   uuid2 = group2.uuid;
 });
 
@@ -114,7 +114,6 @@ test('Add Admin to Group by GoogleID', async () => {
 
   const g = await GroupsRepo.removeUserByGroupID(uuid, [user2.uuid], 'admin');
   expect(g.admins.length).toEqual(1);
-  // ({ uuid } = group);
   expect(g.uuid).toEqual(group.uuid);
 
   const googleIDs = [user3.googleID, user4.googleID];

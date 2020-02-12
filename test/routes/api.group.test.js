@@ -85,7 +85,6 @@ test('Get admins for group', async () => {
   await request(get(`/sessions/${group.id}/admins/`, adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
     const admins = getres.data;
-    console.log('hmm');
     expect(admins.length).toBe(1);
     expect(admins[0].id).toBe(adminID);
   });
@@ -298,7 +297,6 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-
   // eslint-disable-next-line no-console
   console.log('Passed all group route tests');
 });
