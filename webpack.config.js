@@ -41,11 +41,12 @@ module.exports = {
             events: {
                 start: 'cls || clear && node scripts/notify.js',
             },
-            verbose: false,
+            verbose: true,
             restartable: 'rs',
+            script: './build/bundle.js'
         }),
         new ExtraWatchWebpackPlugin({
-            dirs: ['./'],
+            dirs: ['./src'],
         }),
     ],
 };
