@@ -46,6 +46,11 @@ const USER_TYPES = {
   MEMBER: 'member',
 };
 
+const EXPORT_FORMATS = {
+  CMSX: 'cmsx',
+  CANVAS: 'canvas',
+};
+
 /** Custom types for Poll type */
 export type PollState = 'live' | 'ended' | 'shared'
 export type PollType = 'multipleChoice' | 'freeResponse'
@@ -55,4 +60,5 @@ export default {
   POLL_TYPES,
   REQUEST_TYPES,
   USER_TYPES,
+  EXPORT_FORMATS,
 };

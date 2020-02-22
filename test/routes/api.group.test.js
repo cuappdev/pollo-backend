@@ -213,13 +213,17 @@ test('Download csv', async () => {
     headers: {
       Authorization: `Bearer ${adminToken}`,
     },
+    data: {
+      format: 'cmsx',
+      dates: [new Date()],
+    },
   }).catch((e) => {
     console.log(e);
     expect(e).toBe(null);
   });
 
   expect(result.status).toBe(200);
-  expect(result.data).toBe('userid,Poll 1,Poll 2\nu1,A,B\nu2,B,A\n');
+  expect(result.data).toBe('NetID,Assignment Points,Assignment Total,Adjustments,Comments\nu1,2,2,,\nu2,2,2,,\n');
 
   const u3 = await UsersRepo.createUserWithFields('u3', 'u', '3', 'u3@example.com');
   await GroupsRepo.addUsersByIDs(group.id, [u3.uuid]);
@@ -228,13 +232,18 @@ test('Download csv', async () => {
     headers: {
       Authorization: `Bearer ${adminToken}`,
     },
+    data: {
+      format: 'cmsx',
+      dates: [new Date()],
+    },
   }).catch((e) => {
     console.log(e);
     expect(e).toBe(null);
   });
 
   expect(result.status).toBe(200);
-  expect(result.data).toBe('userid,Poll 1,Poll 2\nu1,A,B\nu2,B,A\nu3,,\n');
+  expect(result.data)
+    .toBe('NetID,Assignment Points,Assignment Total,Adjustments,Comments\nu1,A,B,,\nu2,B,A,,\nu3,0,2,,\n');
 
   const p3 = await PollsRepo.createPoll(
     'Poll 3', g, [{ letter: 'A', text: 'Earth' }, { letter: 'B', text: 'Venus' }],
@@ -246,13 +255,18 @@ test('Download csv', async () => {
     headers: {
       Authorization: `Bearer ${adminToken}`,
     },
+    data: {
+      format: 'cmsx',
+      dates: [new Date()],
+    },
   }).catch((e) => {
     console.log(e);
     expect(e).toBe(null);
   });
 
   expect(result.status).toBe(200);
-  expect(result.data).toBe('userid,Poll 1,Poll 2,Poll 3\nu1,A,B,\nu2,B,A,\nu3,,,A\n');
+  expect(result.data)
+    .toBe('NetID,Assignment Points,Assignment Total,Adjustments,Comments\nu1,2,3,,\nu2,2,3,,\nu3,1,3,,\n');
 
   await PollsRepo.deletePollByID(p1.uuid);
   await PollsRepo.deletePollByID(p2.uuid);
