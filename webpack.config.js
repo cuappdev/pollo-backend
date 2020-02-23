@@ -41,7 +41,6 @@ module.exports = {
             events: {
                 start: 'cls || clear && node scripts/notify.js',
             },
-            verbose: true,
             restartable: 'rs',
             script: './build/bundle.js'
         }),
