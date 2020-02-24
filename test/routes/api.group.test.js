@@ -14,8 +14,7 @@ const {
 // Groups
 // Must be running server to test
 
-const opts = { name: 'Test group', code: GroupsRepo.createCode() };
-const opts2 = { name: 'New group' };
+const opts = () => ({ name: 'Test group', code: GroupsRepo.createCode() });
 const googleID = 'usertest';
 let adminToken;
 let userToken;
@@ -30,17 +29,27 @@ beforeAll(async () => {
     console.log('Error connecting to database');
     process.exit();
   });
+});
 
+beforeEach(async () => {
   const user = await UsersRepo.createDummyUser(googleID);
   adminID = user.uuid;
   session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
   adminToken = session.sessionToken;
+
+  await request(post('/sessions/', opts(), adminToken)).then((result) => {
+    expect(result.success).toBe(true);
+    group = result.data;
+  });
+
+  const user2 = await UsersRepo.createDummyUser('dummy');
+  userID = user2.uuid;
+  userToken = (await UserSessionsRepo.createOrUpdateSession(user2, null, null)).sessionToken;
 });
 
 test('Create group', async () => {
-  await request(post('/sessions/', opts, adminToken)).then((result) => {
+  await request(post('/sessions/', opts(), adminToken)).then((result) => {
     expect(result.success).toBe(true);
-    group = result.data;
   });
 });
 
@@ -63,8 +72,6 @@ test('Get groups for admin', async () => {
 });
 
 test('Add admins to group', async () => {
-  const user = await UsersRepo.createDummyUser('dummy');
-  userID = user.uuid;
   const body = {
     adminIDs: [userID],
   };
@@ -78,9 +85,8 @@ test('Get admins for group', async () => {
   await request(get(`/sessions/${group.id}/admins/`, adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
     const admins = getres.data;
-    expect(admins.length).toBe(2);
+    expect(admins.length).toBe(1);
     expect(admins[0].id).toBe(adminID);
-    expect(admins[1].id).toBe(userID);
   });
 });
 
@@ -91,14 +97,10 @@ test('Remove admin from group', async () => {
   await request(put(`/sessions/${group.id}/admins/`, body,
     adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
-    UsersRepo.deleteUserByID(userID);
   });
 });
 
 test('Add members to group', async () => {
-  const user = await UsersRepo.createDummyUser('dummy');
-  userID = user.uuid;
-  userToken = (await UserSessionsRepo.createOrUpdateSession(user, null, null)).sessionToken;
   const body = {
     memberIDs: [userID],
   };
@@ -109,8 +111,11 @@ test('Add members to group', async () => {
 });
 
 test('Get groups as member', async () => {
+  await GroupsRepo.addUsersByIDs(group.id, [userID]);
+
   await request(get('/sessions/all/member/', userToken)).then((getres) => {
     expect(getres.success).toBe(true);
+    expect(getres.data.length).toBe(1);
     const groupRes = getres.data[0];
     expect(group.id).toBe(groupRes.id);
     expect(group.name).toBe(groupRes.name);
@@ -120,6 +125,8 @@ test('Get groups as member', async () => {
 });
 
 test('Get members of group', async () => {
+  await GroupsRepo.addUsersByIDs(group.id, [userID]);
+
   await request(get(`/sessions/${group.id}/members/`, adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
     const members = getres.data;
@@ -129,6 +136,8 @@ test('Get members of group', async () => {
 });
 
 test('Leave group', async () => {
+  await GroupsRepo.addUsersByIDs(group.id, [userID]);
+
   await request(del(`/sessions/${group.id}/members/`, userToken),
     (error, res, body) => {
       expect(body.success).toBe(true);
@@ -150,6 +159,8 @@ test('Leave group', async () => {
 });
 
 test('Remove member from group', async () => {
+  await GroupsRepo.addUsersByIDs(group.id, [userID]);
+
   const body = {
     memberIDs: [userID],
   };
@@ -157,7 +168,6 @@ test('Remove member from group', async () => {
     adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
   });
-  await UsersRepo.deleteUserByID(userID);
 });
 
 test('Get groups for admin', async () => {
@@ -171,14 +181,14 @@ test('Get groups for admin', async () => {
 });
 
 test('Update group', async () => {
-  await request(put(`/sessions/${group.id}`, opts2, adminToken)).then((getres) => {
+  await request(put(`/sessions/${group.id}`, { name: 'New group' }, adminToken)).then((getres) => {
     expect(getres.success).toBe(true);
     expect(getres.data.name).toBe('New group');
   });
 });
 
 test('Update group with invalid adminToken', async () => {
-  await request(put(`/sessions/${group.id}`, opts2, 'invalid'))
+  await request(put(`/sessions/${group.id}`, { name: 'New group' }, 'invalid'))
     .catch((e) => {
       expect(e.statusCode).toBe(401);
     });
@@ -279,9 +289,14 @@ test('Delete group', async () => {
   expect(result.success).toBe(true);
 });
 
-afterAll(async () => {
+afterEach(async () => {
+  await request(del(`/sessions/${group.id}`, adminToken));
   await UsersRepo.deleteUserByID(adminID);
   await UserSessionsRepo.deleteSession(session.uuid);
+  await UsersRepo.deleteUserByID(userID);
+});
+
+afterAll(async () => {
   // eslint-disable-next-line no-console
   console.log('Passed all group route tests');
 });
