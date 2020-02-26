@@ -4,8 +4,8 @@
   "description": "",
   "main": "build/bundle.js",
   "scripts": {
-    "start": "./node_modules/.bin/webpack --watch --mode=development && node build/bundle.js",
-    "prod": "./mode_modules/.bin/webpack -p --mode=production && node build/bundle.js",
+    "start": "./node_modules/.bin/webpack --watch --mode=development",
+    "prod": "./node_modules/.bin/webpack -p --mode=production && node build/bundle.js",
     "test": "jest --forceExit -i",
     "flow": "node_modules/.bin/flow",
     "flow-stop": "node_modules/.bin/flow stop"
