@@ -223,7 +223,7 @@ test('Download csv', async () => {
     headers: {
       Authorization: `Bearer ${adminToken}`,
     },
-    data: {
+    params: {
       format: 'cmsx',
       dates: [new Date()],
     },
@@ -242,7 +242,7 @@ test('Download csv', async () => {
     headers: {
       Authorization: `Bearer ${adminToken}`,
     },
-    data: {
+    params: {
       format: 'cmsx',
       dates: [new Date()],
     },
@@ -253,7 +253,7 @@ test('Download csv', async () => {
 
   expect(result.status).toBe(200);
   expect(result.data)
-    .toBe('NetID,Assignment Points,Assignment Total,Adjustments,Comments\nu1,A,B,,\nu2,B,A,,\nu3,0,2,,\n');
+    .toBe('NetID,Assignment Points,Assignment Total,Adjustments,Comments\nu1,2,2,,\nu2,2,2,,\nu3,0,2,,\n');
 
   const p3 = await PollsRepo.createPoll(
     'Poll 3', g, [{ letter: 'A', text: 'Earth' }, { letter: 'B', text: 'Venus' }],
@@ -265,7 +265,7 @@ test('Download csv', async () => {
     headers: {
       Authorization: `Bearer ${adminToken}`,
     },
-    data: {
+    params: {
       format: 'cmsx',
       dates: [new Date()],
     },
