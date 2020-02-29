@@ -23,10 +23,18 @@ class GetCSVRouter extends AppDevRouter {
     return [super.middleware(), async (req: Request, res: Response, next: NextFunction) => {
       const { id } = req.params;
       const { format, dates } = req.query;
+
+      if (format === undefined || dates === undefined) {
+        res.sendStatus(400);
+        return;
+      }
+
       const parsedDates = dates.map(Date.parse).map(n => new Date(n));
       let s;
       switch (format) {
         case constants.EXPORT_FORMATS.CMSX:
+          res.type('csv');
+          res.set('Content-disposition', `attachment; filename=pollo_group_${id}.csv`);
           s = await CSVGenerator.participationCMSX(id, parsedDates);
           s.pipe(res);
           break;

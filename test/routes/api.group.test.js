@@ -278,6 +278,34 @@ test('Download csv', async () => {
   expect(result.data)
     .toBe('NetID,Assignment Points,Assignment Total,Adjustments,Comments\nu1,2,3,,\nu2,2,3,,\nu3,1,3,,\n');
 
+  await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+    params: {
+      format: 'cmsx',
+      dates: [],
+    },
+  }).catch((e) => {
+    expect(e.response.status).toBe(400);
+  });
+
+  result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+    params: {
+      format: 'cmsx',
+      dates: [new Date('2011-10-10T14:48:00')],
+    },
+  }).catch((e) => {
+    console.log(e);
+    expect(e).toBe(null);
+  });
+
+  expect(result.data)
+    .toBe('NetID,Assignment Points,Assignment Total,Adjustments,Comments\nu1,0,0,,\nu2,0,0,,\nu3,0,0,,\n');
+
   await PollsRepo.deletePollByID(p1.uuid);
   await PollsRepo.deletePollByID(p2.uuid);
   await PollsRepo.deletePollByID(p3.uuid);
