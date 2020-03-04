@@ -14,7 +14,7 @@ const {
 // Groups
 // Must be running server to test
 
-const opts = () => ({ name: 'Test group', code: GroupsRepo.createCode() });
+const opts = () => ({ name: 'Test group' });
 const googleID = 'usertest';
 let adminToken;
 let userToken;
