@@ -4,7 +4,7 @@ import GroupsRepo from '../../repos/GroupsRepo';
 import User from '../../models/User';
 import constants from '../../utils/Constants';
 
-async function participationCMSX(id, dates: Array<Date>): stream {
+async function participation(id, dates: Array<Date>) {
   const polls: Array<?Poll> = (await GroupsRepo.getPolls(id))
     .filter((x: Poll) => {
       const c = new Date(Number.parseInt(x.createdAt) * 1000);
@@ -27,11 +27,17 @@ async function participationCMSX(id, dates: Array<Date>): stream {
     });
   });
 
+  return { scores, total };
+}
+
+async function participationCMSX(id, dates: Array<Date>): stream {
+  const { scores } = await participation(id, dates);
+
   const s = new stream.PassThrough();
-  s.write('NetID,Assignment Points,Assignment Total,Adjustments,Comments\n');
+  s.write('NetID,Participation\n');
 
   Object.entries(scores).forEach(([netID, score]) => {
-    s.write(`${netID},${score},${total},,\n`);
+    s.write(`${netID},${score}\n`);
   });
   s.end();
 
