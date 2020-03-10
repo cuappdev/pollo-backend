@@ -30,14 +30,14 @@ async function participation(id, dates: Array<Date>) {
   return { scores, total };
 }
 
-async function participationCMSX(id, dates: Array<Date>): stream {
-  const { scores } = await participation(id, dates);
+async function participationCMSXPerDay(id, dates: Array<Date>): stream {
+  const scores = await Promise.all(dates.map(async d => (await participation(id, [d])).scores));
 
   const s = new stream.PassThrough();
-  s.write('NetID,Participation\n');
+  s.write(`NetID,${dates.map(d => d.toDateString()).join(',')}\n`);
 
-  Object.entries(scores).forEach(([netID, score]) => {
-    s.write(`${netID},${score}\n`);
+  Object.entries(scores[0]).forEach(([netID, _]) => {
+    s.write(`${netID},${scores.map(ps => ps[netID]).join(',')}\n`);
   });
   s.end();
 
@@ -45,5 +45,5 @@ async function participationCMSX(id, dates: Array<Date>): stream {
 }
 
 export default {
-  participationCMSX,
+  participationCMSXPerDay,
 };

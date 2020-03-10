@@ -35,7 +35,7 @@ class GetCSVRouter extends AppDevRouter {
         case constants.EXPORT_FORMATS.CMSX:
           res.type('csv');
           res.set('Content-disposition', `attachment; filename=pollo_group_${id}.csv`);
-          s = await CSVGenerator.participationCMSX(id, parsedDates);
+          s = await CSVGenerator.participationCMSXPerDay(id, parsedDates);
           s.pipe(res);
           break;
         case constants.EXPORT_FORMATS.CANVAS:

@@ -216,8 +216,7 @@ test('Download csv', async () => {
 
   await GroupsRepo.addUsersByIDs(group.id, [u1.uuid, u2.uuid]);
 
-  polls = await GroupsRepo.getPolls(group.id);
-  console.log(`found ${polls.length} polls`);
+  const today = new Date();
 
   let result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
     headers: {
@@ -225,7 +224,7 @@ test('Download csv', async () => {
     },
     params: {
       format: 'cmsx',
-      dates: [new Date()],
+      dates: [today],
     },
   }).catch((e) => {
     console.log(e);
@@ -233,7 +232,7 @@ test('Download csv', async () => {
   });
 
   expect(result.status).toBe(200);
-  expect(result.data).toBe('NetID,Participation\nu1,2\nu2,2\n');
+  expect(result.data).toBe(`NetID,${today.toDateString()}\nu1,2\nu2,2\n`);
 
   const u3 = await UsersRepo.createUserWithFields('u3', 'u', '3', 'u3@example.com');
   await GroupsRepo.addUsersByIDs(group.id, [u3.uuid]);
@@ -253,7 +252,7 @@ test('Download csv', async () => {
 
   expect(result.status).toBe(200);
   expect(result.data)
-    .toBe('NetID,Participation\nu1,2\nu2,2\nu3,0\n');
+    .toBe(`NetID,${today.toDateString()}\nu1,2\nu2,2\nu3,0\n`);
 
   const p3 = await PollsRepo.createPoll(
     'Poll 3', g, [{ letter: 'A', text: 'Earth' }, { letter: 'B', text: 'Venus' }],
@@ -276,7 +275,7 @@ test('Download csv', async () => {
 
   expect(result.status).toBe(200);
   expect(result.data)
-    .toBe('NetID,Participation\nu1,2\nu2,2\nu3,1\n');
+    .toBe(`NetID,${today.toDateString()}\nu1,2\nu2,2\nu3,1\n`);
 
   await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
     headers: {
@@ -290,13 +289,15 @@ test('Download csv', async () => {
     expect(e.response.status).toBe(400);
   });
 
+  const badDate = new Date('2011-10-10T14:48:00');
+
   result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
     headers: {
       Authorization: `Bearer ${adminToken}`,
     },
     params: {
       format: 'cmsx',
-      dates: [new Date('2011-10-10T14:48:00')],
+      dates: [badDate],
     },
   }).catch((e) => {
     console.log(e);
@@ -304,7 +305,23 @@ test('Download csv', async () => {
   });
 
   expect(result.data)
-    .toBe('NetID,Participation\nu1,0\nu2,0\nu3,0\n');
+    .toBe(`NetID,${badDate.toDateString()}\nu1,0\nu2,0\nu3,0\n`);
+
+  result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+    params: {
+      format: 'cmsx',
+      dates: [badDate, today],
+    },
+  }).catch((e) => {
+    console.log(e);
+    expect(e).toBe(null);
+  });
+
+  expect(result.data)
+    .toBe(`NetID,${badDate.toDateString()},${today.toDateString()}\nu1,0,2\nu2,0,2\nu3,0,1\n`);
 
   await PollsRepo.deletePollByID(p1.uuid);
   await PollsRepo.deletePollByID(p2.uuid);
