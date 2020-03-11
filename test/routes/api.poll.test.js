@@ -25,6 +25,9 @@ beforeAll(async () => {
     console.log('Error connecting to database');
     process.exit();
   });
+});
+
+beforeEach(async () => {
   const user = await UsersRepo.createDummyUser(googleID);
   userID = user.uuid;
   session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
@@ -93,7 +96,7 @@ test('Delete poll', async () => {
   });
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await request(del(`/sessions/${group.id}`, token)).then((result) => {
     expect(result.success).toBe(true);
   });
