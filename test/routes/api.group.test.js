@@ -323,6 +323,8 @@ test('Download csv', async () => {
   expect(result.data)
     .toBe(`NetID,${badDate.toDateString()},${today.toDateString()}\nu1,0,2\nu2,0,2\nu3,0,1\n`);
 
+  console.log(`NetID,${badDate.toDateString()},${today.toDateString()}\nu1,0,2\nu2,0,2\nu3,0,1\n`);
+
   await PollsRepo.deletePollByID(p1.uuid);
   await PollsRepo.deletePollByID(p2.uuid);
   await PollsRepo.deletePollByID(p3.uuid);

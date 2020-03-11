@@ -10,7 +10,7 @@ async function participation(id, dates: Array<Date>) {
       const c = new Date(Number.parseInt(x.createdAt) * 1000);
       return dates.some(d => c.toDateString() === d.toDateString());
     })
-    .sort((a: Poll, b: Poll) => Number.parseInt(a.createdAt) - Number.parseInt(b.createdAt));
+    .sort((pollA: Poll, pollB: Poll) => Number.parseInt(pollA.createdAt) - Number.parseInt(pollB.createdAt));
 
   const total: Number = polls.length;
   const scores: { string: Number } = {};
@@ -30,6 +30,16 @@ async function participation(id, dates: Array<Date>) {
   return { scores, total };
 }
 
+/**
+ * Writes a CSV of participation data for several days to a stream.
+ * Example output:
+ * ```
+ * NetID,Mon Oct 10 2011,Wed Mar 11 2020
+ * u1,0,2
+ * u2,0,2
+ * u3,0,1
+ * ```
+ */
 async function participationCMSXPerDay(id, dates: Array<Date>): stream {
   const scores = await Promise.all(dates.map(async d => (await participation(id, [d])).scores));
 
