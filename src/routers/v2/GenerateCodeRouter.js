@@ -8,7 +8,7 @@ class GenerateCodeRouter extends AppDevRouter<Object> {
     super(constants.REQUEST_TYPES.GET);
   }
 
-  //
+  // deprecated, do not use
   getPath(): string {
     return '/generate/code/';
   }
