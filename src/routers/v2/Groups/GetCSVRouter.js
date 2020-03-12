@@ -4,14 +4,11 @@ import {
   Request,
   Response,
 } from 'express';
-import stream from 'stream';
 
-import Poll from '../../../models/Poll';
-import User from '../../../models/User';
-import GroupsRepo from '../../../repos/GroupsRepo';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';
 import type { ExpressCallback } from '../../../utils/AppDevRouter';
+import CSVGenerator from '../CSVGenerator';
 
 class GetCSVRouter extends AppDevRouter {
   constructor() {
@@ -25,37 +22,30 @@ class GetCSVRouter extends AppDevRouter {
   middleware(): ExpressCallback[] {
     return [super.middleware(), async (req: Request, res: Response, next: NextFunction) => {
       const { id } = req.params;
-      const polls: Array<?Poll> = (await GroupsRepo.getPolls(id))
-        .sort((a: Poll, b: Poll) => Number.parseInt(a.createdAt) - Number.parseInt(b.createdAt));
-      const headers: Array<string> = [];
-      const userResponses: Map<User, Array<string>> = new Map();
-      const users: Array<User> = await GroupsRepo.getUsersByGroupID(id, constants.USER_TYPES.MEMBER);
-      users.forEach((user: User) => {
-        userResponses.set(user, []);
-      });
+      const { format, dates } = req.query;
 
-      polls.forEach((poll: Poll) => {
-        userResponses.forEach((answers: Array<string>, user: User) => {
-          if (Object.prototype.hasOwnProperty.call(poll.answers, user.googleID)) {
-            answers.push(poll.answers[user.googleID][0].letter);
-          } else {
-            answers.push('');
-          }
-        });
-        headers.push(poll.text);
-      });
+      if (format === undefined || dates === undefined) {
+        res.sendStatus(400);
+        return;
+      }
 
-      res.type('csv');
-      res.set('Content-disposition', `attachment; filename=pollo_group_${id}.csv`);
-
-      const s = new stream.PassThrough();
-      s.write(`userid,${headers.join(',')}\n`);
-      userResponses.forEach((response: Array<string>, user: User) => {
-        s.write(`${user.netID},${response.join(',')}\n`);
-      });
-      s.end();
-
-      s.pipe(res);
+      const parsedDates = dates.map(Date.parse).map(n => new Date(n));
+      let s;
+      switch (format) {
+        case constants.EXPORT_FORMATS.CMSX:
+          res.type('csv');
+          res.set('Content-disposition', `attachment; filename=pollo_group_${id}.csv`);
+          s = await CSVGenerator.participationCMSXPerDay(id, parsedDates);
+          s.pipe(res);
+          break;
+        case constants.EXPORT_FORMATS.CANVAS:
+          res.status(501);
+          res.send('Canvas not yet supported');
+          break;
+        default:
+          res.sendStatus(406);
+          break;
+      }
     }];
   }
 }
