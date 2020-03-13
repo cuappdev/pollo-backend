@@ -11,6 +11,17 @@ let draft1;
 let draft2;
 let userID;
 let userToken;
+let session;
+
+const body1 = {
+  text: 'Test draft',
+  options: ['yes', 'no'],
+};
+
+const body2 = {
+  text: 'Another One ... DJ Khaled',
+  options: ['yes'],
+};
 
 beforeAll(async () => {
   await dbConnection().catch((e) => {
@@ -18,21 +29,26 @@ beforeAll(async () => {
     console.log('Error connecting to database');
     process.exit();
   });
+});
+
+beforeEach(async () => {
   const user = await UsersRepo.createDummyUser('googleID');
   userID = user.uuid;
-  const session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
+  session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
   userToken = session.sessionToken;
+
+  await request(post('/drafts/', body1, userToken)).then((getres) => {
+    draft1 = getres.data;
+    expect(getres.success).toBe(true);
+    expect(draft1).toMatchObject(body1);
+  });
 });
 
 test('Create a draft', async () => {
-  const body = {
-    text: 'Test draft',
-    options: ['yes', 'no'],
-  };
-  await request(post('/drafts/', body, userToken)).then((getres) => {
-    draft1 = getres.data;
+  await request(post('/drafts/', body2, userToken)).then((getres) => {
+    draft2 = getres.data;
     expect(getres.success).toBe(true);
-    expect(draft1).toMatchObject(body);
+    expect(draft2).toMatchObject(body2);
   });
 });
 
@@ -67,19 +83,13 @@ test('Update a draft', async () => {
   });
 });
 
-test('Create another draft', async () => {
-  const body = {
-    text: 'Another One ... DJ Khaled',
-    options: ['yes'],
-  };
-  await request(post('/drafts/', body, userToken)).then((getres) => {
+test('Get updated list of drafts (Authorized)', async () => {
+  await request(post('/drafts/', body2, userToken)).then((getres) => {
     draft2 = getres.data;
     expect(getres.success).toBe(true);
-    expect(draft2).toMatchObject(body);
+    expect(draft2).toMatchObject(body2);
   });
-});
 
-test('Get updated list of drafts (Authorized)', async () => {
   await request(get('/drafts/', userToken)).then((getres) => {
     const drafts = getres.data;
     expect(getres.success).toBe(true);
@@ -90,6 +100,12 @@ test('Get updated list of drafts (Authorized)', async () => {
 });
 
 test('Delete draft', async () => {
+  await request(post('/drafts/', body2, userToken)).then((getres) => {
+    draft2 = getres.data;
+    expect(getres.success).toBe(true);
+    expect(draft2).toMatchObject(body2);
+  });
+
   await request(del(`/drafts/${draft1.id}`, userToken)).then((result) => {
     expect(result.success).toBe(true);
   });
@@ -98,6 +114,16 @@ test('Delete draft', async () => {
   });
 });
 
+afterEach(async () => {
+  await request(del(`/drafts/${draft1.id}`, userToken));
+
+  if (draft2 !== undefined) {
+    await request(del(`/drafts/${draft2.id}`, userToken));
+  }
+  await UsersRepo.deleteUserByID(userID);
+  await UserSessionsRepo.deleteSession(session.uuid);
+});
+
 afterAll(async () => {
-  UsersRepo.deleteUserByID(userID);
+  console.log('Passed all draft tests');
 });
