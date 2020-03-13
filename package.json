@@ -54,7 +54,7 @@
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
-    "acorn": "^6.1.1",
+    "acorn": "^6.4.1",
     "ajv": "^6.5.3",
     "axios": "^0.19.0",
     "body-parser": "^1.17.2",
