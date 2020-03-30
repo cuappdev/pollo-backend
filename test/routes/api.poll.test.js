@@ -36,7 +36,7 @@ beforeAll(async () => {
   group = result.data;
 
   poll = await PollsRepo.createPoll('Poll text', await GroupsRepo.getGroupByID(group.id),
-    [{ letter: 'A', text: 'Saturn' }], 'multipleChoice', 'A', null, 'ended', {});
+    [{ letter: 'A', text: 'Saturn' }], 'A', null, 'ended');
 
   expect(result.success).toBe(true);
 });

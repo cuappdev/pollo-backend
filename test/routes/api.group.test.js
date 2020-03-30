@@ -200,14 +200,14 @@ test('Download csv', async () => {
   console.log(`found ${polls.length} polls`);
   const p1 = await PollsRepo.createPoll(
     'Poll 1', g, [{ letter: 'A', text: 'Saturn' }, { letter: 'B', text: 'Mars' }],
-    'multiplechoice', 'A',
+    'A',
     { u1: [{ letter: 'A', text: 'Saturn' }], u2: [{ letter: 'B', text: 'Mars' }] }, 'ended',
   );
   polls = await GroupsRepo.getPolls(group.id);
   console.log(`found ${polls.length} polls`);
   const p2 = await PollsRepo.createPoll(
     'Poll 2', g, [{ letter: 'A', text: 'Earth' }, { letter: 'B', text: 'Venus' }],
-    'multiplechoice', 'B',
+    'B',
     { u1: [{ letter: 'B', text: 'Venus' }], u2: [{ letter: 'A', text: 'Earth' }] }, 'ended',
   );
 
@@ -256,7 +256,7 @@ test('Download csv', async () => {
 
   const p3 = await PollsRepo.createPoll(
     'Poll 3', g, [{ letter: 'A', text: 'Earth' }, { letter: 'B', text: 'Venus' }],
-    'multiplechoice', 'B',
+    'B',
     { u3: [{ letter: 'A', text: 'Earth' }] }, 'ended',
   );
 
