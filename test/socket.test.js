@@ -10,7 +10,7 @@ import GroupsRepo from '../src/repos/GroupsRepo';
 let groupSocket;
 let group;
 let mockClient;
-// let createdPollID;
+let createdPollID;
 
 const googleID = 'user1';
 const poll = {
@@ -114,13 +114,37 @@ test('Delete live poll', () => {
   expect(groupSocket.current).toBeNull();
 });
 
-// test('Delete poll', async () => {
-//   // eslint-disable-next-line no-underscore-dangle
-//   await groupSocket._deletePoll(createdPollID);
+test('Start poll 2', () => {
+  // eslint-disable-next-line no-underscore-dangle
+  groupSocket._startPoll(poll);
+  expect(groupSocket.current).toMatchObject({
+    answerChoices: poll.answerChoices,
+    correctAnswer: poll.correctAnswer,
+    state: poll.state,
+    text: poll.text,
+    answers: {},
+  });
+});
 
-//   const polls = await GroupsRepo.getPolls(group.uuid);
-//   expect(polls.length).toBe(0);
-// });
+test('End poll 2', async () => {
+  // eslint-disable-next-line no-underscore-dangle
+  await groupSocket._endPoll();
+
+  expect(groupSocket.current).toBeNull();
+
+  const polls = await GroupsRepo.getPolls(group.uuid);
+  const createdPoll = polls[0];
+  expect(createdPoll.state).toBe(constants.POLL_STATES.ENDED);
+  createdPollID = createdPoll.uuid;
+});
+
+test('Delete poll', async () => {
+  // eslint-disable-next-line no-underscore-dangle
+  await groupSocket._deletePoll(createdPollID);
+
+  const polls = await GroupsRepo.getPolls(group.uuid);
+  expect(polls.length).toBe(0);
+});
 
 // Teardown
 afterAll(async () => {
