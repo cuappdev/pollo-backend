@@ -15,16 +15,16 @@ let createdPollID;
 const googleID = 'user1';
 const poll = {
   answerChoices: [{
-    letter: 'A',
+    letter: 0,
     text: 'one',
     count: 0,
   },
   {
-    letter: 'B',
+    letter: 0,
     text: 'two',
     count: 0,
   }],
-  correctAnswer: 'A',
+  correctAnswer: 0,
   state: constants.POLL_STATES.LIVE,
   text: 'How do you spell 1?',
 };
@@ -56,7 +56,7 @@ test('Start poll', () => {
 });
 
 test('Answer poll', () => {
-  const submittedAnswer = { letter: 'B', text: 'two' };
+  const submittedAnswer = 0;
   // eslint-disable-next-line no-underscore-dangle
   groupSocket._answerPoll(mockClient, googleID, submittedAnswer);
 
@@ -64,12 +64,12 @@ test('Answer poll', () => {
   expect(userAnswers.length).toBe(1);
   expect(userAnswers[0]).toBe(submittedAnswer);
 
-  const pollChoice = groupSocket.current.answerChoices.find(p => p.letter === submittedAnswer.letter);
+  const pollChoice = groupSocket.current.answerChoices.find(p => p.letter === submittedAnswer);
   expect(pollChoice.count).toBe(1);
 });
 
 test('Change answer', () => {
-  const submittedAnswer = { letter: 'A', text: 'one' };
+  const submittedAnswer = 0;
   // eslint-disable-next-line no-underscore-dangle
   groupSocket._answerPoll(null, googleID, submittedAnswer);
   
@@ -78,7 +78,7 @@ test('Change answer', () => {
   expect(userAnswers[0]).toBe(submittedAnswer);
 
   groupSocket.current.answerChoices.forEach((pollChoice) => {
-    if (pollChoice.letter === submittedAnswer.letter) {
+    if (pollChoice.letter === submittedAnswer) {
       expect(pollChoice.count).toBe(1);
     } else {
       expect(pollChoice.count).toBe(0);
@@ -94,7 +94,7 @@ test('Get current poll (user)', () => {
   expect(currPoll.correctAnswer).toBe(poll.correctAnswer);
   expect(currPoll.state).toBe(poll.state);
   expect(currPoll.text).toBe(poll.text);
-  expect(currPoll.userAnswers[googleID]).toEqual([{ letter: 'A', text: 'one' }]);
+  expect(currPoll.userAnswers[googleID]).toEqual([0]);
 });
 
 test('Get current poll (admin)', () => {
@@ -105,7 +105,7 @@ test('Get current poll (admin)', () => {
   expect(currPoll.correctAnswer).toBe(poll.correctAnswer);
   expect(currPoll.state).toBe(poll.state);
   expect(currPoll.text).toBe(poll.text);
-  expect(currPoll.userAnswers[googleID]).toEqual([{ letter: 'A', text: 'one' }]);
+  expect(currPoll.userAnswers[googleID]).toEqual([0]);
 });
 
 test('Delete live poll', () => {

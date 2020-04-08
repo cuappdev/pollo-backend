@@ -21,11 +21,11 @@ beforeAll(async () => {
 
 test('Create Poll', async () => {
   const poll = await PollsRepo
-    .createPoll('Poll', group, [], 'A', null, 'shared');
+    .createPoll('Poll', group, [], 0, null, 'shared');
   expect(poll.text).toBe('Poll');
   expect(poll.group.uuid).toBe(group.uuid);
   expect(poll.answerChoices).toEqual([]);
-  expect(poll.correctAnswer).toBe('A');
+  expect(poll.correctAnswer).toBe(0);
   expect(poll.state).toBe('shared');
   expect(poll.answers).toEqual({});
   ({ uuid } = poll);

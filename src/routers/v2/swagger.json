@@ -1315,7 +1315,7 @@
             "name": "submittedAnswer",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/PollChoice"
+              "type": "integer"
             }
           }
         ]
@@ -1606,7 +1606,7 @@
           },
           "example": [
             {
-              "letter": "A",
+              "letter": 0,
               "text": "Example",
               "count": 5
             }
@@ -1614,8 +1614,8 @@
         },
         "correctAnswer": {
           "type": "string",
-          "description": "Letter of correct answer choice",
-          "example": "A"
+          "description": "Letter of correct answer choice, -1 if none",
+          "example": 0
         },
         "createdAt": {
           "type": "string",
@@ -1648,13 +1648,10 @@
             "googleID(string)": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/PollChoice"
+                "type": "integer"
               },
               "example": {
-                "googleID1": {
-                  "letter": "A",
-                  "text": "selected answer"
-                }
+                "googleID1": [3]
               }
             }
           }
@@ -1672,25 +1669,6 @@
         "userAnswers"
       ]
     },
-    "PollChoice": {
-      "type": "object",
-      "properties": {
-        "letter": {
-          "type": "string",
-          "description": "Letter identifier of answer choice",
-          "example": "A"
-        },
-        "text": {
-          "type": "string",
-          "description": "Text of answer choice",
-          "example": "Saturn"
-        }
-      },
-      "required": [
-        "letter",
-        "text"
-      ]
-    },
     "PollResult": {
       "type": "object",
       "properties": {
@@ -1700,9 +1678,9 @@
           "nullable": true
         },
         "letter": {
-          "type": "string",
-          "description": "Letter identifier of answer choice",
-          "example": "A"
+          "type": "integer",
+          "description": "Letter identifier of answer choice as an integer, -1 if none",
+          "example": 2
         },
         "text": {
           "type": "string",
@@ -1731,8 +1709,8 @@
         },
         "correctAnswer": {
           "type": "string",
-          "example": "A",
-          "description": "Letter of correct answer choice"
+          "example": 3,
+          "description": "Letter of correct answer choice, -1 if none"
         },
         "createdAt": {
           "type": "string",
@@ -1764,13 +1742,10 @@
             "googleID(string)": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/PollChoice"
+                "type": "integer"
               },
               "example": {
-                "googleID1": {
-                  "letter": "A",
-                  "text": "selected answer"
-                }
+                "googleID1": [3]
               }
             }
           }

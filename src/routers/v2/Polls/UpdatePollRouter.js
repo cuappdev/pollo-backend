@@ -7,7 +7,6 @@ import LogUtils from '../../../utils/LogUtils';
 import PollsRepo from '../../../repos/PollsRepo';
 
 import type { APIPoll } from '../APITypes';
-import type { PollChoice } from '../../../utils/Constants';
 
 class UpdatePollRouter extends AppDevRouter<APIPoll> {
   constructor() {
@@ -45,7 +44,7 @@ class UpdatePollRouter extends AppDevRouter<APIPoll> {
     }
 
     const userAnswer = poll.answers[req.user.googleID];
-    const answerObject: { string: PollChoice[]} = {};
+    const answerObject: { string: number[]} = {};
     answerObject[req.user.googleID] = userAnswer || [];
 
     return {

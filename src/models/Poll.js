@@ -15,14 +15,9 @@ import type { PollState } from '../utils/Constants';
 import constants from '../utils/Constants';
 
 export type PollResult = {|
-  letter: string,
+  letter: number,
   text: string,
-  count: ?number,
-|}
-
-export type PollChoice = {|
-  letter: string,
-  text: string,
+  count: number,
 |}
 
 /**
@@ -46,7 +41,7 @@ class Poll extends Base {
   /**
    * Choices for the poll
    * @example
-   * let answerChoices = [{letter: "A", text: "Saturn", count: 5}]
+   * let answerChoices = [{letter: 0, text: "Saturn", count: 5}]
    */
   @Column('json')
   answerChoices: PollResult[] = undefined;
@@ -54,19 +49,19 @@ class Poll extends Base {
   /**
    * All the answers by students for the poll.
    * @example
-   * let answers = {googleID: [{letter: "A", text: "Saturn"}]}
+   * let answers = {googleID: [0, 1, 3]}
    */
   @Column('json')
-  answers: { string: PollChoice[] } = {};
+  answers: { string: number[] } = {};
 
   /**
    * Correct answer choice.
-   * Empty string if no correct answer chosen.
+   * -1 if no correct answer chosen.
    * @example
-   * let correctAnswer = 'A'
+   * let correctAnswer = 3
   */
-  @Column('character varying')
-  correctAnswer: string = '';
+  @Column('int')
+  correctAnswer: number = -1;
 
   /** The current state of the poll */
   @Column('character varying')

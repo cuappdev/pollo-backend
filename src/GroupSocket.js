@@ -8,7 +8,7 @@ import GroupsRepo from './repos/GroupsRepo';
 import PollsRepo from './repos/PollsRepo';
 import UserSessionsRepo from './repos/UserSessionsRepo';
 
-import type { PollChoice, PollResult } from './models/Poll';
+import type { PollResult } from './models/Poll';
 import type { PollState } from './utils/Constants';
 
 /** Configuration for each GroupSocket */
@@ -28,9 +28,9 @@ type SocketPoll = {
   id?: id,
   createdAt?: string,
   updatedAt?: string,
-  answers: { string: PollChoice[] }, // {googleID: [PollChoice]}
+  answers: { string: number[] },
   answerChoices: PollResult[],
-  correctAnswer: ?string, // letter of PollChoice
+  correctAnswer?: number,
   state: PollState,
   text: string,
 };
@@ -38,12 +38,12 @@ type SocketPoll = {
 type ClientPoll = {
   id?: id,
   answerChoices: PollResult[], // count is null if user is 'member' and poll is live or ended
-  correctAnswer?: string,
+  correctAnswer?: number,
   createdAt?: string,
   state: PollState,
   text: string,
   updatedAt?: string,
-  userAnswers: { string: PollChoice[] } // {googleID: PollChoice[]} of answers
+  userAnswers: { string: number[] }
 };
 
 /**
@@ -128,7 +128,7 @@ export default class GroupSocket {
     }
   };
 
-  _answerPoll(client: IOSocket, googleID: string, submittedAnswer: PollChoice): void {
+  _answerPoll(client: IOSocket, googleID: string, submittedAnswer: number): void {
     const poll = this.current;
     if (!poll) {
       // console.log(`Client ${client.id} tried to answer with no active poll`);
@@ -137,13 +137,17 @@ export default class GroupSocket {
 
     if (poll.answers[googleID]) { // User selected something before
       poll.answerChoices.forEach((p: PollResult) => {
-        if (p.letter && (p.count !== null) && p.letter === poll.answers[googleID][0].letter) { p.count -= 1; }
+        if ((p.letter !== null) && (p.count !== null) && p.letter === poll.answers[googleID][0]) { 
+          p.count -= 1;
+        }
       });
     }
     // update/add response
-    poll.answers[googleID] = [submittedAnswer];
+    poll.answers[googleID] = [submittedAnswer]; // only have one answer at a time
     poll.answerChoices.forEach((p: PollResult) => {
-      if (p.letter && (p.count !== null) && p.letter === submittedAnswer.letter) { p.count += 1; }
+      if ((p.letter !== null) && (p.count !== null) && p.letter === submittedAnswer) {
+        p.count += 1;
+      }
     });
 
     this.current = poll;
@@ -156,7 +160,7 @@ export default class GroupSocket {
   /**
    * Sets up user events on the member side.
    * User Events:
-   * 'server/poll/answer' (PollChoice)
+   * 'server/poll/answer'
    *  - Client answers current poll
    *  - Adds the answer to answers
    *
@@ -165,7 +169,7 @@ export default class GroupSocket {
    * @param {String} googleID
    */
   _setupUserEvents(client: IOSocket, googleID: string): void {
-    client.on('server/poll/answer', (submittedAnswer: PollChoice) => {
+    client.on('server/poll/answer', (submittedAnswer: number) => {
       this._answerPoll(client, googleID, submittedAnswer);
     });
 
@@ -195,7 +199,7 @@ export default class GroupSocket {
 
     let userAnswers = answers;
     if (!userAnswers) userAnswers = {};
-    if (!correctAnswer) correctAnswer = '';
+    if (correctAnswer === undefined || correctAnswer === null) correctAnswer = -1;
 
     const filteredChoices = userRole === constants.USER_TYPES.ADMIN
     || state !== constants.POLL_STATES.LIVE
