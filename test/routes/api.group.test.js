@@ -218,7 +218,7 @@ test('Download csv', async () => {
 
   const today = new Date();
 
-  let result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+  let resultCMS = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
     headers: {
       Authorization: `Bearer ${adminToken}`,
     },
@@ -231,28 +231,60 @@ test('Download csv', async () => {
     expect(e).toBe(null);
   });
 
-  expect(result.status).toBe(200);
-  expect(result.data).toBe(`NetID,${today.toDateString()}\nu1,2\nu2,2\n`);
-
-  const u3 = await UsersRepo.createUserWithFields('u3', 'u', '3', 'u3@example.com');
-  await GroupsRepo.addUsersByIDs(group.id, [u3.uuid]);
-
-  result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+  let resultCanvas = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
     headers: {
       Authorization: `Bearer ${adminToken}`,
     },
     params: {
-      format: 'cmsx',
-      dates: [new Date()],
+      format: 'canvas',
+      dates: [today],
     },
   }).catch((e) => {
     console.log(e);
     expect(e).toBe(null);
   });
 
-  expect(result.status).toBe(200);
-  expect(result.data)
+  expect(resultCMS.status).toBe(200);
+  expect(resultCMS.data).toBe(`NetID,${today.toDateString()}\nu1,2\nu2,2\n`);
+
+  expect(resultCanvas.status).toBe(200);
+  expect(resultCanvas.data).toBe(`Student,ID,${today.toDateString()}\nu 1,u1,2\nu 2,u2,2\n`);
+
+  const u3 = await UsersRepo.createUserWithFields('u3', 'u', '3', 'u3@example.com');
+  await GroupsRepo.addUsersByIDs(group.id, [u3.uuid]);
+
+  resultCMS = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+    params: {
+      format: 'cmsx',
+      dates: [today],
+    },
+  }).catch((e) => {
+    console.log(e);
+    expect(e).toBe(null);
+  });
+
+  resultCanvas = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+    params: {
+      format: 'canvas',
+      dates: [today],
+    },
+  }).catch((e) => {
+    console.log(e);
+    expect(e).toBe(null);
+  });
+
+  expect(resultCMS.status).toBe(200);
+  expect(resultCMS.data)
     .toBe(`NetID,${today.toDateString()}\nu1,2\nu2,2\nu3,0\n`);
+
+  expect(resultCanvas.status).toBe(200);
+  expect(resultCanvas.data).toBe(`Student,ID,${today.toDateString()}\nu 1,u1,2\nu 2,u2,2\nu 3,u3,0\n`);
 
   const p3 = await PollsRepo.createPoll(
     'Poll 3', g, [{ letter: 'A', text: 'Earth' }, { letter: 'B', text: 'Venus' }],
@@ -260,22 +292,38 @@ test('Download csv', async () => {
     { u3: [{ letter: 'A', text: 'Earth' }] }, 'ended',
   );
 
-  result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+  resultCMS = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
     headers: {
       Authorization: `Bearer ${adminToken}`,
     },
     params: {
       format: 'cmsx',
-      dates: [new Date()],
+      dates: [today],
     },
   }).catch((e) => {
     console.log(e);
     expect(e).toBe(null);
   });
 
-  expect(result.status).toBe(200);
-  expect(result.data)
+  resultCanvas = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+    params: {
+      format: 'canvas',
+      dates: [today],
+    },
+  }).catch((e) => {
+    console.log(e);
+    expect(e).toBe(null);
+  });
+
+  expect(resultCMS.status).toBe(200);
+  expect(resultCMS.data)
     .toBe(`NetID,${today.toDateString()}\nu1,2\nu2,2\nu3,1\n`);
+
+  expect(resultCanvas.status).toBe(200);
+  expect(resultCanvas.data).toBe(`Student,ID,${today.toDateString()}\nu 1,u1,2\nu 2,u2,2\nu 3,u3,1\n`);
 
   await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
     headers: {
@@ -289,9 +337,33 @@ test('Download csv', async () => {
     expect(e.response.status).toBe(400);
   });
 
+  await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+    params: {
+      format: 'canvas',
+      dates: [],
+    },
+  }).catch((e) => {
+    expect(e.response.status).toBe(400);
+  });
+
+  await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+    params: {
+      format: 'badformat',
+      dates: [today],
+    },
+  }).catch((e) => {
+    expect(e.response.status).toBe(406);
+  });
+
   const badDate = new Date('2011-10-10T14:48:00');
 
-  result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+  resultCMS = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
     headers: {
       Authorization: `Bearer ${adminToken}`,
     },
@@ -304,10 +376,25 @@ test('Download csv', async () => {
     expect(e).toBe(null);
   });
 
-  expect(result.data)
+  resultCanvas = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+    params: {
+      format: 'canvas',
+      dates: [badDate],
+    },
+  }).catch((e) => {
+    console.log(e);
+    expect(e).toBe(null);
+  });
+
+  expect(resultCMS.data)
     .toBe(`NetID,${badDate.toDateString()}\nu1,0\nu2,0\nu3,0\n`);
 
-  result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+  expect(resultCanvas.data).toBe(`Student,ID,${badDate.toDateString()}\nu 1,u1,0\nu 2,u2,0\nu 3,u3,0\n`);
+
+  resultCMS = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
     headers: {
       Authorization: `Bearer ${adminToken}`,
     },
@@ -320,8 +407,24 @@ test('Download csv', async () => {
     expect(e).toBe(null);
   });
 
-  expect(result.data)
+  resultCanvas = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
+    headers: {
+      Authorization: `Bearer ${adminToken}`,
+    },
+    params: {
+      format: 'canvas',
+      dates: [badDate, today],
+    },
+  }).catch((e) => {
+    console.log(e);
+    expect(e).toBe(null);
+  });
+  
+  expect(resultCMS.data)
     .toBe(`NetID,${badDate.toDateString()},${today.toDateString()}\nu1,0,2\nu2,0,2\nu3,0,1\n`);
+  
+  expect(resultCanvas.data)
+    .toBe(`Student,ID,${badDate.toDateString()},${today.toDateString()}\nu 1,u1,0,2\nu 2,u2,0,2\nu 3,u3,0,1\n`);
 
   console.log(`NetID,${badDate.toDateString()},${today.toDateString()}\nu1,0,2\nu2,0,2\nu3,0,1\n`);
 

@@ -30,17 +30,19 @@ class GetCSVRouter extends AppDevRouter {
       }
 
       const parsedDates = dates.map(Date.parse).map(n => new Date(n));
-      let s;
+      let strm;
       switch (format) {
         case constants.EXPORT_FORMATS.CMSX:
           res.type('csv');
           res.set('Content-disposition', `attachment; filename=pollo_group_${id}.csv`);
-          s = await CSVGenerator.participationCMSXPerDay(id, parsedDates);
-          s.pipe(res);
+          strm = await CSVGenerator.participationCMSXPerDay(id, parsedDates);
+          strm.pipe(res);
           break;
         case constants.EXPORT_FORMATS.CANVAS:
-          res.status(501);
-          res.send('Canvas not yet supported');
+          res.type('csv');
+          res.set('Content-disposition', `attachment; filename=pollo_group_${id}.csv`);
+          strm = await CSVGenerator.participationCanvasPerDay(id, parsedDates);
+          strm.pipe(res);
           break;
         default:
           res.sendStatus(406);
