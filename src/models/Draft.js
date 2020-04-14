@@ -8,6 +8,7 @@ import {
 import uuidv4 from 'uuid/v4';
 import Base from './Base';
 import User from './User';
+import DraftCollection from './DraftCollection';
 
 import type { APIDraft } from '../routers/v2/APITypes';
 
@@ -32,6 +33,10 @@ class Draft extends Base {
   /** User the draft belongs to */
   @ManyToOne(type => User, user => user.drafts)
   user: ?User = null;
+
+  /** Draft collection the draft is in (if it is in one) */
+  @ManyToOne(type => DraftCollection, draftCollection => draftCollection.drafts)
+  draftCollection: ?DraftCollection = undefined;
 
   serialize(): APIDraft {
     return {

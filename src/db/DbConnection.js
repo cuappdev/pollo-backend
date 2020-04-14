@@ -8,6 +8,7 @@ import {
 // All entities
 import Base from '../models/Base';
 import Draft from '../models/Draft';
+import DraftCollection from '../models/DraftCollection';
 import Poll from '../models/Poll';
 import Group from '../models/Group';
 import User from '../models/User';
@@ -20,6 +21,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 const entities = [
   Base,
   Draft,
+  DraftCollection,
   Poll,
   Group,
   User,

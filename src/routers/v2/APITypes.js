@@ -41,6 +41,13 @@ export type APIDraft = {|
   text: string,
 |}
 
+export type APIDraftCollection = {|
+  id : string,
+  createdAt: string,
+  updatedAt: string,
+  name: string,
+|}
+
 export type APIUser = {|
   id: string,
   createdAt: string,

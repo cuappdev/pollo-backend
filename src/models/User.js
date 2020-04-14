@@ -9,6 +9,7 @@ import {
 import uuidv4 from 'uuid/v4';
 import Base from './Base';
 import Draft from './Draft';
+import DraftCollection from './DraftCollection';
 import Group from './Group';
 import appDevUtils from '../utils/AppDevUtils';
 
@@ -55,6 +56,10 @@ class User extends Base {
   /** Drafts that a user has created */
   @OneToMany(type => Draft, draft => draft.user)
   drafts: ?Draft[] = undefined;
+
+  /** Draft collections that a user has created */
+  @OneToMany(type => DraftCollection, draftCollection => draftCollection.user)
+  draftCollections: ?DraftCollection[] = undefined;
 
   /**
    * Method to create a dummy user. (For testing purposes)
