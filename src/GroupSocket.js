@@ -137,7 +137,7 @@ export default class GroupSocket {
 
     if (poll.answers[googleID]) { // User selected something before
       poll.answerChoices.forEach((p: PollResult) => {
-        if ((p.letter !== null) && (p.count !== null) && p.letter === poll.answers[googleID][0]) { 
+        if ((p.index !== null) && (p.count !== null) && p.index === poll.answers[googleID][0]) {
           p.count -= 1;
         }
       });
@@ -145,7 +145,7 @@ export default class GroupSocket {
     // update/add response
     poll.answers[googleID] = [submittedAnswer]; // only have one answer at a time
     poll.answerChoices.forEach((p: PollResult) => {
-      if ((p.letter !== null) && (p.count !== null) && p.letter === submittedAnswer) {
+      if ((p.index !== null) && (p.count !== null) && p.index === submittedAnswer) {
         p.count += 1;
       }
     });

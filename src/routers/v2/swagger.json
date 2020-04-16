@@ -1606,7 +1606,7 @@
           },
           "example": [
             {
-              "letter": 0,
+              "index": 0,
               "text": "Example",
               "count": 5
             }
@@ -1614,7 +1614,7 @@
         },
         "correctAnswer": {
           "type": "string",
-          "description": "Letter of correct answer choice, -1 if none",
+          "description": "Index of correct answer choice, -1 if none",
           "example": 0
         },
         "createdAt": {
@@ -1677,9 +1677,9 @@
           "description": "Number of times choice was selected or upvoted<br/>`Null` when user is member & poll is live",
           "nullable": true
         },
-        "letter": {
+        "index": {
           "type": "integer",
-          "description": "Letter identifier of answer choice as an integer, -1 if none",
+          "description": "Index identifier of answer choice as an integer, -1 if none",
           "example": 2
         },
         "text": {
@@ -1690,7 +1690,7 @@
       },
       "required": [
         "count",
-        "letter",
+        "index",
         "text"
       ]
     },
@@ -1710,7 +1710,7 @@
         "correctAnswer": {
           "type": "string",
           "example": 3,
-          "description": "Letter of correct answer choice, -1 if none"
+          "description": "Index of correct answer choice, -1 if none"
         },
         "createdAt": {
           "type": "string",

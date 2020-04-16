@@ -197,8 +197,8 @@ test('Get Polls from Group', async () => {
   let polls = await GroupsRepo.getPolls(uuid);
   expect(polls.length).toEqual(0);
 
-  const answerChoices1 = [{ letter: 0, text: 'blue', count: 1 }];
-  const answerChoices1WithoutCounts = [{ letter: 0, text: 'blue' }];
+  const answerChoices1 = [{ index: 0, text: 'blue', count: 1 }];
+  const answerChoices1WithoutCounts = [{ index: 0, text: 'blue' }];
 
   const poll = await PollsRepo.createPoll('Poll', group, answerChoices1, -1, null, 'ended');
   polls = await GroupsRepo.getPolls(uuid);

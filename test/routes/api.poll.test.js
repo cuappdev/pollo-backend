@@ -36,7 +36,7 @@ beforeAll(async () => {
   group = result.data;
 
   poll = await PollsRepo.createPoll('Poll text', await GroupsRepo.getGroupByID(group.id),
-    [{ letter: 0, text: 'Saturn' }], 0, null, 'ended');
+    [{ index: 0, text: 'Saturn' }], 0, null, 'ended');
 
   expect(result.success).toBe(true);
 });
@@ -58,14 +58,14 @@ test('Get polls by group', async () => {
 test('Update poll', async () => {
   const opts = {
     text: 'Updated text',
-    answerChoices: { letter: 0, text: 'Mars' },
+    answerChoices: { index: 0, text: 'Mars' },
     state: 'ended',
   };
   await request(put(`/polls/${poll.uuid}`, opts, token)).then((getres) => {
     expect(getres.success).toBe(true);
     expect(getres.data.text).toBe('Updated text');
     expect(getres.data.state).toBe('ended');
-    expect(getres.data.answerChoices).toMatchObject({ letter: 0, text: 'Mars' });
+    expect(getres.data.answerChoices).toMatchObject({ index: 0, text: 'Mars' });
   });
 });
 

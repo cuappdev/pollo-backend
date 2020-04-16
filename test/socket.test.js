@@ -15,12 +15,12 @@ let createdPollID;
 const googleID = 'user1';
 const poll = {
   answerChoices: [{
-    letter: 0,
+    index: 0,
     text: 'one',
     count: 0,
   },
   {
-    letter: 0,
+    index: 0,
     text: 'two',
     count: 0,
   }],
@@ -64,7 +64,7 @@ test('Answer poll', () => {
   expect(userAnswers.length).toBe(1);
   expect(userAnswers[0]).toBe(submittedAnswer);
 
-  const pollChoice = groupSocket.current.answerChoices.find(p => p.letter === submittedAnswer);
+  const pollChoice = groupSocket.current.answerChoices.find(p => p.index === submittedAnswer);
   expect(pollChoice.count).toBe(1);
 });
 
@@ -72,13 +72,13 @@ test('Change answer', () => {
   const submittedAnswer = 0;
   // eslint-disable-next-line no-underscore-dangle
   groupSocket._answerPoll(null, googleID, submittedAnswer);
-  
+
   const userAnswers = groupSocket.current.answers[googleID];
   expect(userAnswers.length).toBe(1);
   expect(userAnswers[0]).toBe(submittedAnswer);
 
   groupSocket.current.answerChoices.forEach((pollChoice) => {
-    if (pollChoice.letter === submittedAnswer) {
+    if (pollChoice.index === submittedAnswer) {
       expect(pollChoice.count).toBe(1);
     } else {
       expect(pollChoice.count).toBe(0);

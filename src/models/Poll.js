@@ -15,7 +15,7 @@ import type { PollState } from '../utils/Constants';
 import constants from '../utils/Constants';
 
 export type PollResult = {|
-  letter: number,
+  index: number,
   text: string,
   count: number,
 |}
@@ -41,7 +41,7 @@ class Poll extends Base {
   /**
    * Choices for the poll
    * @example
-   * let answerChoices = [{letter: 0, text: "Saturn", count: 5}]
+   * let answerChoices = [{index: 0, text: "Saturn", count: 5}]
    */
   @Column('json')
   answerChoices: PollResult[] = undefined;
