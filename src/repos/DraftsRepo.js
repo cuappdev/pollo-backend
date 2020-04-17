@@ -109,6 +109,20 @@ const deleteDraft = async (id: string) => {
 };
 
 /**
+ * Deletes all drafts owned by a certain user
+ * @function
+ * @param {string} id - UUID of user we want to delete drafts for
+ */
+const deleteDraftsByUserID = async (id: string) => {
+  try {
+    const drafts = await getDraftsByUser(id);
+    await Promise.all(drafts.map(async d => (deleteDraft(d.uuid))));
+  } catch (e) {
+    throw LogUtils.logErr('Problem deleting all drafts by User ID', { id });
+  }
+};
+
+/**
 * Get owner of a draft
 * @function
 * @param {string} id - UUID of draft to get owner of
@@ -132,6 +146,7 @@ export default {
   getDraftsByUser,
   updateDraft,
   deleteDraft,
+  deleteDraftsByUserID,
   getDraft,
   getOwnerByID,
 };

@@ -1,9 +1,9 @@
 // @flow
 import {
   Column,
-  Entity,
+  Entity, JoinTable,
   ManyToOne, OneToMany,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import uuidv4 from 'uuid/v4';
 import Base from './Base';
@@ -32,6 +32,7 @@ class DraftCollection extends Base {
 
   /** Drafts within the collection */
   @OneToMany(type => Draft, draft => draft.draftCollection)
+  @JoinTable()
   drafts: ?Draft[] = undefined;
 
   serialize(): APIDraftCollection {

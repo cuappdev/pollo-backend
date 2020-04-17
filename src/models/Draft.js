@@ -4,6 +4,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  ManyToMany,
 } from 'typeorm';
 import uuidv4 from 'uuid/v4';
 import Base from './Base';
