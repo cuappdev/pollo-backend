@@ -32,7 +32,6 @@ class DraftCollection extends Base {
 
   /** Drafts within the collection */
   @OneToMany(type => Draft, draft => draft.draftCollection)
-  @JoinTable()
   drafts: ?Draft[] = undefined;
 
   serialize(): APIDraftCollection {

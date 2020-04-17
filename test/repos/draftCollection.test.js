@@ -71,13 +71,13 @@ test('Add Draft by ID', async () => {
   await DraftCollectionsRepo.addDraftByID(draftCollection1.uuid, draft2.uuid);
   dc = await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid);
   expect(dc.drafts.length).toBe(2);
-  expect(dc.drafts[1].uuid).toBe(draft2.uuid);
+  expect(dc.drafts[1].text).toBe(draft2.text);
 
   await DraftCollectionsRepo.addDraftByID(draftCollection1.uuid, draft1.uuid);
   dc = await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid);
   expect(dc.drafts.length).toBe(2);
-  expect(dc.drafts[0].name).toBe(draft1.name);
-  expect(dc.drafts[1].name).toBe(draft2.name);
+  expect(dc.drafts[0].text).toBe(draft1.text);
+  expect(dc.drafts[1].text).toBe(draft2.text);
 
   await DraftCollectionsRepo.addDraftByID(draftCollection1.uuid, draft3.uuid);
   dc = await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid);
@@ -88,9 +88,9 @@ test('Add Draft by ID', async () => {
   await DraftCollectionsRepo.addDraftByID(draftCollection1.uuid, draft4.uuid, 1);
   dc = await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid);
   expect(dc.drafts.length).toBe(3);
-  expect(dc.drafts[0].name).toBe(draft1.name);
-  expect(dc.drafts[1].name).toBe(draft4.name);
-  expect(dc.drafts[2].name).toBe(draft2.name);
+  expect(dc.drafts[0].text).toBe(draft1.text);
+  expect(dc.drafts[1].text).toBe(draft4.text);
+  expect(dc.drafts[2].text).toBe(draft2.text);
 });
 
 test('Remove Draft By ID', async() => {
@@ -99,18 +99,18 @@ test('Remove Draft By ID', async() => {
   await DraftCollectionsRepo.addDraftByID(draftCollection1.uuid, draft4.uuid);
 
   let dc = await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid);
-  expect(dc.drafts[0].name).toBe(draft1.name);
-  expect(dc.drafts[1].uuid).toBe(draft2.name);
-  expect(dc.drafts[2].name).toBe(draft4.name);
+  expect(dc.drafts[0].text).toBe(draft1.text);
+  expect(dc.drafts[1].text).toBe(draft2.text);
+  expect(dc.drafts[2].text).toBe(draft4.text);
 
   await DraftCollectionsRepo.removeDraftById(draftCollection1.uuid, draft2.uuid);
   dc = await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid);
-  expect(dc.drafts[0].name).toBe(draft1.name);
-  expect(dc.drafts[1].name).toBe(draft4.name);
+  expect(dc.drafts[0].text).toBe(draft1.text);
+  expect(dc.drafts[1].text).toBe(draft4.text);
 
   await DraftCollectionsRepo.removeDraftById(draftCollection1.uuid, draft1.uuid);
   dc = await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid);
-  expect(dc.drafts[0].name).toBe(draft4.name);
+  expect(dc.drafts[0].text).toBe(draft4.text);
 
   await DraftCollectionsRepo.removeDraftById(draftCollection1.uuid, draft4.uuid);
   dc = await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid);
@@ -128,9 +128,9 @@ test('Move Draft By ID', async () => {
 
   await DraftCollectionsRepo.moveDraftByID(draftCollection1.uuid, draft1.uuid, 2);
   let dc = await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid);
-  expect(dc.drafts[0].name).toBe(draft2.name);
-  expect(dc.drafts[1].name).toBe(draft4.name);
-  expect(dc.drafts[2].name).toBe(draft1.name);
+  expect(dc.drafts[0].text).toBe(draft2.text);
+  expect(dc.drafts[1].text).toBe(draft4.text);
+  expect(dc.drafts[2].text).toBe(draft1.text);
 
   await DraftCollectionsRepo.moveDraftByID(draftCollection1.uuid, draft4.uuid, -5);
   dc = await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid);
@@ -140,9 +140,9 @@ test('Move Draft By ID', async () => {
 
   await DraftCollectionsRepo.moveDraftByID(draftCollection1.uuid, draft2.uuid, 55);
   dc = await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid);
-  expect(dc.drafts[0].name).toEqual(draft1.name);
-  expect(dc.drafts[1].name).toEqual(draft4.name);
-  expect(dc.drafts[2].name).toEqual(draft2.name);
+  expect(dc.drafts[0].text).toBe(draft1.text);
+  expect(dc.drafts[1].text).toBe(draft4.text);
+  expect(dc.drafts[2].text).toBe(draft2.text);
 });
 
 test('Delete Draft Collection by ID', async () => {
