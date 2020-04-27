@@ -4,7 +4,6 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-  ManyToMany,
 } from 'typeorm';
 import uuidv4 from 'uuid/v4';
 import Base from './Base';
@@ -38,6 +37,9 @@ class Draft extends Base {
   /** Draft collection the draft is in (if it is in one) */
   @ManyToOne(type => DraftCollection, draftCollection => draftCollection.drafts)
   draftCollection: ?DraftCollection = undefined;
+
+  @Column({ type: 'int', nullable: true })
+  position: ?number = null;
 
   serialize(): APIDraft {
     return {

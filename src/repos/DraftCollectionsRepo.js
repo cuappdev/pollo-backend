@@ -42,8 +42,10 @@ const getDraftCollection = async (id: string): Promise<?DraftCollection> => {
     let dc = await db().createQueryBuilder('draftcollections')
       .leftJoinAndSelect('draftcollections.user', 'user')
       .leftJoinAndSelect('draftcollections.drafts', 'drafts')
+      .leftJoinAndSelect('drafts.user','draftsuser')
       .where('draftcollections.uuid = :draftCollectionID')
       .setParameters({ draftCollectionID: id })
+      .orderBy('drafts.position', 'ASC')
       .getOne();
     return dc;
   } catch (e) {
@@ -60,8 +62,11 @@ const getDraftCollection = async (id: string): Promise<?DraftCollection> => {
 const getDraftCollectionsByUser = async (id: string): Promise<Array<DraftCollection>> => {
   try {
     return await db().createQueryBuilder('draftcollections')
+      .leftJoinAndSelect('draftcollections.drafts', 'drafts')
+      .leftJoinAndSelect('drafts.user','draftsuser')
       .innerJoinAndSelect('draftcollections.user', 'user', 'user.uuid = :userID')
       .setParameters({ userID: id })
+      .orderBy('drafts.position', 'ASC')
       .getMany();
   } catch (e) {
     throw LogUtils.logErr(`Problem getting DraftCollections from User with UUID: ${id}`, e);
@@ -106,14 +111,17 @@ const addDraftByID = async (id: string, draftID: string, pos: ?number): Promise<
         && draft.user.uuid === draftCollection.user.uuid
         && !(draftCollection.drafts.find(d => d.uuid === draft.uuid))) {
         if (!pos || !Number.isInteger(pos) || pos > draftCollection.drafts.length || pos < 0) {
+          draft.position = draftCollection.drafts.length;
           draftCollection.drafts.push(draft);
         } else {
-          const afterPos = draftCollection.drafts.splice(pos);
-          afterPos.unshift(draft);
-          await db().save(draftCollection);
-          draftCollection.drafts.push(...afterPos);
+          for (let i = pos; i < draftCollection.drafts.length; i++) {
+            draftCollection.drafts[i].position += 1;
+          }
+          draft.position = pos;
+          draftCollection.drafts.push(draft);
         }
       }
+
       await db().save(draftCollection);
     }
 
@@ -135,8 +143,17 @@ const removeDraftById = async (id: string, draftID: string): Promise<?DraftColle
     const draftCollection = await getDraftCollection(id);
 
     if (draftCollection) {
-      draftCollection.drafts = draftCollection.drafts.filter(d => d.uuid !== draftID);
-      await db().save(draftCollection);
+      const draft = draftCollection.drafts.find((d: Draft) => d.uuid === draftID);
+      if (draft) {
+        for (let i = draft.position + 1; i < draftCollection.drafts.length; i++) {
+          draftCollection.drafts[i].position -= 1;
+        }
+        draftCollection.drafts[draft.position].position = null;
+        await db().save(draftCollection);
+
+        draftCollection.drafts = draftCollection.drafts.filter(d => d.uuid !== draftID);
+        await db().save(draftCollection);
+      }
     }
 
     return draftCollection;
