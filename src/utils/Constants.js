@@ -27,16 +27,6 @@ const POLL_STATES = {
 };
 
 /**
-* constants for question types
-* @constant
-* @enum {string}
-*/
-const POLL_TYPES = {
-  MULTIPLE_CHOICE: 'multipleChoice',
-  FREE_RESPONSE: 'freeResponse',
-};
-
-/**
 * constants for user types
 * @constant
 * @enum {string}
@@ -53,11 +43,9 @@ const EXPORT_FORMATS = {
 
 /** Custom types for Poll type */
 export type PollState = 'live' | 'ended' | 'shared'
-export type PollType = 'multipleChoice' | 'freeResponse'
 
 export default {
   POLL_STATES,
-  POLL_TYPES,
   REQUEST_TYPES,
   USER_TYPES,
   EXPORT_FORMATS,

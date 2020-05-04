@@ -197,24 +197,18 @@ test('Get Polls from Group', async () => {
   let polls = await GroupsRepo.getPolls(uuid);
   expect(polls.length).toEqual(0);
 
-  const answerChoices1 = [{ letter: 'A', text: 'blue', count: 1 }];
-  const answerChoices2 = [{ text: 'blue', count: 0 }, { text: 'red', count: 2 }];
-  const answerChoices1WithoutCounts = [{ letter: 'A', text: 'blue' }];
+  const answerChoices1 = [{ index: 0, text: 'blue', count: 1 }];
+  const answerChoices1WithoutCounts = [{ index: 0, text: 'blue' }];
 
-  const poll = await PollsRepo.createPoll('Poll', group, answerChoices1, 'multipleChoice', '', null, 'ended');
-  const poll2 = await PollsRepo.createPoll('', group, answerChoices2, 'freeResponse', '', null, 'ended');
+  const poll = await PollsRepo.createPoll('Poll', group, answerChoices1, -1, null, 'ended');
   polls = await GroupsRepo.getPolls(uuid);
-  expect(polls.length).toEqual(2);
+  expect(polls.length).toEqual(1);
   expect(polls[0].uuid).toBe(poll.uuid);
-  expect(polls[1].uuid).toBe(poll2.uuid);
   expect(polls[0].answerChoices).toEqual(answerChoices1WithoutCounts);// if member, hide results
-  expect(polls[1].answerChoices).toEqual(answerChoices2);
   polls = await GroupsRepo.getPolls(uuid, false); // if admin, don't hide results
   expect(polls[0].answerChoices).toEqual(answerChoices1);
-  expect(polls[1].answerChoices).toEqual(answerChoices2);
 
   await PollsRepo.deletePollByID(poll.uuid);
-  await PollsRepo.deletePollByID(poll2.uuid);
 });
 
 test('Delete Group', async () => {

@@ -7,7 +7,6 @@ import LogUtils from '../../../utils/LogUtils';
 import PollsRepo from '../../../repos/PollsRepo';
 
 import type { APIPoll } from '../APITypes';
-import type { PollChoice } from '../../../utils/Constants';
 
 class GetPollRouter extends AppDevRouter<APIPoll> {
   constructor() {
@@ -28,17 +27,15 @@ class GetPollRouter extends AppDevRouter<APIPoll> {
 
     const isAdmin = await GroupsRepo.isAdmin(group.uuid, req.user);
 
-    if (!isAdmin && poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
-      && poll.state !== constants.POLL_STATES.SHARED) {
+    if (!isAdmin && poll.state !== constants.POLL_STATES.SHARED) {
       poll.answerChoices = poll.answerChoices.map((answer) => {
         delete answer.count;
         return answer;
       });
     }
 
-    const userAnswer = poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
-      ? poll.answers[req.user.googleID] : poll.upvotes[req.user.googleID];
-    const answerObject: { string: PollChoice[]} = {};
+    const userAnswer = poll.answers[req.user.googleID];
+    const answerObject: { string: number[]} = {};
     answerObject[req.user.googleID] = userAnswer || [];
 
     return {

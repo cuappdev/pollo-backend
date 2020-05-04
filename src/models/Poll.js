@@ -10,19 +10,14 @@ import Base from './Base';
 import Group from './Group';
 
 import type { APIPoll } from '../routers/v2/APITypes';
-import type { PollType, PollState } from '../utils/Constants';
+import type { PollState } from '../utils/Constants';
 
 import constants from '../utils/Constants';
 
 export type PollResult = {|
-  letter: ?string,
+  index: number,
   text: string,
-  count: ?number,
-|}
-
-export type PollChoice = {|
-  letter: ?string,
-  text: string,
+  count: number,
 |}
 
 /**
@@ -39,10 +34,6 @@ class Poll extends Base {
   @Column('character varying')
   text: string = '';
 
-  /** Type of poll either multipleChoice or freeResponse */
-  @Column('character varying')
-  type: PollType = constants.POLL_TYPES.MULTIPLE_CHOICE;
-
   /** Group the poll belongs to */
   @ManyToOne(type => Group, group => group.polls, { onDelete: 'CASCADE' })
   group: ?Group = null;
@@ -50,39 +41,27 @@ class Poll extends Base {
   /**
    * Choices for the poll
    * @example
-   * let answerChoices_mc = [{letter: "A", text: "Saturn", count: 5}]
-   * let answerChoices_fr = [{text: "Saturn", count: 10}]
+   * let answerChoices = [{index: 0, text: "Saturn", count: 5}]
    */
   @Column('json')
   answerChoices: PollResult[] = undefined;
 
   /**
    * All the answers by students for the poll.
-   * Letter field is optional and only is returned on MC polls.
    * @example
-   * let answers_MC = {googleID: [{letter: "A", text: "Saturn"}]}
-   * let answers_FR = {googleID: [{text: "Saturn"}, {text: "Mars"}]}
+   * let answers = {googleID: [0, 1, 3]}
    */
   @Column('json')
-  answers: { string: PollChoice[] } = {};
+  answers: { string: number[] } = {};
 
   /**
-   * All the upvotes by students for the FR poll. Empty if MC.
+   * Correct answer choice.
+   * -1 if no correct answer chosen.
    * @example
-   * let upvotes_MC = {}
-   * let upvotes_FR = {googleID: [{text: "Saturn"}, {text: "Mars"}]}
-   */
-  @Column('json')
-  upvotes: { string: PollChoice[] } = {};
-
-  /**
-   * Correct answer choice for MC.
-   * Empty string if FR or no correct answer chosen for MC.
-   * @example
-   * let correctAnswer = 'A'
+   * let correctAnswer = 3
   */
-  @Column('character varying')
-  correctAnswer: string = '';
+  @Column('int')
+  correctAnswer: number = -1;
 
   /** The current state of the poll */
   @Column('character varying')
@@ -96,7 +75,6 @@ class Poll extends Base {
       correctAnswer: this.correctAnswer,
       state: this.state,
       text: this.text,
-      type: this.type,
       userAnswers: this.answers,
     };
   }

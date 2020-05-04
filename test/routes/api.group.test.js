@@ -77,8 +77,8 @@ test('Add admins to group', async () => {
   };
   await request(post(`/sessions/${group.id}/admins/`, body,
     adminToken)).then((getres) => {
-    expect(getres.success).toBe(true);
-  });
+      expect(getres.success).toBe(true);
+    });
 });
 
 test('Get admins for group', async () => {
@@ -96,8 +96,8 @@ test('Remove admin from group', async () => {
   };
   await request(put(`/sessions/${group.id}/admins/`, body,
     adminToken)).then((getres) => {
-    expect(getres.success).toBe(true);
-  });
+      expect(getres.success).toBe(true);
+    });
 });
 
 test('Add members to group', async () => {
@@ -106,8 +106,8 @@ test('Add members to group', async () => {
   };
   await request(post(`/sessions/${group.id}/members/`, body,
     adminToken)).then((getres) => {
-    expect(getres.success).toBe(true);
-  });
+      expect(getres.success).toBe(true);
+    });
 });
 
 test('Get groups as member', async () => {
@@ -166,8 +166,8 @@ test('Remove member from group', async () => {
   };
   await request(put(`/sessions/${group.id}/members`, body,
     adminToken)).then((getres) => {
-    expect(getres.success).toBe(true);
-  });
+      expect(getres.success).toBe(true);
+    });
 });
 
 test('Get groups for admin', async () => {
@@ -199,16 +199,14 @@ test('Download csv', async () => {
   let polls: Array<?Poll> = await GroupsRepo.getPolls(group.id);
   console.log(`found ${polls.length} polls`);
   const p1 = await PollsRepo.createPoll(
-    'Poll 1', g, [{ letter: 'A', text: 'Saturn' }, { letter: 'B', text: 'Mars' }],
-    'multiplechoice', 'A',
-    { u1: [{ letter: 'A', text: 'Saturn' }], u2: [{ letter: 'B', text: 'Mars' }] }, 'ended',
+    'Poll 1', g, [{ index: 0, text: 'Saturn' }, { index: 1, text: 'Mars' }],
+    0, { u1: [0], u2: [1] }, 'ended',
   );
   polls = await GroupsRepo.getPolls(group.id);
   console.log(`found ${polls.length} polls`);
   const p2 = await PollsRepo.createPoll(
-    'Poll 2', g, [{ letter: 'A', text: 'Earth' }, { letter: 'B', text: 'Venus' }],
-    'multiplechoice', 'B',
-    { u1: [{ letter: 'B', text: 'Venus' }], u2: [{ letter: 'A', text: 'Earth' }] }, 'ended',
+    'Poll 2', g, [{ index: 0, text: 'Earth' }, { index: 1, text: 'Venus' }],
+    1, { u1: [1], u2: [0] }, 'ended',
   );
 
   const u1 = await UsersRepo.createUserWithFields('u1', 'u', '1', 'u1@example.com');
@@ -255,9 +253,8 @@ test('Download csv', async () => {
     .toBe(`NetID,${today.toDateString()}\nu1,2\nu2,2\nu3,0\n`);
 
   const p3 = await PollsRepo.createPoll(
-    'Poll 3', g, [{ letter: 'A', text: 'Earth' }, { letter: 'B', text: 'Venus' }],
-    'multiplechoice', 'B',
-    { u3: [{ letter: 'A', text: 'Earth' }] }, 'ended',
+    'Poll 3', g, [{ index: 0, text: 'Earth' }, { index: 1, text: 'Venus' }],
+    1, { u3: [0] }, 'ended',
   );
 
   result = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
