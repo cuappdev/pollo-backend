@@ -77,8 +77,8 @@ test('Add admins to group', async () => {
   };
   await request(post(`/sessions/${group.id}/admins/`, body,
     adminToken)).then((getres) => {
-      expect(getres.success).toBe(true);
-    });
+    expect(getres.success).toBe(true);
+  });
 });
 
 test('Get admins for group', async () => {
@@ -96,8 +96,8 @@ test('Remove admin from group', async () => {
   };
   await request(put(`/sessions/${group.id}/admins/`, body,
     adminToken)).then((getres) => {
-      expect(getres.success).toBe(true);
-    });
+    expect(getres.success).toBe(true);
+  });
 });
 
 test('Add members to group', async () => {
@@ -106,8 +106,8 @@ test('Add members to group', async () => {
   };
   await request(post(`/sessions/${group.id}/members/`, body,
     adminToken)).then((getres) => {
-      expect(getres.success).toBe(true);
-    });
+    expect(getres.success).toBe(true);
+  });
 });
 
 test('Get groups as member', async () => {
@@ -166,8 +166,8 @@ test('Remove member from group', async () => {
   };
   await request(put(`/sessions/${group.id}/members`, body,
     adminToken)).then((getres) => {
-      expect(getres.success).toBe(true);
-    });
+    expect(getres.success).toBe(true);
+  });
 });
 
 test('Get groups for admin', async () => {
