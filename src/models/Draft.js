@@ -31,12 +31,13 @@ class Draft extends Base {
   options: string[];
 
   /** User the draft belongs to */
-  @ManyToOne(type => User, user => user.drafts)
+  @ManyToOne(type => User, user => user.drafts, { onDelete: 'CASCADE' })
   user: ?User = null;
 
   /** Draft collection the draft is in (if it is in one) */
-  @ManyToOne(type => DraftCollection, draftCollection => draftCollection.drafts)
-  draftCollection: ?DraftCollection = undefined;
+  @ManyToOne(type => DraftCollection, draftCollection => draftCollection.drafts,
+    { onDelete: 'SET NULL' })
+  draftCollection: ?DraftCollection = undefined ;
 
   @Column({ type: 'int', nullable: true })
   position: ?number = null;

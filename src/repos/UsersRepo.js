@@ -182,8 +182,6 @@ const deleteUserByID = async (id: string) => {
   try {
     const user = await getUserByID(id);
     await UserSessionsRepo.deleteSessionFromUserID(id);
-    await DraftsRepo.deleteDraftsByUserID(id);
-    await DraftCollectionsRepo.deleteDraftCollectionByUserID(id);
     await db().remove(user);
   } catch (e) {
     throw LogUtils.logErr(`Problem deleting user by UUID: ${id}`, e);

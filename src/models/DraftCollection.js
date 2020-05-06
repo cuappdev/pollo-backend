@@ -8,7 +8,7 @@ import {
 import uuidv4 from 'uuid/v4';
 import Base from './Base';
 import Draft from './Draft';
-import User from './User';
+import Group from './Group';
 
 import type { APIDraftCollection } from '../routers/v2/APITypes';
 
@@ -26,12 +26,12 @@ class DraftCollection extends Base {
   @Column('character varying')
   name: string = '';
 
-  /** User who created the collection */
-  @ManyToOne(type => User, user => user.draftCollections)
-  user: ?User = null;
+  /** Group who created the collection */
+  @ManyToOne(type => Group, group => group.draftCollections, { onDelete: 'CASCADE' })
+  group: ?Group = null;
 
   /** Drafts within the collection */
-  @OneToMany(type => Draft, draft => draft.draftCollection)
+  @OneToMany(type => Draft, draft => draft.draftCollection, { cascade: ['insert', 'update'] })
   drafts: ?Draft[] = undefined;
 
   serialize(): APIDraftCollection {

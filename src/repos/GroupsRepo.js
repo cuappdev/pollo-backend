@@ -7,6 +7,7 @@ import User from '../models/User';
 import appDevUtils from '../utils/AppDevUtils';
 import constants from '../utils/Constants';
 import LogUtils from '../utils/LogUtils';
+import DraftCollectionsRepo from './DraftCollectionsRepo';
 
 const db = (): Repository<Group> => getRepository(Group);
 
@@ -99,7 +100,7 @@ const getGroupID = async (code: string) => {
 const deleteGroupByID = async (id: string) => {
   try {
     const group = await getGroupByID(id);
-    
+
     if (group) {
       delete groupCodes[group.code];
       await db().remove(group);

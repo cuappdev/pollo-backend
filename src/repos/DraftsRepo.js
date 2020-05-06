@@ -3,6 +3,7 @@ import { getRepository, Repository } from 'typeorm';
 import Draft from '../models/Draft';
 import User from '../models/User';
 import LogUtils from '../utils/LogUtils';
+import DraftCollectionsRepo from './DraftCollectionsRepo';
 
 const db = (): Repository<Draft> => getRepository(Draft);
 
@@ -101,7 +102,11 @@ const deleteDraft = async (id: string) => {
     const draft = await db().createQueryBuilder('drafts')
       .where('drafts.uuid = :draftID')
       .setParameters({ draftID: id })
+      .leftJoinAndSelect('drafts.draftCollection', 'draftCollection')
       .getOne();
+    if (draft.draftCollection) {
+      await DraftCollectionsRepo.removeDraftById(draft.draftCollection.uuid, draft.uuid);
+    }
     await db().remove(draft);
   } catch (e) {
     throw LogUtils.logErr(`Problem deleting draft by UUID: ${id}`, e);

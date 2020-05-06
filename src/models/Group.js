@@ -13,6 +13,7 @@ import Poll from './Poll';
 import User from './User';
 
 import type { APIGroup } from '../routers/v2/APITypes';
+import DraftCollection from './DraftCollection';
 
 /**
  * Group class represents a grouping of polls.
@@ -46,6 +47,10 @@ class Group extends Base {
   @JoinTable()
   /** Member of the group */
   members: ?User[] = undefined;
+
+  /** Draft collections that a user has created */
+  @OneToMany(type => DraftCollection, draftCollection => draftCollection.group, { cascadeRemove: true })
+  draftCollections: ?DraftCollection[] = undefined;
 
   serialize(): APIGroup {
     return {

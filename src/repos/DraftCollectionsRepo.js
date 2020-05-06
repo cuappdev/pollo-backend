@@ -2,6 +2,7 @@
 import { getRepository, Repository } from 'typeorm';
 import Draft from '../models/Draft';
 import User from '../models/User';
+import Group from '../models/Group';
 import LogUtils from '../utils/LogUtils';
 import DraftCollection from '../models/DraftCollection';
 import DraftsRepo from './DraftsRepo';
@@ -17,12 +18,12 @@ const db = (): Repository<DraftCollection> => getRepository(DraftCollection);
  */
 const createDraftCollection = async (
   name: string,
-  user: User,
+  group: Group,
 ): Promise<DraftCollection> => {
   try {
     const draftCollection = new DraftCollection();
     draftCollection.name = name;
-    draftCollection.user = user;
+    draftCollection.group = group;
     draftCollection.drafts = [];
     await db().save(draftCollection);
     return draftCollection;
@@ -40,9 +41,9 @@ const createDraftCollection = async (
 const getDraftCollection = async (id: string): Promise<?DraftCollection> => {
   try {
     let dc = await db().createQueryBuilder('draftcollections')
-      .leftJoinAndSelect('draftcollections.user', 'user')
+      .leftJoinAndSelect('draftcollections.group', 'group')
       .leftJoinAndSelect('draftcollections.drafts', 'drafts')
-      .leftJoinAndSelect('drafts.user','draftsuser')
+      .leftJoinAndSelect('drafts.user', 'draftsuser')
       .where('draftcollections.uuid = :draftCollectionID')
       .setParameters({ draftCollectionID: id })
       .orderBy('drafts.position', 'ASC')
@@ -54,22 +55,22 @@ const getDraftCollection = async (id: string): Promise<?DraftCollection> => {
 };
 
 /**
- * Gets Draft Collections by user UUID
+ * Gets Draft Collections by group UUID
  * @function
- * @param {string} id - UUID of user
- * @return {DraftCollection[]} - Draft Collections of the user with the given id
+ * @param {string} id - UUID of group
+ * @return {DraftCollection[]} - Draft Collections of the group with the given id
  */
-const getDraftCollectionsByUser = async (id: string): Promise<Array<DraftCollection>> => {
+const getDraftCollectionsByGroup = async (id: string): Promise<Array<DraftCollection>> => {
   try {
     return await db().createQueryBuilder('draftcollections')
       .leftJoinAndSelect('draftcollections.drafts', 'drafts')
-      .leftJoinAndSelect('drafts.user','draftsuser')
-      .innerJoinAndSelect('draftcollections.user', 'user', 'user.uuid = :userID')
-      .setParameters({ userID: id })
+      .leftJoinAndSelect('drafts.user', 'draftsuser')
+      .innerJoinAndSelect('draftcollections.group', 'group', 'group.uuid = :groupID')
+      .setParameters({ groupID: id })
       .orderBy('drafts.position', 'ASC')
       .getMany();
   } catch (e) {
-    throw LogUtils.logErr(`Problem getting DraftCollections from User with UUID: ${id}`, e);
+    throw LogUtils.logErr(`Problem getting DraftCollections from Group with UUID: ${id}`, e);
   }
 };
 
@@ -106,9 +107,7 @@ const addDraftByID = async (id: string, draftID: string, pos: ?number): Promise<
 
     if (draftCollection) {
       const draft = await DraftsRepo.getDraft(draftID);
-      // only drafts from the same user are allowed to be in a collection
       if (draft
-        && draft.user.uuid === draftCollection.user.uuid
         && !(draftCollection.drafts.find(d => d.uuid === draft.uuid))) {
         if (!pos || !Number.isInteger(pos) || pos > draftCollection.drafts.length || pos < 0) {
           draft.position = draftCollection.drafts.length;
@@ -189,8 +188,11 @@ const deleteDraftCollectionByID = async (id: string) => {
   try {
     let draftCollection = await getDraftCollection(id);
     if (draftCollection) {
-      draftCollection.drafts.splice(0);
+      // set all the draft positions to null
+      draftCollection.drafts.forEach((d: Draft) => { d.position = null; });
       await db().save(draftCollection);
+
+      // delete the collection
       draftCollection = await getDraftCollection(id);
       await db().remove(draftCollection);
     }
@@ -200,16 +202,16 @@ const deleteDraftCollectionByID = async (id: string) => {
 };
 
 /**
- * Deletes a Draft Collection by user id
+ * Deletes a Draft Collection by group id
  * @function
- * @param {string} id - UUID of user whose draft collections we want to delete
+ * @param {string} id - UUID of group whose draft collections we want to delete
  */
-const deleteDraftCollectionByUserID = async (id: string) => {
+const deleteDraftCollectionByGroupID = async (id: string) => {
   try {
-    const draftCollections = await getDraftCollectionsByUser(id);
+    const draftCollections = await getDraftCollectionsByGroup(id);
     await Promise.all(draftCollections.map(dc => (deleteDraftCollectionByID(dc.uuid))));
   } catch (e) {
-    throw LogUtils.logErr(`Problem removing draft collection by user ID: ${id}`, e);
+    throw LogUtils.logErr(`Problem removing draft collection by Group ID: ${id}`, e);
   }
 };
 
@@ -217,12 +219,12 @@ const deleteDraftCollectionByUserID = async (id: string) => {
  * Gets owner by the Collection's UUID
  * @function
  * @param {string} id - UUID of Draft Collection
- * @return {?User} - User that owns the collection
+ * @return {?Group} - Group that owns the collection
  */
-const getOwnerByID = async (id: string): Promise<?User> => {
+const getOwnerByID = async (id: string): Promise<?Group> => {
   try {
     const draftCollection = await getDraftCollection(id);
-    return draftCollection.user;
+    return draftCollection.group;
   } catch (e) {
     throw LogUtils.logErr(`Problem getting owner od collection: ${id}`);
   }
@@ -231,12 +233,12 @@ const getOwnerByID = async (id: string): Promise<?User> => {
 export default {
   createDraftCollection,
   getDraftCollection,
-  getDraftCollectionsByUser,
+  getDraftCollectionsByGroup,
   addDraftByID,
   updateCollectionNameByID,
   moveDraftByID,
   removeDraftById,
   deleteDraftCollectionByID,
-  deleteDraftCollectionByUserID,
+  deleteDraftCollectionByGroupID,
   getOwnerByID,
 };

@@ -57,10 +57,6 @@ class User extends Base {
   @OneToMany(type => Draft, draft => draft.user)
   drafts: ?Draft[] = undefined;
 
-  /** Draft collections that a user has created */
-  @OneToMany(type => DraftCollection, draftCollection => draftCollection.user)
-  draftCollections: ?DraftCollection[] = undefined;
-
   /**
    * Method to create a dummy user. (For testing purposes)
    * @function
