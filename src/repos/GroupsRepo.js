@@ -340,7 +340,6 @@ const getPolls = async (id: string, hideUnsharedResults: ?boolean = true):
     return group.polls.map((poll) => {
       if (
         hideUnsharedResults && poll.state !== constants.POLL_STATES.SHARED
-        && poll.type === constants.POLL_TYPES.MULTIPLE_CHOICE
       ) {
         poll.answerChoices = poll.answerChoices.map((choice) => {
           delete choice.count;
