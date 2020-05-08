@@ -20,12 +20,12 @@ jobs:
     - sleep 10; npm run test
   - if: branch = master
     env:
-    - NODE_IMAGE="pollo-dev"
-    - DOMAIN="pollo-dev.cornellappdev.com"
+    - NODE_IMAGE=pollo-dev
+    - DOMAIN=pollo-dev.cornellappdev.com
   - if: branch = release
     env:
-    - NODE_IMAGE="pollo"
-    - DOMAIN="pollo-backend.cornellappdev.com"
+    - NODE_IMAGE=pollo
+    - DOMAIN=pollo-backend.cornellappdev.com
 env:
   global:
   - DB_HOST='localhost' DB_USERNAME='postgres'
