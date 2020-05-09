@@ -81,33 +81,33 @@ test('Add Draft by ID', async () => {
   expect(dc.drafts[0].name).toBe(draft1.name);
   expect(dc.drafts[0].position).toBe(0);
 
-  await DraftCollectionsRepo.addDraftByID(draftCollection1.uuid, draft2.uuid);
+  await DraftCollectionsRepo.addDraftByID(draftCollection1.uuid, draft2.uuid, 0);
   dc = await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid);
   expect(dc.drafts.length).toBe(2);
-  expect(dc.drafts[1].text).toBe(draft2.text);
+  expect(dc.drafts[0].text).toBe(draft2.text);
   dc.drafts.forEach((d, i) => expect(d.position).toBe(i));
 
   await DraftCollectionsRepo.addDraftByID(draftCollection1.uuid, draft1.uuid);
   dc = await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid);
   expect(dc.drafts.length).toBe(2);
-  expect(dc.drafts[0].text).toBe(draft1.text);
-  expect(dc.drafts[1].text).toBe(draft2.text);
+  expect(dc.drafts[0].text).toBe(draft2.text);
+  expect(dc.drafts[1].text).toBe(draft1.text);
   dc.drafts.forEach((d, i) => expect(d.position).toBe(i));
 
   await DraftCollectionsRepo.addDraftByID(draftCollection1.uuid, draft3.uuid);
   dc = await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid);
   expect(dc.drafts.length).toBe(3);
-  expect(dc.drafts[0].name).toBe(draft1.name);
-  expect(dc.drafts[1].name).toBe(draft2.name);
+  expect(dc.drafts[0].name).toBe(draft2.name);
+  expect(dc.drafts[1].name).toBe(draft1.name);
   expect(dc.drafts[2].name).toBe(draft3.name);
   dc.drafts.forEach((d, i) => expect(d.position).toBe(i));
 
   await DraftCollectionsRepo.addDraftByID(draftCollection1.uuid, draft4.uuid, 1);
   dc = await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid);
   expect(dc.drafts.length).toBe(4);
-  expect(dc.drafts[0].text).toBe(draft1.text);
+  expect(dc.drafts[0].text).toBe(draft2.text);
   expect(dc.drafts[1].text).toBe(draft4.text);
-  expect(dc.drafts[2].text).toBe(draft2.text);
+  expect(dc.drafts[2].text).toBe(draft1.text);
   expect(dc.drafts[3].name).toBe(draft3.name);
   dc.drafts.forEach((d, i) => expect(d.position).toBe(i));
 });
@@ -160,7 +160,7 @@ test('Remove Draft By ID', async () => {
   expect(dc.drafts.length).toBe(0);
 
   // remove from empty collection
-  await DraftCollectionsRepo.removeDraftById(draftCollection1.uuid, draft1.uuid)
+  await DraftCollectionsRepo.removeDraftById(draftCollection1.uuid, draft1.uuid);
   dc = await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid);
   expect(dc.drafts.length).toBe(0);
 });
@@ -229,6 +229,13 @@ test('Delete Draft Collection by Group ID', async () => {
 
   dc = await DraftCollectionsRepo.getDraftCollection(draftCollection3.uuid);
   expect(Boolean(dc)).toBe(true);
+});
+
+test('Delete Group and Cascade Collection', async () => {
+  await GroupsRepo.deleteGroupByID(group1.uuid);
+  expect(Boolean(await DraftCollectionsRepo.getDraftCollection(draftCollection1.uuid))).toBe(false);
+  expect(Boolean(await DraftCollectionsRepo.getDraftCollection(draftCollection2.uuid))).toBe(false);
+  expect(Boolean(await DraftCollectionsRepo.getDraftCollection(draftCollection3.uuid))).toBe(true);
 });
 
 afterEach(async () => {

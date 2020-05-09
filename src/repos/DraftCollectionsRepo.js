@@ -28,7 +28,7 @@ const createDraftCollection = async (
     await db().save(draftCollection);
     return draftCollection;
   } catch (e) {
-    throw LogUtils.logErr('Problem creating draft collection', e, { name, user });
+    throw LogUtils.logErr('Problem creating draft collection', e, { name, group });
   }
 };
 
@@ -107,9 +107,9 @@ const addDraftByID = async (id: string, draftID: string, pos: ?number): Promise<
 
     if (draftCollection) {
       const draft = await DraftsRepo.getDraft(draftID);
-      if (draft
+      if (draft && !draft.position
         && !(draftCollection.drafts.find(d => d.uuid === draft.uuid))) {
-        if (!pos || !Number.isInteger(pos) || pos > draftCollection.drafts.length || pos < 0) {
+        if (!Number.isInteger(pos) || pos > draftCollection.drafts.length || pos < 0) {
           draft.position = draftCollection.drafts.length;
           draftCollection.drafts.push(draft);
         } else {
@@ -216,12 +216,12 @@ const deleteDraftCollectionByGroupID = async (id: string) => {
 };
 
 /**
- * Gets owner by the Collection's UUID
+ * Gets group by the Collection's UUID
  * @function
  * @param {string} id - UUID of Draft Collection
  * @return {?Group} - Group that owns the collection
  */
-const getOwnerByID = async (id: string): Promise<?Group> => {
+const getGroupByID = async (id: string): Promise<?Group> => {
   try {
     const draftCollection = await getDraftCollection(id);
     return draftCollection.group;
@@ -240,5 +240,5 @@ export default {
   removeDraftById,
   deleteDraftCollectionByID,
   deleteDraftCollectionByGroupID,
-  getOwnerByID,
+  getGroupByID,
 };
