@@ -995,6 +995,445 @@
         ]
       }
     },
+    "/sessions/{id}/csv/": {
+      "get": {
+        "tags": [
+          "Groups"
+        ],
+        "summary": "Export a CSV from polls in a group",
+        "operationId": "getCSV",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Group UUID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "description": "Format to be exported for (must be either 'canvas' or 'csv')",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Success Response containing the exported CSV"
+          },
+          "400": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Error Code if format or dates were invalid"
+          }
+        }
+      }
+    },
+    "/sessions/:id/collections/": {
+      "get": {
+        "tags": [
+          "Groups",
+          "Drafts"
+        ],
+        "summary": "Gets draft collections",
+        "operationId": "getCollections",
+        "produces": [
+          "application/json"
+        ],
+        "description": "If the user is an admin, this will be a list of all draft collections in the group",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Group UUID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/DraftCollection"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Groups",
+          "Drafts"
+        ],
+        "summary": "Creates a draft collection",
+        "operationId": "postCollection",
+        "produces": [
+          "application/json"
+        ],
+        "description": "If the name is left blank, it will default to the empty string",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Group UUID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "body",
+            "description": "Name of Draft Collection",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/DraftCollection"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/collections/{id}/": {
+      "get": {
+        "tags": [
+          "Groups",
+          "Drafts"
+        ],
+        "summary": "Gets a draft collection",
+        "operationId": "getCollection",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Group UUID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/DraftCollection"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Groups",
+          "Drafts"
+        ],
+        "summary": "Adds a draft to a collection",
+        "operationId": "postDraftToCollection",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Group UUID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "draftID",
+            "in": "body",
+            "description": "Draft UUID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pos",
+            "in": "body",
+            "description": "Index of collection to position Draft",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "204": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/DraftCollection"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Groups",
+          "Drafts"
+        ],
+        "summary": "Updates a draft in a collection",
+        "operationId": "updateCollection",
+        "description": "If no parameters are given, this route has no effect. DraftID cannot be given without position.",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Group UUID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "body",
+            "description": "Name to update group with",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "draftID",
+            "in": "body",
+            "description": "Draft UUID",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pos",
+            "in": "body",
+            "description": "Index of collection to position Draft",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/DraftCollection"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Groups",
+          "Drafts"
+        ],
+        "summary": "Deletes a draft collection",
+        "operationId": "deleteCollection",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Group UUID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                 "type": null
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/collections/{id}/drafts/": {
+      "get": {
+        "tags": [
+          "Groups",
+          "Drafts"
+        ],
+        "summary": "Gets drafts in a colection",
+        "operationId": "getDraftsFromCollection",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Group UUID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Poll"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Groups",
+          "Drafts"
+        ],
+        "summary": "Deletes a draft from a colection",
+        "operationId": "deleteDraftFromCollection",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Group UUID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "draftID",
+            "in": "body",
+            "description": "Draft UUID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": null
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/polls/{id}/": {
       "get": {
         "tags": [
@@ -1546,6 +1985,34 @@
           "type": "string",
           "description": "Timestamp (Unix time)",
           "example": "1555351053"
+        }
+      },
+      "required": [
+        "id",
+        "createdAt",
+        "options",
+        "text",
+        "updatedAt"
+      ]
+    },
+    "DraftCollection": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp (Unix time)",
+          "example": "1555351053"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp (Unix time)",
+          "example": "1555351053"
+        },
+        "name": {
+          "type": "string"
         }
       },
       "required": [

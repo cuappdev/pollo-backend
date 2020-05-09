@@ -332,6 +332,7 @@ test('Download csv', async () => {
     },
   }).catch((e) => {
     expect(e.response.status).toBe(400);
+    console.log(e);
   });
 
   await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
@@ -416,10 +417,10 @@ test('Download csv', async () => {
     console.log(e);
     expect(e).toBe(null);
   });
-  
+
   expect(resultCMS.data)
     .toBe(`NetID,${badDate.toDateString()},${today.toDateString()}\nu1,0,2\nu2,0,2\nu3,0,1\n`);
-  
+
   expect(resultCanvas.data)
     .toBe(`Student,ID,${badDate.toDateString()},${today.toDateString()}\nu 1,u1,0,2\nu 2,u2,0,2\nu 3,u3,0,1\n`);
 
