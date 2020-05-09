@@ -28,7 +28,7 @@ const entities = [
 
 // Setup options
 const connectionOptions: ConnectionOptions = {
-  synchronize: !isProduction,
+  synchronize: true,  // switch back to !isProduction for release
   type: 'postgres',
   host: process.env.DB_HOST,
   port: isProduction ? process.env.DB_PORT : 5432,
