@@ -39,7 +39,7 @@ const connectionOptions: ConnectionOptions = {
     ssl: isProduction,
   },
   entities,
-  migrations: [ChangeID1557207656455],
+  migrations: [],
   cli: {
     entitiesDir: 'src/models',
     migrationsDir: 'src/db/migrations',
