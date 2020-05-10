@@ -17,14 +17,13 @@ class LeaveGroupRouter extends AppDevRouter<NoResponse> {
   }
 
   async content(req: Request) {
-    const groupID = req.params.id;
-    const { user } = req;
+    const { user, params: { id: groupID } } = req;
 
     if (await GroupsRepo.isAdmin(groupID, user)) {
       throw LogUtils.logErr('You are not allowed to leave your own group', {}, { groupID });
     }
 
-    await GroupsRepo.removeUserByGroupID(groupID, user, 'member');
+    await GroupsRepo.removeUserByGroupID(groupID, user.uuid, 'member');
     return null;
   }
 }

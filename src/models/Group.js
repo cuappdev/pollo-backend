@@ -7,50 +7,55 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import uuidv4 from 'uuid/v4';
 import Base from './Base';
 import Poll from './Poll';
-import Question from './Question';
 import User from './User';
 
-@Entity('groups')
+import type { APIGroup } from '../routers/v2/APITypes';
+
 /**
  * Group class represents a grouping of polls.
  * @extends {Base}
  */
+@Entity('groups')
 class Group extends Base {
-  @PrimaryGeneratedColumn()
-  /** Unique identifier */
-  id: any = null;
+  /** Universally unique identifier */
+  @PrimaryGeneratedColumn('uuid')
+  uuid: string = uuidv4();
 
-  @Column('string')
   /** Name of group */
+  @Column('character varying')
   name: string = '';
 
-  @Column('string')
   /** Unique code to join group */
+  @Column('character varying')
   code: string = '';
 
+  /** Admins of the group */
   @ManyToMany(type => User, user => user.adminGroups)
   @JoinTable()
-  /** Admins of the group */
-  admins: ?User[] = [];
+  admins: ?User[] = undefined;
 
-  @OneToMany(type => Poll, poll => poll.group, {
-    cascadeRemove: true,
-  })
   /** Polls belonging to the group */
-  polls: ?Poll[] = [];
+  @OneToMany(type => Poll, poll => poll.group, { cascadeRemove: true })
+  polls: ?Poll[] = undefined;
 
-  @OneToMany(type => Question, question => question.group, {
-    cascadeRemove: true,
-  })
-  /** Questions belonging to the group */
-  questions: ?Question[] = [];
-
+  /** Member of the group */
   @ManyToMany(type => User, user => user.memberGroups)
   @JoinTable()
   /** Member of the group */
-  members: ?User[] = [];
+  members: ?User[] = undefined;
+
+  serialize(): APIGroup {
+    return {
+      ...super.serialize(),
+      id: this.uuid,
+      code: this.code,
+      isLive: false,
+      name: this.name,
+    };
+  }
 }
 
 export default Group;

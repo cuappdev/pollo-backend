@@ -3,10 +3,8 @@ import PollsRepo from '../../src/repos/PollsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
 
-let id;
-let id2;
+let uuid;
 let group;
-let group2;
 let user;
 
 // Connects to db before running tests and does setup
@@ -19,79 +17,53 @@ beforeAll(async () => {
   user = await UsersRepo.createDummyUser('1234');
   group = await GroupsRepo
     .createGroup('Group', GroupsRepo.createCode(), user);
-  group2 = await GroupsRepo
-    .createGroup('Group2', GroupsRepo.createCode(), user);
 });
 
 test('Create Poll', async () => {
   const poll = await PollsRepo
-    .createPoll('Poll', group, {}, true, 'MULTIPLE_CHOICE', 'A');
+    .createPoll('Poll', group, [], 0, null, 'shared');
   expect(poll.text).toBe('Poll');
-  expect(poll.group.id).toBe(group.id);
-  expect(poll.results).toEqual({});
-  expect(poll.shared).toBe(true);
-  expect(poll.type).toBe('MULTIPLE_CHOICE');
-  expect(poll.userAnswers).toEqual({});
-  expect(poll.correctAnswer).toBe('A');
-  ({ id } = poll);
-
-  const poll2 = await PollsRepo.createPoll('', group, {}, false, 'FREE_RESPONSE', '', {});
-  expect(poll2.text).toBe('');
-  expect(poll2.group.id).toBe(group.id);
-  expect(poll2.results).toEqual({});
-  expect(poll2.shared).toBe(false);
-  expect(poll2.type).toBe('FREE_RESPONSE');
-  expect(poll2.userAnswers).toEqual({});
-  expect(poll2.correctAnswer).toBe('');
-  id2 = poll2.id;
+  expect(poll.group.uuid).toBe(group.uuid);
+  expect(poll.answerChoices).toEqual([]);
+  expect(poll.correctAnswer).toBe(0);
+  expect(poll.state).toBe('shared');
+  expect(poll.answers).toEqual({});
+  ({ uuid } = poll);
 });
 
 test('Get Poll', async () => {
-  const poll = await PollsRepo.getPollByID(id);
+  const poll = await PollsRepo.getPollByID(uuid);
   expect(poll.text).toBe('Poll');
-  expect(poll.shared).toBe(true);
-  expect(poll.type).toBe('MULTIPLE_CHOICE');
-
-  const poll2 = await PollsRepo.getPollByID(id2);
-  expect(poll2.text).toBe('');
-  expect(poll2.shared).toBe(false);
-  expect(poll2.type).toBe('FREE_RESPONSE');
+  expect(poll.state).toBe('shared');
 });
 
 test('Update Poll', async () => {
-  const poll = await PollsRepo.updatePollByID(id, 'New Poll', null, false);
+  const poll = await PollsRepo.updatePollByID(uuid, 'New Poll', null, null, 'ended');
   expect(poll.text).toBe('New Poll');
-  expect(poll.shared).toBe(false);
-
-  const poll2 = await PollsRepo.updatePollByID(id2, '', { user: 'result' });
-  expect(poll2.text).toBe('');
-  expect(poll2.results.user).toBe('result');
+  expect(poll.state).toBe('ended');
 });
 
 test('Get Group from Poll', async () => {
-  const p = await PollsRepo.getGroupFromPollID(id);
-  expect(p.id).toBe(group.id);
+  const p = await PollsRepo.getGroupFromPollID(uuid);
+  expect(p.uuid).toBe(group.uuid);
 });
 
 test('Get Polls from Group', async () => {
   await PollsRepo
-    .createPoll('Another poll', group, {}, true, 'FREE_RESPONSE', '');
-  const polls = await GroupsRepo.getPolls(group.id);
-  expect(polls.length).toBe(3);
+    .createPoll('Another poll', group, [], null, null, 'ended');
+  const polls = await GroupsRepo.getPolls(group.uuid);
+  expect(polls.length).toBe(2);
 });
 
 test('Delete Poll', async () => {
-  await PollsRepo.deletePollByID(id);
-  await PollsRepo.deletePollByID(id2);
-  expect(await PollsRepo.getPollByID(id)).not.toBeDefined();
-  expect(await PollsRepo.getPollByID(id2)).not.toBeDefined();
+  await PollsRepo.deletePollByID(uuid);
+  expect(await PollsRepo.getPollByID(uuid)).not.toBeDefined();
 });
 
 // Teardown
 afterAll(async () => {
-  await GroupsRepo.deleteGroupByID(group.id);
-  await GroupsRepo.deleteGroupByID(group2.id);
-  await UsersRepo.deleteUserByID(user.id);
+  await GroupsRepo.deleteGroupByID(group.uuid);
+  await UsersRepo.deleteUserByID(user.uuid);
   // eslint-disable-next-line no-console
   console.log('Passed all poll tests');
 });

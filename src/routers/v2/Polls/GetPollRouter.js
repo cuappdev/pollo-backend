@@ -20,21 +20,27 @@ class GetPollRouter extends AppDevRouter<APIPoll> {
   async content(req: Request) {
     const { id } = req.params;
     const poll = await PollsRepo.getPollByID(id);
-    if (!poll) throw LogUtils.logErr(`Poll with id ${id} cannot be found`);
+    if (!poll) throw LogUtils.logErr(`Poll with UUID ${id} cannot be found`);
 
-    const group = await PollsRepo.getGroupFromPollID(poll.id);
-    if (!group) throw LogUtils.logErr(`Group with id ${id} cannot be found`);
+    const group = await PollsRepo.getGroupFromPollID(poll.uuid);
+    if (!group) throw LogUtils.logErr(`Group with UUID ${id} cannot be found`);
 
-    const isAdmin = await GroupsRepo.isAdmin(group.id, req.user);
+    const isAdmin = await GroupsRepo.isAdmin(group.uuid, req.user);
 
-    return poll && {
-      id: poll.id,
-      text: poll.text,
-      results: poll.results,
-      shared: poll.shared,
-      type: poll.type,
-      answer: isAdmin ? null : poll.userAnswers[req.user.googleID],
-      correctAnswer: poll.correctAnswer,
+    if (!isAdmin && poll.state !== constants.POLL_STATES.SHARED) {
+      poll.answerChoices = poll.answerChoices.map((answer) => {
+        delete answer.count;
+        return answer;
+      });
+    }
+
+    const userAnswer = poll.answers[req.user.googleID];
+    const answerObject: { string: number[]} = {};
+    answerObject[req.user.googleID] = userAnswer || [];
+
+    return {
+      ...poll.serialize(),
+      userAnswers: answerObject,
     };
   }
 }

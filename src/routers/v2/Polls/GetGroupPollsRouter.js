@@ -18,23 +18,23 @@ class GetGroupPollsRouter extends AppDevRouter<Object[]> {
     const { id } = req.params;
     const isAdmin = await GroupsRepo.isAdmin(id, req.user);
     const polls = await GroupsRepo.getPolls(id, !isAdmin);
-    if (!polls) throw LogUtils.logErr(`Problem getting polls from group id: ${id}`);
+    if (!polls) throw LogUtils.logErr(`Problem getting polls from group UUID: ${id}`);
 
     // List of all dates
     const datesArray = [];
     // Date mapped to list of polls
     const pollsByDate = [];
+
     polls.filter(Boolean).forEach((poll) => {
       // date is in Unix time in seconds
       const date = poll.createdAt;
+      const userAnswer = poll.answers[req.user.googleID];
+      const answerObject = {};
+      answerObject[req.user.googleID] = userAnswer || [];
+
       const p = {
-        id: poll.id,
-        text: poll.text,
-        results: poll.results,
-        shared: poll.shared,
-        type: poll.type,
-        answer: isAdmin ? null : poll.userAnswers[req.user.googleID],
-        correctAnswer: poll.correctAnswer,
+        ...poll.serialize(),
+        userAnswers: answerObject,
       };
       const ind = datesArray.indexOf(date);
       if (ind === -1) { // date not found

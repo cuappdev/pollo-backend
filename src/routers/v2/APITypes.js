@@ -1,8 +1,8 @@
 // @flow
+import type { PollState } from '../../utils/Constants';
+import type { PollResult } from '../../models/Poll';
 
 // *********************** GENERAL RESPONSE TYPES ***********************
-
-export type id = string
 
 export type Response<T> = {
   data: T,
@@ -11,39 +11,39 @@ export type Response<T> = {
 }
 
 // ************************ POLLO OBJECT TYPES ************************
+
 export type APIGroup = {|
-  id: id,
+  id: string,
+  createdAt: string,
+  updatedAt: string,
   code: string,
   isLive: boolean,
   name: string,
-  updatedAt: string,
 |}
 
 export type APIPoll = {|
-  id: id,
-  answer: ?string,
-  correctAnswer: string,
-  results: Object,
-  shared: boolean,
+  id: string,
+  createdAt: string,
+  updatedAt: string,
+  answerChoices: PollResult[],
+  correctAnswer: number,
+  state: PollState,
   text: string,
-  type: string,
+  userAnswers: { string: number[] },
 |}
 
 export type APIDraft = {|
-  id: id,
+  id: string,
   createdAt: string,
+  updatedAt: string,
   options: string[],
   text: string,
 |}
 
-export type APIQuestion = {|
-  id: id,
-  createdAt: string,
-  text: string,
-|}
-
 export type APIUser = {|
-  id: id,
+  id: string,
+  createdAt: string,
+  updatedAt: string,
   name: string,
   netID: string,
 |}

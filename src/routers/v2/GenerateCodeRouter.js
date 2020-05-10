@@ -1,13 +1,14 @@
 // @flow
+import GroupsRepo from '../../repos/GroupsRepo';
 import AppDevRouter from '../../utils/AppDevRouter';
 import constants from '../../utils/Constants';
-import GroupsRepo from '../../repos/GroupsRepo';
 
 class GenerateCodeRouter extends AppDevRouter<Object> {
   constructor() {
     super(constants.REQUEST_TYPES.GET);
   }
 
+  // deprecated, do not use
   getPath(): string {
     return '/generate/code/';
   }

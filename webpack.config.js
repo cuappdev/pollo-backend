@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
+const NodemonPlugin = require('nodemon-webpack-plugin');
+const ExtraWatchWebpackPlugin = require('extra-watch-webpack-plugin');
 
 const nodeModules = {};
 fs.readdirSync('node_modules')
@@ -11,7 +13,7 @@ fs.readdirSync('node_modules')
 
 module.exports = {
     devtool: 'eval',
-    entry: ['babel-polyfill', path.join(__dirname, 'src/server.js')],
+    entry: ['@babel/polyfill', path.join(__dirname, 'src/server.js')],
     context: __dirname,
     node: {
         __filename: true,
@@ -34,5 +36,16 @@ module.exports = {
     },
     plugins: [
         new webpack.IgnorePlugin(/\.(css|less)$/),
+        new NodemonPlugin({
+            watch: ['./build', './src/server.js'],
+            events: {
+                start: 'cls || clear && node scripts/notify.js',
+            },
+            restartable: 'rs',
+            script: './build/bundle.js'
+        }),
+        new ExtraWatchWebpackPlugin({
+            dirs: ['./src'],
+        }),
     ],
 };

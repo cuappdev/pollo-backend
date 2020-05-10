@@ -18,18 +18,16 @@ class GetGroupsRouter extends AppDevRouter<APIGroup[]> {
   }
 
   async content(req: Request) {
-    const groups = await UsersRepo.getGroupsByID(req.user.id, 'admin');
+    const groups = await UsersRepo.getGroupsByID(req.user.uuid, 'admin');
     if (!groups) throw LogUtils.logErr('Can\'t find admin groups for user');
     const nodes = await groups
       .filter(Boolean)
       .map(async group => ({
-        id: group.id,
-        name: group.name,
-        code: group.code,
-        updatedAt: await GroupsRepo.latestActivityByGroupID(group.id),
+        ...group.serialize(),
+        updatedAt: await GroupsRepo.latestActivityByGroupID(group.uuid),
         isLive: await req.app.groupManager.isLive(group.code),
       }));
-    return Promise.all(nodes).then(n => n);
+    return Promise.all(nodes);
   }
 }
 
