@@ -12,7 +12,6 @@ import Poll from '../models/Poll';
 import Group from '../models/Group';
 import User from '../models/User';
 import UserSession from '../models/UserSession';
-import { ChangeID1557207656455 } from './migrations/1557207656455-ChangeID.js';
 
 dotenv.config(); // establish env variables
 const isProduction = process.env.NODE_ENV === 'production';
@@ -28,7 +27,7 @@ const entities = [
 
 // Setup options
 const connectionOptions: ConnectionOptions = {
-  synchronize: true,  // switch back to !isProduction for release
+  synchronize: !isProduction,
   type: 'postgres',
   host: process.env.DB_HOST,
   port: isProduction ? process.env.DB_PORT : 5432,

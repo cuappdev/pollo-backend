@@ -9,7 +9,7 @@
       "email": "team@cornellappdev.com"
     }
   },
-  "host": "pollo-dev.cornellappdev.com",
+  "host": "pollo-backend.cornellappdev.com",
   "basePath": "/api/v2",
   "tags": [
     {
