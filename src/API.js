@@ -5,6 +5,8 @@ import cors from 'cors';
 import express from 'express';
 import globby from 'globby';
 import path from 'path';
+import passport from 'passport';
+import configurePassport from './utils/configurePassport';
 
 class API {
   express: Express;
@@ -18,6 +20,9 @@ class API {
   middleware(): void {
     this.express.use(bodyParser.json());
     this.express.use(bodyParser.urlencoded({ extended: false }));
+
+    configurePassport(passport);
+    this.express.use(passport.initialize());
 
     this.express.use(cors());
   }

@@ -45,7 +45,12 @@ const getUserFromToken = async (accessToken: string): Promise<?User> => {
     .leftJoinAndSelect('usersessions.user', 'user')
     .where('usersessions.sessionToken = :accessToken', { accessToken })
     .getOne();
-  return session ? session.user : null;
+  if (session && session.isActive && session.expiresAt > Math.floor(new Date().getTime() / 1000)) {
+    return session.user;
+  } else {
+    return null;
+    // throw Error('No valid session');
+  }
 };
 
 /**
@@ -119,22 +124,43 @@ const deleteSessionFromUserID = async (userID: string) => {
   }
 };
 
+// /**
+//  * Creates a user if one doesn't exist and then initializes a session for them
+//  * @function
+//  * @param {LoginTicket} login - login object supplied by Google
+//  * @return {Object} Object containing session information for the user.
+//  */
+// const createUserAndInitializeSession = async (login: LoginTicket): Promise<Object> => {
+//   const {
+//     sub: googleID,
+//     given_name: first,
+//     family_name: last,
+//     email,
+//   } = login.getPayload();
+//   let user = await UsersRepo.getUserByGoogleID(googleID);
+//   if (!user) {
+//     user = await UsersRepo.createUserWithFields(googleID, first, last, email);
+//   }
+//   const session = await createOrUpdateSession(user, null, null);
+//   return session.serialize();
+// };
+
 /**
  * Creates a user if one doesn't exist and then initializes a session for them
  * @function
  * @param {LoginTicket} login - login object supplied by Google
  * @return {Object} Object containing session information for the user.
  */
-const createUserAndInitializeSession = async (login: LoginTicket): Promise<Object> => {
-  const {
-    sub: googleID,
-    given_name: first,
-    family_name: last,
-    email,
-  } = login.getPayload();
-  let user = await UsersRepo.getUserByGoogleID(googleID);
+const createUserAndInitializeSession = async (id: string, first: string, last: string, email: string): Promise<Object> => {
+  // const {
+  //   sub: googleID,
+  //   given_name: first,
+  //   family_name: last,
+  //   email,
+  // } = login.getPayload();
+  let user = await UsersRepo.getUserByGoogleID(id);
   if (!user) {
-    user = await UsersRepo.createUserWithFields(googleID, first, last, email);
+    user = await UsersRepo.createUserWithFields(id, first, last, email);
   }
   const session = await createOrUpdateSession(user, null, null);
   return session.serialize();
