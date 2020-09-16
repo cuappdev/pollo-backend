@@ -4,16 +4,17 @@ import passport from 'passport';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';
 
-
 import type { APIUserSession } from '../APITypes';
 
-class InitializeSessionRouter extends AppDevRouter<APIUserSession> {
+class SamlInitializeSessionRouter extends AppDevRouter<APIUserSession> {
   constructor() {
     super(constants.REQUEST_TYPES.POST);
   }
 
   getPath(): string {
-    return '/auth/saml/';
+    // Provider param selects SAML identity provider (ex: cornell).
+    // Providers specified in utils/configurePassport.js
+    return '/auth/saml/:provider/';
   }
 
   middleware() {
@@ -25,4 +26,4 @@ class InitializeSessionRouter extends AppDevRouter<APIUserSession> {
   }
 }
 
-export default new InitializeSessionRouter().router;
+export default new SamlInitializeSessionRouter().router;

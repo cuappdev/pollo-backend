@@ -1,5 +1,6 @@
 import { Strategy as BearerStrategy } from 'passport-http-bearer';
 import { Strategy as SamlStrategy } from 'passport-saml';
+import MultiSamlStrategy from 'passport-saml/multiSamlStrategy';
 import UserSessionsRepo from '../repos/UserSessionsRepo';
 
 export default (passport) => {
@@ -7,29 +8,29 @@ export default (passport) => {
     (token, cb) => UserSessionsRepo.getUserFromToken(token).then(user => (user ? cb(null, user) : cb(null, false))),
   ));
 
-  passport.use(new SamlStrategy(
+  passport.use(new MultiSamlStrategy(
     {
-      path: '/api/v2/auth/saml',
-      entryPoint: 'https://shibidp-test.cit.cornell.edu/idp/profile/SAML2/Redirect/SSO',
-      issuer: 'pollo-saml',
+      passReqToCallback: true,
+      getSamlOptions: (req, done) => { // Chooses saml identity provider based on URL params.
+        if (req.params.provider === 'cornell') {
+          done(null, {
+            path: '/api/v2/auth/saml/cornell/',
+            entryPoint: 'https://shibidp-test.cit.cornell.edu/idp/profile/SAML2/Redirect/SSO',
+            issuer: 'pollo-saml',
+          });
+        } else done(new Error('Invalid saml provider'));
+      },
     },
-    (profile, done) => {
-      // findByEmail(profile.email, function(err, user) {
-      //   if (err) {
-      //     return done(err);
-      //   }
-      //   return done(null, user);
-      // });
-
+    (req, profile, done) => {
       console.log(profile);
 
-      const uid = profile['urn:oid:0.9.2342.19200300.100.1.1'];
+      // const uid = profile['urn:oid:0.9.2342.19200300.100.1.1'];
       const givenName = profile['urn:oid:2.5.4.42'];
       const surname = profile['urn:oid:2.5.4.4'];
       const email = profile['urn:oid:0.9.2342.19200300.100.1.3'];
 
       const session = UserSessionsRepo
-        .createUserAndInitializeSession(uid, givenName, surname, email);
+        .createUserAndInitializeSession(email, givenName, surname, email);
 
       return done(null, session);
     },
