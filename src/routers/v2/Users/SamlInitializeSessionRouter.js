@@ -21,13 +21,14 @@ class SamlInitializeSessionRouter extends AppDevRouter<APIUserSession> {
     return [
       passport.authenticate('saml', { session: false }),
       (req, res) => {
-        let session = req.user;
+        let session = JSON.stringify(req.user);
         res.send(`<!DOCTYPE html>
 <html>
     <h1>:)</h1>
     <script>
-        if (window.webkit) window.webkit.messageHandler.jack.postMessage(${JSON.stringify(session)})
-        else if (Mobile) Mobile.handleToken(${JSON.stringify(session)})
+        //if (window.webkit) window.webkit.messageHandler.jack.postMessage(${JSON.stringify(session)})
+        //else if (Mobile)
+        Mobile.handleToken(JSON.stringify(${session}));
     </script>
 </html>
         `);
