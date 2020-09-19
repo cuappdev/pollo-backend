@@ -21,7 +21,7 @@ export default (passport) => {
         } else done(new Error('Invalid saml provider'));
       },
     },
-    (req, profile, done) => {
+    async (req, profile, done) => {
       console.log(profile);
 
       // const uid = profile['urn:oid:0.9.2342.19200300.100.1.1'];
@@ -29,7 +29,7 @@ export default (passport) => {
       const surname = profile['urn:oid:2.5.4.4'];
       const email = profile['urn:oid:0.9.2342.19200300.100.1.3'];
 
-      const session = UserSessionsRepo
+      const session = await UserSessionsRepo
         .createUserAndInitializeSession(email, givenName, surname, email);
 
       return done(null, session);
