@@ -22,8 +22,6 @@ export default (passport) => {
       },
     },
     async (req, profile, done) => {
-      console.log(profile);
-
       // const uid = profile['urn:oid:0.9.2342.19200300.100.1.1'];
       const givenName = profile['urn:oid:2.5.4.42'];
       const surname = profile['urn:oid:2.5.4.4'];
