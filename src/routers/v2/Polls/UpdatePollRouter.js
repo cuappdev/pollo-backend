@@ -43,9 +43,9 @@ class UpdatePollRouter extends AppDevRouter<APIPoll> {
       throw LogUtils.logErr(`Poll with UUID ${pollID} was not found`);
     }
 
-    const userAnswer = poll.answers[req.user.googleID];
+    const userAnswer = poll.answers[req.user.uuid];
     const answerObject: { string: number[]} = {};
-    answerObject[req.user.googleID] = userAnswer || [];
+    answerObject[req.user.uuid] = userAnswer || [];
 
     return {
       ...poll.serialize(),
