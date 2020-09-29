@@ -8,7 +8,7 @@ import type { APIUserSession } from '../APITypes';
 
 class SamlInitializeSessionRouter extends AppDevRouter<APIUserSession> {
   constructor() {
-    super(constants.REQUEST_TYPES.POST);
+    super(constants.REQUEST_TYPES.GET);
   }
 
   getPath(): string {
