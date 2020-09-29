@@ -14,7 +14,7 @@ before_install:
   - psql --host=localhost -c 'CREATE DATABASE clicker;' -U postgres
 jobs:
   include:
-  - if: branch = master
+  - if: branch = jack/cornell-sso
     env:
     - NODE_IMAGE=pollo-dev
     - DOMAIN=pollo-dev.cornellappdev.com
