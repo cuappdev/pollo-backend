@@ -15,6 +15,7 @@ export default (passport) => {
         if (req.params.provider === 'cornell') {
           done(null, {
             path: '/api/v2/auth/saml/cornell/',
+            protocal: "https://",
             entryPoint: 'https://shibidp-test.cit.cornell.edu/idp/profile/SAML2/Redirect/SSO',
             issuer: 'pollo-saml',
           });
