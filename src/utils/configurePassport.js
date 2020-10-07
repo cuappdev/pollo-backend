@@ -1,9 +1,18 @@
 import { Strategy as BearerStrategy } from 'passport-http-bearer';
-import { Strategy as SamlStrategy } from 'passport-saml';
 import MultiSamlStrategy from 'passport-saml/multiSamlStrategy';
 import UserSessionsRepo from '../repos/UserSessionsRepo';
+import UsersRepo from '../repos/UsersRepo';
 
 export default (passport) => {
+  passport.serializeUser(async (user, done) => {
+    done(null, user.uuid || await UserSessionsRepo.getUserFromToken(user.sessionToken));
+  });
+
+  passport.deserializeUser(async (uuid, done) => {
+    console.log(uuid);
+    done(null, await UsersRepo.getUserByID(uuid));
+  });
+
   passport.use(new BearerStrategy(
     (token, cb) => UserSessionsRepo.getUserFromToken(token).then(user => (user ? cb(null, user) : cb(null, false))),
   ));

@@ -6,6 +6,7 @@ import {
 } from 'express';
 import AppDevResponse from './AppDevResponse';
 import UserSessionsRepo from '../repos/UserSessionsRepo';
+import passport from 'passport';
 
 /**
  * Removes element from array on predicate
@@ -31,39 +32,40 @@ function remove<T>(arr: Array<T>, pred: (param: T, num: number) => boolean) {
  */
 async function ensureAuthenticated(req: Request, res: Response,
   next: NextFunction) {
-  const header = req.get('Authorization');
-  if (!header) {
-    res.send(
-      new AppDevResponse(
-        false,
-        { errors: ['Authorization header missing'] },
-      ),
-    );
-    return next(true);
-  }
-  const bearerToken = header.replace('Bearer ', '').trim();
-  if (!bearerToken) {
-    res.send(
-      new AppDevResponse(
-        false,
-        { errors: ['Invalid authorization header'] },
-      ),
-    );
-    return next(true);
-  }
-
-  if (!await UserSessionsRepo.verifySession(bearerToken)) {
-    res.status(401).send(
-      new AppDevResponse(
-        false,
-        { errors: ['Invalid session token'] },
-      ),
-    );
-    return next(true);
-  }
-  const user = await UserSessionsRepo.getUserFromToken(bearerToken);
-  req.user = user;
-  return next();
+  // const header = req.get('Authorization');
+  // if (!header) {
+  //   res.send(
+  //     new AppDevResponse(
+  //       false,
+  //       { errors: ['Authorization header missing'] },
+  //     ),
+  //   );
+  //   return next(true);
+  // }
+  // const bearerToken = header.replace('Bearer ', '').trim();
+  // if (!bearerToken) {
+  //   res.send(
+  //     new AppDevResponse(
+  //       false,
+  //       { errors: ['Invalid authorization header'] },
+  //     ),
+  //   );
+  //   return next(true);
+  // }
+  //
+  // if (!await UserSessionsRepo.verifySession(bearerToken)) {
+  //   res.status(401).send(
+  //     new AppDevResponse(
+  //       false,
+  //       { errors: ['Invalid session token'] },
+  //     ),
+  //   );
+  //   return next(true);
+  // }
+  // const user = await UserSessionsRepo.getUserFromToken(bearerToken);
+  // req.user = user;
+  // return next();
+  passport.authenticate('bearer')(req, res, next);
 }
 
 /**
