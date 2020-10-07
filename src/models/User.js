@@ -62,29 +62,13 @@ class User extends Base {
    * @param {string} id - google id used to create new user
    * @return {User} a new user with supplied google id
    */
-  static dummy(id: string): User {
+  static dummy(email: string): User {
     const user = new User();
-    user.googleID = id;
+    user.googleID = 'googleID';
     user.firstName = '';
     user.lastName = '';
-    user.email = '';
+    user.email = email;
     user.netID = '';
-    return user;
-  }
-
-  /**
-   * Parses google response to create User
-   * @function
-   * @param {Object} creds - credentials google returns
-   * @return {User} a new user with info google supplied
-   */
-  static fromGoogleCreds(creds: Object): User {
-    const user = new User();
-    user.googleID = creds.id;
-    user.firstName = creds.name.givenName;
-    user.lastName = creds.name.familyName;
-    user.email = creds.emails[0].value;
-    user.netID = appDevUtils.netIDFromEmail(user.email);
     return user;
   }
 

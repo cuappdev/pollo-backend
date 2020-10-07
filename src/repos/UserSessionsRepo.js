@@ -158,9 +158,9 @@ const createUserAndInitializeSession = async (id: string, first: string, last: s
   //   family_name: last,
   //   email,
   // } = login.getPayload();
-  let user = await UsersRepo.getUserByGoogleID(id);
+  let user = await UsersRepo.getUserByEmail(email);
   if (!user) {
-    user = await UsersRepo.createUserWithFields(id, first, last, email);
+    user = await UsersRepo.createUserWithFields(first, last, email);
   }
   const session = await createOrUpdateSession(user, null, null);
   return session.serialize();

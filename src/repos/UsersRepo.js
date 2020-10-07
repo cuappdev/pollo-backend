@@ -12,29 +12,15 @@ const db = (): Repository<User> => getRepository(User);
 /**
  * Creates a dummy user and saves it to the db (Testing purposes)
  * @function
- * @param {string} id - Google id to create user with
+ * @param {string} email - email to create user with
  * @return {User} New dummy user
  */
-const createDummyUser = async (id: string): Promise<User> => {
+const createDummyUser = async (email: string): Promise<User> => {
   try {
-    return await db().save(User.dummy(id));
+    return await db().save(User.dummy(email));
   } catch (e) {
     console.log(e);
     throw LogUtils.logErr('Problem creating user', e, { id });
-  }
-};
-
-/**
- * Creates a user using google credentials
- * @function
- * @param {Object} fields - Object containing user info returned by google
- * @return {User} New user created using given credentials
- */
-const createUser = async (fields: Object): Promise<User> => {
-  try {
-    return await db().save(User.fromGoogleCreds(fields));
-  } catch (e) {
-    throw LogUtils.logErr('Problem creating user from google credentials', e, { fields });
   }
 };
 
@@ -48,14 +34,13 @@ const createUser = async (fields: Object): Promise<User> => {
  * @return {User} New user created using given params
  */
 const createUserWithFields = async (
-  googleID: string,
   firstName: string,
   lastName: string,
   email: string,
 ): Promise<User> => {
   try {
     const user = new User();
-    user.googleID = googleID;
+    user.googleID = 'googleID';
     user.firstName = firstName;
     user.lastName = lastName;
     user.email = email;
@@ -93,18 +78,18 @@ const getUserByID = async (id: string): Promise<?User> => {
 };
 
 /**
- * Get a user by googleID
+ * Get a user by email
  * @function
- * @param {string} googleID - GoogleID of user to fetch
+ * @param {string} email - email of user to fetch
  * @return {?User} User with given googleID
  */
-const getUserByGoogleID = async (googleID: string): Promise<?User> => {
+const getUserByEmail = async (email: string): Promise<?User> => {
   try {
     return await db().createQueryBuilder('users')
-      .where('users.googleID = :googleID', { googleID })
+      .where('users.email = :email', { email })
       .getOne();
   } catch (e) {
-    throw LogUtils.logErr('Problem getting user by google ID', e, { googleID });
+    throw LogUtils.logErr('Problem getting user by email', e, { email });
   }
 };
 
@@ -142,32 +127,6 @@ Promise<?Array<User>> => {
       .getMany();
   } catch (e) {
     throw LogUtils.logErr('Problem getting users from UUIDs', e, { userIDs, filter });
-  }
-};
-
-/**
- * Gets all users from list of googleIDs but also filters out using another
- * list of google ids
- * @function
- * @param {string[]} googleIDs - List of googleIDs to fetch users from
- * @param {?string[]} filter - List of googlleIDs to filter out
- * @return {User[]} List of users resulting from given params
- */
-const getUsersByGoogleIDs = async (
-  googleIDs: string[],
-  filter: ?string[],
-): Promise<?Array<User>> => {
-  try {
-    let validIDs = googleIDs;
-    if (filter && filter.length > 0) {
-      validIDs = googleIDs.filter(id => filter && !filter.includes(id));
-    }
-    const ids = `{${String(validIDs)}}`;
-    return await db().createQueryBuilder('users')
-      .where(`users.googleID = ANY('${ids}'::text[])`)
-      .getMany();
-  } catch (e) {
-    throw LogUtils.logErr('Problem getting users from googleIDs', e, { googleIDs, filter });
   }
 };
 
@@ -217,13 +176,11 @@ const getGroupsByID = async (id: string, role: ?string):
 
 export default {
   getUsers,
-  createUser,
   createUserWithFields,
   createDummyUser,
   getGroupsByID,
-  getUserByGoogleID,
   getUserByID,
-  getUsersByGoogleIDs,
+  getUserByEmail,
   getUsersFromIDs,
   deleteUserByID,
 };

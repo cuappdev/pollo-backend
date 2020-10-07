@@ -21,7 +21,7 @@ async function participation(id, dates: Array<Date>) {
 
   polls.forEach((poll: Poll) => {
     users.forEach((user: User) => {
-      if (Object.prototype.hasOwnProperty.call(poll.answers, user.googleID)) {
+      if (Object.prototype.hasOwnProperty.call(poll.answers, user.uuid)) {
         scores[user.netID] += 1;
       }
     });

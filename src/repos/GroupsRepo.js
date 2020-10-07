@@ -99,7 +99,7 @@ const getGroupID = async (code: string) => {
 const deleteGroupByID = async (id: string) => {
   try {
     const group = await getGroupByID(id);
-    
+
     if (group) {
       delete groupCodes[group.code];
       await db().remove(group);
@@ -131,48 +131,6 @@ const updateGroupByID = async (id: string, name: ?string):
     return group;
   } catch (e) {
     throw LogUtils.logErr(`Problem updating group's name: ${id}`, e);
-  }
-};
-
-/**
- * Add users (admins or members) to a group
- * @function
- * @param {string} id - UUID of group to add users
- * @param {string[]} googleIDs - List of user's googleIDs to add
- * @param {string} [role] - Specifies whether to add the users as members or admins
- * @return {?Group} Group that users were added to
- */
-const addUsersByGoogleIDs = async (id: string, googleIDs: string[],
-  role: ?string): Promise<?Group> => {
-  try {
-    const group = await db().createQueryBuilder('groups')
-      .leftJoinAndSelect('groups.admins', 'admins')
-      .leftJoinAndSelect('groups.members', 'members')
-      .leftJoinAndSelect('groups.polls', 'polls')
-      .where('groups.uuid = :groupID')
-      .setParameters({ groupID: id })
-      .getOne();
-    if (group) {
-      if (role === constants.USER_TYPES.ADMIN) {
-        const currAdminIDs = group.admins.map(admin => admin.googleID);
-        const users = await UsersRepo
-          .getUsersByGoogleIDs(googleIDs, currAdminIDs);
-        group.admins = group.admins.concat(users);
-      } else {
-        const currMemberIDs = group.members.map(user => user.googleID);
-        const users = await UsersRepo
-          .getUsersByGoogleIDs(googleIDs, currMemberIDs);
-        group.members = group.members.concat(users);
-      }
-    }
-    await db().save(group);
-    return group;
-  } catch (e) {
-    throw LogUtils.logErr(
-      `Problem adding users to group ${id} by google ids`,
-      e,
-      { googleIDs, role },
-    );
   }
 };
 
@@ -261,7 +219,7 @@ const isAdmin = async (id: string, user: User):
       .where('groups.uuid = :groupID')
       .setParameters({ groupID: id })
       .getOne();
-    const admin = group.admins.find(x => x.googleID === user.googleID);
+    const admin = group.admins.find(x => x.uuid === user.uuid);
     return admin !== undefined;
   } catch (e) {
     throw LogUtils.logErr(`Problem verifying admin status for group: ${id}`, e, { user });
@@ -283,7 +241,7 @@ const isMember = async (id: string, user: User):
       .where('groups.uuid = :groupID')
       .setParameters({ groupID: id })
       .getOne();
-    const member = group.members.find(x => x.googleID === user.googleID);
+    const member = group.members.find(x => x.uuid === user.uuid);
     return member !== undefined;
   } catch (e) {
     throw LogUtils.logErr(`Problem verifying member status for group: ${id}`, e, { user });
@@ -385,7 +343,6 @@ export default {
   getGroupByID,
   getGroupID,
   updateGroupByID,
-  addUsersByGoogleIDs,
   removeUserByGroupID,
   getUsersByGroupID,
   isAdmin,

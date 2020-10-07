@@ -2,7 +2,7 @@ import UserSessionsRepo from '../../src/repos/UserSessionsRepo';
 import UsersRepo from '../../src/repos/UsersRepo';
 import dbConnection from '../../src/db/DbConnection';
 
-const googleID = 'usertest1';
+const email = 'usertest1';
 let sessionID;
 let user;
 
@@ -14,7 +14,7 @@ beforeAll(async () => {
     process.exit();
   });
 
-  user = await UsersRepo.createDummyUser(googleID);
+  user = await UsersRepo.createDummyUser(email);
 });
 
 test('Create Session', async () => {
@@ -27,7 +27,7 @@ test('Create Session', async () => {
 
 test('Get User from Token', async () => {
   user = await UserSessionsRepo.getUserFromToken('access');
-  expect(user.googleID).toEqual(googleID);
+  expect(user.email).toEqual(email);
   const nullUser = await UserSessionsRepo.getUserFromToken('invalid');
   expect(nullUser).toBeNull();
 });
