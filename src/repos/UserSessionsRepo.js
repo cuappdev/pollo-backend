@@ -151,7 +151,7 @@ const deleteSessionFromUserID = async (userID: string) => {
  * @param {LoginTicket} login - login object supplied by Google
  * @return {Object} Object containing session information for the user.
  */
-const createUserAndInitializeSession = async (id: string, first: string, last: string, email: string): Promise<Object> => {
+const createUserAndInitializeSession = async (first: string, last: string, email: string): Promise<Object> => {
   // const {
   //   sub: googleID,
   //   given_name: first,

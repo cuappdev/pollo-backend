@@ -15,7 +15,7 @@ export default (passport) => {
         if (req.params.provider === 'cornell') {
           done(null, {
             path: '/api/v2/auth/saml/cornell/',
-            protocol: "https://",
+            protocol: 'https://',
             entryPoint: 'https://shibidp-test.cit.cornell.edu/idp/profile/SAML2/Redirect/SSO',
             issuer: 'pollo-saml',
           });
@@ -29,7 +29,7 @@ export default (passport) => {
       const email = profile['urn:oid:0.9.2342.19200300.100.1.3'];
 
       const session = await UserSessionsRepo
-        .createUserAndInitializeSession(email, givenName, surname, email);
+        .createUserAndInitializeSession(givenName, surname, email);
 
       return done(null, session);
     },
