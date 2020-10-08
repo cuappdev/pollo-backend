@@ -106,7 +106,7 @@ async function updateSession(req: Request, res: Response, next: NextFunction) {
     );
     return next(true);
   }
-  req.session = session;
+  req.userSession = session;
   return next();
 }
 
