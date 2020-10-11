@@ -65,7 +65,8 @@ async function ensureAuthenticated(req: Request, res: Response,
   // const user = await UserSessionsRepo.getUserFromToken(bearerToken);
   // req.user = user;
   // return next();
-  passport.authenticate('bearer')(req, res, next);
+  if (!req.isAuthenticated()) return passport.authenticate('bearer')(req, res, next);
+  return next();
 }
 
 /**

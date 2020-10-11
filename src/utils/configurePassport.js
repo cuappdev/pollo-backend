@@ -5,12 +5,12 @@ import UsersRepo from '../repos/UsersRepo';
 
 export default (passport) => {
   passport.serializeUser(async (user, done) => {
-    done(null, user.uuid || await UserSessionsRepo.getUserFromToken(user.sessionToken));
+    done(null, user.uuid);
   });
 
   passport.deserializeUser(async (uuid, done) => {
-    console.log(uuid);
-    done(null, await UsersRepo.getUserByID(uuid));
+    const user = await UsersRepo.getUserByID(uuid);
+    done(null, user);
   });
 
   passport.use(new BearerStrategy(
@@ -24,7 +24,7 @@ export default (passport) => {
         if (req.params.provider === 'cornell') {
           done(null, {
             path: '/api/v2/auth/saml/cornell/',
-            protocol: 'https://',
+            protocol: 'http://',
             entryPoint: 'https://shibidp-test.cit.cornell.edu/idp/profile/SAML2/Redirect/SSO',
             issuer: 'pollo-saml',
           });
@@ -32,15 +32,14 @@ export default (passport) => {
       },
     },
     async (req, profile, done) => {
-      // const uid = profile['urn:oid:0.9.2342.19200300.100.1.1'];
       const givenName = profile['urn:oid:2.5.4.42'];
       const surname = profile['urn:oid:2.5.4.4'];
       const email = profile['urn:oid:0.9.2342.19200300.100.1.3'];
 
-      const session = await UserSessionsRepo
-        .createUserAndInitializeSession(givenName, surname, email);
+      let user = await UsersRepo.getUserByEmail(email);
+      if (user === null || user === undefined) user = UsersRepo.createUserWithFields(givenName, surname, email);
 
-      return done(null, session);
+      return done(null, user);
     },
   ));
 };

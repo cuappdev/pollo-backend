@@ -52,7 +52,6 @@ const createUserWithFields = async (
     return user;
   } catch (e) {
     throw LogUtils.logErr('Problem creating user with fields', e, {
-      googleID,
       firstName,
       lastName,
       email,

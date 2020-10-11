@@ -5,6 +5,7 @@ import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';
 
 import type { APIUserSession } from '../APITypes';
+import UserSessionsRepo from '../../../repos/UserSessionsRepo';
 
 class SamlInitializeSessionRouter extends AppDevRouter<APIUserSession> {
   constructor() {
@@ -19,16 +20,16 @@ class SamlInitializeSessionRouter extends AppDevRouter<APIUserSession> {
 
   middleware() {
     return [
-      passport.authenticate('saml', { session: false }),
-      (req, res) => {
-        let session = JSON.stringify(req.user);
+      passport.authenticate('saml'),
+      async (req, res) => {
+        const session = JSON.stringify(await UserSessionsRepo.createOrUpdateSession(req.user));
         res.send(`<!DOCTYPE html>
 <html>
     <h1>:)</h1>
     <script>
         if (window.webkit) window.webkit.messageHandlers.sessionTokenHandler.postMessage(${session});
         else if (typeof Mobile !== 'undefined') Mobile.handleToken(JSON.stringify(${session}));
-        else window.location = "http://localhost:3000";
+        // else window.location = "http://localhost:3000";
     </script>
 </html>
         `);
