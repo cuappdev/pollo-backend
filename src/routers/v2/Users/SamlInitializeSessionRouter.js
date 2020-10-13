@@ -22,7 +22,7 @@ class SamlInitializeSessionRouter extends AppDevRouter<APIUserSession> {
     return [
       passport.authenticate('saml'),
       async (req, res) => {
-        const session = JSON.stringify(await UserSessionsRepo.createOrUpdateSession(req.user));
+        const session = JSON.stringify((await UserSessionsRepo.createOrUpdateSession(req.user)).serialize());
         res.send(`<!DOCTYPE html>
 <html>
     <h1>:)</h1>
