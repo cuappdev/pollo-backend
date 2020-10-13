@@ -31,7 +31,9 @@ function remove<T>(arr: Array<T>, pred: (param: T, num: number) => boolean) {
  * @param {NextFunction} next - Next function
  */
 async function ensureAuthenticated(req: Request, res: Response, next: NextFunction) {
-  if (!req.isAuthenticated()) return passport.authenticate('bearer')(req, res, next);
+  if (!req.isAuthenticated()) {
+    return passport.authenticate('bearer', { session: false })(req, res, next);
+  }
   return next();
 }
 

@@ -31,7 +31,10 @@ class API {
     this.express.use(passport.initialize());
     this.express.use(passport.session());
 
-    this.express.use(cors());
+    this.express.use(cors({
+      origin: process.env.NODE_ENV === 'development' ? true : /\.cornellappdev\.com/,
+      credentials: true,
+    }));
   }
 
   routes(): void {
