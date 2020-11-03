@@ -1,8 +1,8 @@
 #!/bin/bash
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-docker build -t cornellappdev/"$NODE_IMAGE":"$TRAVIS_COMMIT" --no-cache .
-docker push cornellappdev/"$NODE_IMAGE":"$TRAVIS_COMMIT"
+docker build -t cornellappdev/"$NODE_IMAGE":"$TRAVIS_COMMIT"-"$TARGET" --no-cache -f Dockerfile."$TARGET" .
+docker push cornellappdev/"$NODE_IMAGE":"$TRAVIS_COMMIT"-"$TARGET"
 openssl aes-256-cbc -K $encrypted_b9db1102fcfa_key -iv $encrypted_b9db1102fcfa_iv -in server.pem.enc -out server.pem -d
 chmod 600 server.pem
-ssh -i server.pem appdev@"$DOMAIN" "cd docker-compose; export IMAGE_TAG='$TRAVIS_COMMIT'; 
+ssh -i server.pem appdev@"$DOMAIN" "cd docker-compose; export IMAGE_TAG='$TRAVIS_COMMIT-$TARGET';
     docker stack deploy --compose-file docker-compose.yml the-stack"
