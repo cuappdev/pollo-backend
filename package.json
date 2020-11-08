@@ -5,6 +5,7 @@
   "main": "build/bundle.js",
   "scripts": {
     "start": "./node_modules/.bin/webpack --watch --mode=development",
+    "dev": "webpack --mode=development && node build/bundle.js",
     "prod": "./node_modules/.bin/webpack -p --mode=production && node build/bundle.js",
     "test": "jest --forceExit -i",
     "flow": "node_modules/.bin/flow",
