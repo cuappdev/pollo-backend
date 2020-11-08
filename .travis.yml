@@ -7,7 +7,7 @@ services:
 - postgresql
 addons:
   postgresql: '9.6'
-  ssh_known_hosts: 
+  ssh_known_hosts:
   - pollo-backend.cornellappdev.com
   - pollo-dev.cornellappdev.com
 before_install:
@@ -18,10 +18,12 @@ jobs:
     env:
     - NODE_IMAGE=pollo-dev
     - DOMAIN=pollo-dev.cornellappdev.com
+    - TARGET=dev
   - if: branch = release
     env:
     - NODE_IMAGE=pollo
     - DOMAIN=pollo-backend.cornellappdev.com
+    - TARGET=prod
 script:
 - npm run start &
 - sleep 10; npm run test
