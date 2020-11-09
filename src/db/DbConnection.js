@@ -36,7 +36,7 @@ const connectionOptions: ConnectionOptions = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   extra: {
-    ssl: isProduction,
+    ssl: Object.prototype.hasOwnProperty.call(process.env, 'DB_SSL'),
   },
   entities,
   migrations: [],
