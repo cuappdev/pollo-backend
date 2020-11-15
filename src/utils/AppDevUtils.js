@@ -41,8 +41,14 @@ const randomCode = (length: number): string => {
   return result;
 };
 
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+const isProduction = process.env.NODE_ENV === 'production';
+
 export default {
   netIDFromEmail,
   randomCode,
   tryCheckAppDevURL,
+  isDevelopment,
+  isProduction
 };

@@ -8,6 +8,7 @@ import type { APIUserSession } from '../APITypes';
 import UsersRepo from '../../../repos/UsersRepo';
 import UserSessionsRepo from '../../../repos/UserSessionsRepo';
 import LogUtils from '../../../utils/LogUtils';
+import AppDevUtils from '../../../utils/AppDevUtils';
 
 class RefreshTokenRouter extends AppDevRouter<APIUserSession> {
   constructor() {
@@ -24,7 +25,7 @@ class RefreshTokenRouter extends AppDevRouter<APIUserSession> {
 
   async content(req: Request) {
     const { platform, id } = req.params;
-    if (process.env.NODE_ENV !== 'development' || (platform !== 'ios' && platform !== 'android')) {
+    if (!AppDevUtils.isDevelopment || (platform !== 'ios' && platform !== 'android')) {
       throw LogUtils.logErr('Cannot create fake session');
     }
     return UserSessionsRepo.createUserAndInitializeSession(platform, id, `${platform}${id}`);

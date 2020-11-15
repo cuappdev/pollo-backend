@@ -8,6 +8,7 @@ import session from 'express-session';
 import path from 'path';
 import passport from 'passport';
 import configurePassport from './utils/configurePassport';
+import AppDevUtils from './utils/AppDevUtils';
 
 class API {
   express: Express;
@@ -24,7 +25,7 @@ class API {
     this.express.use(session({
       resave: false,
       saveUninitialized: false,
-      secret: 'test secret',
+      secret: process.env.SESSION_SECRET,
     }));
 
     configurePassport(passport);
@@ -32,7 +33,7 @@ class API {
     this.express.use(passport.session());
 
     this.express.use(cors({
-      origin: true /*process.env.NODE_ENV === 'development'*/ ? true : /\.cornellappdev\.com/,
+      origin: AppDevUtils.isDevelopment ? true : /\.cornellappdev\.com/,
       credentials: true,
     }));
   }

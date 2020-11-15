@@ -29,7 +29,7 @@ class SamlInitializeSessionRouter extends AppDevRouter<APIUserSession> {
     <script>
         if (window.webkit) window.webkit.messageHandlers.sessionTokenHandler.postMessage(${session});
         else if (typeof Mobile !== 'undefined') Mobile.handleToken(JSON.stringify(${session}));
-        else window.location = "http://localhost:3000";
+        else window.location = ${process.env.LOGIN_REDiRECT};
     </script>
 </html>
         `);

@@ -3,6 +3,7 @@ import http from 'http';
 import API from './API';
 import dbConnection from './db/DbConnection';
 import GroupManager from './GroupManager';
+import AppDevUtils from './utils/AppDevUtils';
 
 type Error = {
   errno?: number;
@@ -34,7 +35,7 @@ const onError = (error: Error): void => {
 
 const onListening = (): void => {
   const addr: Object = server.address();
-  console.log(`Listening on ${addr.port} (${process.env.NODE_ENV || 'development'})`);
+  console.log(`Listening on ${addr.port} (${process.env.NODE_ENV})`);
 };
 
 // Bootstrap everything
