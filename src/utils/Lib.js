@@ -4,9 +4,9 @@ import {
   Response,
   Request,
 } from 'express';
+import passport from 'passport';
 import AppDevResponse from './AppDevResponse';
 import UserSessionsRepo from '../repos/UserSessionsRepo';
-import passport from 'passport';
 
 /**
  * Removes element from array on predicate

@@ -1,5 +1,4 @@
 // @flow
-import { Request } from 'express';
 import passport from 'passport';
 import AppDevRouter from '../../../utils/AppDevRouter';
 import constants from '../../../utils/Constants';

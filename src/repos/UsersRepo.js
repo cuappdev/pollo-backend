@@ -27,7 +27,6 @@ const createDummyUser = async (email: string): Promise<User> => {
 /**
  * Creates a user
  * @function
- * @param {string} googleID - GoogleID of user
  * @param {string} firstName - First name of user
  * @param {string} lastName - Last name of user
  * @param {string} email - Email of user
@@ -80,7 +79,7 @@ const getUserByID = async (id: string): Promise<?User> => {
  * Get a user by email
  * @function
  * @param {string} email - email of user to fetch
- * @return {?User} User with given googleID
+ * @return {?User} User with given email
  */
 const getUserByEmail = async (email: string): Promise<?User> => {
   try {

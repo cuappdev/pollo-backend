@@ -3,7 +3,6 @@ import http from 'http';
 import API from './API';
 import dbConnection from './db/DbConnection';
 import GroupManager from './GroupManager';
-import AppDevUtils from './utils/AppDevUtils';
 
 type Error = {
   errno?: number;

@@ -50,5 +50,5 @@ export default {
   randomCode,
   tryCheckAppDevURL,
   isDevelopment,
-  isProduction
+  isProduction,
 };

@@ -47,10 +47,9 @@ const getUserFromToken = async (accessToken: string): Promise<?User> => {
     .getOne();
   if (session && session.isActive && session.expiresAt > Math.floor(new Date().getTime() / 1000)) {
     return session.user;
-  } else {
-    return null;
-    // throw Error('No valid session');
   }
+  return null;
+  // throw Error('No valid session');
 };
 
 /**
