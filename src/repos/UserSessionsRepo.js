@@ -123,27 +123,6 @@ const deleteSessionFromUserID = async (userID: string) => {
   }
 };
 
-// /**
-//  * Creates a user if one doesn't exist and then initializes a session for them
-//  * @function
-//  * @param {LoginTicket} login - login object supplied by Google
-//  * @return {Object} Object containing session information for the user.
-//  */
-// const createUserAndInitializeSession = async (login: LoginTicket): Promise<Object> => {
-//   const {
-//     sub: googleID,
-//     given_name: first,
-//     family_name: last,
-//     email,
-//   } = login.getPayload();
-//   let user = await UsersRepo.getUserByGoogleID(googleID);
-//   if (!user) {
-//     user = await UsersRepo.createUserWithFields(googleID, first, last, email);
-//   }
-//   const session = await createOrUpdateSession(user, null, null);
-//   return session.serialize();
-// };
-
 /**
  * Creates a user if one doesn't exist and then initializes a session for them
  * @function
@@ -151,12 +130,6 @@ const deleteSessionFromUserID = async (userID: string) => {
  * @return {Object} Object containing session information for the user.
  */
 const createUserAndInitializeSession = async (first: string, last: string, email: string): Promise<Object> => {
-  // const {
-  //   sub: googleID,
-  //   given_name: first,
-  //   family_name: last,
-  //   email,
-  // } = login.getPayload();
   let user = await UsersRepo.getUserByEmail(email);
   if (!user) {
     user = await UsersRepo.createUserWithFields(first, last, email);

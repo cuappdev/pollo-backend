@@ -6,5 +6,5 @@ DB_NAME=pollo
 GOOGLE_CLIENT_ID=FILL_IN
 GOOGLE_CLIENT_SECRET=FILL_IN
 GOOGLE_REDIRECT_URI=FILL_IN
-LOGIN_REDiRECT=http://localhost:3000 on dev, https://pollo.cornellappdev.com/ for prod
+LOGIN_REDIRECT=http://localhost:3000 on dev, https://pollo.cornellappdev.com/ for prod
 SESSION_SECRET=thiscanbeanything

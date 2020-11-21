@@ -32,6 +32,7 @@ export default (passport) => {
       },
     },
     async (req, profile, done) => {
+      // These attributes come from this page: https://it.cornell.edu/shibboleth/shibboleth-faq
       const givenName = profile['urn:oid:2.5.4.42'];
       const surname = profile['urn:oid:2.5.4.4'];
       const email = profile['urn:oid:0.9.2342.19200300.100.1.3'];
