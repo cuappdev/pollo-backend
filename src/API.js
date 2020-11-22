@@ -4,7 +4,11 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 import globby from 'globby';
+import session from 'express-session';
 import path from 'path';
+import passport from 'passport';
+import configurePassport from './utils/configurePassport';
+import AppDevUtils from './utils/AppDevUtils';
 
 class API {
   express: Express;
@@ -18,8 +22,20 @@ class API {
   middleware(): void {
     this.express.use(bodyParser.json());
     this.express.use(bodyParser.urlencoded({ extended: false }));
+    this.express.use(session({
+      resave: false,
+      saveUninitialized: false,
+      secret: process.env.SESSION_SECRET,
+    }));
 
-    this.express.use(cors());
+    configurePassport(passport);
+    this.express.use(passport.initialize());
+    this.express.use(passport.session());
+
+    this.express.use(cors({
+      origin: AppDevUtils.isDevelopment ? true : /\.cornellappdev\.com/,
+      credentials: true,
+    }));
   }
 
   routes(): void {

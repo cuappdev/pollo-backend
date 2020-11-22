@@ -39,5 +39,6 @@ jobs:
         DB_USERNAME: postgres
         DB_PASSWORD: postgres
         DB_NAME: pollo
-        
-        
+        SESSION_SECRET: secret
+
+

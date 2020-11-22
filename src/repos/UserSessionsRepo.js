@@ -45,7 +45,11 @@ const getUserFromToken = async (accessToken: string): Promise<?User> => {
     .leftJoinAndSelect('usersessions.user', 'user')
     .where('usersessions.sessionToken = :accessToken', { accessToken })
     .getOne();
-  return session ? session.user : null;
+  if (session && session.isActive && session.expiresAt > Math.floor(new Date().getTime() / 1000)) {
+    return session.user;
+  }
+  return null;
+  // throw Error('No valid session');
 };
 
 /**
@@ -125,16 +129,10 @@ const deleteSessionFromUserID = async (userID: string) => {
  * @param {LoginTicket} login - login object supplied by Google
  * @return {Object} Object containing session information for the user.
  */
-const createUserAndInitializeSession = async (login: LoginTicket): Promise<Object> => {
-  const {
-    sub: googleID,
-    given_name: first,
-    family_name: last,
-    email,
-  } = login.getPayload();
-  let user = await UsersRepo.getUserByGoogleID(googleID);
+const createUserAndInitializeSession = async (first: string, last: string, email: string): Promise<Object> => {
+  let user = await UsersRepo.getUserByEmail(email);
   if (!user) {
-    user = await UsersRepo.createUserWithFields(googleID, first, last, email);
+    user = await UsersRepo.createUserWithFields(first, last, email);
   }
   const session = await createOrUpdateSession(user, null, null);
   return session.serialize();

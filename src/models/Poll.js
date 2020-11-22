@@ -49,7 +49,7 @@ class Poll extends Base {
   /**
    * All the answers by students for the poll.
    * @example
-   * let answers = {googleID: [0, 1, 3]}
+   * let answers = {uuid: [0, 1, 3]}
    */
   @Column('json')
   answers: { string: number[] } = {};

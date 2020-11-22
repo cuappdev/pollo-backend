@@ -15,7 +15,7 @@ const {
 // Must be running server to test
 
 const opts = () => ({ name: 'Test group' });
-const googleID = 'usertest';
+const email = 'usertest';
 let adminToken;
 let userToken;
 let session;
@@ -32,7 +32,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  const user = await UsersRepo.createDummyUser(googleID);
+  const user = await UsersRepo.createDummyUser(email);
   adminID = user.uuid;
   session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
   adminToken = session.sessionToken;
@@ -195,22 +195,22 @@ test('Update group with invalid adminToken', async () => {
 });
 
 test('Download csv', async () => {
+  const u1 = await UsersRepo.createUserWithFields('u', '1', 'u1@example.com');
+  const u2 = await UsersRepo.createUserWithFields('u', '2', 'u2@example.com');
+
   const g = await GroupsRepo.getGroupByID(group.id);
   let polls: Array<?Poll> = await GroupsRepo.getPolls(group.id);
   console.log(`found ${polls.length} polls`);
   const p1 = await PollsRepo.createPoll(
     'Poll 1', g, [{ index: 0, text: 'Saturn' }, { index: 1, text: 'Mars' }],
-    0, { u1: [0], u2: [1] }, 'ended',
+    0, { [u1.uuid]: [0], [u2.uuid]: [1] }, 'ended',
   );
   polls = await GroupsRepo.getPolls(group.id);
   console.log(`found ${polls.length} polls`);
   const p2 = await PollsRepo.createPoll(
     'Poll 2', g, [{ index: 0, text: 'Earth' }, { index: 1, text: 'Venus' }],
-    1, { u1: [1], u2: [0] }, 'ended',
+    1, { [u1.uuid]: [1], [u2.uuid]: [0] }, 'ended',
   );
-
-  const u1 = await UsersRepo.createUserWithFields('u1', 'u', '1', 'u1@example.com');
-  const u2 = await UsersRepo.createUserWithFields('u2', 'u', '2', 'u2@example.com');
 
   await GroupsRepo.addUsersByIDs(group.id, [u1.uuid, u2.uuid]);
 
@@ -248,7 +248,7 @@ test('Download csv', async () => {
   expect(resultCanvas.status).toBe(200);
   expect(resultCanvas.data).toBe(`Student,ID,${today.toDateString()}\nu 1,u1,2\nu 2,u2,2\n`);
 
-  const u3 = await UsersRepo.createUserWithFields('u3', 'u', '3', 'u3@example.com');
+  const u3 = await UsersRepo.createUserWithFields('u', '3', 'u3@example.com');
   await GroupsRepo.addUsersByIDs(group.id, [u3.uuid]);
 
   resultCMS = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
@@ -286,7 +286,7 @@ test('Download csv', async () => {
 
   const p3 = await PollsRepo.createPoll(
     'Poll 3', g, [{ index: 0, text: 'Earth' }, { index: 1, text: 'Venus' }],
-    1, { u3: [0] }, 'ended',
+    1, { [u3.uuid]: [0] }, 'ended',
   );
 
   resultCMS = await axios.get(`http://localhost:3000/api/v2/sessions/${group.id}/csv`, {
@@ -416,10 +416,10 @@ test('Download csv', async () => {
     console.log(e);
     expect(e).toBe(null);
   });
-  
+
   expect(resultCMS.data)
     .toBe(`NetID,${badDate.toDateString()},${today.toDateString()}\nu1,0,2\nu2,0,2\nu3,0,1\n`);
-  
+
   expect(resultCanvas.data)
     .toBe(`Student,ID,${badDate.toDateString()},${today.toDateString()}\nu 1,u1,0,2\nu 2,u2,0,2\nu 3,u3,0,1\n`);
 

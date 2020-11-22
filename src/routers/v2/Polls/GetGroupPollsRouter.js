@@ -28,9 +28,9 @@ class GetGroupPollsRouter extends AppDevRouter<Object[]> {
     polls.filter(Boolean).forEach((poll) => {
       // date is in Unix time in seconds
       const date = poll.createdAt;
-      const userAnswer = poll.answers[req.user.googleID];
+      const userAnswer = poll.answers[req.user.uuid];
       const answerObject = {};
-      answerObject[req.user.googleID] = userAnswer || [];
+      answerObject[req.user.uuid] = userAnswer || [];
 
       const p = {
         ...poll.serialize(),

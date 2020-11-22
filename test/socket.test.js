@@ -12,7 +12,7 @@ let group;
 let mockClient;
 let createdPollID;
 
-const googleID = 'user1';
+const uuid = 'user1';
 const poll = {
   answerChoices: [{
     index: 0,
@@ -58,9 +58,9 @@ test('Start poll', () => {
 test('Answer poll', () => {
   const submittedAnswer = 0;
   // eslint-disable-next-line no-underscore-dangle
-  groupSocket._answerPoll(mockClient, googleID, submittedAnswer);
+  groupSocket._answerPoll(mockClient, uuid, submittedAnswer);
 
-  const userAnswers = groupSocket.current.answers[googleID];
+  const userAnswers = groupSocket.current.answers[uuid];
   expect(userAnswers.length).toBe(1);
   expect(userAnswers[0]).toBe(submittedAnswer);
 
@@ -71,9 +71,9 @@ test('Answer poll', () => {
 test('Change answer', () => {
   const submittedAnswer = 0;
   // eslint-disable-next-line no-underscore-dangle
-  groupSocket._answerPoll(null, googleID, submittedAnswer);
+  groupSocket._answerPoll(null, uuid, submittedAnswer);
 
-  const userAnswers = groupSocket.current.answers[googleID];
+  const userAnswers = groupSocket.current.answers[uuid];
   expect(userAnswers.length).toBe(1);
   expect(userAnswers[0]).toBe(submittedAnswer);
 
@@ -94,7 +94,7 @@ test('Get current poll (user)', () => {
   expect(currPoll.correctAnswer).toBe(poll.correctAnswer);
   expect(currPoll.state).toBe(poll.state);
   expect(currPoll.text).toBe(poll.text);
-  expect(currPoll.userAnswers[googleID]).toEqual([0]);
+  expect(currPoll.userAnswers[uuid]).toEqual([0]);
 });
 
 test('Get current poll (admin)', () => {
@@ -105,7 +105,7 @@ test('Get current poll (admin)', () => {
   expect(currPoll.correctAnswer).toBe(poll.correctAnswer);
   expect(currPoll.state).toBe(poll.state);
   expect(currPoll.text).toBe(poll.text);
-  expect(currPoll.userAnswers[googleID]).toEqual([0]);
+  expect(currPoll.userAnswers[uuid]).toEqual([0]);
 });
 
 test('Delete live poll', () => {

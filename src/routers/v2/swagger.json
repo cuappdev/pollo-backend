@@ -77,32 +77,52 @@
         ]
       }
     },
-    "/auth/mobile/": {
+    "/auth/saml/{provider}": {
       "post": {
         "tags": [
           "Authentication"
         ],
-        "summary": "Authenticate mobile",
-        "operationId": "authMobile",
+        "summary": "Authenticate all frontends",
+        "operationId": "auth",
         "consumes": [
           "application/json"
         ],
         "produces": [
-          "application/json"
+          "text/html"
         ],
         "parameters": [
           {
-            "in": "body",
-            "name": "body",
+            "in": "path",
+            "name": "provider",
+            "description": "The saml identity provider to use. Probably \"cornell\".",
             "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "idToken": {
-                  "type": "string"
-                }
-              }
-            }
+            "type": "string"
+          }
+        ],
+        "responses": {
+        }
+      }
+    },
+    "/auth/fake/{platform}/{id}/": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Creates a fake session not requiring sign-in, but only on dev.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "platform",
+            "type": "string",
+            "required": true,
+            "description": "Platform being called from"
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "type": "integer",
+            "required": true,
+            "description": "Some arbitrary ID number"
           }
         ],
         "responses": {
@@ -118,6 +138,22 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/auth/web/logout/": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "End a web session",
+        "produces": [
+          "text/html"
+        ],
+        "responses": {
+          "200": {
+            "description": "a frowning face :("
           }
         }
       }

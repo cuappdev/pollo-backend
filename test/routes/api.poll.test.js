@@ -12,7 +12,7 @@ const {
 // Polls
 // Must be running server to test
 
-const googleID = 'usertest';
+const email = 'usertest';
 let group;
 let session;
 let poll;
@@ -25,7 +25,7 @@ beforeAll(async () => {
     console.log('Error connecting to database');
     process.exit();
   });
-  const user = await UsersRepo.createDummyUser(googleID);
+  const user = await UsersRepo.createDummyUser(email);
   userID = user.uuid;
   session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
   token = session.sessionToken;

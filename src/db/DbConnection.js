@@ -31,12 +31,12 @@ const connectionOptions: ConnectionOptions = {
   synchronize: true,  // switch back to !isProduction for release
   type: 'postgres',
   host: process.env.DB_HOST,
-  port: isProduction ? process.env.DB_PORT : 5432,
+  port: process.env.DB_PORT,
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   extra: {
-    ssl: isProduction,
+    ssl: Object.prototype.hasOwnProperty.call(process.env, 'DB_SSL'),
   },
   entities,
   migrations: [],
