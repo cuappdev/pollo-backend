@@ -96,15 +96,15 @@ export default class AppDevRouter<T: ResponseType> {
   response = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const content: T = await this.content(req);
-      res.json(new AppDevResponse(true, content));
+      await res.json(new AppDevResponse(true, content));
     } catch (e) {
       if (e.message === 1) {
         throw LogUtils.logErr('You must implement content()');
       } else {
-        res.json(new AppDevResponse(false, { errors: [e.message] }));
+        await res.json(new AppDevResponse(false, { errors: [e.message] }));
       }
     }
-  }
+  };
 
   async content(req: Request): Promise<T> {
     throw new Error(1);

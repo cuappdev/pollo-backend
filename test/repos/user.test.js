@@ -5,8 +5,8 @@ import AppDevUtils from '../../src/utils/AppDevUtils';
 
 let uuid;
 let uuid2;
-const googleID = AppDevUtils.randomCode(6);
-const googleID2 = AppDevUtils.randomCode(6);
+const email = AppDevUtils.randomCode(6);
+const email2 = AppDevUtils.randomCode(6);
 let group;
 let group2;
 
@@ -20,41 +20,38 @@ beforeAll(async () => {
 });
 
 test('Create User', async () => {
-  const user = await UsersRepo.createDummyUser(googleID);
-  expect(user.googleID).toBe(googleID);
+  const user = await UsersRepo.createDummyUser(email);
+  expect(user.email).toBe(email);
   expect(user.netID).toBe('');
   ({ uuid } = user);
 });
 
 test('Create User with Fields', async () => {
-  const netID = 'aa000@cornell.edu';
-  const user = await UsersRepo.createUserWithFields(googleID2, 'First', 'Last', netID);
-  expect(user.googleID).toBe(googleID2);
+  const user = await UsersRepo.createUserWithFields('First', 'Last', email2);
+  expect(user.email).toBe(email2);
   expect(user.firstName).toBe('First');
   expect(user.lastName).toBe('Last');
-  expect(user.email).toBe(netID);
-  expect(user.netID).toBe('aa000');
   uuid2 = user.uuid;
 });
 
 test('Get User by ID', async () => {
   const user = await UsersRepo.getUserByID(uuid);
   expect(user.uuid).toEqual(uuid);
-  expect(user.googleID).toBe(googleID);
+  expect(user.email).toBe(email);
 
   const user2 = await UsersRepo.getUserByID(uuid2);
   expect(user2.uuid).toEqual(uuid2);
-  expect(user2.googleID).toBe(googleID2);
+  expect(user2.email).toBe(email2);
 });
 
-test('Get User by googleID', async () => {
-  const user = await UsersRepo.getUserByGoogleID(googleID);
+test('Get User by email', async () => {
+  const user = await UsersRepo.getUserByEmail(email);
   expect(user.uuid).toEqual(uuid);
-  expect(user.googleID).toBe(googleID);
+  expect(user.email).toBe(email);
 
-  const user2 = await UsersRepo.getUserByGoogleID(googleID2);
+  const user2 = await UsersRepo.getUserByEmail(email2);
   expect(user2.uuid).toEqual(uuid2);
-  expect(user2.googleID).toBe(googleID2);
+  expect(user2.email).toBe(email2);
 });
 
 test('Get Users', async () => {
@@ -76,22 +73,6 @@ test('Get Users from IDs', async () => {
   expect(users[0].uuid).toBe(uuid);
 
   users = await UsersRepo.getUsersFromIDs([uuid, uuid2], [uuid, uuid2]);
-  expect(users.length).toEqual(0);
-});
-
-test('Get Users by googleID', async () => {
-  let users = await UsersRepo.getUsersByGoogleIDs([googleID]);
-  expect(users.length).toEqual(1);
-  expect(users[0].googleID).toBe(googleID);
-
-  users = await UsersRepo.getUsersByGoogleIDs([googleID, googleID2]);
-  expect(users.length).toEqual(2);
-
-  users = await UsersRepo.getUsersByGoogleIDs([googleID, googleID2], [googleID2]);
-  expect(users.length).toEqual(1);
-  expect(users[0].googleID).toBe(googleID);
-
-  users = await UsersRepo.getUsersByGoogleIDs([googleID, googleID2], [googleID, googleID2]);
   expect(users.length).toEqual(0);
 });
 

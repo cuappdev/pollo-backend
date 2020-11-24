@@ -37,7 +37,7 @@ npm test
 ````
 
 ### To access docs:
-API documentation can be found at
+API documentation with routes and entities can be found at
 ````
 /docs/
 ````

@@ -111,7 +111,7 @@ export default class GroupSocket {
       }
       case 'member': {
         // console.log(`User with id ${client.id} connected to socket`);
-        this._setupUserEvents(client, user.googleID);
+        this._setupUserEvents(client, user.uuid);
         client.join('members');
         if (this.current) {
           client.emit('user/poll/start', this._currentPoll(constants.USER_TYPES.MEMBER));
@@ -128,22 +128,22 @@ export default class GroupSocket {
     }
   };
 
-  _answerPoll(client: IOSocket, googleID: string, submittedAnswer: number): void {
+  _answerPoll(client: IOSocket, uuid: string, submittedAnswer: number): void {
     const poll = this.current;
     if (!poll) {
       // console.log(`Client ${client.id} tried to answer with no active poll`);
       return;
     }
 
-    if (poll.answers[googleID]) { // User selected something before
+    if (poll.answers[uuid]) { // User selected something before
       poll.answerChoices.forEach((p: PollResult) => {
-        if ((p.index !== null) && (p.count !== null) && p.index === poll.answers[googleID][0]) {
+        if ((p.index !== null) && (p.count !== null) && p.index === poll.answers[uuid][0]) {
           p.count -= 1;
         }
       });
     }
     // update/add response
-    poll.answers[googleID] = [submittedAnswer]; // only have one answer at a time
+    poll.answers[uuid] = [submittedAnswer]; // only have one answer at a time
     poll.answerChoices.forEach((p: PollResult) => {
       if ((p.index !== null) && (p.count !== null) && p.index === submittedAnswer) {
         p.count += 1;
@@ -166,11 +166,11 @@ export default class GroupSocket {
    *
    * @function
    * @param {IOSocket} client - Client's socket object
-   * @param {String} googleID
+   * @param {String} uuid
    */
-  _setupUserEvents(client: IOSocket, googleID: string): void {
+  _setupUserEvents(client: IOSocket, uuid: string): void {
     client.on('server/poll/answer', (submittedAnswer: number) => {
-      this._answerPoll(client, googleID, submittedAnswer);
+      this._answerPoll(client, uuid, submittedAnswer);
     });
 
     client.on('disconnect', async () => {

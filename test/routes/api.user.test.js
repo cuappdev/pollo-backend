@@ -8,7 +8,7 @@ const { get } = require('./lib');
 // Users
 // Must be running server to test
 
-const googleID = 'usertest';
+const email = 'usertest';
 let session;
 let user;
 let token;
@@ -19,7 +19,7 @@ beforeAll(async () => {
     console.log('Error connecting to database');
     process.exit();
   });
-  user = await UsersRepo.createDummyUser(googleID);
+  user = await UsersRepo.createDummyUser(email);
   session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
   token = session.sessionToken;
 });

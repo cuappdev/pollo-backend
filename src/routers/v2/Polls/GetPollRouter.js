@@ -34,9 +34,9 @@ class GetPollRouter extends AppDevRouter<APIPoll> {
       });
     }
 
-    const userAnswer = poll.answers[req.user.googleID];
+    const userAnswer = poll.answers[req.user.uuid];
     const answerObject: { string: number[]} = {};
-    answerObject[req.user.googleID] = userAnswer || [];
+    answerObject[req.user.uuid] = userAnswer || [];
 
     return {
       ...poll.serialize(),

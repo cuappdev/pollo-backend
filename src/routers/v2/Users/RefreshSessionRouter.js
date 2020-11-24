@@ -20,7 +20,7 @@ class RefreshTokenRouter extends AppDevRouter<APIUserSession> {
   }
 
   async content(req: Request) {
-    return req.session;
+    return req.userSession;
   }
 }
 

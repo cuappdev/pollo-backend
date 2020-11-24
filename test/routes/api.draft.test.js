@@ -18,7 +18,7 @@ beforeAll(async () => {
     console.log('Error connecting to database');
     process.exit();
   });
-  const user = await UsersRepo.createDummyUser('googleID');
+  const user = await UsersRepo.createDummyUser('email');
   userID = user.uuid;
   const session = await UserSessionsRepo.createOrUpdateSession(user, null, null);
   userToken = session.sessionToken;

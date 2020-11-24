@@ -44,7 +44,7 @@ test('Create Group', async () => {
   expect(group.name).toBe('Group');
   expect(group.code).toBe(code);
   expect(group.admins.length).toEqual(1);
-  expect(group.admins[0].googleID).toBe(user.googleID);
+  expect(group.admins[0].uuid).toBe(user.uuid);
   expect(group.members.length).toEqual(0);
 
   expect(group2.admins.length).toEqual(0);
@@ -75,7 +75,7 @@ test('Update Group', async () => {
 test('Get Admins from Group', async () => {
   const admins = await GroupsRepo.getUsersByGroupID(uuid, 'admin');
   expect(admins.length).toEqual(1);
-  expect(admins[0].googleID).toBe(user.googleID);
+  expect(admins[0].uuid).toBe(user.uuid);
 
   const admins2 = await GroupsRepo.getUsersByGroupID(uuid2, 'admin');
   expect(admins2.length).toEqual(0);
@@ -84,18 +84,18 @@ test('Get Admins from Group', async () => {
 test('Add Admin to Group by ID', async () => {
   const { admins } = await GroupsRepo.addUsersByIDs(uuid, [user2.uuid], 'admin');
   expect(admins.length).toEqual(2);
-  expect(admins[1].googleID).toBe(user2.googleID);
+  expect(admins[1].uuid).toBe(user2.uuid);
 
   const g = await GroupsRepo.addUsersByIDs(uuid2, [user3.uuid, user4.uuid], 'admin');
   expect(g.admins.length).toEqual(2);
-  expect(g.admins[0].googleID).toBe(user3.googleID);
-  expect(g.admins[1].googleID).toBe(user4.googleID);
+  expect(g.admins[0].uuid).toBe(user3.uuid);
+  expect(g.admins[1].uuid).toBe(user4.uuid);
 });
 
 test('Remove Admin from Group', async () => {
   const g = await GroupsRepo.removeUserByGroupID(uuid, [user2.uuid], 'admin');
   expect(g.admins.length).toEqual(1);
-  expect(g.admins[0].googleID).toBe(user.googleID);
+  expect(g.admins[0].uuid).toBe(user.uuid);
 
   expect(await GroupsRepo.isAdmin(uuid, user2)).toBe(false);
   expect(await GroupsRepo.isMember(uuid, user2)).toBe(false);
@@ -107,8 +107,8 @@ test('Remove Admin from Group', async () => {
   expect(g2.admins.length).toEqual(0);
 });
 
-test('Add Admin to Group by GoogleID', async () => {
-  const { admins } = (await GroupsRepo.addUsersByGoogleIDs(uuid, [user2.googleID], 'admin'));
+test('Add Admin to Group by id', async () => {
+  const { admins } = (await GroupsRepo.addUsersByIDs(uuid, [user2.uuid], 'admin'));
   expect(admins.length).toEqual(2);
   expect(admins[1].uuid).toBe(user2.uuid);
 
@@ -116,8 +116,8 @@ test('Add Admin to Group by GoogleID', async () => {
   expect(g.admins.length).toEqual(1);
   expect(g.uuid).toEqual(group.uuid);
 
-  const googleIDs = [user3.googleID, user4.googleID];
-  group2 = await GroupsRepo.addUsersByGoogleIDs(uuid2, googleIDs, 'admin');
+  const uuids = [user3.uuid, user4.uuid];
+  group2 = await GroupsRepo.addUsersByIDs(uuid2, uuids, 'admin');
   expect(group2.admins.length).toEqual(2);
   expect(group2.admins[0].uuid).toBe(user3.uuid);
   expect(group2.admins[1].uuid).toBe(user4.uuid);
@@ -127,24 +127,24 @@ test('Add Admin to Group by GoogleID', async () => {
   expect(group2.admins.length).toEqual(0);
 });
 
-test('Add Member to Group by GoogleID', async () => {
-  const { members } = (await GroupsRepo.addUsersByGoogleIDs(uuid, [user2.googleID], 'member'));
+test('Add Member to Group by id', async () => {
+  const { members } = (await GroupsRepo.addUsersByIDs(uuid, [user2.uuid], 'member'));
   expect(members.length).toEqual(1);
   expect(members[0].uuid).toBe(user2.uuid);
 
-  const g = await GroupsRepo.addUsersByGoogleIDs(uuid2, [user3.googleID, user4.googleID]);
+  const g = await GroupsRepo.addUsersByIDs(uuid2, [user3.uuid, user4.uuid]);
   expect(g.members.length).toEqual(2);
   expect(g.members[0].uuid).toBe(user3.uuid);
   expect(g.members[1].uuid).toBe(user4.uuid);
 });
 
 test('Get Members of Group', async () => {
-  await GroupsRepo.addUsersByGoogleIDs(uuid, [user2.googleID], 'member');
+  await GroupsRepo.addUsersByIDs(uuid, [user2.uuid], 'member');
   const members = await GroupsRepo.getUsersByGroupID(uuid, 'member');
   expect(members.length).toEqual(1);
-  expect(members[0].googleID).toBe(user2.googleID);
+  expect(members[0].uuid).toBe(user2.uuid);
 
-  await GroupsRepo.addUsersByGoogleIDs(uuid2, [user3.googleID, user4.googleID]);
+  await GroupsRepo.addUsersByIDs(uuid2, [user3.uuid, user4.uuid]);
   const members2 = await GroupsRepo.getUsersByGroupID(uuid2, 'member');
   const members2UUID = members2.map(member => member.uuid);
   expect(members2.length).toEqual(2);
@@ -153,15 +153,15 @@ test('Get Members of Group', async () => {
 });
 
 test('Get All Users of Group', async () => {
-  await GroupsRepo.addUsersByGoogleIDs(uuid, [user.googleID], 'admin');
-  await GroupsRepo.addUsersByGoogleIDs(uuid, [user2.googleID], 'member');
+  await GroupsRepo.addUsersByIDs(uuid, [user.uuid], 'admin');
+  await GroupsRepo.addUsersByIDs(uuid, [user2.uuid], 'member');
 
   const users = await GroupsRepo.getUsersByGroupID(uuid);
   expect(users.length).toEqual(2);
   expect(users[0].uuid).toBe(user.uuid);
   expect(users[1].uuid).toBe(user2.uuid);
 
-  await GroupsRepo.addUsersByGoogleIDs(uuid2, [user3.googleID, user4.googleID]);
+  await GroupsRepo.addUsersByIDs(uuid2, [user3.uuid, user4.uuid]);
 
   const users2 = await GroupsRepo.getUsersByGroupID(uuid2);
   expect(users2.length).toEqual(2);
@@ -181,7 +181,7 @@ test('Remove Member from Group', async () => {
 test('Add Members to Group by ID', async () => {
   let { members } = (await GroupsRepo.addUsersByIDs(uuid, [user2.uuid], 'member'));
   expect(members.length).toEqual(1);
-  expect(members[0].googleID).toBe(user2.googleID);
+  expect(members[0].uuid).toBe(user2.uuid);
 
   ({ members } = await GroupsRepo.addUsersByIDs(uuid, [user3.uuid, user4.uuid]));
   expect(members.length).toEqual(3);
