@@ -14,7 +14,7 @@ before_install:
   - psql --host=localhost -c 'CREATE DATABASE clicker;' -U postgres
 jobs:
   include:
-  - if: branch = jack/cornell-sso
+  - if: branch = master
     env:
     - NODE_IMAGE=pollo-dev
     - DOMAIN=pollo-dev.cornellappdev.com
@@ -40,4 +40,4 @@ deploy:
   skip_cleanup: true
   on:
     all_branches: true
-    condition: $TRAVIS_BRANCH =~ ^(jack/cornell-sso|release)$
+    condition: $TRAVIS_BRANCH =~ ^(master|release)$
