@@ -2,6 +2,8 @@
 import SocketIO from 'socket.io';
 import Group from './models/Group';
 import GroupSocket from './GroupSocket';
+import passport from 'passport';
+import UserSessionsRepo from './repos/UserSessionsRepo';
 
 /**
  * GroupManager is responsible for handling all socket groups
@@ -10,11 +12,28 @@ class GroupManager {
   /** All the groups currently running. */
   groupSockets: Array<GroupSocket> = [];
 
+  sessionMiddleware;
+
   /** The socket io server */
   io: SocketIO.Server;
 
-  constructor(server: SocketIO.Server) {
+  wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
+
+  constructor(server: SocketIO.Server, sessionMiddleware) {
     this.io = SocketIO(server);
+    this.sessionMiddleware = sessionMiddleware;
+    this.io.sockets.use(this.wrap(sessionMiddleware));
+    this.io.sockets.use(this.wrap(passport.initialize()));
+    this.io.sockets.use(this.wrap(passport.session()));
+    this.io.sockets.use(async (socket, next) => {
+      if (socket.request.user) {
+        next();
+      } else {
+        const user = await UserSessionsRepo.getUserFromToken(socket.handshake.query.accessToken);
+        if (user) socket.request.user = user;
+        next();
+      }
+    });
   }
 
   /**

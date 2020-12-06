@@ -13,7 +13,7 @@ type Error = {
 
 const app: API = new API();
 const server: http.Server = http.createServer(app.express);
-app.express.groupManager = new GroupManager(server);
+app.express.groupManager = new GroupManager(server, app.sessionMiddleware);
 const port: number = 3000;
 
 const onError = (error: Error): void => {

@@ -13,6 +13,12 @@ import AppDevUtils from './utils/AppDevUtils';
 class API {
   express: Express;
 
+  sessionMiddleware = session({
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.SESSION_SECRET,
+  });
+
   constructor() {
     this.express = express();
     this.middleware();
@@ -22,11 +28,7 @@ class API {
   middleware(): void {
     this.express.use(bodyParser.json());
     this.express.use(bodyParser.urlencoded({ extended: false }));
-    this.express.use(session({
-      resave: false,
-      saveUninitialized: false,
-      secret: process.env.SESSION_SECRET,
-    }));
+    this.express.use(this.sessionMiddleware);
 
     configurePassport(passport);
     this.express.use(passport.initialize());
