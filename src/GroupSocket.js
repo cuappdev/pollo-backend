@@ -82,7 +82,7 @@ export default class GroupSocket {
   }
 
   _clientError(client: IOSocket, msg: string): void {
-    // console.log(msg);
+    console.log(msg);
   }
 
   /**
@@ -91,11 +91,12 @@ export default class GroupSocket {
    * @param {IOSocket} client - The client object upon connection
    */
   _onConnect = async (client: IOSocket) => {
-    const user = await UserSessionsRepo.getUserFromToken(client.handshake.query.accessToken);
-    if (!user) {
+    if (!client.request.user) {
       this._clientError(client, 'Invalid accessToken: user does not exist');
       return;
     }
+
+    const { user } = client.request;
 
     const userType = (await GroupsRepo.isAdmin(this.group.uuid, user)) ? 'admin' : 'member';
 
