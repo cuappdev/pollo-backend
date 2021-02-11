@@ -9,6 +9,7 @@ import {
 import uuidv4 from 'uuid/v4';
 import Base from './Base';
 import Draft from './Draft';
+import DraftCollection from './DraftCollection';
 import Group from './Group';
 import appDevUtils from '../utils/AppDevUtils';
 

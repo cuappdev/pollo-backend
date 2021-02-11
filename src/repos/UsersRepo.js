@@ -6,6 +6,8 @@ import User from '../models/User';
 import appDevUtils from '../utils/AppDevUtils';
 import constants from '../utils/Constants';
 import LogUtils from '../utils/LogUtils';
+import DraftsRepo from './DraftsRepo';
+import DraftCollectionsRepo from './DraftCollectionsRepo';
 
 const db = (): Repository<User> => getRepository(User);
 

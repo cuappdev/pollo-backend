@@ -3,6 +3,7 @@ import { getRepository, Repository } from 'typeorm';
 import Draft from '../models/Draft';
 import User from '../models/User';
 import LogUtils from '../utils/LogUtils';
+import DraftCollectionsRepo from './DraftCollectionsRepo';
 
 const db = (): Repository<Draft> => getRepository(Draft);
 
@@ -101,10 +102,28 @@ const deleteDraft = async (id: string) => {
     const draft = await db().createQueryBuilder('drafts')
       .where('drafts.uuid = :draftID')
       .setParameters({ draftID: id })
+      .leftJoinAndSelect('drafts.draftCollection', 'draftCollection')
       .getOne();
+    if (draft.draftCollection) {
+      await DraftCollectionsRepo.removeDraftById(draft.draftCollection.uuid, draft.uuid);
+    }
     await db().remove(draft);
   } catch (e) {
     throw LogUtils.logErr(`Problem deleting draft by UUID: ${id}`, e);
+  }
+};
+
+/**
+ * Deletes all drafts owned by a certain user
+ * @function
+ * @param {string} id - UUID of user we want to delete drafts for
+ */
+const deleteDraftsByUserID = async (id: string) => {
+  try {
+    const drafts = await getDraftsByUser(id);
+    await Promise.all(drafts.map(async d => (deleteDraft(d.uuid))));
+  } catch (e) {
+    throw LogUtils.logErr('Problem deleting all drafts by User ID', { id });
   }
 };
 
@@ -132,6 +151,7 @@ export default {
   getDraftsByUser,
   updateDraft,
   deleteDraft,
+  deleteDraftsByUserID,
   getDraft,
   getOwnerByID,
 };
