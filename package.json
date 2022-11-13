@@ -52,7 +52,7 @@
     "request-promise-native": "^1.0.5",
     "serve-favicon": "^2.4.3",
     "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.10"
+    "webpack-cli": "^3.3.12"
   },
   "dependencies": {
     "acorn": "^6.1.1",
